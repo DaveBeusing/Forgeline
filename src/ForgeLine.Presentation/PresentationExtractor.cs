@@ -428,7 +428,7 @@ public sealed class PresentationExtractor : ISimulationTickObserver, IDecalVisib
                 if (entities.TryGetComponent(entity,out HealthState health) && health.Fraction<.7)
                     state=health.IsDepleted?"destroyed":health.Fraction<.25?"critical":"damaged";
                 conveyor=new(piece.Placement,state);
-                renderTransform=new(piece.Placement.Pivot,piece.Placement.Rotation,new Vector3(18));
+                renderTransform=new(piece.Placement.Pivot,piece.Placement.Rotation,new Vector3(18)*piece.Placement.LocalScale);
             }
             baseInstances[baseIndex++] =
                 new RenderInstance(

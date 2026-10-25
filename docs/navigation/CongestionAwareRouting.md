@@ -8,16 +8,18 @@ route-selection service. Existing gameplay still uses the original navigation
 pipeline. No route, movement transform, inventory, fuel balance, queue or dock
 reservation is changed by these components.
 
-The inspected master is `cdb60b1a926e770f25eb1ec350548bb00349ff49`, version
-`0.1.472-dev`. Navigation recovery [PR #354](https://github.com/DaveBeusing/Forgeline/pull/354)
+Initial master was `cdb60b1a926e770f25eb1ec350548bb00349ff49`, version
+`0.1.472-dev`. Publication was synchronized with current master
+`574040b1cde354bc1414a692e2ec075968e0959a`, version `0.1.473-dev`, after the
+conveyor changes in PR #357 landed. Navigation recovery [PR #354](https://github.com/DaveBeusing/Forgeline/pull/354)
 and adjacent technology/rescue [PR #350](https://github.com/DaveBeusing/Forgeline/pull/350)
 are already merged. Shared-contract [PR #356](https://github.com/DaveBeusing/Forgeline/pull/356),
 head `df9290ead9bd09b608a1720d992fac0163d8598a`, is still open at preparation.
 Its revision-1 search, snapshot, clearance and binding declarations are absent
 from master. They have not been copied, imported or redefined here.
 
-The independent work starts from master. Its single PATCH increment is 472 to
-473, not an allocation of the later integrated version. After the prerequisite
+The independent work starts from master. Its reconciled single PATCH increment is
+473 to 474, not an allocation of the later integrated version. After the prerequisite
 lands, synchronize this same branch with current master and reconcile exactly
 one PATCH again before integration. Do not start a competing implementation.
 

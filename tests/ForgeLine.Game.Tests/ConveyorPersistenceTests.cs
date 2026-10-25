@@ -34,6 +34,55 @@ public sealed class ConveyorPersistenceTests
     }
 
     [Fact]
+    public void AutomaticRouteBetweenFreelyPlacedBuildingsDeliversAndReplaysPaidAcceptedAndRejectedRequests()
+    {
+        using MatchRuntime runtime = CreateRuntime(seed: 4137);
+        _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 64));
+        EntityId destination = Build(runtime, BuildingIds.StorageDepot, new(145.25f, 0, 112.5f));
+        EntityId source = runtime.GetBase(Player).CommandCore;
+        IReadOnlyList<ConveyorBuildingPort> ports = ConveyorConstructionService.CapturePorts(
+            runtime.Simulation.Entities, Player);
+        ConveyorBuildingPort output = Assert.Single(ports, port => port.Building == source && !port.Input);
+        ConveyorBuildingPort input = Assert.Single(ports, port => port.Building == destination && port.Input);
+        var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
+            output.Position - Vector3.UnitY * 5.8f, input.Position - Vector3.UnitY * 5.8f,
+            BuildingOrientation.North, 0, true, SourcePortBuilding: source,
+            DestinationPortBuilding: destination, AutomaticRouting: true);
+
+        // The unchanged legacy request cannot connect this deliberately non-grid layout.
+        Assert.Equal(ConveyorFailure.PortMismatch, runtime.Services.Conveyors.Preview(
+            runtime.Simulation.Entities, Player, request with { AutomaticRouting = false }, source).Failure);
+        double steel = TotalSteel(runtime);
+        var rejected = new ConveyorConstructionCommand(runtime.Services.Conveyors, Player,
+            request with { DestinationPortBuilding = runtime.GetBase(new PlayerId(2)).CommandCore },
+            source, runtime.Simulation.CurrentTick);
+        Submit(runtime, rejected);
+        Assert.False(rejected.Accepted);
+        Assert.Equal(ConveyorFailure.PortMismatch, rejected.Result);
+        Assert.Empty(Pieces(runtime));
+        Assert.Equal(steel, TotalSteel(runtime), precision: 8);
+
+        ConveyorPlan plan = runtime.Services.Conveyors.Preview(
+            runtime.Simulation.Entities, Player, request, source);
+        Assert.True(plan.IsValid, plan.Failure.ToString());
+        ExecuteConveyor(runtime, request);
+        Assert.Equal(steel - plan.Steel, TotalSteel(runtime), precision: 8);
+        Assert.Contains(Carriers(runtime), row => row.Piece.Placement.SpanMeters > 0);
+        InventoryId destinationInventory = runtime.Simulation.Entities
+            .GetComponent<InventoryStorage>(destination).InventoryId;
+        RunUntil(runtime, match => match.Inventories.GetQuantity(destinationInventory, ResourceIds.Steel) > 0);
+        Assert.Equal(steel - plan.Steel, TotalSteel(runtime), precision: 8);
+
+        RecordedSimulationCommand[] recorded = runtime.Replay.CaptureCommands()
+            .Where(command => command.Kind == ReplayCommandKind.ConveyorConstruction).ToArray();
+        Assert.Equal(2, recorded.Length);
+        Assert.Equal(rejected.Request, recorded[0].ConveyorRequest);
+        Assert.Equal(request, recorded[1].ConveyorRequest);
+        Assert.All(recorded, command => Assert.True(command.ConveyorRequest.AutomaticRouting));
+        AssertRoundTripsAndContinues(runtime);
+    }
+
+    [Fact]
     public void RealImpactPaidRepairsAndRebuiltConnectionReconstructAtEveryCheckpoint()
     {
         using MatchRuntime runtime = CreateRuntime(seed: 9221);

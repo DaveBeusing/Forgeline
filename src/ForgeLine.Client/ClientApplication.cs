@@ -1651,7 +1651,8 @@ internal sealed class ClientApplication
                 MathF.Max(1.0f, camera.Distance * MathF.Tan(camera.Settings.VerticalFieldOfViewRadians * 0.5f) *
                     12.0f * interactionLayout.Scale / Math.Max(1, window.ClientSize.Height)),
                 informationLayer.OverlayMode,
-                RtsStrategicOverlayHudModel.IsCurrent(currentSnapshot, informationLayer.OverlayMode) ? currentSnapshot?.StrategicOverlay : null);
+                RtsStrategicOverlayHudModel.IsCurrent(currentSnapshot, informationLayer.OverlayMode) ? currentSnapshot?.StrategicOverlay : null,
+                camera.GetMatrices(Math.Max(1,window.ClientSize.Width),Math.Max(1,window.ClientSize.Height)).ViewProjection);
 
             BuildDevelopmentDebugOverlay(
                 debugDraw,
@@ -2207,7 +2208,8 @@ internal sealed class ClientApplication
         RtsCommandFeedback tacticalFeedback,
         float minimumMarkerRadius,
         StrategicOverlayMode strategicOverlayMode,
-        StrategicOverlaySnapshot? strategicOverlaySnapshot)
+        StrategicOverlaySnapshot? strategicOverlaySnapshot,
+        Matrix4x4 viewProjection)
     {
         gameplayDraw.Clear();
 
@@ -2258,7 +2260,9 @@ internal sealed class ClientApplication
         }
 
         buildingPlacementController.Conveyor.Draw(gameplayDraw);
-        ConveyorNetworkOverlay.Draw(gameplayDraw,renderWorld.CurrentSnapshot,selectionController.Selection.Entities,selectionController.HoveredEntity);
+        ConveyorNetworkOverlay.Draw(gameplayDraw,renderWorld.CurrentSnapshot,selectionController.Selection.Entities,
+            selectionController.HoveredEntity,showAllPorts:buildingPlacementController.Conveyor.IsActive,
+            viewProjection:viewProjection);
 
         if (strategicOverlayMode !=
                 StrategicOverlayMode.None &&

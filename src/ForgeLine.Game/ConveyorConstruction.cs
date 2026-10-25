@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json.Serialization;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -24,14 +25,20 @@ public readonly record struct ConveyorBuildRequest(
     ConveyorEdit Edit, ConveyorModule Module, Vector3 Start, Vector3 End,
     BuildingOrientation Orientation, int Tier, bool XFirst,
     EntityId Target = default, EntityId SourcePortBuilding = default,
-    EntityId DestinationPortBuilding = default);
+    EntityId DestinationPortBuilding = default,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool AutomaticRouting = false);
 public readonly record struct ConveyorSocket(Vector3 Position, Vector3 Facing, bool Input);
 public readonly record struct ConveyorPlacement(ConveyorModule Module, Vector3 Pivot,
-    BuildingOrientation Orientation, int Tier)
+    BuildingOrientation Orientation, int Tier,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] float SpanMeters = 0)
 {
     public bool IsSupport => Module is ConveyorModule.Support or ConveyorModule.RaisedSupport;
     public Quaternion Rotation => BuildingFootprint.GetRotation(Orientation);
-    public Vector3 Point(Vector3 local) => Pivot + Vector3.Transform(local, Rotation);
+    [JsonIgnore]
+    public Vector3 LocalScale => Module == ConveyorModule.ShortSegment && SpanMeters > 0
+        ? new(1, 1, SpanMeters / 4) : Vector3.One;
+    public Vector3 Point(Vector3 local) => Pivot + Vector3.Transform(
+        SpanMeters == 0 ? local : local * LocalScale, Rotation);
     public ConveyorSocket[] Sockets
     {
         get
@@ -259,6 +266,8 @@ public sealed class ConveyorConstructionService
         if (!entities.TryGetComponent(payer,out InventoryStorage storage) || !_stock.Contains(storage.InventoryId) ||
             !entities.TryGetComponent(payer,out ControllableEntity sourceOwner) || sourceOwner.Owner!=owner ||
             !entities.HasComponent<CompletedBuilding>(payer)) return Fail(ConveyorFailure.InvalidSource);
+        if (request.AutomaticRouting && request.Edit == ConveyorEdit.Build && request.Module == ConveyorModule.Route)
+            return PreviewAutomatic(entities, owner, request, storage);
         ConveyorPiece old=default;
         if (request.Edit!=ConveyorEdit.Build)
         {
@@ -369,8 +378,141 @@ public sealed class ConveyorConstructionService
             }
             else
             pieces.Add(new(module,module is ConveyorModule.Support or ConveyorModule.RaisedSupport?
-                start with {Y=ground}:start,request.Orientation,module==ConveyorModule.RaisedSupport?1:request.Tier));
+                start with {Y=ground}:start,request.Orientation,module==ConveyorModule.RaisedSupport?1:request.Tier,
+                SpanMeters:request.Edit==ConveyorEdit.Replace && module==old.Placement.Module?old.Placement.SpanMeters:0));
         }
+        return CompletePlan(entities, owner, request, storage, pieces, ground, old, existingPieces);
+
+        void Straight(Vector3 a,Vector3 b)
+        {
+            float distance=Vector3.Distance(a,b); if (distance<.1f)return;
+            Vector3 direction=Vector3.Normalize(b-a);
+            while(distance>1)
+            {
+                float span=distance>=8?8:4;
+                pieces.Add(new(span==8?ConveyorModule.Standard:ConveyorModule.ShortSegment,a+direction*(span/2),ConveyorGeometry.Facing(direction),request.Tier));
+                a+=direction*span;distance-=span;
+            }
+        }
+    }
+
+    private ConveyorPlan PreviewAutomatic(EntityRegistry entities, PlayerId owner,
+        ConveyorBuildRequest request, InventoryStorage storage)
+    {
+        ConveyorPlan Fail(ConveyorFailure failure) => new(failure, Array.Empty<ConveyorPlacement>(), 0);
+        if (request.Target.IsValid) return Fail(ConveyorFailure.InvalidRequest);
+        IReadOnlyList<ConveyorBuildingPort> ports = CapturePorts(entities, owner);
+        IReadOnlyList<ConveyorOwnedPiece> existing = Capture(entities, owner);
+        Vector3 start = request.Start, end = request.End;
+        Vector3? departure = null, arrival = null;
+        ConveyorBuildingPort? sourcePort = null, destinationPort = null;
+        bool startSocket = false, endSocket = false;
+
+        if (request.SourcePortBuilding.IsValid)
+        {
+            ConveyorBuildingPort port = ports.FirstOrDefault(port =>
+                port.Building == request.SourcePortBuilding && !port.Input);
+            if (!port.Building.IsValid || request.Tier != 0 ||
+                Vector3.DistanceSquared(port.Position, start + Vector3.UnitY * 5.8f) >= .0004f)
+                return Fail(ConveyorFailure.PortMismatch);
+            sourcePort = port;
+            departure = Cardinal(port.Facing);
+        }
+        else if (!ResolveSocket(start, false, out startSocket, out departure))
+            return Fail(ConveyorFailure.PortMismatch);
+
+        if (request.DestinationPortBuilding.IsValid)
+        {
+            ConveyorBuildingPort port = ports.FirstOrDefault(port =>
+                port.Building == request.DestinationPortBuilding && port.Input);
+            if (!port.Building.IsValid || request.Tier != 0 ||
+                Vector3.DistanceSquared(port.Position, end + Vector3.UnitY * 5.8f) >= .0004f)
+                return Fail(ConveyorFailure.PortMismatch);
+            destinationPort = port;
+            arrival = Cardinal(-port.Facing);
+        }
+        else if (!ResolveSocket(end, true, out endSocket, out arrival))
+            return Fail(ConveyorFailure.PortMismatch);
+
+        if (sourcePort is null && !startSocket) start = ConveyorGeometry.Snap(start);
+        if (destinationPort is null && !endSocket) end = start + ConveyorGeometry.Snap(end - start);
+        if (!_terrain.TrySampleHeight(start.X, start.Z, out float ground)) return Fail(ConveyorFailure.Terrain);
+        if (sourcePort is not null || startSocket) ground = start.Y - request.Tier * 2;
+        if ((destinationPort is not null || endSocket) && MathF.Abs(end.Y - ground - request.Tier * 2) > .02f)
+            return Fail(ConveyorFailure.PortMismatch);
+        start.Y = ground + request.Tier * 2;
+        end.Y = start.Y;
+
+        ConveyorPlacement? sourceAdapter = null, destinationAdapter = null;
+        if (sourcePort is { } output)
+        {
+            sourceAdapter = new(ConveyorModule.InputAdapter, start + output.Facing * 2,
+                ConveyorGeometry.Facing(output.Facing), request.Tier);
+            start = sourceAdapter.Value.Sockets[^1].Position - Vector3.UnitY * 5.8f;
+        }
+        if (destinationPort is { } input)
+        {
+            destinationAdapter = new(ConveyorModule.OutputAdapter, end + input.Facing * 2,
+                ConveyorGeometry.Facing(-input.Facing), request.Tier);
+            end = destinationAdapter.Value.Sockets[0].Position - Vector3.UnitY * 5.8f;
+        }
+        float adapterLength = (sourceAdapter.HasValue ? 4 : 0) + (destinationAdapter.HasValue ? 4 : 0);
+        if (MathF.Abs(end.X - start.X) + MathF.Abs(end.Z - start.Z) + adapterLength > 256)
+            return Fail(ConveyorFailure.RouteTooLong);
+        var candidates = ConveyorAutomaticRouter.CreateCandidates(start, end, departure, arrival,
+            request.Tier, request.XFirst, 256 - adapterLength);
+        ConveyorPlan? firstFailure = null, affordableFailure = null;
+        foreach (ConveyorRouteCandidate candidate in candidates)
+        {
+            if (candidate.LengthMeters + adapterLength < 4 - .001f) continue;
+            var pieces = new List<ConveyorPlacement>();
+            if (sourceAdapter.HasValue) pieces.Add(sourceAdapter.Value);
+            pieces.AddRange(candidate.Pieces);
+            if (destinationAdapter.HasValue) pieces.Add(destinationAdapter.Value);
+            if (pieces.Count == 0 || !ConveyorAutomaticRouter.IsConnected(pieces) ||
+                ConveyorAutomaticRouter.HasSelfIntersection(pieces)) continue;
+            ConveyorPlan plan = CompletePlan(entities, owner, request, storage, pieces, ground, default, existing);
+            if (plan.IsValid) return plan;
+            firstFailure ??= plan;
+            if (plan.Failure == ConveyorFailure.InsufficientStock) affordableFailure ??= plan;
+        }
+        return affordableFailure ?? firstFailure ?? Fail(ConveyorFailure.PortMismatch);
+
+        bool ResolveSocket(Vector3 point, bool input, out bool found, out Vector3? direction)
+        {
+            found = false;
+            direction = null;
+            foreach (ConveyorOwnedPiece row in existing)
+            {
+                if (row.Status == ConveyorLinkStatus.Destroyed) continue;
+                foreach (ConveyorSocket socket in row.Piece.Placement.Sockets)
+                {
+                    if (socket.Input != input ||
+                        Vector3.DistanceSquared(socket.Position, point + Vector3.UnitY * 5.8f) >= .0004f) continue;
+                    if (found) return false;
+                    found = true;
+                    direction = Cardinal(input ? -socket.Facing : socket.Facing);
+                }
+            }
+            return true;
+        }
+
+        static Vector3 Cardinal(Vector3 direction) => MathF.Abs(direction.X) > MathF.Abs(direction.Z)
+            ? direction.X > 0 ? Vector3.UnitX : -Vector3.UnitX
+            : direction.Z > 0 ? Vector3.UnitZ : -Vector3.UnitZ;
+    }
+
+    private ConveyorPlan CompletePlan(EntityRegistry entities, PlayerId owner,
+        ConveyorBuildRequest request, InventoryStorage storage, List<ConveyorPlacement> pieces,
+        float ground, ConveyorPiece old, IReadOnlyList<ConveyorOwnedPiece> existingPieces)
+    {
+        ConveyorPlan Fail(ConveyorFailure failure, double cost = 0) =>
+            new(failure, Array.AsReadOnly(pieces.ToArray()), cost);
+        if (pieces.Any(piece => !float.IsFinite(piece.SpanMeters) || piece.SpanMeters != 0 &&
+            (piece.Module != ConveyorModule.ShortSegment ||
+             piece.SpanMeters < ConveyorAutomaticRouter.MinimumSpanMeters || piece.SpanMeters > 4)))
+            return Fail(ConveyorFailure.InvalidRequest);
+        IReadOnlyList<ConveyorBuildingPort> ports = CapturePorts(entities, owner);
         // Real supports at carrier ends, never a ground-blocking span AABB.
         foreach (ConveyorPlacement part in pieces.ToArray())
         {
@@ -380,7 +522,7 @@ public sealed class ConveyorConstructionService
                 Vector3 p=socket.Position-Vector3.UnitY*5.8f;
                 int tier=(int)MathF.Round((p.Y-ground)/2);
                 Vector3 foot=new(p.X,ground,p.Z);
-                if(CapturePorts(entities,owner).Any(port=>
+                if(ports.Any(port=>
                     (port.Building==request.SourcePortBuilding || port.Building==request.DestinationPortBuilding) &&
                     Vector3.DistanceSquared(port.Position,socket.Position)<.0004f))continue;
                 if (pieces.Any(v=>v.IsSupport && Vector3.DistanceSquared(v.Pivot,foot)<.01f)) continue;
@@ -468,24 +610,13 @@ public sealed class ConveyorConstructionService
             foot.Bounds.Maximum.Y>=carrier.Bounds.Minimum.Y-.03f && foot.Bounds.Maximum.Y<=carrier.Bounds.Maximum.Y &&
             Vector2.Distance(new(foot.Pivot.X,foot.Pivot.Z),new(carrier.Bounds.Center.X,carrier.Bounds.Center.Z))<=8;
 
-        void Straight(Vector3 a,Vector3 b)
-        {
-            float distance=Vector3.Distance(a,b); if (distance<.1f)return;
-            Vector3 direction=Vector3.Normalize(b-a);
-            while(distance>1)
-            {
-                float span=distance>=8?8:4;
-                pieces.Add(new(span==8?ConveyorModule.Standard:ConveyorModule.ShortSegment,a+direction*(span/2),ConveyorGeometry.Facing(direction),request.Tier));
-                a+=direction*span;distance-=span;
-            }
-        }
         bool PortMatches(EntityId building,bool input,bool first)
         {
             if (!building.IsValid) return true;
             var carriers=pieces.Where(p=>!p.IsSupport).ToArray();
             if(carriers.Length==0)return false;
             ConveyorSocket socket=first?carriers[0].Sockets[0]:carriers[^1].Sockets[^1];
-            return CapturePorts(entities,owner).Any(port=>port.Building==building && port.Input==input &&
+            return ports.Any(port=>port.Building==building && port.Input==input &&
                 Vector3.DistanceSquared(port.Position,socket.Position)<.0004f &&
                 Vector3.Dot(port.Facing,socket.Facing)<-.999f);
         }
@@ -587,7 +718,7 @@ public sealed class ConveyorConstructionService
             foreach(ConveyorPlacement part in plan.Pieces)
             {
                 EntityId e=context.Entities.CreateEntity();
-                var transform=new WorldTransform(part.Bounds.Center,part.Rotation,new Vector3(18));
+                var transform=new WorldTransform(part.Bounds.Center,part.Rotation,new Vector3(18) * part.LocalScale);
                 var presence=new SpatialPresence((part.Bounds.Maximum-part.Bounds.Minimum)/2,
                     new SpatialEntryMetadata(owner.Value,(ulong)ControllableEntityCategory.Logistics,SpatialMobility.Static));
                 EntityId attachment=part.Module==ConveyorModule.InputAdapter?request.SourcePortBuilding:
