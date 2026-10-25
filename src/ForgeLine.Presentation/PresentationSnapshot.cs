@@ -8,6 +8,8 @@ public sealed class PresentationSnapshot
 {
     private readonly RenderInstance[] _instances;
 
+    public NavigationDiagnosticSnapshot? NavigationDiagnosis { get; init; }
+
     public PresentationSnapshot(
         SimulationTick tick,
         TimeSpan tickDuration,

@@ -14,6 +14,9 @@ internal static class Program
         long processEntryTimestamp = Stopwatch.GetTimestamp();
         if (args.Length == 1 && args[0] == "--validate-scenarios")
             return ValidateScenarios();
+        if (args.Length == 4 && args[0] == "--navigation-diagnostics-capture" &&
+            args[3] == "--developer-navigation-diagnostics")
+            return RunNavigationDiagnosticsCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")
@@ -42,6 +45,9 @@ internal static class Program
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunNavigationDiagnosticsCapture(string output, string runtimeRoot) => NavigationDiagnosticsCapture.Run(output, runtimeRoot);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int ValidateScenarios() => ScenarioPackageValidation.Run();

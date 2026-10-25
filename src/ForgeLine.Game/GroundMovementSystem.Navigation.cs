@@ -18,6 +18,21 @@ public sealed partial class GroundMovementSystem
     internal LogisticsNavigationCheckpoint CaptureNavigationState() =>
         _navigationControl?.CaptureState() ?? throw new InvalidOperationException("Navigation motion is not connected.");
 
+    public void SetNavigationDiagnosticObservations(bool enabled)
+    {
+        if (_navigationControl is { } coordinator) coordinator.SetDiagnosticObservations(enabled);
+    }
+
+    /// <summary>Simulation-thread, viewer-scoped copied diagnostics. Never executes a query or command.</summary>
+    public NavigationDiagnosticSnapshot? CaptureNavigationDiagnostics(MatchRuntime runtime, SimulationContext context,
+        PlayerId viewer, ReadOnlySpan<ForgeLine.Core.EntityId> visible)
+    {
+        ArgumentNullException.ThrowIfNull(runtime);
+        ArgumentNullException.ThrowIfNull(context);
+        if (!ReferenceEquals(runtime.Services.GroundMovement, this)) return null;
+        return _navigationControl?.CaptureDiagnostics(runtime, context, viewer, visible);
+    }
+
     private bool ApproveLegacyPose(SimulationContext context, EntityId entity, in WorldTransform start,
         in WorldTransform end, in GroundMovementState state, in GroundMovement movement, in MovementOrder order)
     {

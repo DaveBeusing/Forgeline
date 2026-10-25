@@ -430,6 +430,7 @@ internal sealed class ClientApplication
             new RtsMinimapInteractionController();
         var debugOverlay =
             new DebugOverlayController();
+        var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperNavigationDiagnostics);
         var gameplayDraw =
             new DebugDraw();
         var debugDraw =
@@ -1646,6 +1647,20 @@ internal sealed class ClientApplication
                 tacticalTargetingController.CreateView(
                     currentSnapshot);
 
+            NavigationDiagnosticsView navigationView = navigationDiagnostics.Update(
+                window.IsFocused && !window.IsMinimized && !simulationPaused && !modalFrame && !operationsController.View.Open,
+                inputState.WasKeyPressedWithShift(PlatformKey.F10),
+                inputState.WasKeyPressedWithShift(PlatformKey.F11),
+                inputState.WasKeyPressedWithShift(PlatformKey.F12),
+                snapshotBuffer, simulationHost.SessionId, selectionController.Selection.Entities, LocalPlayer,
+                scenario.Battlefield.Metadata.Key, scenario.RuntimeSettings.Seed,
+                nextLayer: inputState.WasKeyPressed(PlatformKey.F11) && !inputState.WasKeyPressedWithShift(PlatformKey.F11),
+                clearLayers: inputState.WasKeyPressed(PlatformKey.F11) &&
+                    (inputState.IsKeyDown(PlatformKey.LeftControl) || inputState.IsKeyDown(PlatformKey.RightControl)),
+                scrollDelta: inputState.WasKeyPressed(PlatformKey.F10) && !inputState.WasKeyPressedWithShift(PlatformKey.F10)
+                    ? inputState.IsKeyDown(PlatformKey.LeftControl) || inputState.IsKeyDown(PlatformKey.RightControl) ? -1 : 1 : 0);
+            presentationInteraction.SetNavigationDiagnosticsOpen(navigationView.Visible);
+
             RtsCameraState publicationCamera = camera.CaptureState();
             bool publishVisualFrame = renderHost.NeedsFramePublication || receivedInput ||
                 publicationCamera != lastPublishedCamera || currentDisplay != lastPublishedDisplay ||
@@ -1678,6 +1693,7 @@ internal sealed class ClientApplication
                     camera,
                     currentSnapshot?.Construction,
                     currentSnapshot?.Debug);
+                NavigationDiagnosticsViewModel.AppendLayers(debugDraw, currentSnapshot, navigationView);
             }
 
             CombatGroupOverviewView combatGroupOverview = publishVisualFrame
@@ -1792,7 +1808,7 @@ internal sealed class ClientApplication
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
-                    NotificationExpansion: alertController.Expansion),
+                    NotificationExpansion: alertController.Expansion, NavigationDiagnostics: navigationView),
                     gameplayDraw, debugDraw, selectionController.Selection.Entities);
                 lastPublishedCamera = publicationCamera;
                 lastPublishedSnapshot = currentSnapshot;

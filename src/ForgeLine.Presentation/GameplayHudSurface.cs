@@ -37,7 +37,7 @@ public readonly record struct GameplayHudRenderContext(
     TimeSpan PresentationTime = default,
     bool AnimateNotifications = false,
     bool AnimateOperations = false,
-    NotificationExpansion NotificationExpansion = default);
+    NotificationExpansion NotificationExpansion = default, NavigationDiagnosticsView NavigationDiagnostics = default);
 
 public interface IGameplayHudSurface : IDisposable
 {

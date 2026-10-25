@@ -15,6 +15,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         var proposals = new NavigationMotionProposal[candidates.Length];
         var current = new int[candidates.Length];
         var used = new int[candidates.Length];
+        var horizons = DiagnosticObservationsEnabled ? new NavigationCheckedHorizon?[candidates.Length] : null;
         for (int i = 0; i < candidates.Length; i++)
         {
             var candidate = candidates[i];
@@ -48,7 +49,8 @@ internal sealed partial class LogisticsNavigationCoordinator
             else
             {
                 proposal = _motion.ProposeCore(input, collision, _geometry!, Limits.WorkPerTick - consumed,
-                    out int work, out _, out current[i], out used[i]);
+                    out int work, out _, out current[i], out used[i], out var horizon, DiagnosticObservationsEnabled);
+                if (horizons is not null) horizons[i] = horizon;
                 consumed += work;
             }
             inputs[i] = input;
@@ -71,7 +73,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         if (proposals.All(static p => p.Start == p.End))
         {
             var stationary = new NavigationApprovedMotion[candidates.Length];
-            for (int i = 0; i < stationary.Length; i++) stationary[i] = new(inputs[i], proposals[i], current[i], used[i]);
+            for (int i = 0; i < stationary.Length; i++) stationary[i] = new(inputs[i], proposals[i], current[i], used[i], horizons?[i]);
             bool complete = proposals.All(static p => p.Availability == NavigationModuleAvailability.Available);
             return new(Array.AsReadOnly(stationary), complete, consumed,
                 complete ? NavigationBlockReason.None : proposals.First(static p => p.Availability != NavigationModuleAvailability.Available).Reason);
@@ -87,7 +89,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         {
             var final = proposals[i].Availability != NavigationModuleAvailability.Available && proposals[i].Start == proposals[i].End
                 ? proposals[i] : arbitration.Proposals[i];
-            motions[i] = new(inputs[i], final, current[i], used[i]);
+            motions[i] = new(inputs[i], final, current[i], used[i], horizons?[i]);
         }
         return new(Array.AsReadOnly(motions), arbitration.Complete, consumed,
             arbitration.Complete ? NavigationBlockReason.None : NavigationBlockReason.SearchWork);

@@ -12,7 +12,7 @@ namespace ForgeLine.Client;
 /// actual single selection and matching map/seed immediately before each request.
 /// This helper cannot establish freshness or authorization for its caller.
 /// </summary>
-internal static class NavigationDiagnosticReportEncoder
+internal static partial class NavigationDiagnosticReportEncoder
 {
     internal const int MaximumReportBytes = 64 * 1024;
     private const int MaximumMapIdCharacters = 128;
@@ -59,6 +59,10 @@ internal static class NavigationDiagnosticReportEncoder
         // Tactical.SelectedEntities is the copied owned selection. Its rejected
         // count concerns combat eligibility and can legitimately include trucks.
         bool hasQueue = TryReadQueue(snapshot, viewer, selection, actions, cargoTruck, out PlayerVehicleQueueSummary queue);
+        bool connected = NavigationDiagnosticsViewModel.TryGetVehicle(snapshot,
+            new NavigationDiagnosticsView(true, false, expectedSession, selectedEntity), out var detail);
+        if (snapshot.NavigationDiagnosis is not null && !connected) return false;
+
 
         // No report buffer or vehicle strings are allocated before selection validation.
         // The non-expandable stream is a hard byte limit, including JSON escaping.
@@ -68,9 +72,9 @@ internal static class NavigationDiagnosticReportEncoder
             stream.SetLength(0);
             using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
             writer.WriteStartObject();
-            writer.WriteNumber("reportSchemaVersion", 1);
-            writer.WriteString("reportKind", "logistics_navigation_partial_observation");
-            writer.WriteString("coverage", "owned_selection_and_queue_only");
+            writer.WriteNumber("reportSchemaVersion", connected ? 2 : 1);
+            writer.WriteString("reportKind", connected ? "logistics_navigation_observation" : "logistics_navigation_partial_observation");
+            writer.WriteString("coverage", connected ? "current_visible_owned_vehicle" : "owned_selection_and_queue_only");
             writer.WriteStartObject("build");
             WriteBoundedString(writer, "informationalVersion", ClientBuildIdentity.InformationalVersion);
             WriteBoundedString(writer, "sourceRevision", ClientBuildIdentity.SourceRevision);
@@ -82,9 +86,19 @@ internal static class NavigationDiagnosticReportEncoder
             writer.WriteNumber("sessionId", expectedSession.Value);
             writer.WriteNumber("sourceTick", expectedTick.Value);
             writer.WriteNumber("viewer", viewer.Value);
+            if (connected)
+            {
+                var source = snapshot.NavigationDiagnosis!;
+                WriteCurrent(writer, "diagnosticContractRevision", ForgeLine.Navigation.NavigationIntegrationContract.Revision, source);
+                WriteCurrent(writer, "activeModules", source.Modules, source);
+                WriteCurrent(writer, "configuredLimits", source.Limits, source);
+            }
+            else
+            {
             WriteUnavailable(writer, "diagnosticContractRevision", MissingNavigationObservation);
             WriteUnavailable(writer, "activeModules", MissingNavigationObservation);
             WriteUnavailable(writer, "configuredLimits", MissingNavigationObservation);
+            }
 
             writer.WriteStartObject("selectedVehicle");
             writer.WriteString("availability", "available");
@@ -102,6 +116,9 @@ internal static class NavigationDiagnosticReportEncoder
                 WriteUnavailable(writer, "queue", "current_authorized_queue_observation_not_available");
             }
 
+            if (connected) WriteCurrentVehicle(writer, detail, snapshot.NavigationDiagnosis!);
+            else
+            {
             WriteUnavailable(writer, "originalTarget", MissingNavigationObservation);
             WriteUnavailable(writer, "route", MissingNavigationObservation);
             WriteUnavailable(writer, "approachPhase", MissingNavigationObservation);
@@ -116,8 +133,21 @@ internal static class NavigationDiagnosticReportEncoder
             WriteUnavailable(writer, "waitAgeTicks", "queue_change_tick_is_not_wait_start");
             WriteUnavailable(writer, "replanReason", MissingNavigationObservation);
             WriteUnavailable(writer, "fuelRestriction", "fuel_presence_observation_not_available");
+
+            }
             writer.WriteEndObject();
 
+            if (connected)
+            {
+                var source = snapshot.NavigationDiagnosis!;
+                WriteCurrent(writer, "visibleOwnedFleet", new {
+                    Vehicles = source.Vehicles.Count,
+                    Waiting = source.Vehicles.Count(v => v.Facts.TrafficAction is ForgeLine.Game.NavigationTrafficAction.Hold or ForgeLine.Game.NavigationTrafficAction.Yield or ForgeLine.Game.NavigationTrafficAction.Brake),
+                    PendingRequests = source.Vehicles.Count(v => v.Facts.SearchStatus == ForgeLine.Navigation.NavigationSearchStatus.Pending),
+                    MaximumObservedWaitTicks = source.Vehicles.Max(v => v.Facts.WaitAgeTicks),
+                    CurrentActorReplans = source.Vehicles.Sum(v => (decimal)(v.Facts.Replans ?? 0))
+                }, source);
+            }
             writer.WriteStartObject("fleet");
             WriteUnavailable(writer, "waitingSearches", MissingNavigationObservation);
             WriteUnavailable(writer, "activeSearches", MissingNavigationObservation);
@@ -127,17 +157,33 @@ internal static class NavigationDiagnosticReportEncoder
             WriteUnavailable(writer, "cacheBytes", MissingNavigationObservation);
             WriteUnavailable(writer, "activeWorkspaces", MissingNavigationObservation);
             WriteUnavailable(writer, "regionalUpdates", MissingNavigationObservation);
-            WriteUnavailable(writer, "completedDeliveries", "authoritative_delivery_observation_not_available");
+            if (connected) WriteCurrent(writer, "completedDeliveries", snapshot.NavigationDiagnosis!.CompletedDeliveries, snapshot.NavigationDiagnosis!);
+            else WriteUnavailable(writer, "completedDeliveries", "authoritative_delivery_observation_not_available");
             WriteUnavailable(writer, "replans", MissingNavigationObservation);
             writer.WriteEndObject();
 
             writer.WriteStartObject("geometry");
+            if (connected)
+            {
+                var source = snapshot.NavigationDiagnosis!;
+                WriteUnavailable(writer, "drivingCorridor", "footprint_routing_module_not_connected");
+                WriteCurrent(writer, "orientedVehicleHull", new { detail.Facts.Pose, detail.Facts.Profile.HalfExtents }, source);
+                WriteCurrent(writer, "grantedBrakingLookahead", detail.Facts.CheckedHorizon, source);
+                WriteCurrent(writer, "observedConflict", detail.Facts.Conflict, source);
+                if (detail.CompleteReservations) WriteCurrent(writer, "reservedPassage", detail.ReservedPassages, source);
+                else WriteUnavailable(writer, "reservedPassage", "current_reservation_scope_or_tick_unavailable");
+                WriteUnavailable(writer, "dirtyRegions", "regional_update_module_not_connected");
+            }
+            else
+            {
             WriteUnavailable(writer, "drivingCorridor", MissingNavigationObservation);
             WriteUnavailable(writer, "orientedVehicleHull", MissingNavigationObservation);
             WriteUnavailable(writer, "grantedBrakingLookahead", MissingNavigationObservation);
             WriteUnavailable(writer, "observedConflict", MissingNavigationObservation);
             WriteUnavailable(writer, "reservedPassage", MissingNavigationObservation);
             WriteUnavailable(writer, "dirtyRegions", MissingNavigationObservation);
+
+            }
             writer.WriteEndObject();
             WriteUnavailable(writer, "gameplayTimingWindow", "optional_instrumentation_not_connected");
             WriteUnavailable(writer, "gameplayAllocationWindow", "optional_instrumentation_not_connected");
@@ -179,7 +225,7 @@ internal static class NavigationDiagnosticReportEncoder
             }
 
             if (found || !instance.Selectable.IsSelectable || instance.Selectable.Owner != viewer ||
-                (instance.Selectable.Category & ControllableEntityCategory.Unit) == 0 ||
+                (instance.Selectable.Category & (ControllableEntityCategory.Unit | ControllableEntityCategory.Logistics)) == 0 ||
                 (instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 instance.UnitFeature.Unit != unit || instance.UnitFeature.IsWreck)
             {

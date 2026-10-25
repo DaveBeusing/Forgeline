@@ -131,7 +131,7 @@ internal readonly record struct ClientRenderFrame(
     bool MetricsActive = true,
     HoverTooltipView HoverTooltip = default,
     OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default,
-    NotificationExpansion NotificationExpansion = default);
+    NotificationExpansion NotificationExpansion = default, NavigationDiagnosticsView NavigationDiagnostics = default);
 
 internal sealed class ClientRenderHost : IDisposable
 {
@@ -802,7 +802,7 @@ internal sealed class ClientRenderHost : IDisposable
                             animateOperations: current.MetricsActive && !current.SurfaceSuspended &&
                                 current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
                                 current.FeedbackSettings.Animate(qualityProfile.Active),
-                            notificationExpansion: current.NotificationExpansion);
+                            notificationExpansion: current.NotificationExpansion, navigationDiagnostics: current.NavigationDiagnostics);
                         developmentOverlayRenderer.Render(
                             context,
                             overlayMetrics,

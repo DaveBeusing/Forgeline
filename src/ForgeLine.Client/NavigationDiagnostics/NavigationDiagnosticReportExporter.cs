@@ -21,7 +21,7 @@ internal readonly record struct NavigationDiagnosticExportResult(
 }
 
 /// <summary>
-/// Unregistered single-report output for a future authorized developer host.
+/// Bounded single-report output for an explicitly authorized developer action.
 /// The caller must authorize each explicit export action and supply the latest
 /// copied snapshot, current selection and matching session metadata. Overlay
 /// visibility is not authorization. This helper cannot inspect live simulation.
@@ -51,7 +51,14 @@ internal static class NavigationDiagnosticReportExporter
         }
 
         string directory = System.IO.Path.Combine(localData, "FORGELINE", "Diagnostics");
-        string fileId = Guid.NewGuid().ToString("N");
+        return WriteReport(directory, report);
+    }
+
+    internal static NavigationDiagnosticExportResult WriteReport(string directory, byte[] report, Guid? identity = null)
+    {
+        if (report.Length == 0 || report.Length > NavigationDiagnosticReportEncoder.MaximumReportBytes)
+            return new(null, NavigationDiagnosticExportFailure.ObservationUnavailable);
+        string fileId = (identity ?? Guid.NewGuid()).ToString("N");
         string temporaryPath = System.IO.Path.Combine(directory, $".navigation-{fileId}.tmp");
         string reportPath = System.IO.Path.Combine(directory, $"navigation-{fileId}.json");
         bool ownsTemporaryFile = false;

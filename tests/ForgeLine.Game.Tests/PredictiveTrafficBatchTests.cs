@@ -7,7 +7,7 @@ using Xunit;
 
 namespace ForgeLine.Game.Tests;
 
-public sealed class PredictiveTrafficBatchTests
+public sealed partial class PredictiveTrafficBatchTests
 {
     [Theory]
     [InlineData(1, false, true)]
