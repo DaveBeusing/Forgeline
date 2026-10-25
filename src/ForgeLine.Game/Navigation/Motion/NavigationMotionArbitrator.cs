@@ -97,7 +97,7 @@ internal sealed class NavigationMotionArbitrator
             originals.Add(body.Identity, body);
         }
         var stationary = new NavigationCollisionFrame(collision.World, collision.Tick, collision.Coverage,
-            true, stationaryBodies, _maximumBodies);
+            true, stationaryBodies, _maximumBodies, bodyPosesAreFixed: true);
         float delta = inputs.IsEmpty ? 0 : inputs[0].DeltaSeconds;
 
         for (int position = 0; position < order.Length; position++)
@@ -225,6 +225,25 @@ internal sealed class NavigationMotionArbitrator
             result.Reason == NavigationBlockReason.None && result.WorkConsumed > 0) &&
         (result.Status is not (NavigationGeometryStatus.Unavailable or NavigationGeometryStatus.Blocked or
             NavigationGeometryStatus.InvalidInput or NavigationGeometryStatus.Stale) || result.AllowedFraction == 0);
+
+    // One oriented enclosure contains the complete accepted physical motion. Unlike
+    // its broad-phase AABB, it does not fill empty corners beside a yawed vehicle.
+    internal static bool TryBuildSweptOccupancy(in NavigationPose start, in NavigationPose end,
+        in NavigationVehicleProfile profile, out NavigationPose pose, out Vector3 half)
+    {
+        pose = new(Vector3.Lerp(start.Position, end.Position, .5f), Quaternion.Normalize(Quaternion.Slerp(start.Rotation, end.Rotation, .5f)));
+        half = default;
+        if (!start.IsValid || !end.IsValid || !profile.IsValid || !pose.IsValid) return false;
+        double angle = RotationAngle(start.Rotation, end.Rotation);
+        double radius = Math.Sqrt((double)profile.HalfExtents.X * profile.HalfExtents.X +
+            (double)profile.HalfExtents.Y * profile.HalfExtents.Y + (double)profile.HalfExtents.Z * profile.HalfExtents.Z);
+        Vector3 translation = (end.Position - start.Position) * .5f;
+        Vector3 local = Vector3.Transform(translation, Quaternion.Conjugate(pose.Rotation));
+        float scale = MathF.Max(MathF.Max(MathF.Abs(pose.Position.X), MathF.Abs(pose.Position.Y)), MathF.Abs(pose.Position.Z));
+        float padding = (float)(2 * radius * Math.Sin(angle * .25) + (scale + radius + 1) * .000002);
+        half = profile.HalfExtents + Vector3.Abs(local) + new Vector3(padding);
+        return NavigationMotionCapture.Finite(half) && half.X > 0 && half.Y > 0 && half.Z > 0;
+    }
 
     internal static bool TryBuildSweptBounds(in NavigationPose start, in NavigationPose end, in NavigationVehicleProfile profile,
         out AxisAlignedBounds bounds)

@@ -195,7 +195,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 {
                     if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                     workConsumed++;
-                    if (reservation.Owner == ordered[i].Binding.Requester) continue;
+                    if (!ReservationApplies(vehicles[ordered[i].Binding.Requester], reservation)) continue;
                     var region = new NavigationTrafficPassage(reservation.ReservationId, reservation.Pose, reservation.HalfExtents);
                     if (Touches(region, [paths[i][step - 1], paths[i][step]], profiles[i]))
                     {
@@ -261,6 +261,19 @@ internal sealed partial class PredictiveTrafficPlanner
                     NavigationTrafficAction.Hold, 0, null, reason);
             return Array.AsReadOnly(directives);
         }
+    }
+
+    private static bool ReservationApplies(in NavigationVehicleObservation vehicle, in NavigationTrafficReservation reservation)
+    {
+        if (reservation.Owner == vehicle.Entity) return false;
+        // FIFO belongs to the service owner. A later vehicle's unoccupied future
+        // waiting pose cannot reserve the approach against an earlier queue member.
+        // Actual vehicle bodies remain mandatory physical blockers in every case.
+        if (!reservation.PhysicallyOccupied && reservation.Kind == NavigationReservationKind.Queue &&
+            reservation.QueueBuilding.IsValid && vehicle.QueueEntry is { } queue && queue.Owner == vehicle.Owner &&
+            queue.Building == reservation.QueueBuilding && queue.Position > 0 && queue.Position < reservation.QueuePosition)
+            return false;
+        return true;
     }
 
     private ulong WaitingAge(in NavigationOrderBinding binding, ulong tick) =>

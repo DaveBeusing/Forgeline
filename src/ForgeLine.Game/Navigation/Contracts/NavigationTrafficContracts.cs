@@ -9,7 +9,8 @@ public enum NavigationReservationKind : byte { Unspecified = 0, Passage = 1, Doc
 public readonly record struct NavigationTrafficReservation(
     ulong ReservationId, EntityId Owner, ulong Generation, ulong CommandGeneration, NavigationReservationKind Kind,
     NavigationPose Pose, Vector3 HalfExtents, SimulationTick CreatedAt,
-    SimulationTick ReconsiderAt, bool PhysicallyOccupied, bool CreatedAtKnown = true, bool ReconsiderAtKnown = true);
+    SimulationTick ReconsiderAt, bool PhysicallyOccupied, bool CreatedAtKnown = true, bool ReconsiderAtKnown = true,
+    EntityId QueueBuilding = default, int QueuePosition = 0);
 
 /// <summary>Captured single-lane or intersection envelope. Local Z defines its directed axis.</summary>
 public readonly record struct NavigationTrafficPassage(ulong Id, NavigationPose Pose, Vector3 HalfExtents);
@@ -37,7 +38,9 @@ public sealed class NavigationTrafficFrame
             if (reservation.ReservationId == 0 || !reservation.Owner.IsValid || reservation.Generation == 0 ||
                 !reservation.Pose.IsValid || !Enum.IsDefined(reservation.Kind) || reservation.Kind == NavigationReservationKind.Unspecified ||
                 !float.IsFinite(reservation.HalfExtents.LengthSquared()) || reservation.HalfExtents.X <= 0 ||
-                reservation.HalfExtents.Y <= 0 || reservation.HalfExtents.Z <= 0)
+                reservation.HalfExtents.Y <= 0 || reservation.HalfExtents.Z <= 0 ||
+                reservation.QueuePosition < 0 || reservation.QueueBuilding.IsValid != (reservation.QueuePosition > 0) ||
+                reservation.QueueBuilding.IsValid && reservation.Kind != NavigationReservationKind.Queue)
                 throw new ArgumentException("Reservation snapshots must retain identity, generation and physical geometry.", nameof(reservations));
         var passageIds = new HashSet<ulong>();
         foreach (var passage in passages)

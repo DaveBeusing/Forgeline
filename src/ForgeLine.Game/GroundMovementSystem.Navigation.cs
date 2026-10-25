@@ -10,6 +10,7 @@ namespace ForgeLine.Game;
 public sealed partial class GroundMovementSystem
 {
     private LogisticsNavigationCoordinator? _navigationControl;
+    internal NavigationLegacyVeto[] CaptureLegacyNavigationVetoes() => _navigationControl?.CaptureLegacyVetoes() ?? [];
     internal bool NavigationConnected => _navigationControl is not null;
     internal void ConnectNavigation(HierarchicalNavigationSystem navigation, TerrainWorld terrain,
         IReadOnlyList<AxisAlignedBounds> authoredObstacles) =>

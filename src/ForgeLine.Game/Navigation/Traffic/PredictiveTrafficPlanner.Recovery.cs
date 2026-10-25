@@ -124,7 +124,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 {
                     if (consumed == allowance) return false;
                     consumed++;
-                    if (reservation.Owner != vehicle.Entity && Touches(new(reservation.ReservationId, reservation.Pose,
+                    if (ReservationApplies(vehicle, reservation) && Touches(new(reservation.ReservationId, reservation.Pose,
                         reservation.HalfExtents), [simulated.Pose, end], vehicle.Profile)) return false;
                 }
                 foreach (var lease in leases.Values)

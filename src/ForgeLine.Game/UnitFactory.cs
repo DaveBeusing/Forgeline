@@ -54,11 +54,11 @@ public sealed class UnitFactory
             throw new ArgumentOutOfRangeException(nameof(position));
         }
 
-        // Ground logistics at their authored suspension offset before a route captures its start.
-        if (definition.IsCargoTransport && _terrain is not null)
+        // Ground spawned units at their authored suspension offset before movement captures its start.
+        if (_terrain is not null)
         {
             if (!_terrain.TrySampleHeight(position.X, position.Z, out float height) || !float.IsFinite(height))
-                throw new ArgumentOutOfRangeException(nameof(position), "Logistics spawn requires terrain.");
+                throw new ArgumentOutOfRangeException(nameof(position), "Unit spawn requires terrain.");
             position.Y = height + definition.Movement.HeightOffset;
         }
 

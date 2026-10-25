@@ -23,7 +23,8 @@ internal sealed partial class LogisticsNavigationCoordinator
             var input = new NavigationMotionInput(candidate.Binding, context.Tick, (float)context.TickDuration.TotalSeconds,
                 candidate.Vehicle, traffic, candidate.Route, candidate.MaximumSpeed, candidate.CanMove);
             current[i] = used[i] = -1;
-            var collision = frame.GetVehicleCollision(candidate.Vehicle.Entity);
+            var collision = FreezePoses(frame.GetVehicleCollision(candidate.Vehicle.Entity), ref consumed);
+            if (collision is null) return Unavailable(NavigationBlockReason.SearchWork, consumed);
             NavigationMotionProposal proposal;
             float speed = new Vector2(candidate.Vehicle.Movement.Velocity.X, candidate.Vehicle.Movement.Velocity.Z).Length();
             Vector3 forward = Vector3.Transform(Vector3.UnitZ, candidate.Vehicle.Pose.Rotation);

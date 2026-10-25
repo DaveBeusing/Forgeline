@@ -216,7 +216,7 @@ internal sealed partial class LogisticsNavigationCoordinator
                 reservations.Count == Limits.MaximumReservations) { complete = false; break; }
             reservations.Add(new(0xA000000000000000UL | ((ulong)entity.Index + 1), entity, queue.Generation, 0,
                 NavigationReservationKind.Queue, new(queue.Target, Quaternion.CreateFromAxisAngle(Vector3.UnitY, queue.Heading)),
-                vehicle.Profile.HalfExtents, queue.RegisteredAtTick, SimulationTick.Zero, queue.ArrivedAtService, true, false));
+                vehicle.Profile.HalfExtents, queue.RegisteredAtTick, SimulationTick.Zero, queue.ArrivedAtService, true, false, queue.Building, queue.Position));
         }
         return reservations.ToArray();
     }

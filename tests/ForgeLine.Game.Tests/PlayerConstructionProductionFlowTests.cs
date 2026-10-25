@@ -1380,6 +1380,7 @@ public sealed partial class PlayerConstructionProductionFlowTests
 
         if (condition()) return;
         var diagnostics = new List<string>();
+        diagnostics.Add($"navigation={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Actors)}; waits={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Traffic.Vehicles)}; preciseVetoes={string.Join(';', scenario.Services.GroundMovement.CaptureLegacyNavigationVetoes())}");
         foreach (EntityId entity in scenario.Simulation.Entities.Query<CompletedBuilding>())
             diagnostics.Add($"building {entity}:{scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity).BuildingId}" +
                 $"@{scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");

@@ -1101,8 +1101,8 @@ public sealed class SkirmishSupplyPolicyTests
         float identificationRange = units[UnitIds.ScoutVehicle].RadarIdentificationRangeMeters;
         Assert.InRange(Vector2.Distance(new Vector2(scoutOrder.Destination.X, scoutOrder.Destination.Z),
             new Vector2(opposingCore.X, opposingCore.Z)), 0.0f, identificationRange);
-        Assert.Equal(GroundMovementStatus.Moving,
-            entities.GetComponent<GroundMovementState>(supply).Status);
+        Assert.True(entities.GetComponent<GroundMovementState>(supply).Status == GroundMovementStatus.Moving,
+            $"Scout={scout} {entities.GetComponent<WorldTransform>(scout)} {entities.GetComponent<GroundMovementState>(scout)}; Supply={supply} {entities.GetComponent<WorldTransform>(supply)}; State={entities.GetComponent<GroundMovementState>(supply)}; Order={entities.GetComponent<MovementOrder>(supply)}; Vetoes={string.Join(';', scenario.Services.GroundMovement.CaptureLegacyNavigationVetoes())}");
         if (scoutBetweenWaypoints)
         {
             // Arriving at a formation slot clears the local order before

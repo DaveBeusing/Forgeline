@@ -35,6 +35,39 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Fact]
+    public void RealCrossingTrucksReachBothGoalsWithoutOverlappingTheirOrientedFootprints()
+    {
+        var (simulation, _, first) = Create();
+        var entities = simulation.Entities;
+        var second = entities.CreateEntity();
+        entities.AddComponent(second, new WorldTransform(new(4, .5f, 25), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), Vector3.One));
+        entities.AddComponent(second, entities.GetComponent<GroundMovement>(first));
+        entities.AddComponent(second, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.AddComponent(second, new NavigationAgent(NavigationMovementClass.Wheeled));
+        entities.AddComponent(second, entities.GetComponent<UnitIdentity>(first));
+        entities.AddComponent(second, entities.GetComponent<ControllableEntity>(first));
+        entities.AddComponent(second, entities.GetComponent<SpatialPresence>(first));
+        entities.AddComponent(second, new MovementOrder(new PlayerId(1), new(40, .5f, 25), SimulationTick.Zero, new(1)));
+        for (int tick = 0; tick < 600; tick++)
+        {
+            simulation.AdvanceOneTick();
+            var a = entities.GetComponent<WorldTransform>(first);
+            var b = entities.GetComponent<WorldTransform>(second);
+            Vector3 ax = Vector3.Transform(Vector3.UnitX, a.Rotation), az = Vector3.Transform(Vector3.UnitZ, a.Rotation);
+            Vector3 bx = Vector3.Transform(Vector3.UnitX, b.Rotation), bz = Vector3.Transform(Vector3.UnitZ, b.Rotation);
+            Vector3 separation = a.Position - b.Position;
+            bool separated = new[] { ax, az, bx, bz }.Any(axis => MathF.Abs(Vector3.Dot(separation, axis)) >
+                .5f * (MathF.Abs(Vector3.Dot(ax, axis)) + MathF.Abs(Vector3.Dot(az, axis)) +
+                MathF.Abs(Vector3.Dot(bx, axis)) + MathF.Abs(Vector3.Dot(bz, axis))) - .00001f);
+            Assert.True(separated, $"tick={tick}; first={a}; second={b}");
+        }
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(first).Position, new(10, .5f, 40)), 0, .5f);
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(second).Position, new(40, .5f, 25)), 0, .5f);
+        Assert.False(entities.HasComponent<MovementOrder>(first));
+        Assert.False(entities.HasComponent<MovementOrder>(second));
+    }
+
+    [Fact]
     public void ReplacementCommandGetsANewGenerationAndDestination()
     {
         var (simulation, movement, unit) = Create();

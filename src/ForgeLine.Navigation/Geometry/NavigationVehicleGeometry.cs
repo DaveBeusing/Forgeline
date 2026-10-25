@@ -10,7 +10,7 @@ namespace ForgeLine.Navigation;
 /// </summary>
 public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 {
-    public const int AlgorithmRevision = 1;
+    public const int AlgorithmRevision = 2;
 
     private readonly NavigationWorldSnapshot _snapshot;
     private readonly NavigationTerrainEnvelope _terrain;
@@ -120,7 +120,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
                 if (!work.TrySpend())
                     return Result(frame, NavigationGeometryStatus.BudgetExhausted, approved, NavigationBlockReason.SearchWork, null, work);
                 if (body.Identity == movement.Mover) continue;
-                if (!TryObstacleEnvelope(body, movement.DurationSeconds, approved, endFraction, out NavigationCollisionBox obstacle))
+                if (!TryObstacleEnvelope(body, frame.BodyPosesAreFixed, movement.DurationSeconds, approved, endFraction, out NavigationCollisionBox obstacle))
                     return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
                 if (!NavigationCollisionBox.Intersects(swept, obstacle)) continue;
                 // Scan all entries before publishing a blocker so input array
@@ -171,10 +171,10 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         return box with { HalfExtents = extent };
     }
 
-    private static bool TryObstacleEnvelope(in NavigationCollisionBody body, float duration,
+    private static bool TryObstacleEnvelope(in NavigationCollisionBody body, bool poseFixed, float duration,
         float from, float to, out NavigationCollisionBox box)
     {
-        bool moving = body.Kind == NavigationObstacleKind.Vehicle || body.Velocity != Vector3.Zero;
+        bool moving = !poseFixed && (body.Kind == NavigationObstacleKind.Vehicle || body.Velocity != Vector3.Zero);
         if (!moving)
         {
             double staticRadius = NavigationCollisionBox.Radius(body.HalfExtents);

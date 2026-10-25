@@ -39,6 +39,8 @@ internal sealed partial class LogisticsNavigationCoordinator
     private NavigationVehicleGeometry? _geometry;
     private readonly List<NavigationCollisionBody> _legacyEnvelopes = new(128);
     private bool _legacyComplete = true;
+    private readonly List<NavigationCollisionBody> _protectedLogistics = new(MaximumVehicles);
+    private bool _protectedComplete;
     private int _legacyWork;
     private bool _overflow;
     private ulong _tick;
@@ -77,7 +79,8 @@ internal sealed partial class LogisticsNavigationCoordinator
     {
         var previouslyActive = _actors.Values.Where(static a => a.Active).Select(static a => a.Entity).ToHashSet();
         _tick = context.Tick.Value; _active.Clear(); _overflow = false;
-        _legacyEnvelopes.Clear(); _legacyComplete = true; _legacyWork = 0;
+        _legacyEnvelopes.Clear(); _legacyVetoes.Clear(); _legacyComplete = true; _legacyWork = 0;
+        _protectedLogistics.Clear(); _protectedComplete = true;
         foreach (var key in _actors.Keys.ToArray())
         {
             if (!context.Entities.IsAlive(key)) { _actors.Remove(key); _routes.Remove(key); }
@@ -85,6 +88,15 @@ internal sealed partial class LogisticsNavigationCoordinator
         }
         foreach (var entity in context.Entities.Query<WorldTransform, GroundMovementState>(QueryIterationOrder.StableByEntityIndex))
         {
+            if (IsLogisticsVehicle(context.Entities, entity))
+            {
+                if (_protectedLogistics.Count == MaximumVehicles ||
+                    !context.Entities.TryGetComponent(entity, out SpatialPresence presence) ||
+                    !NavigationMotionCapture.TryCaptureBody(context.Entities,
+                        presence.CreateEntry(entity, context.Entities.GetComponent<WorldTransform>(entity)), out var body))
+                    _protectedComplete = false;
+                else _protectedLogistics.Add(body);
+            }
             if (!Controls(context.Entities, entity)) continue;
             if (_active.Count == MaximumVehicles) { _overflow = true; continue; }
             var route = context.Entities.GetComponent<NavigationRouteState>(entity);

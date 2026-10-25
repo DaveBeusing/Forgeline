@@ -474,8 +474,28 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         }
 
         var candidateTransform = transform with { Position = candidate, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading) };
-        if (VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform) ||
-            _navigationControl is not null && !_navigationControl.TryApproveLegacyPose(context, entity, transform, candidateTransform))
+        bool motionBlocked = VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform) ||
+            _navigationControl is not null && !_navigationControl.TryApproveLegacyPose(context, entity, transform, candidateTransform);
+        // A close neighbor can prevent turning without blocking straight departure.
+        // Keep the owned target and try only the current heading at the same bounded
+        // speed; final heading alignment and entered service lanes retain their owner.
+        if (motionBlocked && _navigationControl is not null && speed > 0 && order.TargetHeadingRadians is null &&
+            (!entities.TryGetComponent(entity, out VehicleDockVisit turnVisit) || !turnVisit.LaneEntered) &&
+            (!entities.TryGetComponent(entity, out VehicleQueueEntry turnQueue) || !turnQueue.ArrivedAtService))
+        {
+            Vector3 straight = position + new Vector3(MathF.Sin(state.HeadingRadians), 0, MathF.Cos(state.HeadingRadians)) * (speed * deltaSeconds);
+            if (TryApplyTerrain(ref straight, movement))
+            {
+                var departure = transform with { Position = straight };
+                if (!VehicleDockingService.BlocksStagingStep(entities, entity, transform, departure) &&
+                    _navigationControl.TryApproveLegacyPose(context, entity, transform, departure))
+                {
+                    candidate = straight; candidateTransform = departure; heading = state.HeadingRadians;
+                    motionBlocked = false;
+                }
+            }
+        }
+        if (motionBlocked)
         {
             var waiting = state with { Velocity = Vector3.Zero, Status = GroundMovementStatus.TacticallyPaused,
                 ObservedOrderTick = order.AcceptedAtTick, StalledTicks = 0 };

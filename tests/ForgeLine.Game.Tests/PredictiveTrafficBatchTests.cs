@@ -9,6 +9,31 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class PredictiveTrafficBatchTests
 {
+    [Theory]
+    [InlineData(1, false, true)]
+    [InlineData(1, true, false)]
+    [InlineData(3, false, false)]
+    public void EarlierQueueMemberDoesNotWaitForAnUnoccupiedLaterWaitingPose(int position, bool occupied, bool proceed)
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0] with
+        {
+            QueueEntry = new VehicleQueueEntry(new(9, 1), new(1), 1, SimulationTick.Zero,
+                VehicleQueueService.CargoPickup, Position: position, WaitingCount: 3, Target: new(30, .5f, 20)),
+            PrecisionApproachRadius = 1
+        };
+        var intent = intents[0] with { Binding = intents[0].Binding with { QueueGeneration = 1 } };
+        var reservation = new NavigationTrafficReservation(7, new(2, 1), 1, 0, NavigationReservationKind.Queue,
+            new(new(20, .5f, 20), Quaternion.Identity), Vector3.One, SimulationTick.Zero, SimulationTick.Zero,
+            occupied, QueueBuilding: new(9, 1), QueuePosition: 2);
+        var observed = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [reservation], Limits());
+        var directive = Assert.Single(new PredictiveTrafficPlanner().PlanBatch(observed, [intent], new ClearGeometry(), 3, 10000, out _));
+        Assert.Equal(proceed ? NavigationTrafficAction.Proceed : NavigationTrafficAction.Hold, directive.Action);
+        Assert.Equal(1UL, directive.Binding.QueueGeneration);
+        Assert.Equal(NavigationTrafficAction.Hold,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(observed, [intent], new BlockedGeometry(), 3, 10000, out _)).Action);
+    }
+
     [Fact]
     public void ClearPredictionReportsNoHazardAndRetainsNoWaitingHistory()
     {
