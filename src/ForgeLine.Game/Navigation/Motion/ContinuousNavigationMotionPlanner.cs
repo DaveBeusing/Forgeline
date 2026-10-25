@@ -91,6 +91,20 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         if (!float.IsFinite(groundOffset))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.Terrain);
 
+        if (input.Traffic.Action == NavigationTrafficAction.Proceed && input.Traffic.SuggestedTarget is Vector3 localTarget)
+        {
+            if (input.Traffic.MaximumSpeed > 1 || HorizontalDistance(input.Vehicle.Pose.Position, localTarget) > 6 ||
+                !TryGroundedHorizon(input, collision, geometry, localTarget, groundOffset, maximumSpeed,
+                    workAllowance / 2, ref workConsumed, out var checkedTarget, out float checkedDistance,
+                    out var checkedReason, out bool clear) || !clear)
+                return Hold(input, collision, Availability, NavigationBlockReason.ReservedCorridor, brakingDistance);
+            usedWaypoint = checkedTarget;
+            usedWaypointIndex = -1;
+            return ProposeStep(input, collision, geometry, route, checkedTarget, checkedDistance,
+                groundOffset, currentSpeed, maximumSpeed, brakingDistance, checkedReason,
+                workAllowance, ref workConsumed, out _);
+        }
+
         if (input.Traffic.MaximumSpeed <= 1 &&
             input.Traffic.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
         {
@@ -395,7 +409,7 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
                         new(NavigationModuleAvailability.Available, input.Tick, collision.World.Revision),
                         input.Vehicle.Pose, end, input.Vehicle.Profile, duration, result.AllowedFraction);
                 }
-                if (reason != NavigationBlockReason.Terrain)
+                if (reason is not (NavigationBlockReason.Terrain or NavigationBlockReason.OutsideWorld))
                 {
                     if (safeDistance > 0) reason = approvedReason;
                     return safeDistance > 0;

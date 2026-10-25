@@ -75,7 +75,7 @@ public sealed partial class GroundMovementSystem
                 continue;
             }
             var route = context.Entities.GetComponent<NavigationRouteState>(entity);
-            bool ordinary = accepted.Input.Traffic.Action == NavigationTrafficAction.Proceed;
+            bool ordinary = accepted.Input.Traffic.Action == NavigationTrafficAction.Proceed && !accepted.Input.Traffic.SuggestedTarget.HasValue;
             int next = accepted.CurrentWaypoint;
             if (ordinary && proposal.End != proposal.Start &&
                 !NavigationAcceptedMotionProgress.TryGetNextWaypoint(accepted.Input, proposal, accepted.CurrentWaypoint,
@@ -102,7 +102,7 @@ public sealed partial class GroundMovementSystem
             bool progressed = best - distance >= _options.ProgressEpsilonMeters;
             int stalled = progressed ? 0 : Math.Min(int.MaxValue - 1, previous.StalledTicks) + 1;
             bool changed = proposal.End != proposal.Start;
-            bool arrived = accepted.Input.CanMove && accepted.Input.Traffic.Action != NavigationTrafficAction.Recovery &&
+            bool arrived = accepted.Input.CanMove && !accepted.Input.Traffic.SuggestedTarget.HasValue && accepted.Input.Traffic.Action != NavigationTrafficAction.Recovery &&
                 Distance(position, order.WorldTarget) <= movement.StopRadius + 0.01f;
             var status = arrived ? GroundMovementStatus.Arrived : changed ? GroundMovementStatus.Moving : GroundMovementStatus.TacticallyPaused;
             if (!accepted.Input.CanMove && context.Entities.TryGetComponent(entity, out SupplyMovementConstraint supply) && !supply.CanMove)

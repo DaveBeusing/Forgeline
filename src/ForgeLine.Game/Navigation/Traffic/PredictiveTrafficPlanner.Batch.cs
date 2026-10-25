@@ -60,6 +60,15 @@ internal sealed partial class PredictiveTrafficPlanner
         var hazards = new NavigationBlockReason[ordered.Length];
         Array.Fill(hazards, NavigationBlockReason.None);
         var waitingFor = new EntityId[ordered.Length];
+        var localTargets = new Vector3?[ordered.Length];
+        var actualBodies = new Dictionary<NavigationObstacleIdentity, NavigationCollisionBody>();
+        if (ordered.Any(intent => frame.Tick.Value >= intent.Binding.OriginalOrder.SubmittedAtTick.Value &&
+            frame.Tick.Value - intent.Binding.OriginalOrder.SubmittedAtTick.Value >= RecoveryWaitTicks))
+        {
+            if (frame.Collision.Bodies.Count > workAllowance - workConsumed) return Unavailable(NavigationBlockReason.SearchWork);
+            workConsumed += frame.Collision.Bodies.Count;
+            foreach (var body in frame.Collision.Bodies) actualBodies.Add(body.Identity, body);
+        }
         float dt = horizonSeconds / PredictionSteps;
         for (int i = 0; i < ordered.Length; i++)
         {
@@ -98,6 +107,35 @@ internal sealed partial class PredictiveTrafficPlanner
                 waits[i] = NavigationBlockReason.ReservedCorridor;
             else
                 waits[i] = NavigationBlockReason.None;
+        }
+
+        // Optional local searches share a small slice of the same tick budget.
+        // Rotate the starting identity deterministically so a crowded cohort cannot
+        // spend the entire budget on the same first actors every tick.
+        int detourBudget = Math.Min(32768, (workAllowance - workConsumed) / 4);
+        int detourAttempts = 0;
+        int detourStart = ordered.Length == 0 ? 0 : (int)(frame.Tick.Value % (ulong)ordered.Length);
+        for (int rank = 0; rank < ordered.Length && detourAttempts < 4 && detourBudget > 0; rank++)
+        {
+            int i = (detourStart + rank) % ordered.Length;
+            if (waits[i] != NavigationBlockReason.None) continue;
+            var intent = ordered[i];
+            var vehicle = vehicles[intent.Binding.Requester];
+            int allowance = Math.Min(Math.Min(16384, frame.Limits.WorkPerSearch),
+                Math.Min(detourBudget, (workAllowance - workConsumed) / 3));
+            bool found = TryLocalDetour(frame, vehicle, intent, paths[i], actualBodies, geometry, allowance,
+                out var localTarget, out int detourWork, out bool validDetour);
+            workConsumed += detourWork; detourBudget -= detourWork;
+            if (detourWork > 0) detourAttempts++;
+            if (!validDetour) return Unavailable(NavigationBlockReason.MissingGeometry);
+            if (!found) continue;
+            var localIntent = intent with { Route = null, SteeringTarget = localTarget, MaximumSpeed = MathF.Min(1, intent.MaximumSpeed) };
+            var predicted = Predict(vehicle, localIntent, dt, frame.Collision.World, out var predictionFailure);
+            if (predicted is null) return Unavailable(predictionFailure);
+            paths[i] = predicted;
+            speedCaps[i] = localIntent.MaximumSpeed;
+            localTargets[i] = localTarget;
+            hazards[i] = NavigationBlockReason.MovingVehicle;
         }
 
         // A service-blocked approach cannot capture an unentered crossing against
@@ -266,7 +304,7 @@ internal sealed partial class PredictiveTrafficPlanner
                     // Holding the entire horizon alternates acceleration/braking forever before
                     // a parked vehicle can enter local avoidance or the stopped recovery phase.
                     if (availableDistance > 0 && result.Status is NavigationGeometryStatus.Blocked or NavigationGeometryStatus.Limited &&
-                        result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+                        result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain or NavigationBlockReason.OutsideWorld)
                     {
                         float deceleration = profiles[i].Deceleration;
                         float reserve = deceleration * dt;
@@ -335,7 +373,7 @@ internal sealed partial class PredictiveTrafficPlanner
                     _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with { WaitingFor = waitingFor[i], RecoveryTarget = null };
                 }
                 directives[i] = new(NavigationModuleAvailability.Available, intent.Binding, frame.Tick,
-                    NavigationTrafficAction.Proceed, speedCaps[i], null, hazards[i]);
+                    NavigationTrafficAction.Proceed, speedCaps[i], localTargets[i], hazards[i]);
             }
             else
             {

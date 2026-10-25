@@ -438,6 +438,40 @@ public sealed class ConnectedLogisticsNavigationTests
             $"owner={entities.GetComponent<WorldTransform>(owner)}; occupant={entities.GetComponent<WorldTransform>(unit)}; veto={string.Join(';', movement.CaptureLegacyNavigationVetoes())}");
     }
 
+    [Theory]
+    [InlineData(54)]
+    [InlineData(60)]
+    public void CheckedLocalDetourClearsParkedProductionVehiclesWithoutChangingTheRoot(float goalX)
+    {
+        Vector3 goal = new(goalX, .5f, 24);
+        var (simulation, movement, unit) = Create(goal: goal);
+        var entities = simulation.Entities;
+        var start = new WorldTransform(new(25, .5f, 24), Quaternion.Identity, new(3.4f, 2.5f, 6.8f));
+        entities.SetComponent(unit, start);
+        entities.SetComponent(unit, new UnitIdentity(UnitIds.SupplyTruck, default));
+        entities.SetComponent(unit, new GroundMovement(13, 6.5f, 9, 2.35f, 2, 1, 5.8f, 9, 24, .5f));
+        entities.SetComponent(unit, new SpatialPresence(start.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        var parked = new List<(EntityId Entity, WorldTransform Pose)>();
+        foreach (var pose in new WorldTransform[] {
+            new(new(34, .5f, 16), Quaternion.Identity, new(4.4f, 3.5f, 8)),
+            new(new(34, .5f, 24), Quaternion.Identity, new(2.4f, 2.5f, 4.4f)),
+            new(new(43.2f, .5f, 25.2f), Quaternion.Identity, new(4.4f, 3.5f, 8)) })
+        {
+            var entity = entities.CreateEntity();
+            entities.AddComponent(entity, pose);
+            entities.AddComponent(entity, entities.GetComponent<GroundMovement>(unit));
+            entities.AddComponent(entity, GroundMovementState.Stationary());
+            entities.AddComponent(entity, new SpatialPresence(pose.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+            entities.AddComponent(entity, new UnitIdentity(UnitIds.MainBattleTank, default));
+            parked.Add((entity, pose));
+        }
+        simulation.RunTicks(1000, TestContext.Current.CancellationToken);
+        foreach (var body in parked) Assert.Equal(body.Pose, entities.GetComponent<WorldTransform>(body.Entity));
+        Assert.False(entities.HasComponent<MovementOrder>(unit), $"pose={entities.GetComponent<WorldTransform>(unit)}; motion={entities.GetComponent<GroundMovementState>(unit)}; order={(entities.TryGetComponent(unit, out MovementOrder remaining) ? remaining.ToString() : "none")}; actors={string.Join(';', movement.CaptureNavigationState().Actors)}; waits={string.Join(';', movement.CaptureNavigationState().Traffic.Vehicles)}; leases={string.Join(';', movement.CaptureNavigationState().Traffic.Leases)}");
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position, goal), 0,
+            entities.GetComponent<GroundMovement>(unit).StopRadius + .01f);
+    }
+
     private static (SimulationCoordinator, GroundMovementSystem, EntityId) Create(IReadOnlyList<AxisAlignedBounds>? obstacles = null, Vector3? goal = null)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
