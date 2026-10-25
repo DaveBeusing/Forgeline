@@ -135,6 +135,28 @@ internal sealed partial class PredictiveTrafficPlanner
             int age = ageB.CompareTo(ageA);
             return age != 0 ? age : CompareIdentity(ordered[a].Binding.Requester, ordered[b].Binding.Requester);
         });
+        // Preserve FIFO at shared unentered crossings before a later queue member
+        // parks inside an envelope that the head still needs to reach its front.
+        // Reorder only each queue's existing priority slots, keeping a total
+        // canonical order across unrelated queues and ordinary road users.
+        if (ordered.Any(static intent => intent.Binding.QueueGeneration != 0))
+        {
+            int queueWork = ordered.Length * (ordered.Length + 1);
+            if (queueWork > workAllowance - workConsumed) return Unavailable(NavigationBlockReason.SearchWork);
+            workConsumed += queueWork;
+            var queueSlots = priority.Select((index, rank) => (Index: index, Rank: rank, Vehicle: vehicles[ordered[index].Binding.Requester]))
+                .Where(item => item.Vehicle.QueueEntry is { Generation: > 0, Position: > 0, ArrivedAtService: false } queue &&
+                    queue.Owner == item.Vehicle.Owner && ordered[item.Index].Binding.OriginalOrder.WorldTarget == queue.Target)
+                .GroupBy(static item => (item.Vehicle.QueueEntry!.Value.Building, item.Vehicle.Owner));
+            foreach (var group in queueSlots)
+            {
+                var slots = group.ToArray();
+                var fifo = slots.OrderBy(static item => item.Vehicle.QueueEntry!.Value.Position)
+                    .ThenBy(static item => item.Vehicle.Entity).ToArray();
+                for (int position = 0; position < slots.Length; position++)
+                    priority[slots[position].Rank] = fifo[position].Index;
+            }
+        }
         var crossingPlan = DiscoverCrossings(frame, ordered, paths, profiles, workAllowance - workConsumed);
         workConsumed += crossingPlan.Work;
         if (!crossingPlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);

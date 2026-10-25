@@ -100,6 +100,31 @@ public sealed partial class PredictiveTrafficBatchTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void QueueHeadClaimsAnUnenteredCrossingBeforeItsLaterFollower(bool reverseInput)
+    {
+        var (frame, intents) = Crossing();
+        var vehicles = frame.Vehicles.ToArray();
+        for (int i = 0; i < vehicles.Length; i++)
+        {
+            vehicles[i] = vehicles[i] with {
+                QueueEntry = new(new(99, 1), vehicles[i].Owner, 1, SimulationTick.Zero, VehicleQueueService.CargoPickup,
+                    Position: i == 0 ? 2 : 1, WaitingCount: 2, Target: intents[i].SteeringTarget, Heading: 0),
+                PrecisionApproachRadius = .01f };
+            intents[i] = intents[i] with { Binding = intents[i].Binding with { QueueGeneration = 1 } };
+        }
+        if (reverseInput) { Array.Reverse(vehicles); Array.Reverse(intents); }
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2));
+        var captured = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, vehicles, [], Limits(), [passage]);
+        var planner = new PredictiveTrafficPlanner();
+        var directives = planner.PlanBatch(captured, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(new EntityId(2, 1), Assert.Single(planner.CaptureState().Leases).Owner);
+        Assert.Equal(NavigationTrafficAction.Proceed, Assert.Single(directives, d => d.Binding.Requester == new EntityId(2, 1)).Action);
+        Assert.Equal(NavigationTrafficAction.Hold, Assert.Single(directives, d => d.Binding.Requester == new EntityId(1, 1)).Action);
+    }
+
+    [Theory]
     [InlineData(0, true)]
     [InlineData(1, false)]
     [InlineData(2, false)]
