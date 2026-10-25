@@ -11,6 +11,7 @@ internal readonly record struct NavigationLegacyVeto(EntityId Entity, Simulation
 internal sealed partial class LogisticsNavigationCoordinator
 {
     private readonly Dictionary<EntityId, NavigationLegacyVeto> _legacyVetoes = new();
+    private readonly Dictionary<EntityId, NavigationPhysicalWait> _physicalWaits = new();
     internal NavigationLegacyVeto[] CaptureLegacyVetoes() => _legacyVetoes.Values.OrderBy(static v => v.Entity).ToArray();
     private void ObserveLegacyVeto(EntityId entity, SimulationTick tick, in NavigationSweepResult result)
     {
@@ -53,6 +54,20 @@ internal sealed partial class LogisticsNavigationCoordinator
         { _legacyWork = Limits.WorkPerTick; return false; }
         _legacyWork += result.WorkConsumed;
         ObserveLegacyVeto(entity, context.Tick, result);
+        _physicalWaits.Remove(entity);
+        if (result.FrameTick == context.Tick.Value && result.Revision == collision.World.Revision &&
+            result.Status is NavigationGeometryStatus.Blocked or NavigationGeometryStatus.Limited &&
+            result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle &&
+            result.Blocker is { Source: NavigationObstacleSource.Entity } blocker &&
+            blocker.Value <= uint.MaxValue && blocker.Generation <= uint.MaxValue &&
+            (_physicalWaits.Count < MaximumVehicles || _physicalWaits.ContainsKey(entity)))
+        {
+            if (_legacyWork == Limits.WorkPerTick) return false;
+            _legacyWork++;
+            var other = new EntityId((uint)blocker.Value, (uint)blocker.Generation);
+            if (NavigationMotionCapture.TryCaptureVehicle(context.Entities, other, _movementOptions, out var observedBlocker))
+                _physicalWaits[entity] = new(context.Tick, result.Revision, vehicle, observedBlocker);
+        }
         return result.Status == NavigationGeometryStatus.Clear && result.AllowedFraction == 1 &&
             result.FrameTick == context.Tick.Value && result.Revision == collision.World.Revision;
     }

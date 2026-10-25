@@ -21,13 +21,16 @@ internal sealed partial class PredictiveTrafficPlanner
     /// </summary>
     public IReadOnlyList<NavigationTrafficDirective> PlanBatch(
         NavigationTrafficFrame frame, ReadOnlySpan<NavigationTrafficIntent> intents,
-        INavigationGeometryQuery geometry, float horizonSeconds, int workAllowance, out int workConsumed)
+        INavigationGeometryQuery geometry, float horizonSeconds, int workAllowance, out int workConsumed,
+        ReadOnlySpan<NavigationPhysicalWait> physicalWaits = default)
     {
         ArgumentNullException.ThrowIfNull(frame);
         ArgumentNullException.ThrowIfNull(geometry);
         ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
         if (!float.IsFinite(horizonSeconds) || horizonSeconds < 0.25f || horizonSeconds > 10)
             throw new ArgumentOutOfRangeException(nameof(horizonSeconds));
+        if (physicalWaits.Length > 128)
+            throw new ArgumentException("Physical wait evidence exceeds its capture bound.", nameof(physicalWaits));
         if (intents.Length > MaximumTrackedVehicles)
             throw new ArgumentException("Traffic batch exceeds its participant bound.", nameof(intents));
         var ordered = intents.ToArray();
@@ -286,7 +289,7 @@ internal sealed partial class PredictiveTrafficPlanner
         // accepted reverse step again. No lateral displacement is ever authorized here.
         var recovery = new Vector3?[ordered.Length];
         var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry, passagePlan.Leases,
-            workAllowance - workConsumed, recovery);
+            workAllowance - workConsumed, recovery, physicalWaits);
         if (recoveryWork < 0)
         {
             workConsumed = workAllowance;

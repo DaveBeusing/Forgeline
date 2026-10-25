@@ -11,9 +11,29 @@ internal sealed partial class PredictiveTrafficPlanner
     private int FindRecoveries(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
         Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationBlockReason[] waits,
         EntityId[] waitingFor, INavigationGeometryQuery geometry, IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases,
-        int allowance, Vector3?[] targets)
+        int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits)
     {
         int consumed = 0;
+        var physicalCycles = new Dictionary<EntityId, EntityId>();
+        if (!physicalWaits.IsEmpty)
+        {
+            if (frame.Collision.Bodies.Count > allowance) return -1;
+            consumed += frame.Collision.Bodies.Count;
+            var bodies = frame.Collision.Bodies.ToDictionary(static body => body.Identity);
+            foreach (var observation in physicalWaits)
+            {
+                if (allowance - consumed < 4) return -1;
+                consumed += 4;
+                if (observation.Tick != frame.Tick || observation.Revision != frame.Collision.World.Revision ||
+                    observation.Owner.Entity == observation.Blocker.Entity ||
+                    !vehicles.TryGetValue(observation.Blocker.Entity, out var blocker) || blocker != observation.Blocker ||
+                    !bodies.TryGetValue(NavigationReadAdapter.GetObstacleIdentity(observation.Owner.Entity), out var ownerBody) ||
+                    !bodies.TryGetValue(NavigationReadAdapter.GetObstacleIdentity(blocker.Entity), out var blockerBody) ||
+                    ownerBody.Pose != observation.Owner.Pose || ownerBody.HalfExtents != observation.Owner.Profile.HalfExtents ||
+                    blockerBody.Pose != blocker.Pose || blockerBody.HalfExtents != blocker.Profile.HalfExtents) continue;
+                physicalCycles[observation.Owner.Entity] = blocker.Entity;
+            }
+        }
         var indices = new Dictionary<EntityId, int>();
         for (int i = 0; i < intents.Length; i++) indices.Add(intents[i].Binding.Requester, i);
         var visited = new bool[intents.Length];
@@ -63,12 +83,16 @@ internal sealed partial class PredictiveTrafficPlanner
         }
         // A physical blocker outside the coarse wait graph can justify a verified
         // reverse arc. A service reservation alone is a logical admission wait; it
-        // does not establish a physical deadlock. Explicit cycles were handled above.
+        // does not establish a physical deadlock. A copied same-tick physical veto
+        // in the opposite direction closes a mixed precise/coarse cycle.
         for (int i = 0; i < intents.Length; i++)
         {
             if (targets[i] is not null || !CanRecover(i) || !waitingFor[i].IsValid ||
                 indices.ContainsKey(waitingFor[i]) ||
-                waits[i] is not (NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle)) continue;
+                !(waits[i] is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle ||
+                  waits[i] == NavigationBlockReason.ReservedCorridor &&
+                  physicalCycles.TryGetValue(waitingFor[i], out var physicallyWaitingFor) &&
+                  physicallyWaitingFor == intents[i].Binding.Requester)) continue;
             _ = TryTargets(i);
             if (consumed == allowance && targets[i] is null) return -1;
         }
