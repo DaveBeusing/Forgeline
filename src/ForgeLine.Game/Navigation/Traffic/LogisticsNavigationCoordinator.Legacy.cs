@@ -64,10 +64,24 @@ internal sealed partial class LogisticsNavigationCoordinator
         if (!IsLogisticsVehicle(context.Entities, entity) || maximumSpeed <= 0 ||
             !NavigationMotionCapture.TryCaptureVehicle(context.Entities, entity, _movementOptions, out var vehicle) ||
             vehicle.QueueEntry is not { } queue || queue.ArrivedAtService || queue.Generation == 0 || queue.Position <= 0 || queue.Owner != vehicle.Owner ||
-            !context.Entities.TryGetComponent(entity, out VehicleQueueMotion motion) || motion.Generation != queue.Generation ||
             vehicle.DockVisit is { LaneEntered: true } ||
             vehicle.DirectOrder is not { } order || order.Issuer != vehicle.Owner ||
             order.TargetHeadingRadians.HasValue && order.WorldTarget != queue.Target) return false;
+        bool ownsQueueMotion = context.Entities.TryGetComponent(entity, out VehicleQueueMotion motion) &&
+            motion.Generation == queue.Generation;
+        // Admission removes VehicleQueueMotion from the FIFO head before it has
+        // reached the approach pose. Its exact reserved dock still owns that
+        // approach; absence of the old queue controller is not loss of authority.
+        bool currentApproachTarget = order.WorldTarget == queue.Target ||
+            vehicle.RouteOrder is { } root && root.Issuer == vehicle.Owner && root.WorldTarget == queue.Target &&
+            context.Entities.TryGetComponent(entity, out NavigationRouteState queuedRoute) &&
+            HierarchicalNavigationSystem.IsManagedWaypoint(order, queuedRoute);
+        bool ownsReservedApproach = queue.Position == 1 &&
+            vehicle.DockVisit is { Generation: > 0, LaneEntered: false } reserved && reserved.Building == queue.Building &&
+            vehicle.BuildingSlot is { } reservedSlot && reservedSlot.Truck == entity &&
+            reservedSlot.Owner == vehicle.Owner && reservedSlot.Generation == reserved.Generation &&
+            reservedSlot.Pose == reserved.Pose && reserved.Pose.ApproachStart == queue.Target && currentApproachTarget;
+        if (!ownsQueueMotion && !ownsReservedApproach) return false;
         if (vehicle.DockVisit is { } visit &&
             (visit.Building != queue.Building || visit.Generation > 0 &&
                 (vehicle.BuildingSlot is not { } slot || slot.Truck != entity || slot.Generation != visit.Generation || slot.Owner != vehicle.Owner)))

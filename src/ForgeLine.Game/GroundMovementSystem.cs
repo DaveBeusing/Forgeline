@@ -504,7 +504,6 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             }
         }
         if (_navigationControl is not null &&
-            (order.TargetHeadingRadians is null || entities.HasComponent<VehicleQueueMotion>(entity)) &&
             _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, out var queueDeparture, out float queueHeading))
         {
             Vector3 reverse = queueDeparture.Position;

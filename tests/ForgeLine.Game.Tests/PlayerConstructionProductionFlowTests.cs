@@ -1414,6 +1414,8 @@ public sealed partial class PlayerConstructionProductionFlowTests
             (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ? $"dock={visit} " : "") +
             (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move} " : "") +
             (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleQueueEntry queue) ? $"queue={queue} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleQueueMotion queueMotion) ? $"queueMotion={queueMotion} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit dockVisit) && scenario.Simulation.Entities.TryGetComponent(dockVisit.Building, out VehicleDockSlot slot) ? $"slot={slot} " : "") +
             $"motion={scenario.Simulation.Entities.GetComponent<GroundMovementState>(entity)}");
         Assert.True(condition(), string.Join("; ", diagnostics));
     }
