@@ -57,7 +57,8 @@ internal sealed partial class LogisticsNavigationCoordinator
                 Vector3 target = adapted.Waypoints[probeIndex];
                 float distance = new Vector2(target.X - probeStart.X, target.Z - probeStart.Z).Length();
                 if (!float.IsFinite(distance)) return Unavailable(NavigationBlockReason.Unknown, consumed);
-                probes.Add(new(probeStart, target, probeRemaining));
+                probes.Add(new(probeStart, target, probeRemaining,
+                    2 * (vehicle.Profile.HalfExtents.X + vehicle.Profile.ClearanceMeters)));
                 probeRemaining -= distance;
                 probeStart = target;
             }
