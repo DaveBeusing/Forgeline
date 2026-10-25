@@ -61,12 +61,14 @@ internal sealed partial class PredictiveTrafficPlanner
             _ = TryEscape(i, target, verifyWholeRoute: false);
             if (consumed == allowance && targets[i] is null) return -1;
         }
-        // A precise service owner or a stationary non-participant has no outgoing edge in the
-        // coarse wait graph. Its blocked approach can still yield through a verified reverse arc.
+        // A physical blocker outside the coarse wait graph can justify a verified
+        // reverse arc. A service reservation alone is a logical admission wait; it
+        // does not establish a physical deadlock. Explicit cycles were handled above.
         for (int i = 0; i < intents.Length; i++)
         {
             if (targets[i] is not null || !CanRecover(i) || !waitingFor[i].IsValid ||
-                indices.ContainsKey(waitingFor[i])) continue;
+                indices.ContainsKey(waitingFor[i]) ||
+                waits[i] is not (NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle)) continue;
             _ = TryTargets(i);
             if (consumed == allowance && targets[i] is null) return -1;
         }

@@ -62,6 +62,10 @@ internal sealed partial class PredictiveTrafficPlanner
                 {
                     if (consumed == allowance) return new(leases, consumed, false);
                     consumed++;
+                    // Static flank geometry cannot acquire traffic admission merely
+                    // by touching this coarse envelope. It remains in every physical
+                    // sweep; an actually obstructed lane still cannot be traversed.
+                    if (body.Kind == NavigationObstacleKind.Structure) continue;
                     if (!Occupies(passage, body.Pose, body.HalfExtents, 0)) continue;
                     if (body.Identity.Source != NavigationObstacleSource.Entity || body.Identity.Value > uint.MaxValue ||
                         body.Identity.Generation > uint.MaxValue) { multiple = true; break; }
