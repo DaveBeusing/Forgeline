@@ -252,6 +252,28 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Fact]
+    public void FreeRemoteQueuePoseStartsWithAForwardTurnInsteadOfBackingTheEntireApproach()
+    {
+        Vector3 goal = new(30, .5f, 17);
+        var (simulation, _, truck) = Create(goal: goal);
+        var entities = simulation.Entities;
+        var start = new WorldTransform(new(30, .5f, 30), Quaternion.Identity, new(3.2f, 2.2f, 6.4f));
+        entities.SetComponent(truck, start);
+        entities.SetComponent(truck, new SpatialPresence(start.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        var building = entities.CreateEntity();
+        var pose = new VehicleDockPose(goal + Vector3.UnitZ * 5, goal + Vector3.UnitZ * 10,
+            goal + Vector3.UnitZ * 15, 0, 3.2f, 1.6f, goal);
+        entities.AddComponent(building, new VehicleDockSlot(truck, 1, pose, new(1)));
+        entities.AddComponent(truck, new VehicleDockVisit(building, 1, VehicleDockStatus.Reserved, VehicleDockBlockReason.None, pose));
+        entities.AddComponent(truck, new VehicleQueueEntry(building, new(1), 1, SimulationTick.Zero,
+            VehicleQueueService.CargoPickup, Position: 1, WaitingCount: 1, Target: goal, Heading: 0));
+        simulation.RunTicks(10, TestContext.Current.CancellationToken);
+        Assert.True(entities.GetComponent<WorldTransform>(truck).Position.Z > start.Position.Z);
+        Assert.Equal(goal, entities.GetComponent<MovementOrder>(truck).WorldTarget);
+        Assert.Equal(truck, entities.GetComponent<VehicleDockSlot>(building).Truck);
+    }
+
+    [Fact]
     public void QueueOwnerCanBackIntoItsOwnWaitingPoseWithItsRequiredAlignment()
     {
         Vector3 goal = new(25, .5f, 30);

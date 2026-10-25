@@ -537,7 +537,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             motionBlocked = false; physicalEscape = true;
         }
         if (!physicalEscape && _navigationControl is not null &&
-            _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, out var queueDeparture, out float queueHeading))
+            _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, motionBlocked, out var queueDeparture, out float queueHeading))
         {
             Vector3 reverse = queueDeparture.Position;
             if (TryApplyTerrain(ref reverse, movement))

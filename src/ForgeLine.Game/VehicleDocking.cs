@@ -379,7 +379,8 @@ public sealed partial class VehicleDockingService
             StageBeforeReservation(context, truck, building, owner)) return false;
         if (!TryReserve(context, truck, building, owner, out var visit))
         {
-            StopDockMotion(context.Entities, truck);
+            if (!ContinueBlockedQueueApproach(context, truck, building, owner))
+                StopDockMotion(context.Entities, truck);
             return false;
         }
         ClearFormationMembership(context.Entities, truck);
