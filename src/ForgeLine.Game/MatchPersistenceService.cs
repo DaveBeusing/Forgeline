@@ -618,7 +618,9 @@ public static class MatchPersistenceService
 
     private static void ValidateScenarioIdentity(int schema, PersistedMatchConfiguration configuration)
     {
-        if (schema >= 7 && configuration.CompositionKey == CentralDivideScenario.CompositionKey && configuration.Identity is null)
+        if (configuration.Identity is null &&
+            ScenarioRegistry.Default.Descriptors.Any(d => d.Key == configuration.CompositionKey) &&
+            (schema >= 7 || configuration.CompositionKey != CentralDivideScenario.CompositionKey))
             throw Failure(MatchPersistenceFailureReason.IncompatibleVersion, "This payload requires a complete scenario identity.");
     }
 

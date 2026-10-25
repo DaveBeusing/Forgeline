@@ -245,6 +245,10 @@ jobs:
       - name: Compile and qualify canonical map
         run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 
+      - name: Compile and qualify Split Basin
+        run: dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --scenario split-basin --output artifacts/maps/split-basin.flmap.json --qualification-output artifacts/split-basin-geography.json
+      - name: Split Basin geography and runtime contracts
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class '*SplitBasin*'
       - name: Compiled scenario loading and recovery contracts
         shell: pwsh
         run: |

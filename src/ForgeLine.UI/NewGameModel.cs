@@ -1,7 +1,7 @@
 namespace ForgeLine.UI;
 
 public readonly record struct NewGameConfiguration(string MapName, string FactionName, ulong Seed);
-public sealed record NewGameScenarioOption(string Key, string DisplayName, bool Available, string? Error = null);
+public sealed record NewGameScenarioOption(string Key, string DisplayName, bool Available, string? Error = null, string Description = "");
 
 public sealed class NewGameModel
 {

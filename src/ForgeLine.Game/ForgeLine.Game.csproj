@@ -19,5 +19,7 @@
   <ItemGroup>
     <Content Include="../../assets/maps/runtime/central-divide.flmap.json" Link="maps/central-divide.flmap.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="../../assets/maps/runtime/central-divide.flmap.json.sha256" Link="maps/central-divide.flmap.json.sha256" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../assets/maps/runtime/split-basin.flmap.json" Link="maps/split-basin.flmap.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../assets/maps/runtime/split-basin.flmap.json.sha256" Link="maps/split-basin.flmap.json.sha256" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

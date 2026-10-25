@@ -54,6 +54,7 @@ internal readonly record struct HeadlessOptions(
         string? replayInput = null;
         bool showHelp = false;
         string? scenarioRoot = null;
+        string scenarioKey = CentralDivideScenario.CompositionKey;
 
         for (int index = 0; index < args.Length; index++)
         {
@@ -62,9 +63,10 @@ internal readonly record struct HeadlessOptions(
             switch (argument)
             {
                 case "--scenario":
-                    scenario =
-                        ParseScenario(
-                            GetValue(args, ref index, argument));
+                    string selected = GetValue(args, ref index, argument);
+                    scenario = ParseScenario(selected);
+                    scenarioKey = selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
+                        ? SplitBasinBattlefield.CompositionKey : CentralDivideScenario.CompositionKey;
                     break;
 
                 case "--scenario-root":
@@ -227,7 +229,7 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp) { ScenarioRoot = scenarioRoot };
+            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey };
     }
 
     private static void ValidateCombination(
@@ -344,7 +346,7 @@ internal readonly record struct HeadlessOptions(
         {
             "lightweight" =>
                 HeadlessScenarioKind.Lightweight,
-            "central-divide" or "vertical-slice" or CentralDivideScenario.CompositionKey =>
+            "central-divide" or "vertical-slice" or CentralDivideScenario.CompositionKey or "split-basin" or SplitBasinBattlefield.CompositionKey =>
                 HeadlessScenarioKind.Match,
             _ =>
                 throw new ArgumentException(

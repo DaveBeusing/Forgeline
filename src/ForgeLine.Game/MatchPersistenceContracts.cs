@@ -98,6 +98,10 @@ public sealed record PersistedMatchConfiguration(
             settings.Composition.Identity != LegacyCentralDivideIdentity)
             throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion,
                 "Legacy Central Divide requires its historical qualified map and content revision.");
+        if (Identity is null && CompositionKey != CentralDivideScenario.CompositionKey &&
+            ScenarioRegistry.Default.Descriptors.Any(d => d.Key == CompositionKey))
+            throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion,
+                "Registered scenarios require their saved map and content identity.");
         settings.Validate();
         return settings;
     }
@@ -108,9 +112,7 @@ public sealed record PersistedMatchConfiguration(
         "directorate.starting-base.v1", "command-core-elimination.v1");
 
     private static MatchComposition ResolveBuiltin(string key) =>
-        key == CentralDivideScenario.CompositionKey
-            ? CentralDivideScenario.CreateComposition()
-            : throw new InvalidOperationException($"Unknown match composition: {key}. Supply its content resolver.");
+        ScenarioRegistry.Default.Resolve(key);
 }
 
 public sealed record MatchSaveData(

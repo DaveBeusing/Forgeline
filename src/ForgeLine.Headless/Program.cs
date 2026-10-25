@@ -41,7 +41,7 @@ internal static class Program
         }
 
         var registry = options.ScenarioRoot is null ? ScenarioRegistry.Default :
-            new ScenarioRegistry(options.ScenarioRoot, [ScenarioRegistry.CentralDivideDescriptor]);
+            new ScenarioRegistry(options.ScenarioRoot, ScenarioRegistry.Default.Descriptors);
 
         if (options.LoadInput is not null)
         {
@@ -560,7 +560,7 @@ internal static class Program
     private static void WriteUsage(TextWriter writer)
     {
         writer.WriteLine("ForgeLine.Headless");
-        writer.WriteLine("  --scenario <lightweight|central-divide|central-divide.directorate.v1>");
+        writer.WriteLine("  --scenario <lightweight|central-divide|split-basin|registered composition key>");
         writer.WriteLine("                               Scenario to execute (default: lightweight).");
         writer.WriteLine("  --scenario-root <path>         Registered compiled-map root (default: executable/maps).");
         writer.WriteLine("  --profile <gameplay|validation>");

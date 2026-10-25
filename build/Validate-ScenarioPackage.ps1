@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($PublishRoot)
 $mapRoot = Join-Path $root 'maps'
-$expected = @('central-divide.flmap.json', 'central-divide.flmap.json.sha256')
+$expected = @('central-divide.flmap.json', 'central-divide.flmap.json.sha256', 'split-basin.flmap.json', 'split-basin.flmap.json.sha256')
 $actual = @(Get-ChildItem -LiteralPath $mapRoot -Recurse -File | ForEach-Object { [IO.Path]::GetRelativePath($mapRoot, $_.FullName) } | Sort-Object)
 if (@(Compare-Object ($expected | Sort-Object) $actual).Count -ne 0) { throw 'The package must contain exactly the registered scenario files.' }
 # Execute in the exported folder: startup and restoration must use only deployed data.

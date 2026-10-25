@@ -98,7 +98,8 @@ internal sealed class ClientApplication
         bool skipSplash = false,
         bool applicationRestart = false,
         IWindow? bootstrapWindow = null,
-        bool menuSmoke = false)
+        bool menuSmoke = false,
+        string? scenario = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(renderInstanceCount);
 
@@ -125,6 +126,7 @@ internal sealed class ClientApplication
 
         var newGame =
             new NewGameModel(InspectScenarios());
+        if (scenario is "split-basin" or SplitBasinBattlefield.CompositionKey) newGame.MoveScenario(1);
         RuntimeAssetCatalog runtimeAssets;
         IReadOnlyList<LoadGameEntry> startupSaves;
         string? splashBypassReason = ClientStartupLoop.SplashBypassReason(
@@ -1817,7 +1819,7 @@ internal sealed class ClientApplication
                 visualQualificationOutput,
                 renderInstanceCount,
                 qualificationWindow,
-                measuredQualification);
+                measuredQualification, scenario.RuntimeSettings.Composition);
         }
 
         return 0;
@@ -1841,7 +1843,7 @@ internal sealed class ClientApplication
         string outputPath,
         int renderStressInstances,
         in ClientWindowQualificationSnapshot window,
-        ClientVisualQualificationSnapshot? qualification)
+        ClientVisualQualificationSnapshot? qualification, MatchComposition composition)
     {
         ClientVisualQualificationSnapshot metrics =
             qualification ??
@@ -1867,6 +1869,8 @@ internal sealed class ClientApplication
             {
                 scene =
                     "match-client",
+                scenarioKey = composition.Key,
+                scenarioIdentity = composition.Identity,
                 renderStressInstances,
                 settings =
                     new
@@ -3626,7 +3630,7 @@ internal sealed class ClientApplication
     }
 
     private static NewGameScenarioOption[] InspectScenarios() => ScenarioRegistry.Default.Inspect()
-        .Select(entry => new NewGameScenarioOption(entry.Descriptor.Key, entry.Descriptor.DisplayName, entry.Available, entry.Error))
+        .Select(entry => new NewGameScenarioOption(entry.Descriptor.Key, entry.Descriptor.DisplayName, entry.Available, entry.Error, entry.Descriptor.Description))
         .ToArray();
 
     private readonly record struct FrontendSessionSelectionResult(
