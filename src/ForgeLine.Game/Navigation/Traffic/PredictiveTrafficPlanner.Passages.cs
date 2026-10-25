@@ -86,7 +86,7 @@ internal sealed partial class PredictiveTrafficPlanner
                     var intent = intents[index];
                     var vehicle = vehicles[intent.Binding.Requester];
                     if (multiple || occupant.IsValid && occupant != vehicle.Entity || !intent.CanMove ||
-                        vehicle.DockVisit is not null || vehicle.QueueEntry is not null ||
+                        NavigationPrecisionOwnership.IsPrecise(vehicle) ||
                         intent.Binding.OriginalOrder.Kind != MovementOrderKind.Strategic ||
                         !Touches(passage, paths[index], vehicle.Profile)) continue;
                     Vector3 local = Vector3.Transform(intent.SteeringTarget - vehicle.Pose.Position, Quaternion.Conjugate(passage.Pose.Rotation));
@@ -111,6 +111,19 @@ internal sealed partial class PredictiveTrafficPlanner
             }
         }
         return new(leases, consumed, true);
+    }
+
+    internal bool TryCheckPassage(EntityId owner, NavigationPose start, NavigationPose end,
+        NavigationVehicleProfile profile, int allowance, out int consumed, out bool complete)
+    {
+        consumed = 0; complete = true;
+        foreach (var lease in _passageLeases.Values)
+        {
+            if (consumed == allowance) { complete = false; return false; }
+            consumed++;
+            if (lease.Owner != owner && Touches(lease.Passage, [start, end], profile)) return false;
+        }
+        return true;
     }
 
     private static bool ValidLease(in PredictiveTrafficPassageLease lease) =>
@@ -144,7 +157,7 @@ internal sealed partial class PredictiveTrafficPlanner
         return MathF.Abs(local.X) <= passage.HalfExtents.X + extentX && MathF.Abs(local.Z) <= passage.HalfExtents.Z + extentZ;
     }
 
-    private static bool Touches(in NavigationTrafficPassage passage, NavigationPose[] path, in NavigationVehicleProfile profile)
+    private static bool Touches(in NavigationTrafficPassage passage, ReadOnlySpan<NavigationPose> path, in NavigationVehicleProfile profile)
     {
         float radius = profile.HalfExtents.Length() + profile.ClearanceMeters;
         Vector2 half = new(passage.HalfExtents.X + radius, passage.HalfExtents.Z + radius);

@@ -9,7 +9,7 @@ public enum NavigationReservationKind : byte { Unspecified = 0, Passage = 1, Doc
 public readonly record struct NavigationTrafficReservation(
     ulong ReservationId, EntityId Owner, ulong Generation, ulong CommandGeneration, NavigationReservationKind Kind,
     NavigationPose Pose, Vector3 HalfExtents, SimulationTick CreatedAt,
-    SimulationTick ReconsiderAt, bool PhysicallyOccupied);
+    SimulationTick ReconsiderAt, bool PhysicallyOccupied, bool CreatedAtKnown = true, bool ReconsiderAtKnown = true);
 
 /// <summary>Captured single-lane or intersection envelope. Local Z defines its directed axis.</summary>
 public readonly record struct NavigationTrafficPassage(ulong Id, NavigationPose Pose, Vector3 HalfExtents);
@@ -76,7 +76,7 @@ public sealed class NavigationTrafficFrame
     public IReadOnlyList<NavigationTrafficReservation> Reservations { get; }
 }
 
-public enum NavigationTrafficAction : byte { Hold = 0, Proceed = 1, Yield = 2, Recovery = 3 }
+public enum NavigationTrafficAction : byte { Hold = 0, Proceed = 1, Yield = 2, Recovery = 3, Brake = 4 }
 public readonly record struct NavigationTrafficDirective(
     NavigationModuleAvailability Availability, NavigationOrderBinding Binding, SimulationTick Tick,
     NavigationTrafficAction Action, float MaximumSpeed, Vector3? SuggestedTarget, NavigationBlockReason Reason);

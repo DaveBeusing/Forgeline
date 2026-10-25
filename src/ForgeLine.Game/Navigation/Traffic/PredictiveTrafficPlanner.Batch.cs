@@ -63,6 +63,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 (vehicle.RouteOrder ?? vehicle.DirectOrder) != intent.Binding.OriginalOrder ||
                 (vehicle.DockVisit?.Generation ?? 0) != intent.Binding.DockGeneration ||
                 (vehicle.QueueEntry?.Generation ?? 0) != intent.Binding.QueueGeneration ||
+                !NavigationPrecisionOwnership.Matches(vehicle, intent.Binding) ||
                 !Finite(vehicle.Movement.Velocity) || !float.IsFinite(vehicle.Movement.HeadingRadians) ||
                 !Enum.IsDefined(vehicle.Movement.Status))
                 return Unavailable(NavigationBlockReason.StaleSnapshot);
@@ -79,7 +80,7 @@ internal sealed partial class PredictiveTrafficPlanner
             if (predicted is null) return Unavailable(predictionFailure);
             paths[i] = predicted;
             // Precision owners retain their own admission and release rules.
-            if (!intent.CanMove || vehicle.DockVisit is not null || vehicle.QueueEntry is not null ||
+            if (!intent.CanMove || NavigationPrecisionOwnership.IsPrecise(vehicle) ||
                 intent.Binding.OriginalOrder.Kind != MovementOrderKind.Strategic)
                 waits[i] = NavigationBlockReason.ReservedCorridor;
             else
@@ -163,11 +164,11 @@ internal sealed partial class PredictiveTrafficPlanner
                     if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                     workConsumed++;
                     if (reservation.Owner == ordered[i].Binding.Requester) continue;
-                    var reservedProfile = profiles[i] with { HalfExtents = reservation.HalfExtents, ClearanceMeters = 0 };
-                    if (Conflicts(paths[i][step - 1].Position, paths[i][step].Position, profiles[i],
-                        reservation.Pose.Position, reservation.Pose.Position, reservedProfile))
+                    var region = new NavigationTrafficPassage(reservation.ReservationId, reservation.Pose, reservation.HalfExtents);
+                    if (Touches(region, [paths[i][step - 1], paths[i][step]], profiles[i]))
                     {
                         waits[i] = NavigationBlockReason.ReservedCorridor;
+                        waitingFor[i] = reservation.Owner;
                         break;
                     }
                 }

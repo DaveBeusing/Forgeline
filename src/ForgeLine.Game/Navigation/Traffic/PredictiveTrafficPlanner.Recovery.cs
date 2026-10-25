@@ -74,7 +74,7 @@ internal sealed partial class PredictiveTrafficPlanner
             var intent = intents[index];
             var vehicle = vehicles[intent.Binding.Requester];
             return intent.CanMove && waits[index] != NavigationBlockReason.None &&
-                vehicle.DockVisit is null && vehicle.QueueEntry is null &&
+                !NavigationPrecisionOwnership.IsPrecise(vehicle) &&
                 vehicle.Movement.Velocity.LengthSquared() <= 0.0025f &&
                 WaitingAge(intent.Binding, frame.Tick.Value) >= RecoveryWaitTicks;
         }

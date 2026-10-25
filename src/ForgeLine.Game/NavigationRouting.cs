@@ -244,8 +244,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
     {
         EntityId entity = binding.Requester;
         if (!context.Entities.IsAlive(entity) || binding.CommandGeneration == 0 ||
-            binding.DockGeneration != 0 || binding.QueueGeneration != 0 ||
-            context.Entities.HasComponent<VehicleDockVisit>(entity) || context.Entities.HasComponent<VehicleQueueEntry>(entity) ||
+            !NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, 0, out var observation) ||
+            NavigationPrecisionOwnership.IsPrecise(observation) || !NavigationPrecisionOwnership.Matches(observation, binding) ||
             !context.Entities.TryGetComponent(entity, out NavigationRouteState route) ||
             route.OriginalOrder != binding.OriginalOrder || route.SourceRequest?.RequestId != binding.RequestId ||
             !context.Entities.TryGetComponent(entity, out MovementOrder current) || !IsManagedWaypoint(current, route) ||
@@ -615,7 +615,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         return true;
     }
 
-    private static bool IsManagedWaypoint(
+    internal static bool IsManagedWaypoint(
         in MovementOrder movementOrder,
         in NavigationRouteState route)
     {

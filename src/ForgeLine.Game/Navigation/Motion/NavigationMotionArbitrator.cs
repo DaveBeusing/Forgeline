@@ -194,12 +194,7 @@ internal sealed class NavigationMotionArbitrator
             float.IsFinite(proposal.BrakingDistance) && proposal.BrakingDistance >= 0 &&
             float.IsFinite(proposal.SafeRemainingDistance) && proposal.SafeRemainingDistance >= 0 &&
             Enum.IsDefined(proposal.Reason) &&
-            (binding.DockGeneration == 0 ? vehicle.DockVisit is null :
-                vehicle.DockVisit is VehicleDockVisit visit && visit.Generation == binding.DockGeneration &&
-                vehicle.BuildingSlot is VehicleDockSlot slot && slot.Truck == vehicle.Entity &&
-                slot.Generation == binding.DockGeneration && slot.Owner == vehicle.Owner) &&
-            (binding.QueueGeneration == 0 ? vehicle.QueueEntry is null :
-                vehicle.QueueEntry is VehicleQueueEntry queue && queue.Generation == binding.QueueGeneration);
+            NavigationPrecisionOwnership.Matches(vehicle, binding);
     }
 
     private static bool MayMove(in NavigationMotionInput input, in NavigationMotionProposal proposal)
@@ -207,7 +202,7 @@ internal sealed class NavigationMotionArbitrator
         NavigationTrafficDirective traffic = input.Traffic;
         if (!input.CanMove || !float.IsFinite(input.EffectiveMaximumSpeed) || input.EffectiveMaximumSpeed < 0 ||
             traffic.Availability != NavigationModuleAvailability.Available || traffic.Binding != input.Binding ||
-            traffic.Tick != input.Tick || traffic.Action is not (NavigationTrafficAction.Proceed or NavigationTrafficAction.Recovery) ||
+            traffic.Tick != input.Tick || traffic.Action is not (NavigationTrafficAction.Proceed or NavigationTrafficAction.Recovery or NavigationTrafficAction.Brake) ||
             !float.IsFinite(traffic.MaximumSpeed) || traffic.MaximumSpeed < 0) return false;
         double maximum = Math.Min(input.Vehicle.Profile.MaximumSpeed,
             Math.Min(input.EffectiveMaximumSpeed, traffic.MaximumSpeed));

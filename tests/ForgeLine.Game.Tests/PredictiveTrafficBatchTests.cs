@@ -10,6 +10,79 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void FarReservedDockKeepsItsExactSlotGenerationWithoutHoldingCoarseTravel()
+    {
+        var (frame, intent) = FarDock(VehicleDockStatus.Reserved, false);
+        var result = new PredictiveTrafficPlanner().PlanBatch(frame, [intent], new ClearGeometry(), 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Proceed, Assert.Single(result).Action);
+        Assert.Equal(5UL, result[0].Binding.DockGeneration);
+        Assert.Equal(VehicleDockStatus.Reserved, frame.Vehicles[0].DockVisit!.Value.Status);
+    }
+
+    [Theory]
+    [InlineData(VehicleDockStatus.Reserved, true)]
+    [InlineData(VehicleDockStatus.Approaching, false)]
+    [InlineData(VehicleDockStatus.Aligning, false)]
+    [InlineData(VehicleDockStatus.Docked, false)]
+    [InlineData(VehicleDockStatus.Servicing, false)]
+    [InlineData(VehicleDockStatus.Exiting, false)]
+    public void PreciseDockOwnerRetainsMovement(VehicleDockStatus status, bool entered)
+    {
+        var (frame, intent) = FarDock(status, entered);
+        var geometry = new TracingGeometry();
+        var result = new PredictiveTrafficPlanner().PlanBatch(frame, [intent], geometry, 3, 10000, out _);
+        Assert.Equal(NavigationTrafficAction.Hold, Assert.Single(result).Action);
+        Assert.Equal(NavigationBlockReason.ReservedCorridor, result[0].Reason);
+        Assert.Empty(geometry.Sweeps);
+    }
+
+    [Fact]
+    public void FarQueueMemberTravelsWithItsGenerationAndHandsOffAtTheLocalQueue()
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0] with
+        {
+            QueueEntry = new VehicleQueueEntry(new EntityId(9, 1), new PlayerId(1), 3, new SimulationTick(1),
+                VehicleQueueService.CargoPickup, Position: 2, WaitingCount: 2, Target: new Vector3(30, 0.5f, 20)),
+            PrecisionApproachRadius = 10
+        };
+        var intent = intents[0] with { Binding = intents[0].Binding with { QueueGeneration = 3 } };
+        var far = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [], Limits());
+        Assert.Equal(NavigationTrafficAction.Proceed,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(far, [intent], new ClearGeometry(), 3, 10000, out _)).Action);
+        vehicle = vehicle with { Pose = vehicle.Pose with { Position = new Vector3(25, 0.5f, 20) } };
+        var near = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [], Limits());
+        Assert.Equal(NavigationTrafficAction.Hold,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(near, [intent], new ClearGeometry(), 3, 10000, out _)).Action);
+    }
+
+    [Fact]
+    public void CoarseTravelCannotBorrowAReassignedDockSlot()
+    {
+        var (frame, intent) = FarDock(VehicleDockStatus.Reserved, false);
+        var vehicle = frame.Vehicles[0] with
+            { BuildingSlot = frame.Vehicles[0].BuildingSlot!.Value with { Truck = new EntityId(2, 1) } };
+        var stale = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [], Limits());
+        Assert.Equal(NavigationModuleAvailability.Unavailable,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(stale, [intent], new ClearGeometry(), 3, 10000, out _)).Availability);
+    }
+
+    private static (NavigationTrafficFrame, NavigationTrafficIntent) FarDock(VehicleDockStatus status, bool entered)
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0];
+        var pose = new VehicleDockPose(new(40, 0.5f, 20), new(42, 0.5f, 20), new(44, 0.5f, 20), MathF.PI / 2,
+            1, 0.5f, new Vector3(30, 0.5f, 20));
+        vehicle = vehicle with
+        {
+            DockVisit = new VehicleDockVisit(new EntityId(8, 1), 5, status, VehicleDockBlockReason.None, pose, LaneEntered: entered),
+            BuildingSlot = new VehicleDockSlot(vehicle.Entity, 5, pose, vehicle.Owner), PrecisionApproachRadius = 10
+        };
+        var intent = intents[0] with { Binding = intents[0].Binding with { DockGeneration = 5 } };
+        return (new(frame.Tick, frame.Collision, true, [vehicle], [], Limits()), intent);
+    }
+
+    [Fact]
     public void PredictionContinuesAlongTheSelectedBentRoutePastTheFirstWaypoint()
     {
         var (frame, intents) = Crossing();

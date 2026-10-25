@@ -156,6 +156,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         Vector3 candidate = start.Position + forward * (speed * input.DeltaSeconds);
         candidate = GroundMovementStep.ClampArrival(start.Position, candidate,
             input.Binding.OriginalOrder.WorldTarget, tolerance);
+        candidate = NavigationMotionNumerics.ConstrainTravel(start.Position, candidate, (double)speed * input.DeltaSeconds);
         if (!Spend(workAllowance, ref workConsumed))
             return Hold(input, collision, Availability, NavigationBlockReason.SearchWork, brakingDistance);
         if (!collision.World.TrySampleHeight(candidate.X, candidate.Z, out float height) || !float.IsFinite(height))
@@ -380,6 +381,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
             !vehicle.Owner.IsSpecified || order.Issuer != vehicle.Owner ||
             input.Binding.RequestId == 0 || input.Binding.CommandGeneration == 0 ||
             !vehicle.Pose.IsValid || !vehicle.Profile.IsValid || !Finite(vehicle.Movement.Velocity) ||
+            !NavigationPrecisionOwnership.Matches(vehicle, input.Binding) ||
             !float.IsFinite(vehicle.Movement.HeadingRadians) || !Enum.IsDefined(vehicle.Movement.Status) ||
             !float.IsFinite(input.DeltaSeconds) || input.DeltaSeconds <= 0 ||
             !float.IsFinite(input.EffectiveMaximumSpeed) || input.EffectiveMaximumSpeed < 0 ||
@@ -418,8 +420,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         input.Binding.OriginalOrder.TargetHeadingRadians.HasValue ||
         input.Vehicle.DirectOrder is MovementOrder order &&
             (order.Kind == MovementOrderKind.LocalApproach || order.TargetHeadingRadians.HasValue) ||
-        input.Vehicle.DockVisit.HasValue || input.Vehicle.QueueEntry.HasValue ||
-        input.Binding.DockGeneration != 0 || input.Binding.QueueGeneration != 0 ||
+        NavigationPrecisionOwnership.IsPrecise(input.Vehicle) ||
         input.Route?.Request.TargetSemantics == NavigationTargetSemantics.DockAccess ||
         input.Route?.Request.Goal.RequiredHeadingRadians.HasValue == true;
 

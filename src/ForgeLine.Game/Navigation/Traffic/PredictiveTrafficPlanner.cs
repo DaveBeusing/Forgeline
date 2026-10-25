@@ -24,6 +24,8 @@ internal sealed partial class PredictiveTrafficPlanner : INavigationTrafficPlann
     private readonly Dictionary<ulong, PredictiveTrafficPassageLease> _passageLeases = new();
     private readonly Dictionary<EntityId, PredictiveTrafficVehicleState> _states = new();
 
+    internal bool HasReservations => _passageLeases.Count != 0;
+
     public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
 
     public NavigationTrafficDirective Plan(
