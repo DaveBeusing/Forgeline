@@ -20,6 +20,21 @@ public sealed class ConnectedLogisticsNavigationTests
         Assert.False(simulation.Entities.HasComponent<MovementOrder>(unit), $"Position={pose.Position}; state={state}; actors={string.Join(';', checkpoint.Actors)}");
     }
     [Fact]
+    public void VerifiedTurningArcMayTemporarilyLoseProjectedProgressWithoutConsumingTheRoute()
+    {
+        var (simulation, movement, unit) = Create();
+        simulation.RunTicks(30, TestContext.Current.CancellationToken);
+        var route = simulation.Entities.GetComponent<NavigationRouteState>(unit);
+        var pose = simulation.Entities.GetComponent<WorldTransform>(unit);
+        simulation.Entities.SetComponent(unit, pose with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI) });
+        simulation.Entities.SetComponent(unit, GroundMovementState.Stationary(MathF.PI));
+        simulation.RunTicks(300, TestContext.Current.CancellationToken);
+        Assert.InRange(Vector3.Distance(simulation.Entities.GetComponent<WorldTransform>(unit).Position, route.OriginalOrder.WorldTarget), 0, .5f);
+        Assert.False(simulation.Entities.HasComponent<MovementOrder>(unit));
+        Assert.Equal(route.OriginalOrder, Assert.Single(movement.CaptureNavigationState().Actors).OriginalOrder);
+    }
+
+    [Fact]
     public void ReplacementCommandGetsANewGenerationAndDestination()
     {
         var (simulation, movement, unit) = Create();
@@ -59,6 +74,58 @@ public sealed class ConnectedLogisticsNavigationTests
         Assert.Equal(initial, simulation.Entities.GetComponent<WorldTransform>(unit));
         Assert.True(simulation.Entities.HasComponent<MovementOrder>(unit));
         Assert.Equal(GroundMovementStatus.OutOfFuel, simulation.Entities.GetComponent<GroundMovementState>(unit).Status);
+    }
+    [Fact]
+    public void OfficialScenarioContinuesToDeliverCargoWithTrafficConnected()
+    {
+        using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026), TestContext.Current.CancellationToken);
+        runtime.Simulation.RunTicks(5000, TestContext.Current.CancellationToken);
+        long earlierDeliveries = runtime.CargoTransport.Metrics.CompletedOrderCount;
+        runtime.Simulation.RunTicks(5000, TestContext.Current.CancellationToken);
+        var actors = runtime.Services.GroundMovement.CaptureNavigationState().Actors;
+        var details = new List<string>();
+        foreach (var entity in runtime.Simulation.Entities.Query<UnitIdentity>())
+        {
+            var es = runtime.Simulation.Entities;
+            if (es.GetComponent<UnitIdentity>(entity).UnitId != UnitIds.CargoTruck) continue;
+            es.TryGetComponent(entity, out GroundMovementState state);
+            es.TryGetComponent(entity, out MovementOrder order);
+            es.TryGetComponent(entity, out VehicleDockVisit dock);
+            es.TryGetComponent(entity, out VehicleQueueEntry queue);
+            var transform = es.GetComponent<WorldTransform>(entity);
+            runtime.Terrain.TrySampleHeight(transform.Position.X, transform.Position.Z, out float ground);
+            details.Add($"offset={transform.Position.Y - ground}; authored={es.GetComponent<GroundMovement>(entity).HeightOffset}; {entity} {es.GetComponent<WorldTransform>(entity).Position} {state} {order} {dock} {queue}");
+        }
+        foreach (var entity in runtime.Simulation.Entities.Query<WorldTransform, SpatialPresence>())
+        {
+            var es = runtime.Simulation.Entities;
+            if (!NavigationMotionCapture.TryCaptureBody(es, es.GetComponent<SpatialPresence>(entity).CreateEntry(entity, es.GetComponent<WorldTransform>(entity)), out _))
+                details.Add($"INVALID PHYSICAL BODY {entity} {es.GetComponent<SpatialPresence>(entity)}");
+        }
+        Assert.True(earlierDeliveries > 0 && runtime.CargoTransport.Metrics.CompletedOrderCount > earlierDeliveries,
+            $"Deliveries={earlierDeliveries}->{runtime.CargoTransport.Metrics.CompletedOrderCount}; Actors: {string.Join(';', actors)}; Vehicles: {string.Join(';', details)}");
+    }
+    [Fact]
+    public void ActiveTrafficSurvivesSerializedSaveReplayAndIndependentContinuation()
+    {
+        using var original = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026), TestContext.Current.CancellationToken);
+        original.Simulation.RunTicks(950, TestContext.Current.CancellationToken);
+        Assert.NotEmpty(original.Services.GroundMovement.CaptureNavigationState().Actors);
+        var save = MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(MatchPersistenceService.CaptureSave(original)));
+        var replay = MatchPersistenceSerializer.DeserializeReplay(MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(original)));
+        using var restored = MatchPersistenceService.Restore(save);
+        using var playback = MatchPersistenceService.PlayReplay(replay);
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        foreach (ulong ticks in new ulong[] { 1, 30, 200 })
+        {
+            original.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            restored.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            playback.Simulation.RunTicks(ticks, TestContext.Current.CancellationToken);
+            string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+            Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
+        }
     }
     private static (SimulationCoordinator, GroundMovementSystem, EntityId) Create()
     {

@@ -267,6 +267,26 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
             if (index > currentWaypoint)
                 candidate = route.Waypoints[index - 1];
         }
+        // A parked body can occupy an intermediate grid waypoint while a later
+        // corridor target remains reachable. Inspect bounded forward directions
+        // before settling for the blocked prefix. Full body/terrain clearance is
+        // mandatory; this does not consume or replace the original waypoint.
+        for (int index = last + 1, inspectedForward = 0; index < total && inspectedForward < _options.MaximumLookaheadWaypoints; index++, inspectedForward++)
+        {
+            if (!Spend(horizonWorkLimit, ref consumed)) break;
+            Vector3 point = index < pointCount ? route.Waypoints[index] : input.Binding.OriginalOrder.WorldTarget;
+            Vector3 delta = point - input.Vehicle.Pose.Position; delta.Y = 0;
+            float length = delta.Length();
+            if (!float.IsFinite(length) || length <= DirectionEpsilon) continue;
+            Vector3 alternate = length > lookahead ? input.Vehicle.Pose.Position + delta * (lookahead / length) : point;
+            if (TryGroundedHorizon(input, collision, geometry, alternate, groundOffset, maximumSpeed,
+                horizonWorkLimit, ref consumed, out var nextTarget, out float nextDistance, out var nextReason, out bool clear) && clear)
+            {
+                target = nextTarget; safeDistance = nextDistance; usedWaypoint = index; reason = nextReason;
+                return true;
+            }
+            if (nextReason == NavigationBlockReason.MissingGeometry) { reason = nextReason; return false; }
+        }
         if (safeDistance <= 0) return false;
         reason = partialReason;
         return true;

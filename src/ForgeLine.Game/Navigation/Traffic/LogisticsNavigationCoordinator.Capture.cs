@@ -24,7 +24,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         var candidates = new Candidate[_active.Count];
         var observations = new NavigationVehicleObservation[_active.Count];
         var intents = new NavigationTrafficIntent[_active.Count];
-        var probes = new NavigationPassageProbe[_active.Count];
+        var probes = new List<NavigationPassageProbe>(_active.Count * 4);
         var neighborhoods = new Dictionary<EntityId, NavigationCollisionFrame>();
         for (int i = 0; i < _active.Count; i++)
         {
@@ -49,14 +49,23 @@ internal sealed partial class LogisticsNavigationCoordinator
             observations[i] = vehicle;
             int waypoint = route.NextWaypointIndex - 1;
             intents[i] = new(binding, vehicle.DirectOrder!.Value.WorldTarget, maximum, canMove, adapted, waypoint);
-            Vector3 probeTarget = adapted.Waypoints[Math.Min(adapted.Waypoints.Count - 1, waypoint + 4)];
-            probes[i] = new(vehicle.Pose.Position, probeTarget,
-                MathF.Max(snapshot.Grid.Settings.CellSizeMeters, maximum * Limits.PlanningHorizonSeconds));
+            Vector3 probeStart = vehicle.Pose.Position;
+            float probeRemaining = MathF.Max(snapshot.Grid.Settings.CellSizeMeters, maximum * Limits.PlanningHorizonSeconds);
+            for (int probeIndex = waypoint, segment = 0; probeRemaining > 0 && probeIndex < adapted.Waypoints.Count; probeIndex++, segment++)
+            {
+                if (segment == 16) return Unavailable(NavigationBlockReason.SearchWork, consumed);
+                Vector3 target = adapted.Waypoints[probeIndex];
+                float distance = new Vector2(target.X - probeStart.X, target.Z - probeStart.Z).Length();
+                if (!float.IsFinite(distance)) return Unavailable(NavigationBlockReason.Unknown, consumed);
+                probes.Add(new(probeStart, target, probeRemaining));
+                probeRemaining -= distance;
+                probeStart = target;
+            }
             var local = CaptureNeighborhood(physical, vehicle, context.Tick, ref consumed);
             if (local is null) return Unavailable(NavigationBlockReason.SearchWork, consumed);
             neighborhoods.Add(entity, local);
         }
-        var passageCapture = NavigationPassageDiscovery.Capture(snapshot, probes, Limits.WorkPerTick - consumed);
+        var passageCapture = NavigationPassageDiscovery.Capture(snapshot, CollectionsMarshal.AsSpan(probes), Limits.WorkPerTick - consumed);
         consumed += passageCapture.WorkConsumed;
         if (!passageCapture.Complete) return Unavailable(NavigationBlockReason.SearchWork, consumed);
         var reservations = CaptureServiceReservations(context, ref consumed, out bool reservationsComplete);

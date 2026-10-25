@@ -10,6 +10,38 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void ClearPredictionReportsNoHazardAndRetainsNoWaitingHistory()
+    {
+        var (frame, intents) = Crossing();
+        var single = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [frame.Vehicles[0]], [], Limits());
+        var planner = new PredictiveTrafficPlanner();
+        var directive = Assert.Single(planner.PlanBatch(single, [intents[0]], new ClearGeometry(), 3, 10000, out _));
+        Assert.Equal(NavigationBlockReason.None, directive.Reason);
+        Assert.Empty(planner.CaptureState().Vehicles);
+    }
+
+    [Fact]
+    public void VerifiedPartialHorizonAllowsBrakingApproachInsteadOfAnEarlyStop()
+    {
+        var (frame, intents) = Crossing();
+        var single = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [frame.Vehicles[0]], [], Limits());
+        var planner = new PredictiveTrafficPlanner();
+        var directive = Assert.Single(planner.PlanBatch(single, [intents[0]], new LimitedGeometry(), 3, 10000, out _));
+        Assert.Equal(NavigationTrafficAction.Proceed, directive.Action);
+        Assert.Equal(NavigationBlockReason.MovingVehicle, directive.Reason);
+        Assert.InRange(directive.MaximumSpeed, .01f, 5.99f);
+        Assert.Equal(new EntityId(99, 1), Assert.Single(planner.CaptureState().Vehicles).WaitingFor);
+    }
+
+    private sealed class LimitedGeometry : INavigationGeometryQuery
+    {
+        public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
+        public NavigationSweepResult Sweep(NavigationCollisionFrame frame, in NavigationSweep movement, int workAllowance) =>
+            new(NavigationGeometryStatus.Limited, frame.World.Revision, frame.Tick, .5f, NavigationBlockReason.MovingVehicle,
+                NavigationReadAdapter.GetObstacleIdentity(new EntityId(99, 1)), 1);
+    }
+
+    [Fact]
     public void FarReservedDockKeepsItsExactSlotGenerationWithoutHoldingCoarseTravel()
     {
         var (frame, intent) = FarDock(VehicleDockStatus.Reserved, false);
@@ -17,6 +49,17 @@ public sealed class PredictiveTrafficBatchTests
         Assert.Equal(NavigationTrafficAction.Proceed, Assert.Single(result).Action);
         Assert.Equal(5UL, result[0].Binding.DockGeneration);
         Assert.Equal(VehicleDockStatus.Reserved, frame.Vehicles[0].DockVisit!.Value.Status);
+    }
+
+    [Fact]
+    public void UnenteredBlockedDockDoesNotTakeOwnershipOfCoarseTravel()
+    {
+        var (frame, intent) = FarDock(VehicleDockStatus.Blocked, false);
+        var vehicle = frame.Vehicles[0] with { DockVisit = frame.Vehicles[0].DockVisit!.Value with { Generation = 0 }, BuildingSlot = null };
+        intent = intent with { Binding = intent.Binding with { DockGeneration = 0 } };
+        var blocked = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [], Limits());
+        Assert.Equal(NavigationTrafficAction.Proceed,
+            Assert.Single(new PredictiveTrafficPlanner().PlanBatch(blocked, [intent], new ClearGeometry(), 3, 10000, out _)).Action);
     }
 
     [Theory]
@@ -273,6 +316,32 @@ public sealed class PredictiveTrafficBatchTests
             Assert.True(Vector3.Dot(directive.SuggestedTarget.Value - vehicle.Pose.Position, backwards) > 0);
             Assert.InRange(directive.MaximumSpeed, 0.01f, 1);
         }
+    }
+
+    [Fact]
+    public void ReverseSteeringEscapeRetainsItsGoalAcrossActualMotionAndCheckpoint()
+    {
+        var (frame, intents) = Crossing();
+        var stopped = frame.Vehicles.Select(static v => v with { Movement = v.Movement with { Velocity = Vector3.Zero } }).ToArray();
+        var planner = new PredictiveTrafficPlanner();
+        var geometry = new CycleGeometry(false);
+        frame = new(frame.Tick, frame.Collision, true, stopped, [], Limits());
+        planner.PlanBatch(frame, intents, geometry, 3, 10000, out _);
+        var later = new NavigationTrafficFrame(new(50), new(frame.Collision.World, 50, frame.Collision.Coverage, true, [], 10), true, stopped, [], Limits());
+        var first = Assert.Single(planner.PlanBatch(later, intents, geometry, 3, 10000, out _), static d => d.Action == NavigationTrafficAction.Recovery);
+        int index = Array.FindIndex(stopped, v => v.Entity == first.Binding.Requester);
+        var vehicle = stopped[index];
+        Vector3 side = Vector3.Transform(Vector3.UnitX, vehicle.Pose.Rotation);
+        Assert.True(MathF.Abs(Vector3.Dot(first.SuggestedTarget!.Value - vehicle.Pose.Position, side)) >= 5.99f, $"Escape={first}; leases={string.Join(';', planner.CaptureState().Leases)}");
+        Assert.True(NavigationReverseMotion.TryStep(vehicle, first.SuggestedTarget.Value, 1, .05f, frame.Collision.World, out var end, out _, out float heading));
+        stopped[index] = vehicle with { Pose = end, Movement = vehicle.Movement with { Velocity = (end.Position - vehicle.Pose.Position) / .05f, HeadingRadians = heading } };
+        var restored = new PredictiveTrafficPlanner(); restored.RestoreState(planner.CaptureState());
+        var next = new NavigationTrafficFrame(new(51), new(frame.Collision.World, 51, frame.Collision.Coverage, true, [], 10), true, stopped, [], Limits());
+        var actual = planner.PlanBatch(next, intents, geometry, 3, 10000, out _);
+        Assert.Equal(actual.ToArray(), restored.PlanBatch(next, intents, geometry, 3, 10000, out _).ToArray());
+        var continuing = Assert.Single(actual, d => d.Binding.Requester == first.Binding.Requester);
+        Assert.Equal(NavigationTrafficAction.Recovery, continuing.Action);
+        Assert.Equal(first.SuggestedTarget, continuing.SuggestedTarget);
     }
 
     private sealed class CycleGeometry(bool blockRear) : INavigationGeometryQuery

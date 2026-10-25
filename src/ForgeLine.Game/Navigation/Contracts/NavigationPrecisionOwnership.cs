@@ -10,7 +10,7 @@ internal static class NavigationPrecisionOwnership
         if (vehicle.DirectOrder is MovementOrder direct &&
             (direct.Kind != MovementOrderKind.Strategic || direct.TargetHeadingRadians.HasValue)) return true;
         if (vehicle.DockVisit is { } visit &&
-            (visit.LaneEntered || visit.Status is not VehicleDockStatus.Reserved and not VehicleDockStatus.Busy)) return true;
+            (visit.LaneEntered || visit.Status is not VehicleDockStatus.Reserved and not VehicleDockStatus.Busy and not VehicleDockStatus.Blocked)) return true;
         if (vehicle.QueueEntry is { } queue)
         {
             if (queue.ArrivedAtService || !float.IsFinite(vehicle.PrecisionApproachRadius) || vehicle.PrecisionApproachRadius <= 0) return true;
@@ -27,7 +27,7 @@ internal static class NavigationPrecisionOwnership
             if (visit.Generation != binding.DockGeneration) return false;
             if (visit.Generation > 0 && (vehicle.BuildingSlot is not VehicleDockSlot slot || slot.Truck != vehicle.Entity ||
                 slot.Generation != visit.Generation || slot.Owner != vehicle.Owner)) return false;
-            if (visit.Generation == 0 && (visit.LaneEntered || visit.Status != VehicleDockStatus.Busy)) return false;
+            if (visit.Generation == 0 && (visit.LaneEntered || visit.Status is not VehicleDockStatus.Busy and not VehicleDockStatus.Blocked)) return false;
         }
         else if (binding.DockGeneration != 0) return false;
         if (vehicle.QueueEntry is { } queue)

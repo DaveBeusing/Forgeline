@@ -16,7 +16,7 @@ internal static class NavigationPassageDiscovery
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentOutOfRangeException.ThrowIfNegative(workAllowance);
-        if (probes.Length > 512) throw new ArgumentException("Passage probe bound exceeded.", nameof(probes));
+        if (probes.Length > 2048) throw new ArgumentException("Passage probe bound exceeded.", nameof(probes));
         var grid = snapshot.Grid;
         var passages = new SortedDictionary<ulong, NavigationTrafficPassage>();
         var captured = new Dictionary<(int Cell, int Axis), ulong>();

@@ -34,7 +34,10 @@ public sealed partial class GroundMovementSystem
         if (_navigationControl is not { } coordinator) return;
         var plan = coordinator.Prepare(context);
         var motions = plan.Motions.ToDictionary(static m => m.Input.Binding.Requester);
+        var participants = new List<EntityId>(plan.Motions.Count);
         foreach (var entity in context.Entities.Query<WorldTransform, GroundMovementState>(ForgeLine.Ecs.QueryIterationOrder.StableByEntityIndex))
+            if (LogisticsNavigationCoordinator.Controls(context.Entities, entity)) participants.Add(entity);
+        foreach (var entity in participants)
         {
             if (!LogisticsNavigationCoordinator.Controls(context.Entities, entity) ||
                 !context.Entities.TryGetComponent(entity, out GroundMovement movement) ||
@@ -80,8 +83,7 @@ public sealed partial class GroundMovementSystem
             float distance = Distance(position, accepted.Input.Binding.OriginalOrder.WorldTarget);
             float best = previous.ObservedOrderTick == order.AcceptedAtTick ? previous.PreviousDistanceToTarget : oldDistance;
             if (!float.IsFinite(best)) best = oldDistance;
-            bool progressed = best - distance >= _options.ProgressEpsilonMeters ||
-                ordinary && proposal.End.Rotation != proposal.Start.Rotation;
+            bool progressed = best - distance >= _options.ProgressEpsilonMeters;
             int stalled = progressed ? 0 : Math.Min(int.MaxValue - 1, previous.StalledTicks) + 1;
             bool changed = proposal.End != proposal.Start;
             bool arrived = accepted.Input.CanMove && accepted.Input.Traffic.Action != NavigationTrafficAction.Recovery &&

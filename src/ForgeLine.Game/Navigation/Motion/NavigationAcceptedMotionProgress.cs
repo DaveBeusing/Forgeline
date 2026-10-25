@@ -41,8 +41,11 @@ internal static class NavigationAcceptedMotionProgress
                 return false;
             if (index == usedWaypoint) break;
         }
-        if (!start.Found || !end.Found || start.Ambiguous || end.Ambiguous || end.Progress + 0.000001 < start.Progress)
-            return false;
+        if (!start.Found || !end.Found) return false;
+        // Steering around a corner can temporarily move away from the path's projection.
+        // Geometry has already accepted that motion. Retain waypoint ownership until a
+        // later unambiguous forward projection; do not veto the safe turning arc itself.
+        if (start.Ambiguous || end.Ambiguous || end.Progress + 0.000001 < start.Progress) return true;
 
         // The rank is a segment index plus its projected fraction. Reaching an
         // intermediate vertex permits choosing the next target, never removing

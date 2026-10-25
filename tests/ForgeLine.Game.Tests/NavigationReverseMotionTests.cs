@@ -29,11 +29,13 @@ public sealed class NavigationReverseMotionTests
         Assert.InRange(speed, 0.9f, 1.00001f);
     }
 
-    [Fact]
-    public void ReverseSteeringReachesASideEscapeWithinAccelerationAndYawBounds()
+    [Theory]
+    [InlineData(7, 4)]
+    [InlineData(6, 1)]
+    public void ReverseSteeringReachesASideEscapeWithinAccelerationAndYawBounds(float side, float rear)
     {
         var (world, vehicle) = Setup();
-        Vector3 target = new(2993, 0.5f, 2996);
+        Vector3 target = new(3000 - side, 0.5f, 3000 - rear);
         for (int tick = 0; tick < 300; tick++)
         {
             var start = vehicle;

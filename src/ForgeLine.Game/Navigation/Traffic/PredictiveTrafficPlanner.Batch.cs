@@ -52,7 +52,10 @@ internal sealed partial class PredictiveTrafficPlanner
         foreach (var vehicle in frame.Vehicles) vehicles.Add(vehicle.Entity, vehicle);
         var paths = new NavigationPose[ordered.Length][];
         var profiles = new NavigationVehicleProfile[ordered.Length];
+        var speedCaps = new float[ordered.Length];
         var waits = new NavigationBlockReason[ordered.Length];
+        var hazards = new NavigationBlockReason[ordered.Length];
+        Array.Fill(hazards, NavigationBlockReason.None);
         var waitingFor = new EntityId[ordered.Length];
         float dt = horizonSeconds / PredictionSteps;
         for (int i = 0; i < ordered.Length; i++)
@@ -70,17 +73,24 @@ internal sealed partial class PredictiveTrafficPlanner
             if (!frame.GetVehicleCollision(vehicle.Entity).IsComplete)
                 return Unavailable(NavigationBlockReason.MissingGeometry);
             profiles[i] = vehicle.Profile;
+            speedCaps[i] = MathF.Min(intent.MaximumSpeed, vehicle.Profile.MaximumSpeed);
             if (intent.Route is { } route && (route.Request.RequestId != intent.Binding.RequestId ||
                 route.Request.OriginalDestination != intent.Binding.OriginalOrder.WorldTarget ||
                 route.Request.Vehicle != vehicle.Profile || route.Request.Revision != frame.Collision.World.Revision ||
                 intent.CurrentWaypoint < 0 || intent.CurrentWaypoint >= route.Waypoints.Count ||
                 vehicle.DirectOrder?.WorldTarget != route.Waypoints[intent.CurrentWaypoint]))
                 return Unavailable(NavigationBlockReason.StaleSnapshot);
-            var predicted = Predict(vehicle, intent, dt, frame.Collision.World, out var predictionFailure);
+            bool escaping = _states.TryGetValue(vehicle.Entity, out var priorEscape) &&
+                priorEscape.CommandGeneration == intent.Binding.CommandGeneration && priorEscape.LastTick <= frame.Tick.Value &&
+                priorEscape.RecoveryTarget is Vector3 escapeTarget && HorizontalDistance(vehicle.Pose.Position, escapeTarget) > .2f &&
+                intent.CanMove && !NavigationPrecisionOwnership.IsPrecise(vehicle);
+            var predicted = escaping
+                ? PredictReverse(vehicle, priorEscape.RecoveryTarget!.Value, intent.MaximumSpeed, dt, frame.Collision.World, out var predictionFailure)
+                : Predict(vehicle, intent, dt, frame.Collision.World, out predictionFailure);
             if (predicted is null) return Unavailable(predictionFailure);
             paths[i] = predicted;
             // Precision owners retain their own admission and release rules.
-            if (!intent.CanMove || NavigationPrecisionOwnership.IsPrecise(vehicle) ||
+            if (escaping || !intent.CanMove || NavigationPrecisionOwnership.IsPrecise(vehicle) ||
                 intent.Binding.OriginalOrder.Kind != MovementOrderKind.Strategic)
                 waits[i] = NavigationBlockReason.ReservedCorridor;
             else
@@ -129,6 +139,7 @@ internal sealed partial class PredictiveTrafficPlanner
         {
             if (waits[i] != NavigationBlockReason.None) continue;
             var collision = frame.GetVehicleCollision(ordered[i].Binding.Requester);
+            float clearDistance = 0;
             for (int step = 1; step <= PredictionSteps; step++)
             {
                 if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
@@ -153,6 +164,27 @@ internal sealed partial class PredictiveTrafficPlanner
                     return Unavailable(NavigationBlockReason.SearchWork);
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1)
                 {
+                    // A future obstruction is a braking horizon, not an immediate stop. The
+                    // actual motion owner still sweeps its chosen steering step independently.
+                    // Holding the entire horizon alternates acceleration/braking forever before
+                    // a parked vehicle can enter local avoidance or the stopped recovery phase.
+                    float availableDistance = clearDistance + HorizontalDistance(paths[i][step - 1].Position, paths[i][step].Position) * result.AllowedFraction;
+                    if (availableDistance > 0 && result.Status is NavigationGeometryStatus.Blocked or NavigationGeometryStatus.Limited &&
+                        result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+                    {
+                        float deceleration = profiles[i].Deceleration;
+                        float reserve = deceleration * dt;
+                        float safe = MathF.Sqrt(reserve * reserve + 2 * deceleration * availableDistance) - reserve;
+                        speedCaps[i] = MathF.Min(speedCaps[i], safe);
+                        hazards[i] = result.Reason;
+                        if (result.Blocker is NavigationObstacleIdentity distant && distant.Source == NavigationObstacleSource.Entity &&
+                            distant.Value <= uint.MaxValue && distant.Generation <= uint.MaxValue)
+                            waitingFor[i] = new((uint)distant.Value, (uint)distant.Generation);
+                        if (vehicles[ordered[i].Binding.Requester].Movement.Velocity.LengthSquared() <= .0025f &&
+                            WaitingAge(ordered[i].Binding, frame.Tick.Value) >= RecoveryWaitTicks)
+                            waits[i] = result.Reason;
+                        break;
+                    }
                     if (result.Blocker is NavigationObstacleIdentity blocker && blocker.Source == NavigationObstacleSource.Entity &&
                         blocker.Value <= uint.MaxValue && blocker.Generation <= uint.MaxValue)
                         waitingFor[i] = new EntityId((uint)blocker.Value, (uint)blocker.Generation);
@@ -173,13 +205,14 @@ internal sealed partial class PredictiveTrafficPlanner
                     }
                 }
                 if (waits[i] != NavigationBlockReason.None) break;
+                clearDistance += HorizontalDistance(paths[i][step - 1].Position, paths[i][step].Position);
             }
         }
         // A stopped wait-for cycle may grant one fully swept reverse escape. Search is bounded,
         // deterministic and remains advisory: the movement owner must brake first and sweep each
         // accepted reverse step again. No lateral displacement is ever authorized here.
         var recovery = new Vector3?[ordered.Length];
-        var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry,
+        var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry, passagePlan.Leases,
             workAllowance - workConsumed, recovery);
         if (recoveryWork < 0)
         {
@@ -187,23 +220,6 @@ internal sealed partial class PredictiveTrafficPlanner
             return Unavailable(NavigationBlockReason.SearchWork);
         }
         workConsumed += recoveryWork;
-        for (int i = 0; i < recovery.Length; i++)
-        {
-            if (recovery[i] is not Vector3 escape) continue;
-            foreach (var lease in passagePlan.Leases.Values)
-            {
-                if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
-                workConsumed++;
-                if (lease.Owner != ordered[i].Binding.Requester &&
-                    Touches(lease.Passage, [vehicles[ordered[i].Binding.Requester].Pose,
-                        new NavigationPose(escape, vehicles[ordered[i].Binding.Requester].Pose.Rotation)], profiles[i]))
-                {
-                    recovery[i] = null;
-                    break;
-                }
-            }
-        }
-
         // State is committed only after a complete successful computation.
         _passageLeases.Clear();
         foreach (var pair in passagePlan.Leases) _passageLeases.Add(pair.Key, pair.Value);
@@ -214,9 +230,14 @@ internal sealed partial class PredictiveTrafficPlanner
             var intent = ordered[i];
             if (waits[i] == NavigationBlockReason.None)
             {
-                _states.Remove(intent.Binding.Requester);
+                if (hazards[i] == NavigationBlockReason.None) _states.Remove(intent.Binding.Requester);
+                else
+                {
+                    _ = Waiting(intent.Binding, frame.Tick, hazards[i], 0);
+                    _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with { WaitingFor = waitingFor[i], RecoveryTarget = null };
+                }
                 directives[i] = new(NavigationModuleAvailability.Available, intent.Binding, frame.Tick,
-                    NavigationTrafficAction.Proceed, MathF.Min(intent.MaximumSpeed, profiles[i].MaximumSpeed), null, NavigationBlockReason.None);
+                    NavigationTrafficAction.Proceed, speedCaps[i], null, hazards[i]);
             }
             else
             {
@@ -255,6 +276,22 @@ internal sealed partial class PredictiveTrafficPlanner
     {
         int index = a.Index.CompareTo(b.Index);
         return index != 0 ? index : a.Generation.CompareTo(b.Generation);
+    }
+
+    private static NavigationPose[]? PredictReverse(NavigationVehicleObservation vehicle, Vector3 target,
+        float maximumSpeed, float dt, NavigationWorldSnapshot world, out NavigationBlockReason failure)
+    {
+        failure = NavigationBlockReason.Terrain;
+        var poses = new NavigationPose[PredictionSteps + 1]; poses[0] = vehicle.Pose;
+        for (int step = 1; step <= PredictionSteps; step++)
+        {
+            if (!NavigationReverseMotion.TryStep(vehicle, target, maximumSpeed, dt, world, out var end, out _, out float heading)) return null;
+            poses[step] = end;
+            vehicle = vehicle with { Pose = end, Movement = vehicle.Movement with
+                { Velocity = (end.Position - vehicle.Pose.Position) / dt, HeadingRadians = heading } };
+        }
+        failure = NavigationBlockReason.None;
+        return poses;
     }
 
     private static NavigationPose[]? Predict(in NavigationVehicleObservation vehicle, in NavigationTrafficIntent intent,

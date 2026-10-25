@@ -358,7 +358,7 @@ public sealed class MatchRuntime : IDisposable
             new UnitFactory(
                 simulation.Entities,
                 inventories,
-                cargoTransport);
+                cargoTransport, terrain);
         var unitProduction =
             new UnitProductionSystem(
                 unitDefinitions,
