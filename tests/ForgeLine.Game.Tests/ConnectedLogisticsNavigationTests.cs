@@ -179,6 +179,43 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Fact]
+    public void ReservedHeadCanClearARearNeighborBeforeEnteringItsDockLane()
+    {
+        Vector3 goal = new(45.61064f, .5f, 29.082f);
+        var (simulation, movement, unit) = Create(goal: goal);
+        var entities = simulation.Entities;
+        const float heading = 2.9160392f;
+        var initial = new WorldTransform(new(30, .5f, 30), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading), new(3.2f, 2.4f, 6.4f));
+        entities.SetComponent(unit, initial);
+        entities.SetComponent(unit, GroundMovementState.Stationary(heading));
+        entities.SetComponent(unit, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        entities.SetComponent(unit, new GroundMovement(14.5f, 7, 10, 2.5f, 1.9f, 1, 5.5f, 8, 24, .5f));
+        entities.SetComponent(unit, new MovementOrder(new PlayerId(1), goal, SimulationTick.Zero, new(1), MovementOrderKind.LocalApproach, MathF.PI / 2));
+        var building = entities.CreateEntity();
+        Vector3 approach = new(30.21064f, .5f, 29.082f);
+        var queue = new VehicleQueueEntry(building, new PlayerId(1), 15, SimulationTick.Zero,
+            VehicleQueueService.CargoPickup, Position: 1, WaitingCount: 1, Target: approach, Heading: MathF.PI / 2);
+        var dockPose = new VehicleDockPose(goal, goal + new Vector3(15.2f, 0, 0), goal + new Vector3(30.4f, 0, 0), MathF.PI / 2, 3.2f, 1.6f, approach);
+        entities.AddComponent(building, new VehicleDockSlot(unit, 15, dockPose, new PlayerId(1)));
+        entities.AddComponent(unit, new VehicleDockVisit(building, 15, VehicleDockStatus.Approaching, VehicleDockBlockReason.None, dockPose));
+        entities.AddComponent(unit, queue);
+        var parked = entities.CreateEntity();
+        var parkedPose = initial with { Position = new(23.97074f, .5f, 30.915f), Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, 1.9693964f) };
+        entities.AddComponent(parked, parkedPose);
+        entities.AddComponent(parked, entities.GetComponent<GroundMovement>(unit));
+        entities.AddComponent(parked, GroundMovementState.Stationary(1.9693964f));
+        entities.AddComponent(parked, entities.GetComponent<UnitIdentity>(unit));
+        entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(unit));
+        entities.AddComponent(parked, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        simulation.RunTicks(600, TestContext.Current.CancellationToken);
+        Assert.Equal(parkedPose, entities.GetComponent<WorldTransform>(parked));
+        Assert.Equal(queue, entities.GetComponent<VehicleQueueEntry>(unit));
+        Assert.False(entities.GetComponent<VehicleDockVisit>(unit).LaneEntered);
+        Assert.False(entities.HasComponent<MovementOrder>(unit), $"pose={entities.GetComponent<WorldTransform>(unit)}; veto={string.Join(';', movement.CaptureLegacyNavigationVetoes())}");
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position, goal), 0, .11f);
+    }
+
+    [Fact]
     public void QueueOwnerCanBackIntoItsOwnWaitingPoseWithItsRequiredAlignment()
     {
         Vector3 goal = new(25, .5f, 30);
