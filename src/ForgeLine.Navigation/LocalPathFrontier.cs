@@ -1,6 +1,6 @@
 namespace ForgeLine.Navigation;
 
-/// <summary>Exclusively leased local-search queue with bounded retained storage.</summary>
+/// <summary>Exclusively leased local-search workspace with bounded retained storage.</summary>
 internal sealed class LocalPathFrontier
 {
     private const int MaximumRetainedQueues = 8;
@@ -8,6 +8,10 @@ internal sealed class LocalPathFrontier
     private static readonly LocalPathFrontier?[] s_available = new LocalPathFrontier[MaximumRetainedQueues];
     private readonly PriorityQueue<(int Index, float Cost), (float Estimate, float Remaining, int Index)> _queue = new();
     private int _peakCount;
+
+    public Dictionary<int, float> BestCost { get; } = new();
+    public Dictionary<int, int> Previous { get; } = new();
+    public HashSet<NavigationSectorCoordinate> Corridor { get; } = new();
 
     private LocalPathFrontier() { }
 
@@ -25,8 +29,15 @@ internal sealed class LocalPathFrontier
     {
         // All success, failure and exception paths release their exclusive
         // lease. Queue values contain no world, entity or path references.
+        bool oversized = frontier._peakCount > MaximumRetainedEntries ||
+            frontier.BestCost.Count > MaximumRetainedEntries ||
+            frontier.Previous.Count > MaximumRetainedEntries ||
+            frontier.Corridor.Count > MaximumRetainedEntries;
         frontier._queue.Clear();
-        if (frontier._peakCount > MaximumRetainedEntries) return;
+        frontier.BestCost.Clear();
+        frontier.Previous.Clear();
+        frontier.Corridor.Clear();
+        if (oversized) return;
         frontier._peakCount = 0;
         for (int index = 0; index < s_available.Length; index++)
         {

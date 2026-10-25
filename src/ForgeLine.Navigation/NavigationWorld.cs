@@ -38,6 +38,16 @@ public sealed class NavigationWorld
         in NavigationCapabilities capabilities)
     {
         NavigationCapabilities key = capabilities;
+        if (_graphs.TryGetValue(key, out Lazy<NavigationSectorGraph>? cached))
+        {
+            return cached.Value;
+        }
+        return GetOrCreateSectorGraph(key);
+    }
+
+    private NavigationSectorGraph GetOrCreateSectorGraph(NavigationCapabilities key)
+    {
+        // Construct the capturing factory only on a miss, not for every truck route.
         var candidate =
             new Lazy<NavigationSectorGraph>(
                 () => NavigationSectorGraphBuilder.Build(

@@ -1,0 +1,80 @@
+name: Logistics navigation qualification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/navigation-qualification.yml'
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Game/NavigationRouting.cs'
+      - 'tests/ForgeLine.Navigation.Tests/**'
+      - 'tests/ForgeLine.Game.Tests/*Navigation*Tests.cs'
+      - 'build/navigation/**'
+  push:
+    branches: [master, fix/logistics-navigation-resilience]
+    paths:
+      - '.github/workflows/navigation-qualification.yml'
+      - 'src/ForgeLine.Navigation/**'
+      - 'src/ForgeLine.Game/NavigationRouting.cs'
+      - 'tests/ForgeLine.Navigation.Tests/**'
+      - 'tests/ForgeLine.Game.Tests/*Navigation*Tests.cs'
+      - 'build/navigation/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: logistics-navigation-readonly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            tests
+            assets/maps
+            build/navigation
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Navigation correctness, alternate routes and workspace isolation
+        run: dotnet test --project tests/ForgeLine.Navigation.Tests/ForgeLine.Navigation.Tests.csproj -c Release
+      - name: Loaded-truck blockade recovery and command ownership
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj -c Release -- --filter-class '*LogisticsNavigationRecoveryTests' '*NavigationWaypointOwnershipTests' '*NavigationBlockadeRecoveryTests'
+      - name: Retain source-matched CPU probe
+        shell: bash
+        run: |
+          mkdir -p artifacts/navigation
+          dotnet build build/navigation/NavigationProbe.csproj -c Release
+          dotnet build/navigation/bin/Release/net10.0/NavigationProbe.dll artifacts/navigation/current-cpu.json
+          git rev-parse HEAD > artifacts/navigation/source-commit.txt
+          dotnet --info > artifacts/navigation/runtime.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logistics-navigation-cpu-${{ github.sha }}
+          path: artifacts/navigation/
+          retention-days: 14
+
+  windows-game:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            tests
+            assets/maps
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Complete Game test project on the interactive target platform
+        run: dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj -c Release

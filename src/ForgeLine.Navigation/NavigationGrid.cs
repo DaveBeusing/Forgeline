@@ -273,6 +273,8 @@ public static class NavigationGridBuilder
         AxisAlignedBounds[] obstacles =
             staticObstacles?.ToArray() ?? [];
         ValidateObstacles(obstacles);
+        bool[] staticBlocked = RasterizeStaticObstacles(
+            worldBounds, width, height, resolvedSettings, obstacles);
 
         var cells =
             new NavigationCellSample[checked(width * height)];
@@ -311,13 +313,7 @@ public static class NavigationGridBuilder
                           (180.0f / MathF.PI)
                         : 90.0f;
 
-                bool blocked =
-                    IntersectsStaticObstacle(
-                        worldX,
-                        worldZ,
-                        halfCell,
-                        resolvedSettings.StaticObstacleClearanceMeters,
-                        obstacles);
+                bool blocked = staticBlocked.Length != 0 && staticBlocked[z * width + x];
 
                 cells[z * width + x] =
                     new NavigationCellSample(
@@ -339,32 +335,61 @@ public static class NavigationGridBuilder
             cells);
     }
 
-    private static bool IntersectsStaticObstacle(
-        float centerX,
-        float centerZ,
-        float halfCell,
-        float clearance,
+    private static bool[] RasterizeStaticObstacles(
+        in AxisAlignedBounds worldBounds,
+        int width,
+        int height,
+        NavigationGridSettings settings,
         ReadOnlySpan<AxisAlignedBounds> obstacles)
     {
-        float cellMinimumX = centerX - halfCell;
-        float cellMaximumX = centerX + halfCell;
-        float cellMinimumZ = centerZ - halfCell;
-        float cellMaximumZ = centerZ + halfCell;
-
-        for (int index = 0; index < obstacles.Length; index++)
+        if (obstacles.IsEmpty) return [];
+        var blocked = new bool[checked(width * height)];
+        foreach (AxisAlignedBounds obstacle in obstacles)
         {
-            AxisAlignedBounds obstacle = obstacles[index];
-
-            if (cellMinimumX <= obstacle.Maximum.X + clearance &&
-                cellMaximumX >= obstacle.Minimum.X - clearance &&
-                cellMinimumZ <= obstacle.Maximum.Z + clearance &&
-                cellMaximumZ >= obstacle.Minimum.Z - clearance)
+            GetOverlappingCells(worldBounds.Minimum.X, width, settings.CellSizeMeters,
+                obstacle.Minimum.X - settings.StaticObstacleClearanceMeters,
+                obstacle.Maximum.X + settings.StaticObstacleClearanceMeters,
+                out int firstX, out int endX);
+            if (firstX >= endX) continue;
+            GetOverlappingCells(worldBounds.Minimum.Z, height, settings.CellSizeMeters,
+                obstacle.Minimum.Z - settings.StaticObstacleClearanceMeters,
+                obstacle.Maximum.Z + settings.StaticObstacleClearanceMeters,
+                out int firstZ, out int endZ);
+            for (int z = firstZ; z < endZ; z++)
             {
-                return true;
+                Array.Fill(blocked, true, z * width + firstX, endX - firstX);
             }
         }
+        return blocked;
+    }
 
-        return false;
+    private static void GetOverlappingCells(
+        float origin, int count, float cellSize, float minimum, float maximum,
+        out int first, out int end)
+    {
+        // Search the exact float cell edges used by the original overlap test.
+        // Division/floor rounding at a boundary can otherwise omit touching
+        // cells, especially with negative origins or non-binary cell sizes.
+        float half = cellSize * 0.5f;
+        int lower = 0;
+        int upper = count;
+        while (lower < upper)
+        {
+            int middle = lower + (upper - lower) / 2;
+            float center = origin + middle * cellSize + half;
+            if (center + half < minimum) lower = middle + 1;
+            else upper = middle;
+        }
+        first = lower;
+        upper = count;
+        while (lower < upper)
+        {
+            int middle = lower + (upper - lower) / 2;
+            float center = origin + middle * cellSize + half;
+            if (center - half <= maximum) lower = middle + 1;
+            else upper = middle;
+        }
+        end = lower;
     }
 
     private static void ValidateObstacles(
