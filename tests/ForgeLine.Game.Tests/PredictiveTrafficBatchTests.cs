@@ -10,6 +10,35 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void ForeignServiceAdmissionPreventsNewAndRetainedUnenteredPassageClaims()
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0];
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2));
+        var reservation = new NavigationTrafficReservation(7, new(99, 1), 1, 0, NavigationReservationKind.Dock,
+            passage.Pose, passage.HalfExtents, SimulationTick.Zero, SimulationTick.Zero, true);
+        var planner = new PredictiveTrafficPlanner();
+        NavigationTrafficDirective Observe(ulong tick, bool reserved, bool entered = false)
+        {
+            var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true, [], 10);
+            var observed = entered ? vehicle with { Pose = passage.Pose } : vehicle;
+            var captured = new NavigationTrafficFrame(new(tick), collision, true, [observed],
+                reserved ? [reservation] : [], Limits(), [passage]);
+            return Assert.Single(planner.PlanBatch(captured, [intents[0]], new ClearGeometry(), 3, 10000, out _));
+        }
+        Assert.Equal(NavigationTrafficAction.Hold, Observe(1, true).Action);
+        Assert.Empty(planner.CaptureState().Leases);
+        Assert.Equal(NavigationTrafficAction.Proceed, Observe(2, false).Action);
+        Assert.False(Assert.Single(planner.CaptureState().Leases).Entered);
+        Assert.Equal(NavigationTrafficAction.Hold, Observe(3, true).Action);
+        Assert.Empty(planner.CaptureState().Leases);
+        planner.RestoreState(new(3, [], [new(passage, vehicle.Entity, 1, 1, 2, 3, true)]));
+        Assert.Equal(NavigationTrafficAction.Hold, Observe(4, true, entered: true).Action);
+        Assert.Equal(vehicle.Entity, Assert.Single(planner.CaptureState().Leases).Owner);
+        Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
+    }
+
+    [Fact]
     public void FullyClearedVehicleCanContinueAwayWithoutBeingRecapturedByItsBoundingCircle()
     {
         var passage = new NavigationTrafficPassage(1, new(new(30, .5f, 30), Quaternion.Identity), new(4, 1, 4));

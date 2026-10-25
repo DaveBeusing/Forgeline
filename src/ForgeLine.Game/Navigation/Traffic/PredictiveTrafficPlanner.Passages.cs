@@ -14,7 +14,7 @@ internal sealed partial class PredictiveTrafficPlanner
     private sealed record PassagePlan(Dictionary<ulong, PredictiveTrafficPassageLease> Leases, int Work, bool Complete);
 
     private PassagePlan PreparePassages(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
-        Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationPose[][] paths, int[] priority,
+        Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationPose[][] paths, int[] priority, bool[] admissionAllowed,
         IReadOnlyList<NavigationTrafficPassage> discovered,
         NavigationBlockReason[] waits, EntityId[] waitingFor, int allowance)
     {
@@ -49,8 +49,10 @@ internal sealed partial class PredictiveTrafficPlanner
                 // entry, canceled/changed commands or an expired approach can yield the admission.
                 if (allowance - consumed < intents.Length) return new(leases, allowance, false);
                 consumed += intents.Length;
-                bool stillApproaching = intents.Any(i => i.Binding.Requester == prior.Owner &&
-                    i.Binding.CommandGeneration == prior.CommandGeneration && i.CanMove);
+                bool stillApproaching = false;
+                for (int i = 0; i < intents.Length; i++)
+                    if (intents[i].Binding.Requester == prior.Owner && intents[i].Binding.CommandGeneration == prior.CommandGeneration &&
+                        intents[i].CanMove && admissionAllowed[i]) { stillApproaching = true; break; }
                 retained = occupied || !entered && stillApproaching && frame.Tick.Value - prior.GrantedAt < 80;
                 if (retained) active = prior with { LastTick = frame.Tick.Value, Entered = entered };
             }
@@ -89,7 +91,7 @@ internal sealed partial class PredictiveTrafficPlanner
                     consumed += PredictionSteps;
                     var intent = intents[index];
                     var vehicle = vehicles[intent.Binding.Requester];
-                    if (multiple || occupant.IsValid && occupant != vehicle.Entity || !intent.CanMove ||
+                    if (multiple || occupant.IsValid && occupant != vehicle.Entity || !intent.CanMove || !admissionAllowed[index] ||
                         NavigationPrecisionOwnership.IsPrecise(vehicle) ||
                         intent.Binding.OriginalOrder.Kind != MovementOrderKind.Strategic ||
                         !Touches(passage, paths[index], vehicle.Profile)) continue;
@@ -107,7 +109,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (allowance - consumed < PredictionSteps) return new(leases, allowance, false);
                 consumed += PredictionSteps;
                 var vehicle = vehicles[intents[index].Binding.Requester];
-                if (retained && vehicle.Entity == active.Owner || !Touches(passage, paths[index], vehicle.Profile) ||
+                if (!admissionAllowed[index] || retained && vehicle.Entity == active.Owner || !Touches(passage, paths[index], vehicle.Profile) ||
                     paths[index].Length > 1 && IsOutwardDeparture(passage, paths[index][0], paths[index][1], vehicle.Profile)) continue;
                 waits[index] = NavigationBlockReason.ReservedCorridor;
                 if (retained) waitingFor[index] = active.Owner;
