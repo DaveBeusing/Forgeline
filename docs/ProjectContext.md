@@ -157,15 +157,16 @@ Configured and read back on **2026-10-25**, at `master` commit
 - Before configuration there was no branch protection and the ruleset collection
   was empty. These controls use branch protection rather than a new ruleset;
   an empty ruleset collection alone no longer indicates absent enforcement.
-- GitHub reports PR #366 at `9c8f6268` as `BLOCKED` while its required check
-  is incomplete. That PR is also a draft; this observation does not independently
-  isolate status-check enforcement from the draft restriction. No prohibited
-  production push, deletion or actual merge was attempted as a test.
+- An isolated branch at the exact master revision received the same protection
+  request. GitHub rejected a direct fast-forward push with `GH006`, explicitly
+  citing both required pull-request integration and the cancelled `build-test`
+  check. The branch head stayed unchanged. The temporary branch and its protection
+  were then removed; master was never the target of the test.
 
 The connected content API does not expose administration writes. The locally
 authenticated GitHub CLI supplied administrator access for the configuration and
 readback. [Issue #307](https://github.com/DaveBeusing/Forgeline/issues/307) records
-the evidence and the remaining isolated rejection-test acceptance boundary.
+the configuration and isolated rejection-test evidence.
 Read current protection and ruleset settings before subsequent administration
 changes and preserve stronger controls. Successful CI alone does not establish
 repository protection.
