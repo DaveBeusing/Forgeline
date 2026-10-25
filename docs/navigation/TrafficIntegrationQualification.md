@@ -41,3 +41,7 @@ A static building touching the abstract admission envelope was treated as a traf
 ## Service wait versus physical escape
 
 A long external dock-reservation wait alone previously triggered a reverse Recovery directive. The red-to-green case now retains Hold/ReservedCorridor without inventing a physical blocker. Proactive escape outside the coarse participant graph requires an observed MovingVehicle or StaticObstacle reason. Explicit detected wait cycles and already verified retained escapes keep their separate bounded handling. All original turn/convoy cases remain green; the expanded set is 74 passed / 3 failed out of 77, with the same natural player/fleet cases outstanding.
+
+## Rear-clear passage contact
+
+Circumscribed-circle admission could recapture a vehicle after its complete footprint had already cleared a foreign passage, leaving it blocked just outside the region. Touches now projects the complete conservative swept physical enclosure (translation, rotation and clearance) into the horizontal passage frame. The outward-occupant check uses the same contact representation, including numerical padding. Geometry remains authoritative and the original owner/Entered lease is retained. The new outward-continuation case fails before and passes after, while inward re-entry remains rejected. Follow-up set:75 passed /3 same natural-flow failures out of78.

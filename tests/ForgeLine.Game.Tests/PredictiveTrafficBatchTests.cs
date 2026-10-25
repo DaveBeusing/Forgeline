@@ -10,6 +10,26 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void FullyClearedVehicleCanContinueAwayWithoutBeingRecapturedByItsBoundingCircle()
+    {
+        var passage = new NavigationTrafficPassage(1, new(new(30, .5f, 30), Quaternion.Identity), new(4, 1, 4));
+        var profile = new NavigationVehicleProfile(new(1.6f, 1.1f, 3.2f), .25f, 6, 4, 4, 2);
+        var owner = new EntityId(1, 1);
+        var other = new EntityId(2, 1);
+        var planner = new PredictiveTrafficPlanner();
+        planner.RestoreState(new(3, [], [new(passage, owner, 1, 1, 1, 1, true)]));
+        var start = new NavigationPose(new(30, .5f, 37.55f), Quaternion.Identity);
+        Assert.True(start.Position.Z - profile.HalfExtents.Z - profile.ClearanceMeters > passage.Pose.Position.Z + passage.HalfExtents.Z);
+        var outward = start with { Position = start.Position + Vector3.UnitZ * .1f };
+        Assert.True(planner.TryCheckPassage(other, start, outward, profile, 100, out _, out bool complete));
+        Assert.True(complete);
+        var inward = start with { Position = start.Position - Vector3.UnitZ * .3f };
+        Assert.False(planner.TryCheckPassage(other, start, inward, profile, 100, out _, out _));
+        Assert.Equal(owner, Assert.Single(planner.CaptureState().Leases).Owner);
+        Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
+    }
+
+    [Fact]
     public void WaitingForAnExternalServiceReservationDoesNotInventAPhysicalReverseEscape()
     {
         var (frame, intents) = Crossing();

@@ -135,7 +135,7 @@ internal sealed partial class PredictiveTrafficPlanner
     private static bool IsOutwardDeparture(in NavigationTrafficPassage passage, NavigationPose start,
         NavigationPose end, in NavigationVehicleProfile profile)
     {
-        if (!Occupies(passage, start, profile.HalfExtents, profile.ClearanceMeters)) return false;
+        if (!Touches(passage, [start, start], profile)) return false;
         Quaternion inverse = Quaternion.Conjugate(passage.Pose.Rotation);
         Vector3 a = Vector3.Transform(start.Position - passage.Pose.Position, inverse);
         Vector3 b = Vector3.Transform(end.Position - passage.Pose.Position, inverse);
@@ -180,26 +180,17 @@ internal sealed partial class PredictiveTrafficPlanner
 
     private static bool Touches(in NavigationTrafficPassage passage, ReadOnlySpan<NavigationPose> path, in NavigationVehicleProfile profile)
     {
-        float radius = profile.HalfExtents.Length() + profile.ClearanceMeters;
-        Vector2 half = new(passage.HalfExtents.X + radius, passage.HalfExtents.Z + radius);
-        Quaternion inverse = Quaternion.Conjugate(passage.Pose.Rotation);
         for (int step = 1; step < path.Length; step++)
         {
-            Vector3 a = Vector3.Transform(path[step - 1].Position - passage.Pose.Position, inverse);
-            Vector3 b = Vector3.Transform(path[step].Position - passage.Pose.Position, inverse);
-            float low = 0, high = 1;
-            if (Clip(a.X, b.X - a.X, half.X, ref low, ref high) &&
-                Clip(a.Z, b.Z - a.Z, half.Y, ref low, ref high)) return true;
+            // Use the complete swept physical box rather than a circumscribed
+            // circle. Otherwise a fully cleared rear can be captured again by
+            // the wider circle after the outward-occupant exception has ended.
+            if (!NavigationMotionArbitrator.TryBuildSweptOccupancy(path[step - 1], path[step], profile,
+                out var pose, out var half)) return true;
+            // Passage admission is horizontal; preserve full yaw/tilt projection
+            // and clearance without turning ground-height changes into free entry.
+            if (Occupies(passage, pose, half, profile.ClearanceMeters)) return true;
         }
         return false;
-    }
-
-    private static bool Clip(float start, float delta, float half, ref float low, ref float high)
-    {
-        if (MathF.Abs(delta) < 0.000001f) return MathF.Abs(start) <= half;
-        float a = (-half - start) / delta, b = (half - start) / delta;
-        low = MathF.Max(low, MathF.Min(a, b));
-        high = MathF.Min(high, MathF.Max(a, b));
-        return low <= high;
     }
 }
