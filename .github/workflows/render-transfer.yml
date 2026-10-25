@@ -1,0 +1,65 @@
+name: Render preparation compilation
+on:
+  push:
+    branches: [performance/render-frame-reuse]
+    paths:
+      - 'build/render-transfer/**'
+      - '.github/workflows/render-transfer.yml'
+permissions:
+  contents: write
+concurrency:
+  group: render-preparation-transfer-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  compile:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            src
+            assets/maps
+            assets/source/branding
+            assets/source/ui/fonts
+            assets/source/audio
+            build/render-transfer
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Apply source-pinned render changes
+        run: python build/render-transfer/apply.py
+      - name: Compile the production Windows client without executing programs or tests
+        shell: pwsh
+        run: |
+          dotnet build src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release 2>&1 | Tee-Object -FilePath artifacts/render-transfer/release-build.log
+          $code = $LASTEXITCODE
+          exit $code
+      - name: Commit compiled source changes to the same feature branch
+        shell: pwsh
+        run: |
+          $branch = 'performance/render-frame-reuse'
+          $remote = (git ls-remote origin "refs/heads/$branch").Split()[0]
+          if ($remote -ne $env:GITHUB_SHA) { throw 'Feature branch advanced; source publication requires a new review.' }
+          $files = (Get-Content build/render-transfer/edits.json -Raw | ConvertFrom-Json).path
+          git add -- $files
+          if ($LASTEXITCODE -ne 0) { throw 'Could not stage exact source files.' }
+          git diff --cached --check
+          if ($LASTEXITCODE -ne 0) { throw 'Source whitespace check failed.' }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Connect demand-aware frame publication and incremental render preparation'
+          if ($LASTEXITCODE -ne 0) { throw 'Source commit failed.' }
+          git push origin "HEAD:refs/heads/$branch"
+          if ($LASTEXITCODE -ne 0) { throw 'Non-forced feature branch publication failed.' }
+          git rev-parse HEAD | Out-File artifacts/render-transfer/source-commit.txt -Encoding utf8
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-compilation-${{ github.sha }}
+          path: artifacts/render-transfer/
+          retention-days: 14
