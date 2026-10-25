@@ -56,6 +56,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
 
         _completedOrders.Clear();
         _debugAgents.Clear();
+        _navigationControl?.BeginTick(context);
 
         int groundUnits = 0;
         int orderedUnits = 0;
@@ -66,11 +67,14 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         int neighborAdjustments = 0;
         int obstacleAdjustments = 0;
 
+        for (int movementPass = 0; movementPass < (_navigationControl is null ? 1 : 2); movementPass++)
         foreach (EntityId entity in context.Entities.Query<
                      WorldTransform,
                      GroundMovementState>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            if (_navigationControl is not null &&
+                LogisticsNavigationCoordinator.IsLogisticsVehicle(context.Entities, entity) != (movementPass == 1)) continue;
             if (!context.Entities.TryGetComponent(
                     entity,
                     out GroundMovement movement))
@@ -110,9 +114,10 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             }
 
             orderedUnits++;
+            if (_navigationControl is not null && LogisticsNavigationCoordinator.Controls(context.Entities, entity)) continue;
 
             ProcessOrderedMovement(
-                context.Entities,
+                context,
                 entity,
                 movement,
                 order,
@@ -125,7 +130,11 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 ref terrainBlockedUnits,
                 ref neighborAdjustments,
                 ref obstacleAdjustments);
+            if (_navigationControl is not null)
+                _navigationControl.RecordLegacyMotion(context, entity, transform, context.Entities.GetComponent<WorldTransform>(entity));
         }
+
+        ExecuteNavigationMovement(context, deltaSeconds, ref movingUnits, ref stuckUnits, ref arrivedUnits, ref terrainBlockedUnits);
 
         for (int index = 0; index < _completedOrders.Count; index++)
         {
@@ -157,7 +166,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
     }
 
     private void ProcessOrderedMovement(
-        EntityRegistry entities,
+        SimulationContext context,
         EntityId entity,
         in GroundMovement movement,
         in MovementOrder order,
@@ -171,6 +180,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         ref int neighborAdjustments,
         ref int obstacleAdjustments)
     {
+        var entities = context.Entities;
         float stopRadius = order.TargetHeadingRadians.HasValue ? 0.1f : movement.StopRadius;
         float arrivalRadius = stopRadius + 0.01f;
         Vector3 position = transform.Position;
@@ -280,7 +290,9 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             MathF.Abs(GroundMovementState.NormalizeAngle(state.HeadingRadians - targetHeading)) > MathF.PI / 90)
         {
             float aligned = MoveTowardsAngle(state.HeadingRadians, targetHeading, movement.TurnRateRadiansPerSecond * deltaSeconds);
-            entities.SetComponent(entity, transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, aligned) });
+            var alignedTransform = transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, aligned) };
+            if (!ApproveLegacyPose(context, entity, transform, alignedTransform, state, movement, order)) return;
+            entities.SetComponent(entity, alignedTransform);
             entities.SetComponent(entity, state with { HeadingRadians = aligned, Velocity = Vector3.Zero });
             return;
         }
@@ -289,6 +301,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             WorldTransform arrivedTransform = SnapToTerrain(
                 transform,
                 movement);
+            if (!ApproveLegacyPose(context, entity, transform, arrivedTransform, state, movement, order)) return;
             GroundMovementState arrivedState = state with
             {
                 Velocity = Vector3.Zero,
@@ -461,7 +474,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         }
 
         var candidateTransform = transform with { Position = candidate, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading) };
-        if (VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform))
+        if (VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform) ||
+            _navigationControl is not null && !_navigationControl.TryApproveLegacyPose(context, entity, transform, candidateTransform))
         {
             var waiting = state with { Velocity = Vector3.Zero, Status = GroundMovementStatus.TacticallyPaused,
                 ObservedOrderTick = order.AcceptedAtTick, StalledTicks = 0 };

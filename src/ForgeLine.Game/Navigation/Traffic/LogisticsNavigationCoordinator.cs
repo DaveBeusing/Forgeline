@@ -21,7 +21,7 @@ internal sealed record LogisticsNavigationPlan(
 /// <summary>Simulation-thread coordinator. GroundMovement retains every transform/order commit.</summary>
 internal sealed partial class LogisticsNavigationCoordinator
 {
-    internal const int MaximumVehicles = 128, MaximumBodies = 2048, MaximumLocalBodies = 128;
+    internal const int MaximumVehicles = 128, MaximumBodies = 4096, MaximumLocalBodies = 128;
     private const int MaximumHistory = 512, MaximumWaypoints = 4096;
     private readonly HierarchicalNavigationSystem _navigation;
     private readonly TerrainWorld _terrain;
@@ -37,6 +37,9 @@ internal sealed partial class LogisticsNavigationCoordinator
     private NavigationWorld? _sourceWorld;
     private NavigationWorldSnapshot? _snapshot;
     private NavigationVehicleGeometry? _geometry;
+    private readonly List<NavigationCollisionBody> _legacyEnvelopes = new(128);
+    private bool _legacyComplete = true;
+    private int _legacyWork;
     private bool _overflow;
     private ulong _tick;
 
@@ -74,6 +77,7 @@ internal sealed partial class LogisticsNavigationCoordinator
     {
         var previouslyActive = _actors.Values.Where(static a => a.Active).Select(static a => a.Entity).ToHashSet();
         _tick = context.Tick.Value; _active.Clear(); _overflow = false;
+        _legacyEnvelopes.Clear(); _legacyComplete = true; _legacyWork = 0;
         foreach (var key in _actors.Keys.ToArray())
         {
             if (!context.Entities.IsAlive(key)) { _actors.Remove(key); _routes.Remove(key); }
@@ -108,7 +112,7 @@ internal sealed partial class LogisticsNavigationCoordinator
     {
         if (_overflow) return Unavailable(NavigationBlockReason.SearchWork);
         if (_active.Count == 0 && !_traffic.HasReservations)
-            return new(Array.Empty<NavigationApprovedMotion>(), true, 0, NavigationBlockReason.None);
+            return new(Array.Empty<NavigationApprovedMotion>(), true, _legacyWork, NavigationBlockReason.None);
         EnsureWorld();
         return PrepareCaptured(context);
     }

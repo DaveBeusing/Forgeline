@@ -134,7 +134,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(ordered[i].Binding.Requester),
                     paths[i][step - 1], paths[i][step], profiles[i], dt);
-                var result = geometry.Sweep(collision, sweep, workAllowance - workConsumed);
+                var result = SweepGrounded(collision, geometry, sweep, workAllowance - workConsumed);
                 if (result.WorkConsumed < 0 || result.WorkConsumed > workAllowance - workConsumed ||
                     !Enum.IsDefined(result.Status) || !Enum.IsDefined(result.Reason) ||
                     !float.IsFinite(result.AllowedFraction) || result.AllowedFraction < 0 || result.AllowedFraction > 1 ||

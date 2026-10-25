@@ -18,8 +18,8 @@ internal sealed partial class LogisticsNavigationCoordinator
     private LogisticsNavigationPlan PrepareCaptured(SimulationContext context)
     {
         var snapshot = _snapshot!;
-        var physical = CapturePhysical(context, snapshot);
-        int consumed = physical.Work;
+        var physical = CapturePhysical(context, snapshot, Limits.WorkPerTick - _legacyWork);
+        int consumed = _legacyWork + physical.Work;
         if (!physical.Collision.IsComplete) return Unavailable(NavigationBlockReason.MissingGeometry, consumed);
         var candidates = new Candidate[_active.Count];
         var observations = new NavigationVehicleObservation[_active.Count];
@@ -42,7 +42,7 @@ internal sealed partial class LogisticsNavigationCoordinator
             var binding = new NavigationOrderBinding(entity, route.OriginalOrder, source.RequestId, actor.Generation,
                 vehicle.DockVisit?.Generation ?? 0, vehicle.QueueEntry?.Generation ?? 0);
             if (!NavigationPrecisionOwnership.Matches(vehicle, binding) || !TryAdaptRoute(entity, route, vehicle.Profile,
-                snapshot, context.Entities.GetComponent<GroundMovement>(entity).StopRadius + 0.01f, ref consumed, out var adapted)) return Unavailable(NavigationBlockReason.StaleSnapshot, consumed);
+                snapshot, context.Entities.GetComponent<GroundMovement>(entity).StopRadius, ref consumed, out var adapted)) return Unavailable(NavigationBlockReason.StaleSnapshot, consumed);
             var (maximum, canMove) = CaptureConstraints(context, entity, vehicle.Profile.MaximumSpeed);
             if (!float.IsFinite(maximum) || maximum < 0) return Unavailable(NavigationBlockReason.Unknown, consumed);
             candidates[i] = new(vehicle, binding, adapted, maximum, canMove);
@@ -69,10 +69,10 @@ internal sealed partial class LogisticsNavigationCoordinator
         return PlanMotion(context, frame, candidates, directives, consumed);
     }
 
-    private PhysicalCapture CapturePhysical(SimulationContext context, NavigationWorldSnapshot snapshot)
+    private PhysicalCapture CapturePhysical(SimulationContext context, NavigationWorldSnapshot snapshot, int allowance)
     {
         var bodies = new List<NavigationCollisionBody>(Math.Min(MaximumBodies, 256));
-        bool complete = !_authoredOverflow;
+        bool complete = !_authoredOverflow && _legacyComplete;
         int consumed = 0;
         float maximumSpeed = 0;
         var bounds = snapshot.WorldBounds;
@@ -80,7 +80,7 @@ internal sealed partial class LogisticsNavigationCoordinator
             new(bounds.Maximum.X, bounds.Maximum.Y + 1024, bounds.Maximum.Z));
         foreach (var entity in context.Entities.Query<WorldTransform, SpatialPresence>(QueryIterationOrder.StableByEntityIndex))
         {
-            if (!NavigationMotionCapture.Spend(Limits.WorkPerTick, ref consumed) || bodies.Count == MaximumBodies)
+            if (!NavigationMotionCapture.Spend(allowance, ref consumed) || bodies.Count == MaximumBodies)
             { complete = false; break; }
             var transform = context.Entities.GetComponent<WorldTransform>(entity);
             var presence = context.Entities.GetComponent<SpatialPresence>(entity);
@@ -93,7 +93,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         }
         for (int i = 0; i < _authored.Length; i++)
         {
-            if (!NavigationMotionCapture.Spend(Limits.WorkPerTick, ref consumed) || bodies.Count == MaximumBodies)
+            if (!NavigationMotionCapture.Spend(allowance, ref consumed) || bodies.Count == MaximumBodies)
             { complete = false; break; }
             var authored = _authored[i];
             float clearance = snapshot.Grid.Settings.StaticObstacleClearanceMeters;
@@ -103,6 +103,12 @@ internal sealed partial class LogisticsNavigationCoordinator
                     MathF.Max(0.001f, authored.Extents.Z + clearance)), Vector3.Zero);
             if (!NavigationMotionCapture.IsValid(body)) { complete = false; continue; }
             bodies.Add(body);
+        }
+        foreach (var envelope in _legacyEnvelopes)
+        {
+            if (!NavigationMotionCapture.Spend(allowance, ref consumed) || bodies.Count == MaximumBodies)
+            { complete = false; break; }
+            bodies.Add(envelope);
         }
         if (!float.IsFinite(maximumSpeed)) complete = false;
         return new(new(snapshot, context.Tick.Value, coverage, complete, CollectionsMarshal.AsSpan(bodies), MaximumBodies),

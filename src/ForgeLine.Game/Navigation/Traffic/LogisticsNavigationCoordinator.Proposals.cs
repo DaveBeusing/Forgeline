@@ -67,6 +67,14 @@ internal sealed partial class LogisticsNavigationCoordinator
             }
             proposals[i] = proposal;
         }
+        if (proposals.All(static p => p.Start == p.End))
+        {
+            var stationary = new NavigationApprovedMotion[candidates.Length];
+            for (int i = 0; i < stationary.Length; i++) stationary[i] = new(inputs[i], proposals[i], current[i], used[i]);
+            bool complete = proposals.All(static p => p.Availability == NavigationModuleAvailability.Available);
+            return new(Array.AsReadOnly(stationary), complete, consumed,
+                complete ? NavigationBlockReason.None : proposals.First(static p => p.Availability != NavigationModuleAvailability.Available).Reason);
+        }
         // Reserve the already bounded waypoint handoff before granting any actual translation.
         int progressReserve = candidates.Length * 17;
         if (progressReserve > Limits.WorkPerTick - consumed) return Unavailable(NavigationBlockReason.SearchWork, consumed);
@@ -74,7 +82,12 @@ internal sealed partial class LogisticsNavigationCoordinator
         var arbitration = _arbitrator.Constrain(frame.Collision, inputs, proposals, _geometry!, Limits.WorkPerTick - consumed);
         consumed += arbitration.WorkConsumed;
         var motions = new NavigationApprovedMotion[candidates.Length];
-        for (int i = 0; i < motions.Length; i++) motions[i] = new(inputs[i], arbitration.Proposals[i], current[i], used[i]);
+        for (int i = 0; i < motions.Length; i++)
+        {
+            var final = proposals[i].Availability != NavigationModuleAvailability.Available && proposals[i].Start == proposals[i].End
+                ? proposals[i] : arbitration.Proposals[i];
+            motions[i] = new(inputs[i], final, current[i], used[i]);
+        }
         return new(Array.AsReadOnly(motions), arbitration.Complete, consumed,
             arbitration.Complete ? NavigationBlockReason.None : NavigationBlockReason.SearchWork);
     }

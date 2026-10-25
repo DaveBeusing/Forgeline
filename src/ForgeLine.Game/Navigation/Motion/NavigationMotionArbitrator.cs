@@ -121,7 +121,7 @@ internal sealed class NavigationMotionArbitrator
                     Hold(input, collision, NavigationBlockReason.Unknown);
                 continue;
             }
-            if (!MayMove(input, proposal) || !TryEnvelope(proposal, input.Vehicle.Profile, out AxisAlignedBounds envelope))
+            if (!MayMove(input, proposal) || !TryBuildSweptBounds(proposal.Start, proposal.End, input.Vehicle.Profile, out AxisAlignedBounds envelope))
             {
                 output[index] = Hold(input, collision, NavigationBlockReason.Unknown);
                 continue;
@@ -226,22 +226,22 @@ internal sealed class NavigationMotionArbitrator
         (result.Status is not (NavigationGeometryStatus.Unavailable or NavigationGeometryStatus.Blocked or
             NavigationGeometryStatus.InvalidInput or NavigationGeometryStatus.Stale) || result.AllowedFraction == 0);
 
-    private static bool TryEnvelope(in NavigationMotionProposal proposal, in NavigationVehicleProfile profile,
+    internal static bool TryBuildSweptBounds(in NavigationPose start, in NavigationPose end, in NavigationVehicleProfile profile,
         out AxisAlignedBounds bounds)
     {
         bounds = default;
-        Vector3 first = Extents(profile.HalfExtents, proposal.Start.Rotation);
-        Vector3 last = Extents(profile.HalfExtents, proposal.End.Rotation);
+        Vector3 first = Extents(profile.HalfExtents, start.Rotation);
+        Vector3 last = Extents(profile.HalfExtents, end.Rotation);
         double radius = Math.Sqrt((double)profile.HalfExtents.X * profile.HalfExtents.X +
             (double)profile.HalfExtents.Y * profile.HalfExtents.Y + (double)profile.HalfExtents.Z * profile.HalfExtents.Z);
-        double angle = RotationAngle(proposal.Start.Rotation, proposal.End.Rotation);
+        double angle = RotationAngle(start.Rotation, end.Rotation);
         // Any intermediate orientation is at most half the full arc from one endpoint.
-        Vector3 absolute = Vector3.Max(Vector3.Abs(proposal.Start.Position), Vector3.Abs(proposal.End.Position));
+        Vector3 absolute = Vector3.Max(Vector3.Abs(start.Position), Vector3.Abs(end.Position));
         float padding = (float)(2 * radius * Math.Sin(angle * 0.25) + profile.ClearanceMeters +
             0.000002 * (Math.Max(Math.Max(absolute.X, absolute.Y), absolute.Z) + radius + 1));
         Vector3 half = Vector3.Max(first, last) + new Vector3(padding);
-        Vector3 minimum = Vector3.Min(proposal.Start.Position, proposal.End.Position) - half;
-        Vector3 maximum = Vector3.Max(proposal.Start.Position, proposal.End.Position) + half;
+        Vector3 minimum = Vector3.Min(start.Position, end.Position) - half;
+        Vector3 maximum = Vector3.Max(start.Position, end.Position) + half;
         if (!NavigationMotionCapture.Finite(minimum) || !NavigationMotionCapture.Finite(maximum)) return false;
         bounds = new AxisAlignedBounds(minimum, maximum);
         return true;
