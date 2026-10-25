@@ -99,6 +99,58 @@ public sealed partial class PredictiveTrafficBatchTests
         Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
     }
 
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(4, false)]
+    [InlineData(5, false)]
+    public void MixedDockCycleRequiresCurrentPhysicalEvidence(int stalePart, bool expectRecovery)
+    {
+        var (frame, intents) = Crossing();
+        float heading = -MathF.PI / 2;
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(10, .5f, 20) };
+        var vehicle = frame.Vehicles[0] with { Pose = new(new(21, .5f, 20), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(heading) };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var owner = vehicle with { Entity = new(99, 1), Pose = vehicle.Pose with { Position = new(18, .5f, 20) } };
+        var reservation = new NavigationTrafficReservation(7, owner.Entity, 1, 0, NavigationReservationKind.Dock,
+            new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2), SimulationTick.Zero, SimulationTick.Zero, true);
+        NavigationTrafficFrame Capture(ulong tick)
+        {
+            NavigationCollisionBody Body(NavigationVehicleObservation observed) => new(
+                NavigationReadAdapter.GetObstacleIdentity(observed.Entity), NavigationObstacleKind.Vehicle,
+                observed.Pose, observed.Profile.HalfExtents, Vector3.Zero);
+            var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true,
+                [Body(vehicle), Body(owner)], 10);
+            return new(new(tick), collision, true, [vehicle], [reservation], Limits());
+        }
+        var planner = new PredictiveTrafficPlanner();
+        Assert.Equal(NavigationTrafficAction.Hold, Assert.Single(planner.PlanBatch(Capture(1), [intent], new ClearGeometry(), 3, 10000, out _)).Action);
+        var evidence = new NavigationPhysicalWait(new(50), frame.Collision.World.Revision, owner, vehicle);
+        evidence = stalePart switch
+        {
+            1 => evidence with { Tick = new(49) },
+            2 => evidence with { Revision = evidence.Revision with { Costs = evidence.Revision.Costs + 1 } },
+            3 => evidence with { Owner = owner with { Pose = owner.Pose with { Position = owner.Pose.Position + Vector3.UnitX } } },
+            4 => evidence with { Blocker = vehicle with { DirectOrder = root with { WorldTarget = root.WorldTarget + Vector3.UnitZ } } },
+            5 => evidence with { Owner = owner with { Entity = new(99, 2) } },
+            _ => evidence
+        };
+        var directive = Assert.Single(planner.PlanBatch(Capture(50), [intent], new ClearGeometry(), 3, 10000, out _, [evidence]));
+        Assert.Equal(expectRecovery ? NavigationTrafficAction.Recovery : NavigationTrafficAction.Hold, directive.Action);
+        Assert.Equal(intent.Binding, directive.Binding);
+        Assert.Empty(planner.CaptureState().Leases);
+        if (expectRecovery)
+        {
+            Assert.NotNull(directive.SuggestedTarget);
+            Assert.True(directive.SuggestedTarget.Value.X > vehicle.Pose.Position.X);
+            Assert.InRange(directive.MaximumSpeed, .01f, 1);
+        }
+        else Assert.Null(directive.SuggestedTarget);
+    }
+
     [Fact]
     public void WaitingForAnExternalServiceReservationDoesNotInventAPhysicalReverseEscape()
     {

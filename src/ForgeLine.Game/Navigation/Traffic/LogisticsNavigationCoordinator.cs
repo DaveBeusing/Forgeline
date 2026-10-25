@@ -89,7 +89,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         var previouslyActive = _actors.Values.Where(static a => a.Active).Select(static a => a.Entity).ToHashSet();
         _tick = context.Tick.Value; _active.Clear(); _overflow = false;
         _diagnosticMotions.Clear(); _diagnosticHorizons.Clear();
-        _legacyEnvelopes.Clear(); _legacyVetoes.Clear(); _legacyComplete = true; _legacyWork = 0;
+        _legacyEnvelopes.Clear(); _legacyVetoes.Clear(); _physicalWaits.Clear(); _legacyComplete = true; _legacyWork = 0;
         _protectedLogistics.Clear(); _protectedComplete = true;
         foreach (var key in _actors.Keys.ToArray())
         {

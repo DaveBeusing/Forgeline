@@ -399,6 +399,45 @@ public sealed class ConnectedLogisticsNavigationTests
             Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
         }
     }
+    [Fact]
+    public void ExitingDockOwnerAndCoarseOccupantResolveTheirPhysicalWaitCycle()
+    {
+        var (simulation, movement, unit) = Create(goal: new(41, .5f, 5));
+        var entities = simulation.Entities;
+        const float heading = 2.8742f;
+        var initial = new WorldTransform(new(41.0974f, .5f, 37.0027f),
+            Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading), new(3.2f, 2.4f, 6.4f));
+        entities.SetComponent(unit, initial);
+        entities.SetComponent(unit, GroundMovementState.Stationary(heading));
+        entities.SetComponent(unit, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        entities.SetComponent(unit, new GroundMovement(14.5f, 7, 10, 2.5f, 1.9f, 1, 5.5f, 8, 24, .5f));
+        var owner = entities.CreateEntity();
+        const float ownerHeading = .8207964f;
+        var ownerInitial = initial with { Position = new(42.562f, .5f, 30.606f),
+            Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, ownerHeading) };
+        entities.AddComponent(owner, ownerInitial);
+        entities.AddComponent(owner, entities.GetComponent<GroundMovement>(unit));
+        entities.AddComponent(owner, GroundMovementState.Stationary(ownerHeading));
+        entities.AddComponent(owner, entities.GetComponent<UnitIdentity>(unit));
+        entities.AddComponent(owner, entities.GetComponent<ControllableEntity>(unit));
+        entities.AddComponent(owner, entities.GetComponent<SpatialPresence>(unit));
+        var building = entities.CreateEntity();
+        var dockPose = new VehicleDockPose(new(6.8f, .5f, 30.5f), new(22, .5f, 30.5f),
+            new(37.2f, .5f, 30.5f), MathF.PI / 2, 3.2f, 1.6f);
+        entities.AddComponent(building, new VehicleDockSlot(owner, 40, dockPose, new PlayerId(1)));
+        var visit = new VehicleDockVisit(building, 40, VehicleDockStatus.Exiting, VehicleDockBlockReason.None,
+            dockPose, ExitTurning: true, LaneEntered: true, DepartureDistance: 5.2f);
+        entities.AddComponent(owner, visit);
+        var ownerOrder = new MovementOrder(new(1), new(42.4f, .5f, 43.6777f), SimulationTick.Zero, new(1),
+            MovementOrderKind.LocalApproach, 0);
+        entities.AddComponent(owner, ownerOrder);
+        simulation.RunTicks(800, TestContext.Current.CancellationToken);
+        Assert.Equal(visit, entities.GetComponent<VehicleDockVisit>(owner));
+        Assert.Equal(owner, entities.GetComponent<VehicleDockSlot>(building).Truck);
+        Assert.True(entities.GetComponent<WorldTransform>(owner).Position.Z > ownerInitial.Position.Z + 3,
+            $"owner={entities.GetComponent<WorldTransform>(owner)}; occupant={entities.GetComponent<WorldTransform>(unit)}; veto={string.Join(';', movement.CaptureLegacyNavigationVetoes())}");
+    }
+
     private static (SimulationCoordinator, GroundMovementSystem, EntityId) Create(IReadOnlyList<AxisAlignedBounds>? obstacles = null, Vector3? goal = null)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };

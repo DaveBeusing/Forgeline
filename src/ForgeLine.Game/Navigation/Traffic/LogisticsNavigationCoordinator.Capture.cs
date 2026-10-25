@@ -78,11 +78,25 @@ internal sealed partial class LogisticsNavigationCoordinator
         if (!reservationsComplete) return Unavailable(NavigationBlockReason.MissingGeometry, consumed);
         var frame = new NavigationTrafficFrame(context.Tick, physical.Collision, true, observations,
             reservations, Limits, passageCapture.Passages.ToArray(), neighborhoods);
+        var physicalWaits = new List<NavigationPhysicalWait>(_physicalWaits.Count);
+        foreach (var observation in _physicalWaits.Values)
+        {
+            if (Limits.WorkPerTick - consumed < 2) return Unavailable(NavigationBlockReason.SearchWork, consumed);
+            consumed += 2;
+            if (observation.Tick != context.Tick || observation.Revision != snapshot.Revision ||
+                !NavigationMotionCapture.TryCaptureVehicle(context.Entities, observation.Owner.Entity, _movementOptions, out var owner) ||
+                !NavigationMotionCapture.TryCaptureVehicle(context.Entities, observation.Blocker.Entity, _movementOptions, out var blocker) ||
+                !SamePhysicalWaitOwner(owner, observation.Owner) || blocker != observation.Blocker) continue;
+            physicalWaits.Add(observation with { Owner = owner });
+        }
         var directives = _traffic.PlanBatch(frame, intents, _geometry!, Limits.PlanningHorizonSeconds,
-            Limits.WorkPerTick - consumed, out int trafficWork);
+            Limits.WorkPerTick - consumed, out int trafficWork, CollectionsMarshal.AsSpan(physicalWaits));
         consumed += trafficWork;
         return PlanMotion(context, frame, candidates, directives, consumed);
     }
+
+    private static bool SamePhysicalWaitOwner(in NavigationVehicleObservation current, in NavigationVehicleObservation observed) =>
+        current with { Movement = observed.Movement } == observed;
 
     private PhysicalCapture CapturePhysical(SimulationContext context, NavigationWorldSnapshot snapshot, int allowance)
     {
