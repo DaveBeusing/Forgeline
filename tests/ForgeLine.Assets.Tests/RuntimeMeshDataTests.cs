@@ -62,6 +62,39 @@ public sealed class RuntimeMeshDataTests
             StringComparison.OrdinalIgnoreCase);
     }
 
+    [Theory]
+    [InlineData(32_000, 3, 1)]
+    [InlineData(1, 96_000, 1)]
+    [InlineData(1, 3, 32_000)]
+    public void TruncatedDeclaredBlocksAreRejectedBeforeProportionalAllocation(int vertices, int indices, int sections)
+    {
+        byte[] header = new byte[24];
+        BitConverter.GetBytes(RuntimeMeshData.CurrentVersion).CopyTo(header, 0);
+        BitConverter.GetBytes(vertices).CopyTo(header, 8);
+        BitConverter.GetBytes(indices).CopyTo(header, 12);
+        BitConverter.GetBytes(sections).CopyTo(header, 20);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        Assert.Throws<InvalidDataException>(() => RuntimeMeshData.FromPayload(header));
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.InRange(allocated, 0, 65_536);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(23)]
+    [InlineData(25)]
+    [InlineData(100)]
+    [InlineData(179)]
+    public void TruncatedPayloadSectionsFail(int length)
+    {
+        var mesh = new RuntimeMeshData(RuntimeMeshAttributes.None,
+            [Vertex(0, 0, 0, 0, 0), Vertex(1, 0, 0, 0, 0), Vertex(0, 1, 0, 0, 0)],
+            [0u, 1u, 2u], [], [new(0, 3, -1)]);
+        byte[] payload = mesh.ToPayload();
+        Assert.Throws<InvalidDataException>(() => RuntimeMeshData.FromPayload(payload[..length]));
+        Assert.Throws<InvalidDataException>(() => RuntimeMeshData.FromPayload([.. payload, 0]));
+    }
+
     [Fact]
     public void RejectsOutOfRangeMaterialSlot()
     {

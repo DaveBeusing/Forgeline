@@ -337,9 +337,18 @@ public sealed class JobScheduler : IDisposable
             cancelPending = _cancelPending;
         }
 
+        ExceptionDispatchInfo? cancellationFailure = null;
         if (cancelPending)
         {
-            _shutdownCancellation.Cancel();
+            try
+            {
+                _shutdownCancellation.Cancel();
+            }
+            catch (AggregateException exception)
+            {
+                // Observers do not own worker termination or completion notification.
+                cancellationFailure = ExceptionDispatchInfo.Capture(exception);
+            }
 
             lock (_gate)
             {
@@ -383,6 +392,7 @@ public sealed class JobScheduler : IDisposable
             _shutdownCompleted = true;
             Monitor.PulseAll(_gate);
         }
+        cancellationFailure?.Throw();
     }
 
     public void Dispose()

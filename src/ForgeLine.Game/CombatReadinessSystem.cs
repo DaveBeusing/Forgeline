@@ -64,6 +64,7 @@ public sealed class CombatReadinessSystem : ISimulationSystem
     private readonly List<EntityId> _groups = new();
     private readonly Dictionary<EntityId, List<EntityId>> _membersByGroup =
         new();
+    private readonly List<EntityId> _staleGroups = new();
     private readonly List<UnitCombatReadinessReadModel> _unitDebug = new();
     private readonly List<CombatGroupReadinessReadModel> _groupDebug = new();
 
@@ -85,6 +86,7 @@ public sealed class CombatReadinessSystem : ISimulationSystem
     public bool DebugCaptureEnabled { get; set; }
 
     public CombatReadinessMetrics Metrics { get; private set; }
+    internal int CachedGroupCount => _membersByGroup.Count;
 
     public CombatReadinessDebugSnapshot LastDebugSnapshot
     {
@@ -649,6 +651,10 @@ public sealed class CombatReadinessSystem : ISimulationSystem
 
             members.Add(member);
         }
+        _staleGroups.Clear();
+        foreach (var pair in _membersByGroup)
+            if (pair.Value.Count == 0) _staleGroups.Add(pair.Key);
+        foreach (EntityId group in _staleGroups) _membersByGroup.Remove(group);
     }
 
     private static void SetUnitReadiness(

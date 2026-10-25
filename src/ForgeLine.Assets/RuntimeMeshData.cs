@@ -140,13 +140,22 @@ public sealed class RuntimeMeshData
             throw new InvalidDataException("Runtime mesh declared counts exceed supported production limits.");
         }
 
+        long fixedBytes = checked((long)vertexCount * VertexStride + (long)indexCount * sizeof(uint) +
+            (long)sectionCount * 3 * sizeof(int));
+        if (fixedBytes + materialCount > stream.Length - stream.Position)
+            throw new InvalidDataException("Runtime mesh declared layout exceeds the available payload.");
+
         var materialIds = new string[materialCount];
         try
         {
             for (int index = 0; index < materialIds.Length; index++)
             {
-                string value = reader.ReadString();
-                _ = AssetId.Parse(value);
+                int length = reader.Read7BitEncodedInt();
+                if (length is < 3 or > 4096 || length > stream.Length - stream.Position - fixedBytes)
+                    throw new InvalidDataException("Runtime mesh material ID length exceeds its bounded table.");
+                string value = Encoding.UTF8.GetString(reader.ReadBytes(length));
+                if (!AssetId.TryParse(value, out _))
+                    throw new InvalidDataException("Runtime mesh material ID is invalid.");
                 materialIds[index] = value;
             }
         }
@@ -154,6 +163,13 @@ public sealed class RuntimeMeshData
         {
             throw new InvalidDataException("Runtime mesh material table is truncated.", exception);
         }
+        catch (FormatException exception)
+        {
+            throw new InvalidDataException("Runtime mesh material length is invalid.", exception);
+        }
+
+        if (stream.Length - stream.Position != fixedBytes)
+            throw new InvalidDataException("Runtime mesh block lengths do not match the remaining payload.");
 
         var vertices = new RuntimeMeshVertex[vertexCount];
         try
@@ -224,6 +240,8 @@ public sealed class RuntimeMeshData
         foreach (string materialId in MaterialIds)
         {
             _ = AssetId.Parse(materialId);
+            if (Encoding.UTF8.GetByteCount(materialId) > 4096)
+                throw new InvalidDataException("Runtime mesh material ID exceeds 4096 UTF-8 bytes.");
         }
 
         for (int index = 0; index < Vertices.Count; index++)

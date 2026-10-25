@@ -1,5 +1,6 @@
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Intelligence;
 using ForgeLine.Simulation;
 using ForgeLine.World;
@@ -12,18 +13,21 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
     private readonly SpatialGridIndex? _spatialIndex;
     private readonly BuildingCombatDestruction? _buildings;
     private readonly Action<SimulationContext>? _staticTopologyChanged;
+    private readonly InventoryStore? _inventories;
 
     public CombatEntityLifecycleSystem(
         CombatRuntime runtime,
         SpatialGridIndex? spatialIndex = null,
         BuildingCombatDestruction? buildings = null,
-        Action<SimulationContext>? staticTopologyChanged = null)
+        Action<SimulationContext>? staticTopologyChanged = null,
+        InventoryStore? inventories = null)
     {
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
         _spatialIndex = spatialIndex;
         _buildings = buildings;
         _staticTopologyChanged = staticTopologyChanged;
+        _inventories = inventories;
     }
 
     public SimulationPhase Phase =>
@@ -73,6 +77,7 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                 continue;
             }
             _buildings?.RemoveBeforeEntityDestruction(context, destruction.Entity);
+            ReleaseUnitSupply(context, destruction.Entity);
             staticTopologyChanged |= context.Entities.TryGetComponent(
                 destruction.Entity, out SpatialPresence presence) && presence.Metadata.Mobility == SpatialMobility.Static;
             _spatialIndex?.Remove(
@@ -86,6 +91,20 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
             _staticTopologyChanged?.Invoke(context);
         _runtime.SetActiveProjectiles(
             context.Entities.GetComponentCount<ProjectileState>());
+    }
+
+    private void ReleaseUnitSupply(SimulationContext context, EntityId entity)
+    {
+        if (_inventories is null || !context.Entities.HasComponent<UnitIdentity>(entity)) return;
+        InventoryId fuel = context.Entities.TryGetComponent(entity, out UnitFuelState drive)
+            ? drive.InventoryId : default;
+        InventoryId ammunition = context.Entities.TryGetComponent(entity, out AmmunitionState weapon)
+            ? weapon.InventoryId : default;
+        // Cargo inventory loss remains owned by CargoTransportSystem's reservation cleanup.
+        InventoryId cargo = context.Entities.TryGetComponent(entity, out CargoTransport transport)
+            ? transport.CargoInventory : default;
+        if (fuel != cargo) _inventories.DestroyInventory(fuel);
+        if (ammunition != fuel && ammunition != cargo) _inventories.DestroyInventory(ammunition);
     }
 
     private static void CreateUnitWreckPresentation(
