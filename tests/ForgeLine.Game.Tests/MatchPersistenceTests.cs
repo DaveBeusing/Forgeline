@@ -12,6 +12,72 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class MatchPersistenceTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CombatGroupReplacementAndRealCasualtyPreserveSaveReplay(bool casualty)
+    {
+        MatchRuntimeSettings settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 7521);
+        MatchComposition basis = settings.Composition;
+        EntityId attacker = EntityId.Invalid, partner = EntityId.Invalid, victim = EntityId.Invalid;
+        Vector3 home = basis.Battlefield.Starts[0].CommandCorePosition;
+        MatchComposition composition = basis with
+        {
+            Key = "unit-lifecycle-recovery",
+            CreateStartingBase = (entities, inventories, factory, terrain, start, content, stock) =>
+            {
+                var result = basis.CreateStartingBase(entities, inventories, factory, terrain, start, content, stock);
+                if (start.Player == new PlayerId(1))
+                {
+                    attacker = factory.Create(content.Units[UnitIds.MainBattleTank], home + new Vector3(100, 0, 80), start.Player);
+                    partner = factory.Create(content.Units[UnitIds.MainBattleTank], home + new Vector3(100, 0, 100), start.Player);
+                }
+                else if (casualty)
+                    victim = factory.Create(content.Units[UnitIds.ScoutVehicle], home + new Vector3(150, 0, 80), start.Player);
+                return result;
+            }
+        };
+        settings = settings with { Composition = composition,
+            Participants = CentralDivideScenario.CreateDefaultParticipants(false, false) };
+        using MatchRuntime original = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
+        InventoryId lostSupply = casualty
+            ? original.Simulation.Entities.GetComponent<UnitFuelState>(victim).InventoryId : default;
+        for (int index = 0; index < 32; index++)
+        {
+            original.Simulation.SubmitCommand(PlayerTacticalActionCommand.HoldPosition(new(1), [attacker, partner],
+                original.Simulation.CurrentTick, original.Intelligence, composition.Content.Weapons,
+                composition.Content.Artillery), original.Simulation.CurrentTick.Next());
+            original.Simulation.AdvanceOneTick();
+            Assert.Equal(1, original.Simulation.Entities.GetComponentCount<CombatGroupIntent>());
+        }
+        if (casualty)
+        {
+            if (original.Simulation.Entities.IsAlive(victim))
+                original.Simulation.SubmitCommand(PlayerTacticalActionCommand.Attack(new(1), [attacker], victim,
+                    original.Simulation.CurrentTick, original.Intelligence, composition.Content.Weapons,
+                    composition.Content.Artillery), original.Simulation.CurrentTick.Next());
+            for (int tick = 0; tick < 600 && original.Simulation.Entities.IsAlive(victim); tick++)
+                original.Simulation.AdvanceOneTick();
+            Assert.False(original.Simulation.Entities.IsAlive(victim));
+            Assert.False(original.Inventories.Contains(lostSupply));
+            original.Simulation.AdvanceOneTick();
+        }
+        MatchComposition Resolve(string key) => key == composition.Key ? composition : throw new InvalidOperationException(key);
+        MatchSaveData save = MatchPersistenceService.CaptureSave(original);
+        using MatchRuntime restored = MatchPersistenceService.Restore(
+            MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(save)), Resolve);
+        using MatchRuntime replay = MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(original))), Resolve);
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(replay).ComputeSha256());
+        original.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
+        restored.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
+        replay.Simulation.RunTicks(10, TestContext.Current.CancellationToken);
+        string expected = MatchAuthoritativeSnapshot.Capture(original).ComputeSha256();
+        Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
+        Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(replay).ComputeSha256());
+    }
+
     [Fact]
     public void AcceptedLoadedConvoyAndManualEscortReplacementRoundTrip()
     {

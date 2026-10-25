@@ -8,14 +8,14 @@ namespace ForgeLine.Game.Tests;
 public sealed class CompiledScenarioTests
 {
     [Fact]
-    public void ProductiveCompiledStartKeepsSchemaEightCheckpointsAndGeography()
+    public void ProductiveCompiledStartKeepsSchemaNineCheckpointsAndGeography()
     {
         using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         Assert.Equal(ScenarioRegistry.CentralDivideDescriptor.Identity, runtime.RuntimeSettings.Composition.Identity);
         BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create()).ValidateMatches(runtime.Battlefield);
-        Assert.Equal("DD7193BEFC6B8357EFC22D156E57C3F53E9C94E297F200A75B71763082CFE4D0", MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
+        Assert.Equal("7782A73F6555E2C7F993A8CE1073292D3C37F8EC68046989D92D416D5EDD81C6", MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
         runtime.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
-        Assert.Equal("B994E0FD0195766BB241EF64957B83B7F11352272D6913AA0D575E61DAD516A3", MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
+        Assert.Equal("698974DEE343EFF7A569819A998368B66B08D80ADBA4E3669A83BF29C94FC197", MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
         var report = BattlefieldOperationalGeographyValidator.Validate(runtime.Battlefield, runtime.Terrain,
             new NavigationGridSettings { CellSizeMeters = 16, StaticObstacleClearanceMeters = 0.5f },
             new NavigationSectorSettings { SectorSizeCells = 8 });

@@ -484,7 +484,8 @@ public sealed class MatchRuntime : IDisposable
                 combatRuntime,
                 spatialIndex,
                 buildingDestruction,
-                strategicInfrastructure.RefreshRemovedStaticEntities);
+                strategicInfrastructure.RefreshRemovedStaticEntities,
+                inventories);
         var suppression =
             new SuppressionSystem
             {
