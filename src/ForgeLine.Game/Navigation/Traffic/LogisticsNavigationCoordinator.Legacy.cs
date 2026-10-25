@@ -58,7 +58,7 @@ internal sealed partial class LogisticsNavigationCoordinator
     }
 
     internal bool TryProposeLegacyQueueReverse(SimulationContext context, EntityId entity,
-        in WorldTransform start, float maximumSpeed, out WorldTransform end, out float heading)
+        in WorldTransform start, float maximumSpeed, bool forwardBlocked, out WorldTransform end, out float heading)
     {
         end = start; heading = 0;
         if (!IsLogisticsVehicle(context.Entities, entity) || maximumSpeed <= 0 ||
@@ -88,6 +88,13 @@ internal sealed partial class LogisticsNavigationCoordinator
             return false;
         Vector3 forward = Vector3.Transform(Vector3.UnitZ, start.Rotation);
         if (Vector3.Dot(queue.Target - start.Position, forward) >= 0) return false;
+        Vector3 approachDelta = queue.Target - start.Position; approachDelta.Y = 0;
+        float localRange = vehicle.Profile.HalfExtents.Z * 2;
+        // Prefer the checked forward approach for a remote waiting pose. Reverse
+        // remains available when forward motion is physically blocked, and an
+        // already backing owner retains that motion until its own endpoint.
+        if (!forwardBlocked && Vector3.Dot(vehicle.Movement.Velocity, forward) >= -.001f &&
+            approachDelta.LengthSquared() > localRange * localRange) return false;
         EnsureWorld();
         if (!NavigationReverseMotion.TryStep(vehicle, queue.Target, MathF.Min(1, maximumSpeed),
             (float)context.TickDuration.TotalSeconds, _snapshot!, out var proposal, out float speed, out heading, arrivalTolerance: .05f) ||
