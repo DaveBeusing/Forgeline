@@ -87,6 +87,18 @@ internal sealed partial class LogisticsNavigationCoordinator
         {
             var final = proposals[i].Availability != NavigationModuleAvailability.Available && proposals[i].Start == proposals[i].End
                 ? proposals[i] : arbitration.Proposals[i];
+            if (final.Start != final.End)
+            {
+                foreach (var reservation in frame.Reservations)
+                {
+                    int checkWork = PredictiveTrafficPlanner.ServiceReservationCheckWork(2);
+                    if (checkWork > Limits.WorkPerTick - consumed) return Unavailable(NavigationBlockReason.SearchWork, consumed);
+                    consumed += checkWork;
+                    if (!PredictiveTrafficPlanner.BlocksServiceReservation(candidates[i].Vehicle, reservation, [final.Start, final.End])) continue;
+                    final = Hold(inputs[i], frame.Collision, NavigationBlockReason.ReservedCorridor);
+                    break;
+                }
+            }
             motions[i] = new(inputs[i], final, current[i], used[i]);
         }
         return new(Array.AsReadOnly(motions), arbitration.Complete, consumed,
