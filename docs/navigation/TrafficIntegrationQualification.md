@@ -37,3 +37,7 @@ A new no-QueueMotion reserved-head regression fails before and passes after the 
 ## Static flank geometry and admission
 
 A static building touching the abstract admission envelope was treated as a traffic occupant and could block an otherwise physically clear lane forever. Static Structure bodies now remain in collision capture and every actual geometry sweep, but cannot acquire dynamic traffic admission. An existing occupied vehicle lease still retains the complete physical rear-clear condition. A real NavigationVehicleGeometry regression independently proves both clear flank travel and obstruction when the same building is moved onto the path; the admission case is red before and green after. The follow-up set has 73 passed / 3 failed out of 76; the same three natural player/fleet cases remain unresolved.
+
+## Service wait versus physical escape
+
+A long external dock-reservation wait alone previously triggered a reverse Recovery directive. The red-to-green case now retains Hold/ReservedCorridor without inventing a physical blocker. Proactive escape outside the coarse participant graph requires an observed MovingVehicle or StaticObstacle reason. Explicit detected wait cycles and already verified retained escapes keep their separate bounded handling. All original turn/convoy cases remain green; the expanded set is 74 passed / 3 failed out of 77, with the same natural player/fleet cases outstanding.

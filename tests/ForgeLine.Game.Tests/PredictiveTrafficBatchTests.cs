@@ -10,6 +10,27 @@ namespace ForgeLine.Game.Tests;
 public sealed class PredictiveTrafficBatchTests
 {
     [Fact]
+    public void WaitingForAnExternalServiceReservationDoesNotInventAPhysicalReverseEscape()
+    {
+        var (frame, intents) = Crossing();
+        var vehicle = frame.Vehicles[0] with { Movement = GroundMovementState.Stationary(MathF.PI / 2) };
+        var reservation = new NavigationTrafficReservation(7, new(99, 1), 1, 0, NavigationReservationKind.Dock,
+            new(new(20, .5f, 20), Quaternion.Identity), new(1, 1, 1), SimulationTick.Zero, SimulationTick.Zero, true);
+        var planner = new PredictiveTrafficPlanner();
+        NavigationTrafficDirective Observe(ulong tick)
+        {
+            var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true, [], 10);
+            var captured = new NavigationTrafficFrame(new(tick), collision, true, [vehicle], [reservation], Limits());
+            return Assert.Single(planner.PlanBatch(captured, [intents[0]], new ClearGeometry(), 3, 10000, out _));
+        }
+        Assert.Equal(NavigationTrafficAction.Hold, Observe(1).Action);
+        var waiting = Observe(50);
+        Assert.Equal(NavigationBlockReason.ReservedCorridor, waiting.Reason);
+        Assert.Equal(NavigationTrafficAction.Hold, waiting.Action);
+        Assert.Null(Assert.Single(planner.CaptureState().Vehicles).RecoveryTarget);
+    }
+
+    [Fact]
     public void StaticFlankBuildingCannotOwnAdmissionToAnOtherwiseClearPassage()
     {
         var (frame, intents) = Crossing();
