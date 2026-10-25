@@ -83,7 +83,10 @@ internal sealed partial class PredictiveTrafficPlanner
             int age = ageB.CompareTo(ageA);
             return age != 0 ? age : CompareIdentity(ordered[a].Binding.Requester, ordered[b].Binding.Requester);
         });
-        var passagePlan = PreparePassages(frame, ordered, vehicles, paths, priority, waits, waitingFor,
+        var crossingPlan = DiscoverCrossings(frame, ordered, paths, profiles, workAllowance - workConsumed);
+        workConsumed += crossingPlan.Work;
+        if (!crossingPlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);
+        var passagePlan = PreparePassages(frame, ordered, vehicles, paths, priority, crossingPlan.Passages, waits, waitingFor,
             workAllowance - workConsumed);
         workConsumed += passagePlan.Work;
         if (!passagePlan.Complete) return Unavailable(NavigationBlockReason.SearchWork);

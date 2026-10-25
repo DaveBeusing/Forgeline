@@ -36,8 +36,8 @@ public sealed class PredictiveTrafficBatchTests
         Assert.Equal(a.ToArray(), b.ToArray());
         Assert.Equal(workA, workB);
         Assert.Equal(NavigationTrafficAction.Proceed, a[0].Action);
-        Assert.Equal(NavigationTrafficAction.Yield, a[1].Action);
-        Assert.Equal(NavigationBlockReason.MovingVehicle, a[1].Reason);
+        Assert.Equal(NavigationTrafficAction.Hold, a[1].Action);
+        Assert.Equal(NavigationBlockReason.ReservedCorridor, a[1].Reason);
     }
 
     [Fact]
@@ -98,8 +98,8 @@ public sealed class PredictiveTrafficBatchTests
         var expected = planner.PlanBatch(next, intents, new ClearGeometry(), 3, 10000, out _);
         var actual = restored.PlanBatch(next, intents, new ClearGeometry(), 3, 10000, out _);
         Assert.Equal(expected.ToArray(), actual.ToArray());
-        Assert.Equal(NavigationTrafficAction.Yield, actual[0].Action);
-        Assert.Equal(NavigationTrafficAction.Proceed, actual[1].Action);
+        Assert.Equal(NavigationTrafficAction.Proceed, actual[0].Action);
+        Assert.Equal(NavigationTrafficAction.Hold, actual[1].Action);
     }
 
     [Theory]

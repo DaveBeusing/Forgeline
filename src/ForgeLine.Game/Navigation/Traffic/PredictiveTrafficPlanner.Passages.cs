@@ -15,11 +15,12 @@ internal sealed partial class PredictiveTrafficPlanner
 
     private PassagePlan PreparePassages(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
         Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationPose[][] paths, int[] priority,
+        IReadOnlyList<NavigationTrafficPassage> discovered,
         NavigationBlockReason[] waits, EntityId[] waitingFor, int allowance)
     {
         int consumed = 0;
         var passages = new SortedDictionary<ulong, NavigationTrafficPassage>();
-        foreach (var passage in frame.Passages) passages.Add(passage.Id, passage);
+        foreach (var passage in discovered) passages.Add(passage.Id, passage);
         // Changed or removed route geometry cannot discard a physically occupied old lease.
         foreach (var lease in _passageLeases.Values) passages[lease.Passage.Id] = lease.Passage;
         var leases = new Dictionary<ulong, PredictiveTrafficPassageLease>();
@@ -119,9 +120,11 @@ internal sealed partial class PredictiveTrafficPlanner
 
     private static bool Covered(NavigationCollisionFrame collision, in NavigationTrafficPassage passage)
     {
-        float radius = passage.HalfExtents.Length();
-        Vector3 min = passage.Pose.Position - new Vector3(radius);
-        Vector3 max = passage.Pose.Position + new Vector3(radius);
+        Vector3 extent = Vector3.Abs(Vector3.Transform(Vector3.UnitX, passage.Pose.Rotation)) * passage.HalfExtents.X +
+            Vector3.Abs(Vector3.Transform(Vector3.UnitY, passage.Pose.Rotation)) * passage.HalfExtents.Y +
+            Vector3.Abs(Vector3.Transform(Vector3.UnitZ, passage.Pose.Rotation)) * passage.HalfExtents.Z;
+        Vector3 min = passage.Pose.Position - extent;
+        Vector3 max = passage.Pose.Position + extent;
         // Only horizontal coverage matters for a ground passage; terrain owns height validation.
         return min.X >= collision.Coverage.Minimum.X && max.X <= collision.Coverage.Maximum.X &&
             min.Z >= collision.Coverage.Minimum.Z && max.Z <= collision.Coverage.Maximum.Z;
