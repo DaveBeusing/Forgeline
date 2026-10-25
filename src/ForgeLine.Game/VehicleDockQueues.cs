@@ -417,6 +417,12 @@ public sealed partial class VehicleDockingService
             entities.TryGetComponent(truck, out MovementOrder evacuation) &&
             MathF.Abs(Vector3.Dot(evacuation.WorldTarget - motion.Front, side)) >
                 MathF.Abs(Vector3.Dot(current.Position - motion.Front, side))) return false;
+        // A later arrival can already be ahead while the FIFO head is still
+        // approaching. It may advance away from that head only as far as its
+        // own assigned tail pose. This does not grant service or dock admission.
+        if (entry.Position > 1 && Vector3.Dot(current.Position - predecessor.Position, forward) > 0 &&
+            Vector3.Dot(next.Position - current.Position, forward) > 0 &&
+            Vector3.Dot(next.Position - motion.Tail, forward) <= .001f) return false;
         var ownBounds = VehicleBounds(next);
         var priorBounds = VehicleBounds(predecessor);
         float ownHalf = MathF.Abs(forward.X) * ownBounds.Extents.X + MathF.Abs(forward.Z) * ownBounds.Extents.Z;

@@ -8,6 +8,29 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class VehicleQueueApproachGateTests
 {
+    [Fact]
+    public void ArrivalAlreadyAheadMayAdvanceToItsOwnTailPoseWithoutTakingDockAdmission()
+    {
+        var entities = new EntityRegistry();
+        var building = entities.CreateEntity();
+        var predecessor = entities.CreateEntity();
+        entities.AddComponent(predecessor, new WorldTransform(new(-10, 0, 0),
+            Quaternion.Identity, new(3.2f, 2.2f, 6.4f)));
+        var truck = entities.CreateEntity();
+        var current = new WorldTransform(Vector3.Zero, Quaternion.Identity, new(3.2f, 2.2f, 6.4f));
+        entities.AddComponent(truck, new VehicleQueueEntry(building, new PlayerId(1), 1,
+            SimulationTick.Zero, VehicleQueueService.CargoDelivery, Position: 2, WaitingCount: 2,
+            Target: new(20, 0, 0), Heading: MathF.PI / 2, Predecessor: predecessor));
+        entities.AddComponent(truck, new VehicleQueueMotion(new(32, 0, 0), new(20, 0, 0),
+            MathF.PI / 2, predecessor, 2, 1));
+        Assert.False(VehicleDockingService.BlocksQueueStep(entities, truck, current,
+            current with { Position = new(.1f, 0, 0) }));
+        Assert.True(VehicleDockingService.BlocksQueueStep(entities, truck,
+            current with { Position = new(20, 0, 0) }, current with { Position = new(20.2f, 0, 0) }));
+        Assert.Equal(2, entities.GetComponent<VehicleQueueEntry>(truck).Position);
+        Assert.False(entities.HasComponent<VehicleDockSlot>(building));
+    }
+
     [Theory]
     [InlineData(0, true)]
     [InlineData(12, false)]

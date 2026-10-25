@@ -125,8 +125,8 @@ internal sealed partial class PredictiveTrafficPlanner
                 {
                     if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                     workConsumed++;
-                    if (!Conflicts(paths[i][step - 1].Position, paths[i][step].Position, profiles[i],
-                        paths[j][step - 1].Position, paths[j][step].Position, profiles[j])) continue;
+                    if (!Conflicts(paths[i][step - 1], paths[i][step], profiles[i],
+                        paths[j][step - 1], paths[j][step], profiles[j])) continue;
                     waits[i] = NavigationBlockReason.MovingVehicle;
                     waitingFor[i] = ordered[j].Binding.Requester;
                     break;
@@ -164,10 +164,40 @@ internal sealed partial class PredictiveTrafficPlanner
                     return Unavailable(NavigationBlockReason.SearchWork);
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1)
                 {
+                    float availableDistance = clearDistance + HorizontalDistance(paths[i][step - 1].Position, paths[i][step].Position) * result.AllowedFraction;
                     // A turn may be blocked by a body behind us while forward clearance
                     // is available. This bounded preview grants only a slow ordinary proposal;
                     // the movement owner and final batch arbiter still sweep the actual tick.
-                    if (result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+                    bool localBlocker = false;
+                    if (result.Blocker is { } observedBlocker)
+                    {
+                        foreach (var body in collision.Bodies)
+                        {
+                            if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
+                            workConsumed++;
+                            if (body.Identity != observedBlocker) continue;
+                            var currentVehicle = vehicles[ordered[i].Binding.Requester];
+                            Vector3 forward = Vector3.Transform(Vector3.UnitZ, currentVehicle.Pose.Rotation);
+                            bool behind = Vector3.Dot(body.Pose.Position - currentVehicle.Pose.Position, forward) < 0;
+                            if (ordered[i].Route is { } turningRoute)
+                            {
+                                var origin = turningRoute.Request.Start;
+                                Vector3 originalForward = Vector3.Transform(Vector3.UnitZ, origin.Rotation);
+                                Vector3 goalDelta = ordered[i].Binding.OriginalOrder.WorldTarget - origin.Position;
+                                goalDelta.Y = 0;
+                                // Retain clearance throughout an initially backward-facing turn,
+                                // even after its heading temporarily points toward the rear body.
+                                behind |= Vector3.Dot(goalDelta, originalForward) < -.5f * goalDelta.Length() &&
+                                    Vector3.Dot(body.Pose.Position - origin.Position, originalForward) < 0;
+                            }
+                            float localRange = profiles[i].HalfExtents.Length() + profiles[i].ClearanceMeters +
+                                body.HalfExtents.Length() + 3;
+                            localBlocker = behind && HorizontalDistance(body.Pose.Position, currentVehicle.Pose.Position) <= localRange;
+                            break;
+                        }
+                    }
+                    if ((availableDistance <= 0 || localBlocker) &&
+                        result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
                     {
                         int forwardWork = ForwardClearance(frame, vehicles[ordered[i].Binding.Requester],
                             ordered[i], geometry, passagePlan.Leases, workAllowance - workConsumed, out bool clearForward);
@@ -184,7 +214,6 @@ internal sealed partial class PredictiveTrafficPlanner
                     // actual motion owner still sweeps its chosen steering step independently.
                     // Holding the entire horizon alternates acceleration/braking forever before
                     // a parked vehicle can enter local avoidance or the stopped recovery phase.
-                    float availableDistance = clearDistance + HorizontalDistance(paths[i][step - 1].Position, paths[i][step].Position) * result.AllowedFraction;
                     if (availableDistance > 0 && result.Status is NavigationGeometryStatus.Blocked or NavigationGeometryStatus.Limited &&
                         result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
                     {
@@ -384,14 +413,49 @@ internal sealed partial class PredictiveTrafficPlanner
 
     // Circumscribed discs conservatively contain every yawed horizontal footprint. Minimize relative
     // separation over the whole interval instead of checking endpoints (which can tunnel at crossings).
-    private static bool Conflicts(Vector3 a0, Vector3 a1, in NavigationVehicleProfile a,
-        Vector3 b0, Vector3 b1, in NavigationVehicleProfile b)
+    // Compare the complete swept physical boxes in the second vehicle's translating
+    // frame. Equal motion cancels, so clear parallel lanes and safe following gaps
+    // do not become fictitious crossings. Rotation remains conservatively enclosed.
+    private static bool Conflicts(in NavigationPose a0, in NavigationPose a1, in NavigationVehicleProfile a,
+        in NavigationPose b0, in NavigationPose b1, in NavigationVehicleProfile b)
     {
-        Vector2 relative = new(a0.X - b0.X, a0.Z - b0.Z);
-        Vector2 velocity = new(a1.X - a0.X - b1.X + b0.X, a1.Z - a0.Z - b1.Z + b0.Z);
-        float t = velocity.LengthSquared() > 0 ? Math.Clamp(-Vector2.Dot(relative, velocity) / velocity.LengthSquared(), 0, 1) : 0;
-        float radius = a.HalfExtents.Length() + a.ClearanceMeters +
-            b.HalfExtents.Length() + b.ClearanceMeters;
-        return (relative + velocity * t).LengthSquared() <= radius * radius;
+        var relativeStart = a0 with { Position = a0.Position - b0.Position };
+        var relativeEnd = a1 with { Position = a1.Position - b1.Position };
+        var stationaryStart = b0 with { Position = Vector3.Zero };
+        var stationaryEnd = b1 with { Position = Vector3.Zero };
+        if (!NavigationMotionArbitrator.TryBuildSweptOccupancy(relativeStart, relativeEnd, a,
+                out var first, out var firstHalf) ||
+            !NavigationMotionArbitrator.TryBuildSweptOccupancy(stationaryStart, stationaryEnd, b,
+                out var second, out var secondHalf)) return true;
+        firstHalf += new Vector3(a.ClearanceMeters);
+        secondHalf += new Vector3(b.ClearanceMeters);
+        Span<Vector3> firstAxes = stackalloc Vector3[3]
+        {
+            Vector3.Transform(Vector3.UnitX, first.Rotation),
+            Vector3.Transform(Vector3.UnitY, first.Rotation),
+            Vector3.Transform(Vector3.UnitZ, first.Rotation)
+        };
+        Span<Vector3> secondAxes = stackalloc Vector3[3]
+        {
+            Vector3.Transform(Vector3.UnitX, second.Rotation),
+            Vector3.Transform(Vector3.UnitY, second.Rotation),
+            Vector3.Transform(Vector3.UnitZ, second.Rotation)
+        };
+        Vector3 delta = first.Position - second.Position;
+        for (int axisIndex = 0; axisIndex < 15; axisIndex++)
+        {
+            Vector3 axis = axisIndex < 3 ? firstAxes[axisIndex] : axisIndex < 6 ?
+                secondAxes[axisIndex - 3] : Vector3.Cross(firstAxes[(axisIndex - 6) / 3], secondAxes[(axisIndex - 6) % 3]);
+            float lengthSquared = axis.LengthSquared();
+            if (lengthSquared < 1e-10f) continue;
+            float support = firstHalf.X * MathF.Abs(Vector3.Dot(axis, firstAxes[0])) +
+                firstHalf.Y * MathF.Abs(Vector3.Dot(axis, firstAxes[1])) +
+                firstHalf.Z * MathF.Abs(Vector3.Dot(axis, firstAxes[2])) +
+                secondHalf.X * MathF.Abs(Vector3.Dot(axis, secondAxes[0])) +
+                secondHalf.Y * MathF.Abs(Vector3.Dot(axis, secondAxes[1])) +
+                secondHalf.Z * MathF.Abs(Vector3.Dot(axis, secondAxes[2]));
+            if (MathF.Abs(Vector3.Dot(delta, axis)) > support + 1e-5f * MathF.Sqrt(lengthSquared)) return false;
+        }
+        return true;
     }
 }

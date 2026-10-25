@@ -162,11 +162,23 @@ public sealed class MatchPersistenceTests
         Assert.False(original.Simulation.Entities.HasComponent<CargoConvoyEscort>(escort));
         VerifyCheckpoint(continueTicks: true);
         InventoryId received = original.Simulation.Entities.GetComponent<InventoryStorage>(destination).InventoryId;
-        Assert.True(original.RunUntil(runtime =>
+        bool delivered = original.RunUntil(runtime =>
             runtime.Inventories.GetQuantity(received, ResourceIds.Fuel) == 200 &&
             runtime.Inventories.GetQuantity(received, ResourceIds.Ammunition) == 200 &&
             trucks.All(truck => !runtime.Simulation.Entities.HasComponent<CargoTransportOrder>(truck)),
-            5000, TestContext.Current.CancellationToken));
+            5000, TestContext.Current.CancellationToken);
+        var checkpoint = original.Services.GroundMovement.CaptureNavigationState();
+        string failure = $"fuel={original.Inventories.GetQuantity(received, ResourceIds.Fuel)}; ammo={original.Inventories.GetQuantity(received, ResourceIds.Ammunition)}; actors={string.Join(';', checkpoint.Actors)}; waits={string.Join(';', checkpoint.Traffic.Vehicles)}; leases={string.Join(';', checkpoint.Traffic.Leases)}; vetoes={string.Join(';', original.Services.GroundMovement.CaptureLegacyNavigationVetoes())}";
+        foreach (var truck in trucks)
+        {
+            var entities = original.Simulation.Entities;
+            entities.TryGetComponent(truck, out MovementOrder movementOrder);
+            entities.TryGetComponent(truck, out VehicleQueueEntry queue);
+            entities.TryGetComponent(truck, out VehicleDockVisit dock);
+            entities.TryGetComponent(truck, out CargoConvoyMotionConstraint convoy);
+            failure += $" truck={truck}: pose={entities.GetComponent<WorldTransform>(truck)} movement={entities.GetComponent<GroundMovementState>(truck)} order={movementOrder} queue={queue} dock={dock} convoy={convoy};";
+        }
+        Assert.True(delivered, failure);
         Assert.False(original.Simulation.Entities.IsAlive(create.CreatedConvoy));
         InventoryId source = original.GetBase(issuer).StartingInventory;
         Assert.Equal(0, original.Inventories.GetReservedQuantity(source, ResourceIds.Fuel));

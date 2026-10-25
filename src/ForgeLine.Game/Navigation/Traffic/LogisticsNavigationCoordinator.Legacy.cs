@@ -63,18 +63,24 @@ internal sealed partial class LogisticsNavigationCoordinator
         end = start; heading = 0;
         if (!IsLogisticsVehicle(context.Entities, entity) || maximumSpeed <= 0 ||
             !NavigationMotionCapture.TryCaptureVehicle(context.Entities, entity, _movementOptions, out var vehicle) ||
-            vehicle.QueueEntry is not { } queue || queue.ArrivedAtService ||
+            vehicle.QueueEntry is not { } queue || queue.ArrivedAtService || queue.Generation == 0 || queue.Position <= 0 || queue.Owner != vehicle.Owner ||
             !context.Entities.TryGetComponent(entity, out VehicleQueueMotion motion) || motion.Generation != queue.Generation ||
             vehicle.DockVisit is { LaneEntered: true } ||
-            vehicle.DirectOrder is not { } order || order.TargetHeadingRadians.HasValue) return false;
+            vehicle.DirectOrder is not { } order || order.Issuer != vehicle.Owner ||
+            order.TargetHeadingRadians.HasValue && order.WorldTarget != queue.Target) return false;
+        if (vehicle.DockVisit is { } visit &&
+            (visit.Building != queue.Building || visit.Generation > 0 &&
+                (vehicle.BuildingSlot is not { } slot || slot.Truck != entity || slot.Generation != visit.Generation || slot.Owner != vehicle.Owner)))
+            return false;
         Vector3 forward = Vector3.Transform(Vector3.UnitZ, start.Rotation);
         if (Vector3.Dot(queue.Target - start.Position, forward) >= 0) return false;
         EnsureWorld();
         if (!NavigationReverseMotion.TryStep(vehicle, queue.Target, MathF.Min(1, maximumSpeed),
-            (float)context.TickDuration.TotalSeconds, _snapshot!, out var proposal, out float speed, out heading) || speed <= 0)
+            (float)context.TickDuration.TotalSeconds, _snapshot!, out var proposal, out float speed, out heading, arrivalTolerance: .05f) ||
+            speed <= 0 || speed > MathF.Min(1, maximumSpeed) + .00001f)
             return false;
         end = start with { Position = proposal.Position, Rotation = proposal.Rotation };
-        return TryApproveLegacyPose(context, entity, start, end);
+        return true;
     }
 
     // Earlier non-logistics movement cannot enter a logistics footprint and then

@@ -7,12 +7,13 @@ namespace ForgeLine.Game;
 internal static class NavigationReverseMotion
 {
     internal static bool TryStep(in NavigationVehicleObservation vehicle, Vector3 target, float maximumSpeed,
-        float deltaSeconds, NavigationWorldSnapshot world, out NavigationPose end, out float speed, out float heading)
+        float deltaSeconds, NavigationWorldSnapshot world, out NavigationPose end, out float speed, out float heading, float arrivalTolerance = .15f)
     {
         end = vehicle.Pose; speed = 0; heading = vehicle.Movement.HeadingRadians;
         if (!vehicle.Pose.IsValid || !vehicle.Profile.IsValid || !NavigationMotionCapture.Finite(target) ||
             !float.IsFinite(maximumSpeed) || maximumSpeed < 0 || !float.IsFinite(deltaSeconds) || deltaSeconds <= 0 ||
-            !float.IsFinite(heading) || !NavigationMotionCapture.Finite(vehicle.Movement.Velocity)) return false;
+            !float.IsFinite(heading) || !NavigationMotionCapture.Finite(vehicle.Movement.Velocity) ||
+            !float.IsFinite(arrivalTolerance) || arrivalTolerance < 0) return false;
         Vector3 forward = Vector3.Transform(Vector3.UnitZ, vehicle.Pose.Rotation);
         Vector3 up = Vector3.Transform(Vector3.UnitY, vehicle.Pose.Rotation);
         if (MathF.Abs(forward.Y) > 0.001f || up.Y < 0.999f ||
@@ -22,12 +23,12 @@ internal static class NavigationReverseMotion
         float distance = delta.Length();
         float current = new Vector2(vehicle.Movement.Velocity.X, vehicle.Movement.Velocity.Z).Length();
         if (!float.IsFinite(distance) || !float.IsFinite(current) || current > vehicle.Profile.MaximumSpeed + 0.01f) return false;
-        if (distance <= 0.15f) return true;
+        if (distance <= arrivalTolerance) return true;
         float desiredHeading = MathF.Atan2(-delta.X, -delta.Z);
         float angle = GroundMovementState.NormalizeAngle(desiredHeading - heading);
         heading = GroundMovementState.NormalizeAngle(heading + Math.Clamp(angle,
             -vehicle.Profile.MaximumYawRate * deltaSeconds, vehicle.Profile.MaximumYawRate * deltaSeconds));
-        float remaining = MathF.Max(0, distance - 0.15f);
+        float remaining = MathF.Max(0, distance - arrivalTolerance);
         float limit = MathF.Min(MathF.Min(1, maximumSpeed), vehicle.Profile.MaximumSpeed);
         limit = MathF.Min(limit, MathF.Sqrt(2 * vehicle.Profile.Deceleration * remaining));
         if (MathF.Abs(angle) > MathF.PI / 30) limit = MathF.Min(limit, remaining * vehicle.Profile.MaximumYawRate * 0.5f);
