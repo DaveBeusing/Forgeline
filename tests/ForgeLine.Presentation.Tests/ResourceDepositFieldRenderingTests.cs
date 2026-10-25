@@ -39,7 +39,11 @@ public sealed class ResourceDepositFieldRenderingTests
         using var graphics = new FieldGraphicsDevice();
         using var renderer = new SimpleInstanceRenderer(graphics, fixture.Catalog());
         var camera = new RtsCamera(new() { InitialDistance = 100 });
-        renderer.Render(new SubmissionGraphics.FakeGraphicsCommandContext(), camera, world, 1);
+        var commands = new SubmissionGraphics.FakeGraphicsCommandContext();
+        renderer.Render(commands, camera, world, 1);
+        Assert.Equal([0, 1, 2, 3], commands.PixelTextures.Keys.Order().ToArray());
+        Assert.Equal(1, commands.IndexedDrawCalls);
+        Assert.Equal(2, commands.LastInstanceCount);
         Assert.Equal(1, world.InstanceCount);
         Assert.Equal(root, world.GetInterpolatedInstance(0, 1));
         Assert.Equal(1, renderer.LastDiagnostics.VisibleInstances);
