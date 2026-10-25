@@ -134,6 +134,30 @@ public sealed partial class VehicleDockingService
         return true;
     }
 
+    private bool ContinueBlockedQueueApproach(SimulationContext context, EntityId truck, EntityId building, PlayerId owner)
+    {
+        var entities = context.Entities;
+        if (!OwnsTruck(entities, truck, owner) || !Operational(entities, building) ||
+            !entities.TryGetComponent(building, out CompletedBuilding completed) || completed.Owner != owner ||
+            !entities.TryGetComponent(building, out BuildingLoadingDock definition) || !definition.IsValid ||
+            !entities.TryGetComponent(building, out VehicleQueueLane lane) ||
+            !entities.TryGetComponent(truck, out VehicleQueueEntry queue) || queue.Building != building || queue.Owner != owner ||
+            queue.Generation == 0 || queue.Position != 1 || queue.ArrivedAtService || !_queues.IsHead(entities, truck, building, context.Tick) ||
+            !entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Building != building || visit.Generation != 0 || visit.LaneEntered ||
+            !entities.TryGetComponent(truck, out WorldTransform transform) ||
+            !entities.TryGetComponent(truck, out GroundMovementState motion) ||
+            !NavigationMotionCapture.Finite(queue.Target) || !float.IsFinite(queue.Heading)) return false;
+        bool settled = VehicleDockPose.HorizontalDistanceSquared(transform.Position, queue.Target) <= .11f * .11f &&
+            MathF.Abs(GroundMovementState.NormalizeAngle(motion.HeadingRadians - queue.Heading)) <= MathF.PI / 90 &&
+            motion.Velocity.LengthSquared() <= .05f * .05f;
+        if (settled) return false;
+        // Admission can fail while the head is still approaching its own safe
+        // waiting pose. It retains that approach, not permission to enter/service
+        // the occupied lane. Physical motion and FIFO gates still approve each tick.
+        QueueMove(context, truck, owner, queue.Target, queue.Heading, lane);
+        return true;
+    }
+
     private bool TryQueueLane(EntityRegistry entities, EntityId truck, EntityId building, in VehicleDockPose pose,
         in WorldTransform transform, in GroundMovement movement, out VehicleQueueLane lane)
     {

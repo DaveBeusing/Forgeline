@@ -8,6 +8,33 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class VehicleQueuePhysicalTests
 {
+    [Fact]
+    public void BlockedAdmissionKeepsTheHeadMovingToItsOwnClearWaitingPose()
+    {
+        var fixture = new Traffic(1, false);
+        var entities = fixture.Simulation.Entities;
+        var head = fixture.Trucks[0];
+        var initial = entities.GetComponent<WorldTransform>(head);
+        var blocker = entities.CreateEntity();
+        var blockedPose = initial with { Position = new(590, 1, 526.5f) };
+        entities.AddComponent(blocker, blockedPose);
+        entities.AddComponent(blocker, entities.GetComponent<GroundMovement>(head));
+        entities.AddComponent(blocker, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.AddComponent(blocker, entities.GetComponent<ControllableEntity>(head));
+        entities.AddComponent(blocker, new SpatialPresence(blockedPose.Scale * .5f, new(1, 4, SpatialMobility.Mobile)));
+        fixture.Simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        var queue = entities.GetComponent<VehicleQueueEntry>(head);
+        var current = entities.GetComponent<WorldTransform>(head);
+        Assert.True(current.Position.X > initial.Position.X + 2);
+        Assert.InRange(Vector3.Distance(current.Position, queue.Target), 0, .11f);
+        Assert.Equal(1, queue.Position);
+        Assert.False(entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        Assert.Equal(0UL, entities.GetComponent<VehicleDockVisit>(head).Generation);
+        Assert.False(entities.GetComponent<VehicleDockVisit>(head).LaneEntered);
+        Assert.Equal(blockedPose, entities.GetComponent<WorldTransform>(blocker));
+        Assert.Empty(fixture.Completed);
+    }
+
     [Theory]
     [InlineData(4u)]
     [InlineData(10u)]
