@@ -124,10 +124,10 @@ internal sealed partial class PredictiveTrafficPlanner
                     result.FrameTick != frame.Tick.Value || result.Revision != frame.Collision.World.Revision) return false;
                 foreach (var reservation in frame.Reservations)
                 {
-                    if (consumed == allowance) return false;
-                    consumed++;
-                    if (ReservationApplies(vehicle, reservation) && Touches(new(reservation.ReservationId, reservation.Pose,
-                        reservation.HalfExtents), [simulated.Pose, end], vehicle.Profile)) return false;
+                    int checkWork = ServiceReservationCheckWork(2);
+                    if (checkWork > allowance - consumed) { consumed = allowance; return false; }
+                    consumed += checkWork;
+                    if (BlocksServiceReservation(vehicle, reservation, [simulated.Pose, end])) return false;
                 }
                 foreach (var lease in leases.Values)
                 {

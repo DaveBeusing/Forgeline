@@ -110,11 +110,13 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                 workConsumed++;
                 if (!ReservationApplies(vehicles[ordered[i].Binding.Requester], reservation)) continue;
-                if (workAllowance - workConsumed < PredictionSteps)
+                int reservationWork = PredictionSteps + ServiceReservationCheckWork(paths[i].Length);
+                if (workAllowance - workConsumed < reservationWork)
                 { workConsumed = workAllowance; return Unavailable(NavigationBlockReason.SearchWork); }
-                workConsumed += PredictionSteps;
+                workConsumed += reservationWork;
                 if (!Touches(new(reservation.ReservationId, reservation.Pose, reservation.HalfExtents), paths[i], profiles[i])) continue;
                 admissionAllowed[i] = false;
+                if (!BlocksServiceReservation(vehicles[ordered[i].Binding.Requester], reservation, paths[i])) continue;
                 waits[i] = NavigationBlockReason.ReservedCorridor;
                 waitingFor[i] = reservation.Owner;
                 break;
@@ -265,8 +267,10 @@ internal sealed partial class PredictiveTrafficPlanner
                     if (workConsumed == workAllowance) return Unavailable(NavigationBlockReason.SearchWork);
                     workConsumed++;
                     if (!ReservationApplies(vehicles[ordered[i].Binding.Requester], reservation)) continue;
-                    var region = new NavigationTrafficPassage(reservation.ReservationId, reservation.Pose, reservation.HalfExtents);
-                    if (Touches(region, [paths[i][step - 1], paths[i][step]], profiles[i]))
+                    int checkWork = ServiceReservationCheckWork(2);
+                    if (checkWork > workAllowance - workConsumed) return Unavailable(NavigationBlockReason.SearchWork);
+                    workConsumed += checkWork;
+                    if (BlocksServiceReservation(vehicles[ordered[i].Binding.Requester], reservation, [paths[i][step - 1], paths[i][step]]))
                     {
                         waits[i] = NavigationBlockReason.ReservedCorridor;
                         waitingFor[i] = reservation.Owner;

@@ -47,10 +47,10 @@ internal sealed partial class PredictiveTrafficPlanner
             bool reserved = false;
             foreach (var reservation in frame.Reservations)
             {
-                if (consumed == allowance) return -1;
-                consumed++;
-                if (ReservationApplies(vehicle, reservation) && Touches(new(reservation.ReservationId,
-                    reservation.Pose, reservation.HalfExtents), [vehicle.Pose, end], vehicle.Profile)) reserved = true;
+                int checkWork = ServiceReservationCheckWork(2);
+                if (checkWork > allowance - consumed) return -1;
+                consumed += checkWork;
+                if (BlocksServiceReservation(vehicle, reservation, [vehicle.Pose, end])) reserved = true;
             }
             foreach (var lease in leases.Values)
             {

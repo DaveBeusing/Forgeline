@@ -9,6 +9,47 @@ namespace ForgeLine.Game.Tests;
 
 public sealed partial class PredictiveTrafficBatchTests
 {
+    [Theory]
+    [InlineData(21, 30, true)]
+    [InlineData(14, 30, false)]
+    [InlineData(21, 10, false)]
+    public void ExistingForeignDockOccupantsMayLeaveOutwardWithoutTakingAdmission(float position, float goal, bool outward)
+    {
+        var (frame, intents) = Crossing();
+        float heading = goal > position ? MathF.PI / 2 : -MathF.PI / 2;
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(goal, .5f, 20) };
+        var vehicle = frame.Vehicles[0] with { Pose = new(new(position, .5f, 20), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(heading) };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2));
+        var reservation = new NavigationTrafficReservation(7, new(99, 1), 1, 0, NavigationReservationKind.Dock,
+            passage.Pose, passage.HalfExtents, SimulationTick.Zero, SimulationTick.Zero, true);
+        var captured = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [vehicle], [reservation], Limits(), [passage]);
+        var planner = new PredictiveTrafficPlanner();
+        var directive = Assert.Single(planner.PlanBatch(captured, [intent], new ClearGeometry(), 3, 10000, out _));
+        Assert.Equal(outward ? NavigationTrafficAction.Proceed : NavigationTrafficAction.Hold, directive.Action);
+        Assert.Equal(intent.Binding, directive.Binding);
+        Assert.Empty(planner.CaptureState().Leases);
+    }
+
+    [Fact]
+    public void OutwardDockEvacuationRejectsReentryRotationAndOtherReservationKinds()
+    {
+        var (frame, _) = Crossing();
+        var vehicle = frame.Vehicles[0];
+        var reservation = new NavigationTrafficReservation(7, new(99, 1), 1, 0, NavigationReservationKind.Dock,
+            new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2), SimulationTick.Zero, SimulationTick.Zero, true);
+        var start = vehicle.Pose with { Position = new(21, .5f, 20) };
+        var outside = start with { Position = new(30, .5f, 20) };
+        Assert.False(PredictiveTrafficPlanner.BlocksServiceReservation(vehicle, reservation, [start, outside]));
+        Assert.True(PredictiveTrafficPlanner.BlocksServiceReservation(vehicle, reservation, [start, outside, start]));
+        Assert.True(PredictiveTrafficPlanner.BlocksServiceReservation(vehicle, reservation,
+            [start, start with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, .3f) }]));
+        Assert.True(PredictiveTrafficPlanner.BlocksServiceReservation(vehicle,
+            reservation with { Kind = NavigationReservationKind.Queue }, [start, outside]));
+        Assert.True(PredictiveTrafficPlanner.BlocksServiceReservation(vehicle, reservation, [start]));
+    }
+
     [Fact]
     public void ForeignServiceAdmissionPreventsNewAndRetainedUnenteredPassageClaims()
     {
