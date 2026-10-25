@@ -3,10 +3,10 @@ using ForgeLine.Navigation;
 
 namespace ForgeLine.Game;
 
-internal readonly record struct NavigationPassageProbe(Vector3 Position, Vector3 SteeringTarget, float LookaheadMeters);
+internal readonly record struct NavigationPassageProbe(Vector3 Position, Vector3 SteeringTarget, float LookaheadMeters, float VehicleWidthMeters);
 internal sealed record NavigationPassageCapture(IReadOnlyList<NavigationTrafficPassage> Passages, int WorkConsumed, bool Complete);
 
-/// <summary>Bounded one-cell lane discovery on the pinned grid; physical clearance remains a separate veto.</summary>
+/// <summary>Bounded vehicle-scale lane discovery on the pinned grid; physical clearance remains a separate veto.</summary>
 internal static class NavigationPassageDiscovery
 {
     private const int MaximumProbeSteps = 32, MaximumChainCells = 512, MaximumPassages = 128;
@@ -25,13 +25,23 @@ internal static class NavigationPassageDiscovery
         foreach (var probe in probes)
         {
             if (!Finite(probe.Position) || !Finite(probe.SteeringTarget) ||
-                !float.IsFinite(probe.LookaheadMeters) || probe.LookaheadMeters <= 0) return Finish(false);
+                !float.IsFinite(probe.LookaheadMeters) || probe.LookaheadMeters <= 0 ||
+                !float.IsFinite(probe.VehicleWidthMeters) || probe.VehicleWidthMeters <= 0) return Finish(false);
             Vector3 delta = probe.SteeringTarget - probe.Position;
             delta.Y = 0;
             float distance = MathF.Min(delta.Length(), probe.LookaheadMeters);
             if (!float.IsFinite(distance)) return Finish(false);
             double requiredSteps = Math.Ceiling((double)distance / (grid.Settings.CellSizeMeters * 0.5));
             if (requiredSteps > MaximumProbeSteps) return Finish(false);
+            // One coarse pathfinding cell can contain several physical lanes.
+            // It cannot establish exclusive single-lane ownership when its width
+            // already accommodates two captured vehicle widths. Actual crossing
+            // prediction and every physical sweep still apply at this resolution.
+            if ((double)grid.Settings.CellSizeMeters >= 2d * probe.VehicleWidthMeters)
+            {
+                if (!Spend(1)) return Finish(false);
+                continue;
+            }
             int steps = Math.Max(1, (int)requiredSteps);
             Vector3 direction = delta.LengthSquared() > 0 ? Vector3.Normalize(delta) : Vector3.Zero;
             for (int sample = 0; sample <= steps; sample++)
