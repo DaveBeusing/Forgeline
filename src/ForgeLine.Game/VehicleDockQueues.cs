@@ -404,6 +404,10 @@ public sealed partial class VehicleDockingService
         Vector3 forward = new(MathF.Sin(motion.Heading), 0, MathF.Cos(motion.Heading));
         Vector3 side = new(forward.Z, 0, -forward.X);
         if (MathF.Abs(Vector3.Dot(current.Position - motion.Front, side)) > current.Scale.X + 2) return false;
+        // A predecessor still approaching from outside the lane has not occupied
+        // its no-passing plane. Dock admission stays FIFO and physical bodies
+        // remain vetoes; do not trap a follower at its own free waiting pose.
+        if (MathF.Abs(Vector3.Dot(predecessor.Position - motion.Front, side)) > predecessor.Scale.X + 2) return false;
         // A new arrival can already be ahead of its FIFO predecessor. Do not
         // let the no-passing gate trap it there while it moves sideways out
         // of the lane to reach its assigned tail position. Inspect the route

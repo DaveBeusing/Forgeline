@@ -68,6 +68,81 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Fact]
+    public void ProjectedFinalWaypointHandsBackToTheOriginalLocalApproach()
+    {
+        Vector3 goal = new(20, .5f, 20);
+        var (simulation, _, unit) = Create([new(new(23, -1, 23), new(23.5f, 2, 23.5f))], goal);
+        bool projected = false, localApproach = false;
+        for (int tick = 0; tick < 300; tick++)
+        {
+            simulation.AdvanceOneTick();
+            if (simulation.Entities.TryGetComponent(unit, out NavigationRouteState route))
+                projected |= route.Path.Waypoints[^1] != route.OriginalOrder.WorldTarget;
+            if (simulation.Entities.TryGetComponent(unit, out MovementOrder order))
+                localApproach |= order.Kind == MovementOrderKind.LocalApproach;
+        }
+        Assert.True(projected);
+        Assert.True(localApproach);
+        Assert.InRange(Vector3.Distance(simulation.Entities.GetComponent<WorldTransform>(unit).Position, goal), 0, .5f);
+        Assert.False(simulation.Entities.HasComponent<MovementOrder>(unit));
+        Assert.False(simulation.Entities.HasComponent<NavigationRouteState>(unit));
+    }
+
+    [Fact]
+    public void IdleLongVehicleDoesNotBlockAPhysicallyClearParallelRoute()
+    {
+        var (simulation, _, first) = Create();
+        var entities = simulation.Entities;
+        var parked = entities.CreateEntity();
+        var initial = new WorldTransform(new(13.2f, .5f, 25), Quaternion.Identity, new(3.4f, 2.5f, 6.8f));
+        entities.AddComponent(parked, initial);
+        entities.AddComponent(parked, entities.GetComponent<GroundMovement>(first));
+        entities.AddComponent(parked, GroundMovementState.Stationary());
+        entities.AddComponent(parked, new NavigationAgent(NavigationMovementClass.Wheeled));
+        entities.AddComponent(parked, entities.GetComponent<UnitIdentity>(first));
+        entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(first));
+        entities.AddComponent(parked, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        simulation.RunTicks(300, TestContext.Current.CancellationToken);
+        Assert.Equal(initial, entities.GetComponent<WorldTransform>(parked));
+        var position = entities.GetComponent<WorldTransform>(first).Position;
+        Assert.True(Vector3.Distance(position, new(10, .5f, 40)) < .5f, $"Truck stopped at {position} despite a clear physical lane.");
+        Assert.False(entities.HasComponent<MovementOrder>(first));
+    }
+
+    [Fact]
+    public void RearNeighborCannotPreventASafeForwardClearanceBeforeTurning()
+    {
+        Vector3 goal = new(10, .5f, 30);
+        var (simulation, movement, unit) = Create(goal: goal);
+        var entities = simulation.Entities;
+        var initial = new WorldTransform(new(30, .5f, 30), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), new(3.2f, 2.2f, 6.4f));
+        entities.SetComponent(unit, initial);
+        entities.SetComponent(unit, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.SetComponent(unit, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        var parked = entities.CreateEntity();
+        var parkedPose = initial with { Position = new(24.85f, .5f, 30), Rotation = Quaternion.Identity };
+        entities.AddComponent(parked, parkedPose);
+        entities.AddComponent(parked, entities.GetComponent<GroundMovement>(unit));
+        entities.AddComponent(parked, GroundMovementState.Stationary());
+        entities.AddComponent(parked, new NavigationAgent(NavigationMovementClass.Wheeled));
+        entities.AddComponent(parked, entities.GetComponent<UnitIdentity>(unit));
+        entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(unit));
+        entities.AddComponent(parked, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        bool forwardClearance = false;
+        for (int tick = 0; tick < 600; tick++)
+        {
+            simulation.AdvanceOneTick();
+            var pose = entities.GetComponent<WorldTransform>(unit);
+            forwardClearance |= pose.Position.X > initial.Position.X + .05f;
+        }
+        Assert.True(forwardClearance, $"No initial straight clearance; final={entities.GetComponent<WorldTransform>(unit)}; movement={entities.GetComponent<GroundMovementState>(unit)}.");
+        Assert.Equal(parkedPose, entities.GetComponent<WorldTransform>(parked));
+        var final = entities.GetComponent<WorldTransform>(unit).Position;
+        Assert.True(Vector3.Distance(final, goal) < .5f, $"Turning truck stopped at {final}; movement={entities.GetComponent<GroundMovementState>(unit)}; checkpoint={string.Join(';', movement.CaptureNavigationState().Actors)}; traffic={movement.CaptureNavigationState().Traffic}.");
+        Assert.False(entities.HasComponent<MovementOrder>(unit));
+    }
+
+    [Fact]
     public void ReplacementCommandGetsANewGenerationAndDestination()
     {
         var (simulation, movement, unit) = Create();
@@ -160,14 +235,14 @@ public sealed class ConnectedLogisticsNavigationTests
             Assert.Equal(expected, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
         }
     }
-    private static (SimulationCoordinator, GroundMovementSystem, EntityId) Create()
+    private static (SimulationCoordinator, GroundMovementSystem, EntityId) Create(IReadOnlyList<AxisAlignedBounds>? obstacles = null, Vector3? goal = null)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
         var terrain = new TerrainWorld(settings, [new TerrainChunk(new(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
-        var world = NavigationWorld.Build(terrain, gridSettings: new NavigationGridSettings { CellSizeMeters = 4 });
+        var world = NavigationWorld.Build(terrain, obstacles ?? [], gridSettings: new NavigationGridSettings { CellSizeMeters = 4 });
         var navigation = new HierarchicalNavigationSystem(new HierarchicalPathfinder(world));
         var movement = new GroundMovementSystem(terrain);
-        movement.ConnectNavigation(navigation, terrain, []);
+        movement.ConnectNavigation(navigation, terrain, obstacles ?? []);
         var simulation = new SimulationCoordinator();
         simulation.RegisterSystem(navigation); simulation.RegisterSystem(movement);
         var entities = simulation.Entities; var unit = entities.CreateEntity();
@@ -178,7 +253,7 @@ public sealed class ConnectedLogisticsNavigationTests
         entities.AddComponent(unit, new UnitIdentity(UnitIds.CargoTruck, default));
         entities.AddComponent(unit, new ControllableEntity(new PlayerId(1), ControllableEntityCategory.Logistics));
         entities.AddComponent(unit, new SpatialPresence(new Vector3(.5f), new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
-        entities.AddComponent(unit, new MovementOrder(new PlayerId(1), new(10, .5f, 40), SimulationTick.Zero, new(1)));
+        entities.AddComponent(unit, new MovementOrder(new PlayerId(1), goal ?? new(10, .5f, 40), SimulationTick.Zero, new(1)));
         return (simulation, movement, unit);
     }
 }

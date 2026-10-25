@@ -1406,12 +1406,14 @@ public sealed partial class PlayerConstructionProductionFlowTests
                 $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel)}" +
                 $" ammunition={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition)}");
         }
+        diagnostics.Add($"leases={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Traffic.Leases)}");
         diagnostics.Add($"distribution={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests)}");
         foreach (EntityId entity in scenario.Simulation.Entities.Query<CargoTransport>())
             diagnostics.Add($"{entity}: {scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(entity)} " +
             $"position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position} " +
             (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ? $"dock={visit} " : "") +
-            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move.WorldTarget} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleQueueEntry queue) ? $"queue={queue} " : "") +
             $"motion={scenario.Simulation.Entities.GetComponent<GroundMovementState>(entity)}");
         Assert.True(condition(), string.Join("; ", diagnostics));
     }

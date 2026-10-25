@@ -75,6 +75,16 @@ public sealed class UnitFactory
         return entity;
     }
 
+    internal bool TryGroundProductionPosition(UnitDefinition definition, Vector3 position, out Vector3 grounded)
+    {
+        grounded = position;
+        if (!IsFinite(position)) return false;
+        if (_terrain is null) return true;
+        if (!_terrain.TrySampleHeight(position.X, position.Z, out float height) || !float.IsFinite(height)) return false;
+        grounded.Y = height + definition.Movement.HeightOffset;
+        return IsFinite(grounded);
+    }
+
     private EntityId CreateStandardEntity(
         UnitDefinition definition,
         Vector3 position,

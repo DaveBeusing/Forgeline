@@ -63,6 +63,11 @@ internal sealed partial class LogisticsNavigationCoordinator
             }
             var local = CaptureNeighborhood(physical, vehicle, context.Tick, ref consumed);
             if (local is null) return Unavailable(NavigationBlockReason.SearchWork, consumed);
+            // Current-pose occupancy is the planning model; active participants have
+            // separate copied kinematic predictions. Every actual move is later
+            // checked against held source poses and all prior accepted swept bodies.
+            local = FreezePoses(local, ref consumed);
+            if (local is null) return Unavailable(NavigationBlockReason.SearchWork, consumed);
             neighborhoods.Add(entity, local);
         }
         var passageCapture = NavigationPassageDiscovery.Capture(snapshot, CollectionsMarshal.AsSpan(probes), Limits.WorkPerTick - consumed);

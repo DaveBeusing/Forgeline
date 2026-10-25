@@ -57,6 +57,26 @@ internal sealed partial class LogisticsNavigationCoordinator
             result.FrameTick == context.Tick.Value && result.Revision == collision.World.Revision;
     }
 
+    internal bool TryProposeLegacyQueueReverse(SimulationContext context, EntityId entity,
+        in WorldTransform start, float maximumSpeed, out WorldTransform end, out float heading)
+    {
+        end = start; heading = 0;
+        if (!IsLogisticsVehicle(context.Entities, entity) || maximumSpeed <= 0 ||
+            !NavigationMotionCapture.TryCaptureVehicle(context.Entities, entity, _movementOptions, out var vehicle) ||
+            vehicle.QueueEntry is not { } queue || queue.ArrivedAtService ||
+            !context.Entities.TryGetComponent(entity, out VehicleQueueMotion motion) || motion.Generation != queue.Generation ||
+            vehicle.DockVisit is { LaneEntered: true } ||
+            vehicle.DirectOrder is not { } order || order.TargetHeadingRadians.HasValue) return false;
+        Vector3 forward = Vector3.Transform(Vector3.UnitZ, start.Rotation);
+        if (Vector3.Dot(queue.Target - start.Position, forward) >= 0) return false;
+        EnsureWorld();
+        if (!NavigationReverseMotion.TryStep(vehicle, queue.Target, MathF.Min(1, maximumSpeed),
+            (float)context.TickDuration.TotalSeconds, _snapshot!, out var proposal, out float speed, out heading) || speed <= 0)
+            return false;
+        end = start with { Position = proposal.Position, Rotation = proposal.Rotation };
+        return TryApproveLegacyPose(context, entity, start, end);
+    }
+
     // Earlier non-logistics movement cannot enter a logistics footprint and then
     // leave the protected vehicle trapped in an initial-overlap hold. Precise and
     // coarse logistics move only after this pass and see its accepted envelopes.
@@ -100,6 +120,7 @@ internal sealed partial class LogisticsNavigationCoordinator
 
     private NavigationCollisionFrame? FreezePoses(NavigationCollisionFrame source, ref int consumed)
     {
+        if (source.BodyPosesAreFixed) return source;
         if (source.Bodies.Count > Limits.WorkPerTick - consumed) { consumed = Limits.WorkPerTick; return null; }
         consumed += source.Bodies.Count;
         return new(source.World, source.Tick, source.Coverage, source.IsComplete,

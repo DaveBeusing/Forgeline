@@ -103,7 +103,8 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (allowance - consumed < PredictionSteps) return new(leases, allowance, false);
                 consumed += PredictionSteps;
                 var vehicle = vehicles[intents[index].Binding.Requester];
-                if (retained && vehicle.Entity == active.Owner || !Touches(passage, paths[index], vehicle.Profile)) continue;
+                if (retained && vehicle.Entity == active.Owner || !Touches(passage, paths[index], vehicle.Profile) ||
+                    paths[index].Length > 1 && IsOutwardDeparture(passage, paths[index][0], paths[index][1], vehicle.Profile)) continue;
                 waits[index] = NavigationBlockReason.ReservedCorridor;
                 if (retained) waitingFor[index] = active.Owner;
                 else foreach (var other in physicalOccupants)
@@ -121,9 +122,25 @@ internal sealed partial class PredictiveTrafficPlanner
         {
             if (consumed == allowance) { complete = false; return false; }
             consumed++;
-            if (lease.Owner != owner && Touches(lease.Passage, [start, end], profile)) return false;
+            if (lease.Owner != owner && Touches(lease.Passage, [start, end], profile) &&
+                !IsOutwardDeparture(lease.Passage, start, end, profile)) return false;
         }
         return true;
+    }
+
+    private static bool IsOutwardDeparture(in NavigationTrafficPassage passage, NavigationPose start,
+        NavigationPose end, in NavigationVehicleProfile profile)
+    {
+        if (!Occupies(passage, start, profile.HalfExtents, profile.ClearanceMeters)) return false;
+        Quaternion inverse = Quaternion.Conjugate(passage.Pose.Rotation);
+        Vector3 a = Vector3.Transform(start.Position - passage.Pose.Position, inverse);
+        Vector3 b = Vector3.Transform(end.Position - passage.Pose.Position, inverse);
+        Vector2 first = new(a.X / passage.HalfExtents.X, a.Z / passage.HalfExtents.Z);
+        Vector2 last = new(b.X / passage.HalfExtents.X, b.Z / passage.HalfExtents.Z);
+        Vector2 change = last - first;
+        // Distance from the reserved centre must increase over the entire segment.
+        // No permission to enter, cross the centre, rotate in place or release the lease.
+        return Vector2.Dot(first, change) >= 0 && last.LengthSquared() > first.LengthSquared() + .0000001f;
     }
 
     private static bool ValidLease(in PredictiveTrafficPassageLease lease) =>

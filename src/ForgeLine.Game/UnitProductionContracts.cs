@@ -11,7 +11,8 @@ public enum UnitProductionStatus : byte
     Running = 1,
     NoInput = 2,
     NoPower = 3,
-    Paused = 4
+    Paused = 4,
+    OutputBlocked = 5
 }
 
 public enum UnitProductionBlockReason : byte
@@ -21,7 +22,8 @@ public enum UnitProductionBlockReason : byte
     NoPower = 2,
     Paused = 3,
     UnsupportedUnit = 4,
-    InvalidFacility = 5
+    InvalidFacility = 5,
+    OutputBlocked = 6
 }
 
 public struct UnitProductionFacility

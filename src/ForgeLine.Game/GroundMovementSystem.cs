@@ -495,6 +495,12 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 }
             }
         }
+        if (motionBlocked && _navigationControl is not null && order.TargetHeadingRadians is null &&
+            _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, out var queueDeparture, out float queueHeading))
+        {
+            candidate = queueDeparture.Position; candidateTransform = queueDeparture; heading = queueHeading;
+            motionBlocked = false;
+        }
         if (motionBlocked)
         {
             var waiting = state with { Velocity = Vector3.Zero, Status = GroundMovementStatus.TacticallyPaused,

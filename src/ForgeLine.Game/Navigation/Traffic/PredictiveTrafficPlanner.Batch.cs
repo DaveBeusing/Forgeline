@@ -164,6 +164,22 @@ internal sealed partial class PredictiveTrafficPlanner
                     return Unavailable(NavigationBlockReason.SearchWork);
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1)
                 {
+                    // A turn may be blocked by a body behind us while forward clearance
+                    // is available. This bounded preview grants only a slow ordinary proposal;
+                    // the movement owner and final batch arbiter still sweep the actual tick.
+                    if (result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+                    {
+                        int forwardWork = ForwardClearance(frame, vehicles[ordered[i].Binding.Requester],
+                            ordered[i], geometry, passagePlan.Leases, workAllowance - workConsumed, out bool clearForward);
+                        if (forwardWork < 0) { workConsumed = workAllowance; return Unavailable(NavigationBlockReason.SearchWork); }
+                        workConsumed += forwardWork;
+                        if (clearForward)
+                        {
+                            speedCaps[i] = MathF.Min(1, ordered[i].MaximumSpeed);
+                            hazards[i] = result.Reason;
+                            break;
+                        }
+                    }
                     // A future obstruction is a braking horizon, not an immediate stop. The
                     // actual motion owner still sweeps its chosen steering step independently.
                     // Holding the entire horizon alternates acceleration/braking forever before
@@ -269,10 +285,13 @@ internal sealed partial class PredictiveTrafficPlanner
         // FIFO belongs to the service owner. A later vehicle's unoccupied future
         // waiting pose cannot reserve the approach against an earlier queue member.
         // Actual vehicle bodies remain mandatory physical blockers in every case.
-        if (!reservation.PhysicallyOccupied && reservation.Kind == NavigationReservationKind.Queue &&
-            reservation.QueueBuilding.IsValid && vehicle.QueueEntry is { } queue && queue.Owner == vehicle.Owner &&
-            queue.Building == reservation.QueueBuilding && queue.Position > 0 && queue.Position < reservation.QueuePosition)
-            return false;
+        if (!reservation.PhysicallyOccupied && reservation.Kind == NavigationReservationKind.Queue && reservation.QueueBuilding.IsValid)
+        {
+            // A future waiting target has no occupancy authority over another service
+            // queue or an unrelated road user. Its actual owner remains a physical body.
+            if (vehicle.QueueEntry is not { } queue || queue.Building != reservation.QueueBuilding) return false;
+            if (queue.Owner == vehicle.Owner && queue.Position > 0 && queue.Position < reservation.QueuePosition) return false;
+        }
         return true;
     }
 
