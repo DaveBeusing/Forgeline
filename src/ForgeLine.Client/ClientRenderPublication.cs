@@ -71,7 +71,7 @@ internal sealed class ClientRenderPublication
     private static DebugLabel[] CopyLabelList(IReadOnlyList<DebugLabel> source, ref DebugLabel[]? cached)
     {
         if (source.Count == 0) { cached = null; return []; }
-        bool same = cached is not null && cached.Length == source.Count;
+        bool same = cached is not null && !ReferenceEquals(source, cached) && cached.Length == source.Count;
         for (int i = 0; same && i < source.Count; i++) same = cached![i].Equals(source[i]);
         if (same) return cached!;
         var result = new DebugLabel[source.Count];
@@ -85,7 +85,7 @@ internal sealed class ClientRenderPublication
     private static EntityId[] CopySelectionSet(IReadOnlyCollection<EntityId> source, ref EntityId[]? cached)
     {
         if (source.Count == 0) { cached = null; return []; }
-        if (cached is not null && cached.Length == source.Count)
+        if (cached is not null && !ReferenceEquals(source, cached) && cached.Length == source.Count)
         {
             int index = 0;
             bool same = true;
