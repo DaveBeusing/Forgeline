@@ -112,6 +112,15 @@ internal static class SubmissionGraphics
 
         public int LastInstanceCount { get; private set; }
 
+        public Dictionary<int, IGraphicsTexture> PixelTextures { get; } = [];
+
+        public void SetPixelTexture(int slot, IGraphicsTexture texture)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(slot);
+            ArgumentNullException.ThrowIfNull(texture);
+            PixelTextures[slot] = texture;
+        }
+
         public void SetViewport(
             float x,
             float y,
