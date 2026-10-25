@@ -315,7 +315,7 @@ internal sealed class RegionalUpdateCoordinator : IDisposable
     private void TouchTick(ulong tick)
     {
         RegionalChangeJournal journal = Journal;
-        if (tick < _tick) throw new ArgumentOutOfRangeException(nameof(tick));
+        ArgumentOutOfRangeException.ThrowIfLessThan(tick, _tick);
         journal.AdvanceTick(tick);
         if (tick != _tick)
         {

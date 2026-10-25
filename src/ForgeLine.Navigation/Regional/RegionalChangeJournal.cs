@@ -244,7 +244,7 @@ internal sealed class RegionalChangeJournal
     /// <summary>Call at a coherent new-tick boundary before using pending collision data.</summary>
     public void AdvanceTick(ulong tick)
     {
-        if (tick < LastTick) throw new ArgumentOutOfRangeException(nameof(tick));
+        ArgumentOutOfRangeException.ThrowIfLessThan(tick, LastTick);
         if (tick == LastTick) return;
         LastTick = tick;
         _changesThisTick = 0;
@@ -288,7 +288,7 @@ internal sealed class RegionalChangeJournal
         ImmutableSortedDictionary<RegionalObstacleKey, RegionalObstacleRecord> expected = FrozenBatch?.Obstacles ?? _current;
         if (RequiresResynchronization || !ReferenceEquals(targetRegistry, expected))
             throw new InvalidOperationException("The publication target is stale or source resynchronization is required.");
-        if (tick < LastTick) throw new ArgumentOutOfRangeException(nameof(tick));
+        ArgumentOutOfRangeException.ThrowIfLessThan(tick, LastTick);
         bool laterTick = tick > LastTick;
         _published = targetRegistry;
         _pendingSince = FrozenBatch is null

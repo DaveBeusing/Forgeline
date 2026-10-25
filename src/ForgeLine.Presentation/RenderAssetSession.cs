@@ -8,7 +8,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.Presentation;
 
 // A render-owner facade over the existing caches. Native resources still retire
-// through their device's last-use fences; this class does not create a second cache.
+// through their device's last-use fences. Frame maps only borrow resolved handles.
 internal sealed class RenderAssetSession : IDisposable
 {
     private readonly int _owner = Environment.CurrentManagedThreadId;
@@ -30,6 +30,12 @@ internal sealed class RenderAssetSession : IDisposable
     private long? _uploadCount, _logicalBytes;
     private ulong? _dxgiBytes;
     private string? _failure;
+    private const int MaximumFrameResourceEntries = 2048;
+    private readonly Dictionary<string, (RuntimeMeshBuffers Mesh, AssetId Id)> _frameMeshes = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, RuntimeMaterialResources> _frameMaterials = new(StringComparer.Ordinal);
+    internal int ReusedMeshLookups { get; private set; }
+    internal int ReusedMaterialLookups { get; private set; }
+    private bool CanReuseFrameResources => _phase is Phase.Preparing or Phase.Prepared or Phase.Recording;
 
     internal RenderAssetSession(IGraphicsDevice graphics, RuntimeAssetCatalog catalog, TextureDetailQuality quality)
     {
@@ -54,6 +60,8 @@ internal sealed class RenderAssetSession : IDisposable
         CheckOwner();
         if (_graphics.IsRecording || _phase != Phase.Idle)
             throw new InvalidOperationException("Prepare requires an idle render owner before recording.");
+        ClearFrameResources();
+        ReusedMeshLookups = ReusedMaterialLookups = 0;
         _explicitFrames = true; _phase = Phase.Preparing; _sequence++; _session = session; _tick = tick;
         _prepareMs = _recordMs = _submitMs = _retireMs = _waitMs = _presentMs = null; _fence = null;
         _uploadCount = _logicalBytes = null; _dxgiBytes = null; _failure = null;
@@ -69,7 +77,7 @@ internal sealed class RenderAssetSession : IDisposable
         if (MetricsEnabled) _prepareMs = Stopwatch.GetElapsedTime(_started).TotalMilliseconds;
         _phase = Phase.Prepared;
     }
-    internal void AbortPrepare() { CheckOwner(); _phase = Phase.Idle; }
+    internal void AbortPrepare() { CheckOwner(); ClearFrameResources(); _phase = Phase.Idle; }
     internal void BeginRecord()
     {
         CheckOwner();
@@ -126,20 +134,47 @@ internal sealed class RenderAssetSession : IDisposable
         // Release only the CPU frame boundary. Cache resources remain owned; actual
         // native disposal continues to use existing device retirement, never CPU timing.
         _phase = Phase.Idle;
+        ClearFrameResources();
         if (MetricsEnabled) _retireMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
     }
     internal bool TryGetMesh(string id, out RuntimeMeshBuffers mesh, out AssetId resolved)
-    { CheckOwner(); return _resources.TryGetMesh(id, out mesh, out resolved); }
+    {
+        CheckOwner();
+        bool reuse = CanReuseFrameResources;
+        if (reuse && _frameMeshes.TryGetValue(id, out var cached))
+        {
+            mesh = cached.Mesh; resolved = cached.Id; ReusedMeshLookups++; return true;
+        }
+        bool found = _resources.TryGetMesh(id, out mesh, out resolved);
+        if (reuse && found && mesh.IsValid && _frameMeshes.Count < MaximumFrameResourceEntries)
+            _frameMeshes.TryAdd(id, (mesh, resolved));
+        return found;
+    }
     internal bool TryGetMesh(string id, out RuntimeMeshBuffers mesh)
-    { CheckOwner(); return _resources.TryGetMesh(id, out mesh); }
+        => TryGetMesh(id, out mesh, out _);
     internal bool TryGetMesh(in WorldFeaturePresentationMetadata feature, WorldAssetLod lod, out RuntimeMeshBuffers mesh, out AssetId resolved)
     { CheckOwner(); return _resources.TryGetMesh(feature, lod, out mesh, out resolved); }
     internal RuntimeMaterialResources ResolveMaterial(string id)
-    { CheckOwner(); return _resources.ResolveMaterial(id); }
+    {
+        CheckOwner();
+        bool reuse = CanReuseFrameResources;
+        if (reuse && _frameMaterials.TryGetValue(id, out var cached))
+        { ReusedMaterialLookups++; return cached; }
+        RuntimeMaterialResources material = _resources.ResolveMaterial(id);
+        if (reuse && !material.UsesDevelopmentFallback && _frameMaterials.Count < MaximumFrameResourceEntries)
+            _frameMaterials.TryAdd(id, material);
+        return material;
+    }
     internal bool TryGetMaterialTint(string id, out Vector4 tint)
     { CheckOwner(); return _resources.TryGetMaterialTint(id, out tint); }
     internal bool TryGetMaterialTint(in WorldFeaturePresentationMetadata feature, out Vector4 tint)
     { CheckOwner(); return _resources.TryGetMaterialTint(feature, out tint); }
+    private void ClearFrameResources()
+    {
+        // Borrowed handles, owned by the existing resident asset store. Never dispose
+        // them here; no frame cache may extend their session lifetime.
+        _frameMeshes.Clear(); _frameMaterials.Clear();
+    }
     private void CheckOwner()
     {
         if (Environment.CurrentManagedThreadId != _owner)
@@ -150,6 +185,6 @@ internal sealed class RenderAssetSession : IDisposable
     {
         if (Environment.CurrentManagedThreadId != _owner) throw new InvalidOperationException("Dispose requires the render owner.");
         if (_disposed) return;
-        _resources.Dispose(); _disposed = true;
+        ClearFrameResources(); _resources.Dispose(); _disposed = true;
     }
 }

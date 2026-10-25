@@ -46,6 +46,8 @@ internal readonly record struct ClientVisualQualificationSnapshot(
     double TerrainCpuSubmissionMilliseconds = 0.0)
 {
     public RenderAssetFrameMetrics? AssetPreparation { get; init; }
+    public ClientRenderWorkMetrics RenderWork { get; init; }
+    public ClientPublicationMetrics Publication { get; init; }
     public bool GpuTimingAvailable { get; init; }
     public GraphicsFrameDiagnostics? FramePasses { get; init; }
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
@@ -169,6 +171,9 @@ internal sealed class ClientRenderHost : IDisposable
     private ClientVisualQualificationSnapshot? _latestQualification;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
+    private int _terrainPreparing;
+    internal bool IsPreparingTerrain => Volatile.Read(ref _terrainPreparing) != 0;
+    internal bool NeedsFramePublication => _publication.NeedsFramePublication;
     private long _publishedFrames;
     private long _completedFrames;
     private long _lastCompletedFrameAt;
@@ -298,8 +303,19 @@ internal sealed class ClientRenderHost : IDisposable
         ThrowIfDisposed();
         ThrowIfFaulted();
 
-        ClientRenderFrame copied = ClientRenderPublication.Copy(frame);
+        return StoreFrame(ClientRenderPublication.Copy(frame));
+    }
 
+    public bool Publish(in ClientRenderFrame frame, DebugDraw gameplay, DebugDraw debug,
+        IReadOnlyCollection<ForgeLine.Core.EntityId> selection)
+    {
+        ThrowIfDisposed();
+        ThrowIfFaulted();
+        return StoreFrame(ClientRenderPublication.CopyDraws(frame, gameplay, debug, selection));
+    }
+
+    private bool StoreFrame(in ClientRenderFrame copied)
+    {
         lock (_frameGate)
         {
             ThrowIfDisposed();
@@ -498,9 +514,14 @@ internal sealed class ClientRenderHost : IDisposable
                 _startup.End(StartupPhase.GameplayRenderer, sessionId: _startup.CurrentSessionId);
             _started.Set();
 
+            bool presentedLastIteration = false;
+            long terrainDeferredFrames = 0;
             while (Volatile.Read(ref _stopping) == 0)
             {
-                _signal.WaitOne(IdleWait);
+                // Active rendering is paced by the device, not an extra 16 ms
+                // mailbox sleep. Suspended/occluded/empty work still sleeps.
+                _signal.WaitOne(presentedLastIteration ? TimeSpan.Zero : IdleWait);
+                presentedLastIteration = false;
 
                 if (Volatile.Read(ref _stopping) != 0)
                 {
@@ -553,6 +574,7 @@ internal sealed class ClientRenderHost : IDisposable
                 {
                     worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
+                    ulong loadingPresented = graphics.PresentedFrameCount;
                     graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
                     {
                         context.BeginPass(GraphicsFramePass.Overlay);
@@ -563,6 +585,7 @@ internal sealed class ClientRenderHost : IDisposable
                         if (current.Frontend is FrontendSurfaceView loading)
                             frontendRenderer.Render(context, loading, current.UiScale);
                     });
+                    presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > loadingPresented;
                     continue;
                 }
 
@@ -589,7 +612,6 @@ internal sealed class ClientRenderHost : IDisposable
                         sinceSnapshot,
                         snapshot.TickDuration);
                 double particleDelta = Stopwatch.GetElapsedTime(lastParticleFrame,now).TotalSeconds;
-                lastParticleFrame = now;
 
                 RebuildDraw(
                     gameplayDraw,
@@ -660,16 +682,48 @@ internal sealed class ClientRenderHost : IDisposable
                     runtimeMetrics.FramesPerSecond.HasValue && runtimeMetrics.TicksPerSecond.HasValue)
                     lastMeasuredRunningRates = runtimeMetrics;
 
-                ulong presentedBefore = !_startupPresented ? graphics.PresentedFrameCount : 0;
-                terrainRenderer.Prepare(renderCamera, Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
-                    Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)),
-                    shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null);
+                ulong presentedBefore = graphics.PresentedFrameCount;
+                int worldWidth = Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale));
+                int worldHeight = Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale));
+                GraphicsDirectionalShadowFrame? preparedShadow = shadowSettings.Enabled
+                    ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null;
+                long terrainStarted = Stopwatch.GetTimestamp();
+                bool terrainReady = terrainRenderer.PrepareStep(renderCamera, worldWidth, worldHeight, preparedShadow);
+                double terrainPrepareMs = Stopwatch.GetElapsedTime(terrainStarted).TotalMilliseconds;
+                if (!terrainReady)
+                {
+                    Volatile.Write(ref _terrainPreparing, 1);
+                    terrainDeferredFrames++;
+                    // Never record a partial main/light union. Keep the event owner
+                    // responsive and show a truthful preparation surface instead.
+                    graphics.RenderFrame(GraphicsColor.ForgeLineClear, context =>
+                    {
+                        context.BeginPass(GraphicsFramePass.Overlay);
+                        frontendRenderer.Render(context, current.Frontend ??
+                            FrontendSurfaceView.Loading("Preparing terrain", false, 0), current.UiScale);
+                    });
+                    presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > presentedBefore;
+                    lock (_frameGate)
+                    {
+                        _latestActionRing = default;
+                        if (_latestQualification is { } pending)
+                            _latestQualification = pending with
+                            {
+                                RenderWork = new(terrainPrepareMs, 0, true, terrainDeferredFrames,
+                                    instanceRenderer.PreparationReuse),
+                                Publication = _publication.Metrics
+                            };
+                    }
+                    Interlocked.Increment(ref _completedFrames);
+                    Volatile.Write(ref _lastCompletedFrameAt, Stopwatch.GetTimestamp());
+                    continue;
+                }
+                lastParticleFrame = now;
+                long assetsStarted = Stopwatch.GetTimestamp();
                 instanceRenderer.Prepare(renderCamera, renderWorld, new(
-                    Math.Max(1, (int)Math.Ceiling(width * (double)qualityProfile.ResolutionScale)),
-                    Math.Max(1, (int)Math.Ceiling(height * (double)qualityProfile.ResolutionScale)), renderAlpha,
-                    shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null,
-                    shadowSettings.MaximumCasters,
+                    worldWidth, worldHeight, renderAlpha, preparedShadow, shadowSettings.MaximumCasters,
                     (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, current.MetricsActive), particleRenderer);
+                double assetPrepareMs = Stopwatch.GetElapsedTime(assetsStarted).TotalMilliseconds;
                 ObjectActionRingView inputRing = default;
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
@@ -681,8 +735,7 @@ internal sealed class ClientRenderHost : IDisposable
                             current.PreAlphaUx.Mode is PreAlphaUxMode.Paused or PreAlphaUxMode.Help || !current.MetricsActive);
                         ClientWorldPassSequence.Record(context,
                             atmosphere.Enabled ? SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height) : null,
-                            shadowSettings.Enabled ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null,
-                            shadowSettings, ref worldPasses);
+                            preparedShadow, shadowSettings, ref worldPasses);
                         long debugStartedAt =
                             Stopwatch.GetTimestamp();
                         debugDrawRenderer.Render(
@@ -768,8 +821,12 @@ internal sealed class ClientRenderHost : IDisposable
                         }
                     });
 
+                presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > presentedBefore;
                 if (graphics.PresentedFrameCount > presentedBefore)
+                {
+                    Volatile.Write(ref _terrainPreparing, 0);
                     lock (_frameGate) _latestActionRing = inputRing;
+                }
 
                 if (!_startupPresented && graphics.PresentedFrameCount > presentedBefore && current.Frontend is null &&
                     (!_expectedSession.HasValue || snapshot.SessionId == _expectedSession.Value))
@@ -817,7 +874,13 @@ internal sealed class ClientRenderHost : IDisposable
                     runtimeMetrics, lastMeasuredRunningRates,particleRenderer.Diagnostics, qualityProfile);
                 lock (_frameGate)
                     if (_latestQualification is { } measured)
-                        _latestQualification = measured with { AssetPreparation = instanceRenderer.AssetFrameMetrics };
+                        _latestQualification = measured with
+                        {
+                            AssetPreparation = instanceRenderer.AssetFrameMetrics,
+                            RenderWork = new(terrainPrepareMs, assetPrepareMs, false, terrainDeferredFrames,
+                                instanceRenderer.PreparationReuse),
+                            Publication = _publication.Metrics
+                        };
 
                 if (StopwatchElapsed(
                         nextDiagnosticAt,
@@ -838,6 +901,9 @@ internal sealed class ClientRenderHost : IDisposable
                         $"debugCpuMs={debugOverlayCpuMilliseconds:F3} " +
                         $"pendingRetirement={graphics.Diagnostics.Health.PendingRetirementCount} " +
                         $"terrainSubmitMs={terrainRenderer.LastDiagnostics.CpuSubmissionMilliseconds:F3} " +
+                        $"terrainPrepareMs={terrainPrepareMs:F3} assetPrepareMs={assetPrepareMs:F3} " +
+                        $"terrainDeferredFrames={terrainDeferredFrames} " +
+                        $"skinDeforms={instanceRenderer.PreparationReuse.DeformedPoses} skinReuse={instanceRenderer.PreparationReuse.ReusedPoses} " +
                         $"terrainTextures={terrainRenderer.LastDiagnostics.TextureBindingsPerDraw} " +
                         $"light={_sceneLighting.DirectionalIntensity:F2}/{_sceneLighting.AmbientIntensity:F2} " +
                         $"exposure={_sceneLighting.Exposure:F2} " +
@@ -1184,3 +1250,7 @@ internal readonly record struct ClientRenderHealth(
     long CompletedFrames,
     long LastCompletedFrameTimestamp,
     bool Faulted);
+
+internal readonly record struct ClientRenderWorkMetrics(double TerrainPrepareMilliseconds,
+    double InstancePrepareMilliseconds, bool TerrainPending, long TerrainDeferredFrames,
+    RenderPreparationReuseMetrics Reuse);
