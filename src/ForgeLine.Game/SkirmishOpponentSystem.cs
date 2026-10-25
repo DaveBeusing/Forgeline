@@ -3749,6 +3749,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
         return Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(demand, 2, maximum));
     }
+    private static int ResolveEssentialCargoFleetTarget(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
+        Math.Max(configuration.MinimumCargoTrucks, Math.Clamp(owned.SupplyDepots.Count, 2, 4));
+
     private static bool RequiresCargoReplacementReserve(
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
@@ -4253,10 +4256,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     liveRequests - 1);
         }
 
+        bool firstSupplyWithHealthyHauling = candidate == UnitIds.SupplyTruck &&
+            GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks &&
+            GetUnitCount(owned, UnitIds.CargoTruck) >= ResolveEssentialCargoFleetTarget(owned, configuration);
         if (!candidateQueued &&
             liveRequests <
                 configuration.MaximumQueuedUnitsPerFacility &&
-            (!RequiresCargoReplacementReserve(owned, configuration) ||
+            (firstSupplyWithHealthyHauling || !RequiresCargoReplacementReserve(owned, configuration) ||
              HasLogisticsReplacementReserve(facility, candidate)))
         {
             QueueUnitProduction(
@@ -4462,6 +4468,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             GetUnitCount(
                 owned,
                 UnitIds.CargoTruck);
+        // Establish missing mobile supply once the live depot-hauling minimum
+        // is healthy, before optional processing-industry fleet growth. An
+        // expanded depot network still requires its live Cargo replacement first.
+        if (cargoCount >= ResolveEssentialCargoFleetTarget(owned, configuration) &&
+            GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks)
+            return UnitIds.SupplyTruck;
+
         // A blocked queued replacement cannot make the live fleet healthy.
         if (cargoCount < cargoTarget)
         {

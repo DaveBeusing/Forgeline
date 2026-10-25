@@ -782,11 +782,13 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Theory]
-    [InlineData(false, false, true)]
-    [InlineData(true, false, false)]
-    [InlineData(true, true, true)]
+    [InlineData(false, false, true, 3, false)]
+    [InlineData(true, false, false, 3, false)]
+    [InlineData(true, true, true, 3, false)]
+    [InlineData(false, false, false, 0, true)]
+    [InlineData(false, false, true, 3, true)]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery(
-        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery)
+        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery, int additionalDepots, bool industryOnly)
     {
         MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -798,7 +800,7 @@ public sealed class SkirmishProductionPolicyTests
             entities.GetComponent<WorldTransform>(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).CommandCore);
 
-        for (int index = 0; index < 3; index++)
+        for (int index = 0; index < additionalDepots; index++)
         {
             InventoryId depotInventory =
                 scenario.Inventories.CreateInventory(
@@ -871,6 +873,23 @@ public sealed class SkirmishProductionPolicyTests
             }
         }
 
+        if (industryOnly)
+        {
+            var owner = scenario.GetBase(new PlayerId(1)).Player;
+            foreach (var (building, capability) in new[] {
+                (BuildingIds.Smelter, ProductionCapability.SteelProcessing),
+                (BuildingIds.Refinery, ProductionCapability.FuelProcessing),
+                (BuildingIds.ElectronicsPlant, ProductionCapability.ElectronicsProcessing) })
+            {
+                EntityId processor = entities.CreateEntity();
+                entities.AddComponent(processor, coreTransform);
+                entities.AddComponent(processor, new CompletedBuilding(building, owner, SimulationTick.Zero));
+                entities.AddComponent(processor, new ProductionFacility(
+                    scenario.Inventories.CreateInventory(new InventorySpecification(4_000)),
+                    scenario.Inventories.CreateInventory(new InventorySpecification(4_000)), capability, SimulationTick.Zero));
+            }
+        }
+
         InventoryId input =
             scenario.Inventories.CreateInventory(
                 new InventorySpecification(4_000.0));
@@ -916,6 +935,7 @@ public sealed class SkirmishProductionPolicyTests
             TestContext.Current.CancellationToken);
 
         bool queuedRecoveryCargo = false;
+        bool queuedFirstSupply = false;
         foreach (EntityId requestEntity in
                  entities.Query<UnitProductionRequest>(
                      QueryIterationOrder.StableByEntityIndex))
@@ -924,6 +944,8 @@ public sealed class SkirmishProductionPolicyTests
                 entities.GetComponent<UnitProductionRequest>(
                     requestEntity);
 
+            if (request.Facility == factory && request.UnitId == UnitIds.SupplyTruck && request.Priority == ProductionPriority.High)
+                queuedFirstSupply = true;
             if (request.Facility == factory &&
                 request.UnitId == UnitIds.CargoTruck &&
                 request.Priority == ProductionPriority.High)
@@ -934,6 +956,20 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         Assert.Equal(expectedCargoRecovery, queuedRecoveryCargo);
+        if (industryOnly && additionalDepots == 0)
+        {
+            Assert.True(queuedFirstSupply);
+            scenario.Simulation.RunTicks(21, TestContext.Current.CancellationToken);
+            bool retainedSupply = false;
+            foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            {
+                var request = entities.GetComponent<UnitProductionRequest>(entity);
+                if (request.Facility != factory || entities.HasComponent<UnitProductionCancellationRequest>(entity)) continue;
+                Assert.NotEqual(UnitIds.CargoTruck, request.UnitId);
+                retainedSupply |= request.UnitId == UnitIds.SupplyTruck;
+            }
+            Assert.True(retainedSupply);
+        }
     }
 
     [Theory]
