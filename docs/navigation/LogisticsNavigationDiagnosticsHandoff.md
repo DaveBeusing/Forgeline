@@ -4,7 +4,7 @@
 
 Partial implementation: an internal bounded report encoder and one-shot local writer are prepared. No diagnostics view, capture adapter, overlay layer, or export action is registered. Shared integration and manual acceptance are outstanding. See [LogisticsNavigationDiagnostics.md](LogisticsNavigationDiagnostics.md) for semantics, privacy boundaries, file output, controls, and acceptance constraints.
 
-Inspected base: `master` at `cdb60b1a926e770f25eb1ec350548bb00349ff49`, including PR #350 and PR #354. Required common contracts: PR #356 at `df9290ead9bd09b608a1720d992fac0163d8598a`, proposed revision 1, not present on this base. Recheck current `master`, the PR state, and the resulting contract revision before continuing.
+Original inspected base: `cdb60b1a926e770f25eb1ec350548bb00349ff49`, including PR #350 and PR #354. Current synchronized base: `master` at `574040b1cde354bc1414a692e2ec075968e0959a` after PR #357. Its conveyor changes are preserved and do not alter the report's source contracts. The prepared version is 0.1.474-dev, exactly one PATCH above this base's 0.1.473-dev. Required common contracts: PR #356 at `df9290ead9bd09b608a1720d992fac0163d8598a`, proposed revision 1, not present on this base. Recheck current `master`, the PR state, and the resulting contract revision before continuing.
 
 ## Implemented entry points
 

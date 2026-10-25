@@ -1,13 +1,15 @@
 # Conveyor construction, placement and UX
 
-Implementation baseline: master `d7c45792` (0.1.450), including the conveyor model
-and material packages. This work prepares 0.1.451. The Release client and its
-dependencies were built; automated tests, CI, native interaction/camera smokes
-and save/replay round trips were deliberately not run at the user's request.
-All manual acceptance below remains pending. The subsequent
-[simulation package](ConveyorSimulationAndVehicleInterop.md) activates inventory flow,
-additional authored building ports, drive power and occupied-wreck repair; its current
-behavior supersedes the construction-only baseline statements in this document.
+Draw route connects a source building to a destination building without manually
+placing either adapter. Eligible buildings expose their actual directed ports;
+the construction service owns route geometry, placement validation and payment.
+[Conveyor simulation and vehicle interoperability](ConveyorSimulationAndVehicleInterop.md)
+defines finite inventory flow, resource restrictions, drive power and recovery.
+
+The original fixed-grid construction implementation was introduced from master
+`d7c45792` (0.1.450). Its recorded commands retain their original planner. New
+interactive routes explicitly select automatic directed routing so freely placed
+buildings no longer need matching horizontal 4m grid phases.
 
 ## V1 interaction and layout
 
@@ -19,12 +21,13 @@ through SubmitBuild. The existing paginated Build menu handles the longer list.
 
 | Gesture while conveyor placement owns input | Behavior |
 | --- | --- |
-| first world click in Draw route | anchor start; no command or cost yet |
+| first click on a source building in Draw route | choose its output and anchor the route; no command or cost yet |
+| first click on a free belt output or ground | extend that output or start a standalone route |
 | pointer movement | current-tick authoritative plan, part cages and directional IN/OUT arrows |
-| second world click | request the complete route only when its preview is current and valid |
+| second click on a destination building, belt input or ground | choose the input automatically and request the complete route only when its preview is current and valid |
 | click with a special module selected | request that individual module and automatic feet |
 | Q / E | rotate special modules by 90 degrees |
-| Tab | choose X-first or Z-first bend for a drawn route |
+| Tab | change the preferred bend order for equivalent automatic routes |
 | T | select carrier tier 0 or 1; endpoint snapping adopts the starting socket tier |
 | V | cycle Build → Remove → Replace → Repair; point at the owned part to edit |
 | Escape / right click | cancel the unsubmitted plan and leave placement |
@@ -37,6 +40,14 @@ meshes. Support cages show the actual ground footprint; carrier cages remain
 elevated. Built instances use the existing authored meshes and PBR atlas, with
 LOD0/1/2 at the existing 140/420m handoff distances.
 
+During conveyor construction, visible owned buildings show **IN** and **OUT**
+markers at their real sockets. The input arrow points toward the building and the
+output arrow points away. Labels and direction distinguish the two roles in
+addition to cyan/amber coloring. Outside construction the selected or hovered
+building retains its port markers. At most 64 building ports are drawn; focused
+buildings have priority. Offscreen ports do not consume that budget. Unsupported
+buildings do not acquire decorative ports.
+
 The world-selection and tactical controllers yield to placement. Existing modal,
 pause, focus, resize, session and HUD-pointer rules remain active. Pointer capture
 clears the preview and never emits a world click. Only a matching request ID and
@@ -46,12 +57,22 @@ another edit. Cancellation cannot retract a command that has already been submit
 
 ## Deterministic geometry decisions
 
-- Routing uses 4m increments, cardinal headings and one optional 90-degree bend.
-  It prefers 8m straights, then a 4m remainder. A bend consumes 4m on both legs
-  and selects the separately authored left/right curve, without negative scale.
-- A route is bounded to 4–256m after terminal adapters. A match contains at most
-  4096 constructed pieces, including feet. Unsupported lengths, fractional
-  endpoint phases and tier jumps fail closed; no invisible stretch piece is used.
+- Automatic routing respects the outgoing source tangent and incoming destination
+  tangent, including existing belt sockets. A bounded deterministic set of
+  cardinal routes is ordered by length and piece count and checked through the
+  normal placement rules. A bend consumes 4m on each leg and uses the authored
+  left/right curve without negative scale. This is a local construction planner,
+  not an unrestricted terrain or obstacle pathfinder.
+- Straight runs use ordinary 8m/4m carriers and length-adjusted short carriers
+  where necessary. Their actual length drives sockets, bounds, rendering,
+  selection, supports and authoritative state. A shorter carrier still costs
+  the normal short-carrier Steel amount; no invisible gap or free transfer is
+  introduced. Existing fixed-size pieces and manually selected modules retain
+  their dimensions.
+- An automatic route is bounded to 4–256m including terminal adapters. A match
+  contains at most 4096 constructed pieces, including feet. Height mismatches, unsupported tier
+  jumps and physically obstructed candidates remain explicit placement failures.
+  New routes check their consecutive directed sockets and reject self-crossings.
 - Merger/splitter modules are explicit single placements. They retain all three
   typed/directed sockets and can receive separately drawn branches. They are not
   inferred from crossing routes.
@@ -99,17 +120,25 @@ The simulation package adds the exact further sockets and inventory bindings lis
 in [its activated port table](ConveyorSimulationAndVehicleInterop.md). These two rows
 remain the original construction baseline, not the complete current port catalog.
 
-Route starts snap within 2m to an output socket and ends to an input socket.
-Existing belt sockets snap within 1.5m. A building route automatically includes
+Clicking the visible building selects its matching output or input. Near an
+exposed port or belt socket, a screen-space snap chooses one nearest authorized
+endpoint with stable tie-breaking. The endpoint position, building identity and
+tier are selected together; a later belt candidate cannot leave an unrelated
+building identity attached to the request. Stale and foreign snapshots are not
+used for endpoint selection.
+
+A building route automatically includes
 the correct 4m building-to-belt or belt-to-building adapter, with complementary
 facing and height. Its building-side end may touch only its explicit target;
 feet are not placed inside that wall. Both ownership and the current building
 entity generation are rechecked when the command executes.
 
-The 4m lattice is relative to the selected start port; a destination port must
-share its phase. Ports at different phases or more than 0.02m apart in carrier
-height are rejected with Port mismatch. Position buildings with compatible port
-coordinates; V1 does not fill a 2m gap or an arbitrary grade with a scaled mesh.
+The automatic planner allows horizontal differences that are not multiples of
+4m. Endpoints must still be within 0.02m in carrier height; use the existing
+explicit ramps for supported tier changes. The former start-relative 4m lattice
+remains only for legacy recorded requests. Existing connections are not moved
+when a new route is planned. A port already occupied by an adapter cannot gain a
+second coincident connection; extend a free belt end or place a splitter instead.
 The subsequent simulation package adds resource transfer, throughput, drive power and
 arbitration to this paid geometry. Regional trucks retain their existing road system.
 
@@ -135,17 +164,19 @@ at the accepted simulation tick; there is no separate conveyor building timer.
 
 `SubmitConveyor` uses the existing bounded PlayerCommandGateway and host channel.
 `ConveyorConstructionCommand` carries the typed edit, endpoints, orientation,
-tier, bend order, source/target IDs and payer. Its execution reevaluates the full
-plan against current ownership, terrain, collisions, stock and entity generations.
+tier, bend preference, routing mode, source/target IDs and payer. Its execution
+reevaluates the full plan against current ownership, terrain, collisions, stock
+and entity generations.
 Only then does one atomic Steel removal pay for the complete plan before any
 pieces are created. Rejected requests create nothing and charge nothing.
 
 Remove requires an empty finite buffer and removes the selected piece without
 a salvage refund. Auto feet are removed only when no remaining carrier socket
 uses them; hand-placed feet remain explicit infrastructure. A used support cannot
-be removed directly. Replace keeps the existing pivot, tier and rotation and
-requires exactly the same world socket positions, directions and roles. It pays
-the full new module cost and preserves shared feet; occupied targets cannot be
+be removed directly. Replace keeps the existing pivot, tier, rotation and adjusted
+short-carrier length and requires exactly the same world socket positions,
+directions and roles. It pays the full new module cost and preserves shared feet;
+occupied targets cannot be
 replaced. An upgrade requiring different sockets is a new route/ramp construction,
 not a silent topology rewrite. Repair costs 4 Steel and restores a damaged living
 piece's HealthState; healthy targets are rejected. Occupied damaged parts may be
@@ -158,15 +189,40 @@ generation-bearing source and target IDs. Save restoration already reconstructs
 the match by replaying recorded commands; the new codec schedules them against
 that match's conveyor service. Authoritative ConveyorPiece, transform, health and
 paid inventory changes are included in the normal ECS/inventory snapshot hash.
-The additive optional replay field is omitted for legacy commands. Old empty
+`AutomaticRouting` is omitted when false, and an adjusted carrier's `SpanMeters`
+is omitted when zero. New calculated rendering helpers are excluded from state
+JSON. Old requests therefore retain their original planner and serialization;
+new commands reconstruct their selected geometry through the same authoritative
+service. This preserves old saves in the updated application, not playback of
+new automatic routes in older executables. Old empty
 matches gain no new component store simply by opening the conveyor UI. No new
 wall-clock input, random selection or presentation-owned gameplay state is used.
-Replay/save/load round-trip acceptance is explicitly pending manual execution.
+Acceptance must include real delivery and matching save/replay continuation,
+not only a successful geometry preview.
+
+## Automated acceptance
+
+The routing acceptance uses real paid construction and finite inventory flow.
+`ConveyorAutomaticRoutingTests` covers all sixteen building-orientation pairs,
+fractional placement, small lateral offsets, extension from an existing output,
+occupied/wrong-height/foreign endpoint rejection and replacement of an adjusted
+carrier followed by another delivery. `ConveyorPersistenceTests` adds an actual
+paid MatchRuntime opening, delivery to a freely placed depot, rejected-command
+history and Save/Replay hashes immediately and after further ticks.
+
+`ConveyorConnectionUxTests` covers the two-click controller flow, actual building
+picking, port/socket competition, current owner/visibility/generation boundaries,
+ramp tiers, rotated marker direction and the on-screen marker budget. These are
+managed interaction/geometry checks, not native D3D12 visual qualification.
+
+The existing conveyor flow, distribution, battlefield supply, presentation bounds
+and extraction checks remain part of focused acceptance. No required CI gate,
+assertion, reference hash, material cost or resource rule is relaxed.
 
 ## Manual acceptance checklist, not executed
 
-1. Build the full runtime asset catalog, build the client, then run the existing
-   test suites manually. This task has not launched any tests or CI workflows.
+1. Build the full runtime asset catalog and client for native acceptance. Automated
+   acceptance and hosted CI evidence must identify their actual source revision.
 2. Open Build → Conveyor / Draw route. Place straight 4/8/12/32m routes and both
    bend orders in all four directions. Cancel after the first click and during
    pointer capture; inspect that no stock or entities changed before acceptance.
@@ -175,9 +231,10 @@ Replay/save/load round-trip acceptance is explicitly pending manual execution.
 4. Place both ramps and tier-1 carriers, merger/splitter branches, caps and shared
    feet. Inspect physical port mating, bounds, LODs, arrows and masks in native
    1080p/1440p/4K presentation. Review support loading and the conservative 16m cap.
-5. Connect the explicit Storage/Hub ports with compatible phases. Check direction,
-   0.02m height tolerance, wrong owner, absent/removed building, incompatible phase,
-   other building types and absent resource-transfer authority.
+5. Click freely positioned and rotated source/destination buildings, including
+   fractional horizontal coordinates. Check automatic adapters, directed
+   continuity and actual delivery. Verify markers, existing belt-end extension,
+   occupied-port rejection, 0.02m height tolerance, wrong owner and removed buildings.
 6. Cross a road with free span and outside feet; reject feet on road, truck bays,
    occupied approaches, buildings, units, steep terrain and out-of-area locations.
    Drive real trucks below spans and confirm only actual feet block navigation.

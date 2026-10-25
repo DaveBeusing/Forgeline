@@ -16,7 +16,7 @@ public static class PresentationBounds
         if (instance.ConveyorFeature.IsSpecified)
         {
             var (lo,hi)=ConveyorGeometry.LocalBounds(instance.ConveyorFeature.Placement.Module);
-            return (hi-lo)/2;
+            return (hi-lo)*instance.ConveyorFeature.Placement.LocalScale/2;
         }
         Vector3 halfExtents =
             Vector3.Max(

@@ -8,9 +8,11 @@ public static class ConveyorNetworkOverlay
 {
     public const int MaximumFocusedPieces = 32;
     public const int MaximumLabels = 8;
+    public const int MaximumBuildingPorts = 64;
 
     public static void Draw(DebugDraw draw, PresentationSnapshot? snapshot,
-        IReadOnlyCollection<EntityId> selection, EntityId hovered)
+        IReadOnlyCollection<EntityId> selection, EntityId hovered, bool showAllPorts = false,
+        Matrix4x4? viewProjection = null)
     {
         ArgumentNullException.ThrowIfNull(draw);
         ArgumentNullException.ThrowIfNull(selection);
@@ -29,6 +31,7 @@ public static class ConveyorNetworkOverlay
                 if (count == MaximumFocusedPieces) break;
                 if (!focus[..count].Contains(entity)) focus[count++] = entity;
             }
+        DrawBuildingPorts(draw, snapshot, network, experience.Player, focus[..count], showAllPorts, viewProjection);
         foreach (var entity in focus[..count])
         {
             var row = network.Pieces.FirstOrDefault(p => p.Entity == entity);
@@ -51,6 +54,65 @@ public static class ConveyorNetworkOverlay
                 if (position is { } end && Finite(end)) draw.Line(center, end + Vector3.UnitY * .6f, color);
             }
         }
+    }
+
+    private static void DrawBuildingPorts(DebugDraw draw, PresentationSnapshot snapshot,
+        ConveyorConstructionReadModel network, PlayerId player, ReadOnlySpan<EntityId> focus, bool showAll,
+        Matrix4x4? viewProjection)
+    {
+        int drawn = 0;
+        // Focused buildings retain their markers when a large construction network reaches the budget.
+        foreach (var entity in focus)
+            foreach (var port in network.Ports)
+                if (port.Building == entity && CanDraw(port))
+                {
+                    DrawPort(draw, port);
+                    if (++drawn == MaximumBuildingPorts) return;
+                }
+        if (!showAll) return;
+        foreach (var port in network.Ports)
+        {
+            if (focus.Contains(port.Building) || !CanDraw(port)) continue;
+            DrawPort(draw, port);
+            if (++drawn == MaximumBuildingPorts) return;
+        }
+
+        bool CanDraw(ConveyorBuildingPort port) => port.Building.IsValid && port.Owner == player &&
+            Finite(port.Position) && Finite(port.Facing) &&
+            new Vector2(port.Facing.X, port.Facing.Z).LengthSquared() > .5f &&
+            (!viewProjection.HasValue || InView(port.Position, viewProjection.Value)) &&
+            OperationsWorldOverlay.CanFocus(snapshot, port.Building);
+    }
+
+    private static bool InView(Vector3 position, Matrix4x4 projection)
+    {
+        Vector4 clip = Vector4.Transform(new Vector4(position, 1), projection);
+        return float.IsFinite(clip.X) && float.IsFinite(clip.Y) && float.IsFinite(clip.Z) &&
+            float.IsFinite(clip.W) && clip.W > 0 && clip.X >= -clip.W && clip.X <= clip.W &&
+            clip.Y >= -clip.W && clip.Y <= clip.W && clip.Z >= 0 && clip.Z <= clip.W;
+    }
+
+    private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port)
+    {
+        Vector3 outward = Vector3.Normalize(new Vector3(port.Facing.X, 0, port.Facing.Z));
+        Vector3 side = Vector3.Cross(Vector3.UnitY, outward);
+        Vector4 color = port.Input ? new(.2f, .8f, 1, 1) : new(1, .72f, .18f, 1);
+        Vector3 center = port.Position;
+        Vector3 up = Vector3.UnitY * .75f;
+        Vector3 across = side * .75f;
+        draw.Line(center - across - up, center + across - up, color);
+        draw.Line(center + across - up, center + across + up, color);
+        draw.Line(center + across + up, center - across + up, color);
+        draw.Line(center - across + up, center - across - up, color);
+        Vector3 inner = center + outward * .2f;
+        Vector3 outer = center + outward * 3;
+        Vector3 start = port.Input ? outer : inner;
+        Vector3 tip = port.Input ? inner : outer;
+        Vector3 direction = port.Input ? -outward : outward;
+        draw.Line(start, tip, color);
+        draw.Line(tip, tip - direction * .9f + side * .65f, color);
+        draw.Line(tip, tip - direction * .9f - side * .65f, color);
+        draw.Label(center + Vector3.UnitY * 1.15f + outward * .3f, port.Input ? "IN" : "OUT", color);
     }
 
     private static bool Finite(Vector3 point) => float.IsFinite(point.X) && float.IsFinite(point.Y) && float.IsFinite(point.Z);
