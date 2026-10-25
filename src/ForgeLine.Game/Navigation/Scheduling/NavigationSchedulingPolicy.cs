@@ -82,11 +82,14 @@ internal sealed class NavigationSchedulingPolicy
     /// slot but cannot be planned until a later Submit passes admission. The
     /// caller keeps the actual gameplay order and explicitly retries submission.
     /// </summary>
-    internal NavigationPolicySubmission Submit(in NavigationPolicyRequest request, NavigationServiceClass serviceClass)
+    internal NavigationPolicySubmission Submit(in NavigationPolicyRequest request, NavigationServiceClass serviceClass,
+        SimulationTick? queuedSince = null)
     {
         EnsureTick();
         if (!request.IsValid || !Enum.IsDefined(serviceClass) ||
-            request.Pending.OriginalOrder.AcceptedAtTick > _ledger.Tick)
+            request.Pending.OriginalOrder.AcceptedAtTick > _ledger.Tick ||
+            (queuedSince.HasValue && (queuedSince.Value > _ledger.Tick ||
+                queuedSince.Value < request.Pending.OriginalOrder.AcceptedAtTick)))
             return NavigationPolicySubmission.InvalidInput;
 
         int slot = Find(request.Entity);
@@ -105,8 +108,8 @@ internal sealed class NavigationSchedulingPolicy
 
         bool sameCommand = previous is NavigationPolicyEntryState prior &&
             prior.Request.CommandGeneration == request.CommandGeneration;
-        SimulationTick queuedAt = sameCommand ? previous!.Value.QueuedAt : _ledger.Tick;
-        SimulationTick readySince = sameCommand ? previous!.Value.ReadySince : _ledger.Tick;
+        SimulationTick queuedAt = sameCommand ? previous!.Value.QueuedAt : queuedSince ?? _ledger.Tick;
+        SimulationTick readySince = sameCommand ? previous!.Value.ReadySince : queuedAt;
         SimulationTick retryAt = sameCommand ? previous!.Value.RetryAt : _ledger.Tick;
         if (_ledger.Admissions == _limits.MaximumAdmissionsPerTick)
         {
@@ -170,7 +173,8 @@ internal sealed class NavigationSchedulingPolicy
     /// Reserves one batch before any worker starts. Entries get at most one slice
     /// per tick; unused reservations are not redistributed by completion timing.
     /// </summary>
-    internal int Plan(Span<NavigationPolicyGrant> destination)
+    internal int Plan(Span<NavigationPolicyGrant> destination,
+        Predicate<NavigationPolicyRequest>? tryPrepare = null)
     {
         EnsureTick();
         if (_ledger.Planned)
@@ -196,6 +200,9 @@ internal sealed class NavigationSchedulingPolicy
             int allowance = Math.Min(Math.Min(_limits.WorkPerSlice, availableWork),
                 _limits.WorkPerRequest - entry.WorkConsumed);
             if (allowance <= 0) continue;
+            // Preparation runs in fair order before any worker starts. An
+            // unavailable active/memory slot must not waste a work reservation.
+            if (tryPrepare is not null && !tryPrepare(entry.Request)) continue;
             ulong sequence = nextGrantSequence;
             nextGrantSequence = checked(nextGrantSequence + 1);
             _grants[count++] = new NavigationPolicyGrant(sequence, entry.Sequence, _ledger.Tick, entry.Request, allowance);
