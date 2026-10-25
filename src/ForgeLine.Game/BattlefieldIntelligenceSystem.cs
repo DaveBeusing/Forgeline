@@ -34,6 +34,7 @@ public readonly record struct BattlefieldIntelligenceMetrics(
 public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
 {
     private readonly FactionIntelligenceStore _intelligence;
+    private readonly TechnologyDefinitionCatalog _technologies;
     private readonly SpatialGridIndex? _spatialIndex;
     private readonly SpatialQueryBuffer _queryBuffer = new(512);
     private readonly Dictionary<EntityId, VisualCoverage> _visualCoverage =
@@ -59,11 +60,13 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
 
     public BattlefieldIntelligenceSystem(
         FactionIntelligenceStore intelligence,
-        SpatialGridIndex? spatialIndex = null)
+        SpatialGridIndex? spatialIndex = null,
+        TechnologyDefinitionCatalog? technologies = null)
     {
         _intelligence = intelligence ??
             throw new ArgumentNullException(nameof(intelligence));
         _spatialIndex = spatialIndex;
+        _technologies = technologies ?? DirectorateTechnologyDefinitions.CreateCatalog();
     }
 
     public SimulationPhase Phase => SimulationPhase.Sensors;
@@ -231,7 +234,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                         transform.Position,
                         sensor.DetectionRangeMeters,
                         IsRadar: true,
-                        sensor.IdentificationRangeMeters));
+                        RadarOperation.IdentificationRange(context.Entities, sensorEntity, sensor, _technologies)));
             }
 
             if (!IsSensorDue(
@@ -294,9 +297,8 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
         RadarSensorState sensor,
         Vector3 sensorPosition)
     {
-        float identificationRangeSquared =
-            sensor.IdentificationRangeMeters *
-            sensor.IdentificationRangeMeters;
+        float identificationRange = RadarOperation.IdentificationRange(context.Entities, sensorEntity, sensor, _technologies);
+        float identificationRangeSquared = identificationRange * identificationRange;
 
         ForEachCandidate(
             context,
@@ -320,7 +322,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                     targetTransform.Position -
                     sensorPosition;
                 IntelligenceState state =
-                    sensor.IdentificationRangeMeters > 0.0f &&
+                    identificationRange > 0.0f &&
                     delta.LengthSquared() <=
                     identificationRangeSquared
                         ? IntelligenceState.Identified

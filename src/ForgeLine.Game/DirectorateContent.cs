@@ -410,6 +410,7 @@ public static class DirectorateContent
         new()
         {
             Id = UnitIds.MobileArtillery,
+            RequiredTechnologyCapability = TechnologyCapabilityIds.MechanizedSystems,
             Faction = FactionId,
             Key = "directorate.unit.mobile_artillery",
             DisplayName = "Mobile Artillery",

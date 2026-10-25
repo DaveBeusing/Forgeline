@@ -387,4 +387,5 @@ public readonly record struct SkirmishOpponentDebugReadModel(
         SkirmishRetreatReason.None,
     SkirmishOffensiveAdmissionReadModel OffensiveAdmission =
         default,
-    SkirmishRaidReadModel Raid = default);
+    SkirmishRaidReadModel Raid = default,
+    SkirmishResearchReadModel Research = default);

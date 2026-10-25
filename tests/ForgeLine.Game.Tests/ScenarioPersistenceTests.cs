@@ -5,7 +5,7 @@ namespace ForgeLine.Game.Tests;
 public sealed class ScenarioPersistenceTests
 {
     [Fact]
-    public void SaveReplayAndLegacyRestoreKeepQualifiedIdentityAndExactHash()
+    public void SaveReplayKeepQualifiedIdentityAndRejectUnqualifiedLegacyLayout()
     {
         using var source = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         source.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
@@ -20,9 +20,8 @@ public sealed class ScenarioPersistenceTests
         Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(playback).ComputeSha256());
         var legacy = save with { SchemaVersion = 6, Configuration = save.Configuration with { Identity = null } };
         legacy = MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(legacy));
-        using var migrated = MatchPersistenceService.Restore(legacy);
-        Assert.Equal(save.Configuration.Identity, migrated.RuntimeSettings.Composition.Identity);
-        Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(migrated).ComputeSha256());
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(legacy)).Reason);
     }
 
     [Fact]

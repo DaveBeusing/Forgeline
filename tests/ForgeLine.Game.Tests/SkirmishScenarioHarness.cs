@@ -9,6 +9,25 @@ namespace ForgeLine.Game.Tests;
 
 internal sealed class SkirmishScenarioHarness
 {
+    // Isolated policy cases author already researched capabilities. Normal-stock
+    // research/payment and fleet progression are covered by TechnologyNormalMatchTests.
+    internal static void CompleteResearchForPolicyFixture(MatchRuntime scenario, PlayerId player)
+    {
+        foreach (TechnologyId id in new[] { TechnologyIds.IndustrialStandardization,
+                     TechnologyIds.MechanizedSystems, TechnologyIds.SensorFusion })
+        {
+            EntityId completed = scenario.Simulation.Entities.CreateEntity();
+            scenario.Simulation.Entities.AddComponent(completed,
+                new CompletedTechnology(player, id, scenario.Simulation.CurrentTick));
+            foreach (TechnologyCapabilityId capability in scenario.Services.TechnologyDefinitions[id].Unlocks)
+            {
+                EntityId unlock = scenario.Simulation.Entities.CreateEntity();
+                scenario.Simulation.Entities.AddComponent(unlock,
+                    new TechnologyCapabilityUnlock(player, capability, id, scenario.Simulation.CurrentTick));
+            }
+        }
+    }
+
     internal static bool HasExpansionFundingPrerequisites(MatchRuntime scenario, PlayerId player)
     {
         BuildingId[] industry = [BuildingIds.PowerPlant, BuildingIds.StorageDepot, BuildingIds.Smelter,

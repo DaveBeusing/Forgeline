@@ -331,7 +331,8 @@ public sealed class AutomaticResupplyDecisionSystem : ISimulationSystem
                     assignment.Recipient ==
                         recipient)
                 {
-                    return BattlefieldResupplyPlanner
+                    return TacticalCommandUtilities.TryGetMovementIntent(context, providerEntity, out _) &&
+                           BattlefieldResupplyPlanner
                                .CanProviderReachImmobileRecipient(
                                    context,
                                    _inventories,

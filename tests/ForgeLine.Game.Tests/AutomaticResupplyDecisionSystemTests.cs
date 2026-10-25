@@ -79,6 +79,41 @@ public sealed class AutomaticResupplyDecisionSystemTests
                 .Provider);
     }
 
+    [Fact]
+    public void RescueWithoutItsMovementIsReplannedWithoutCreatingFuel()
+    {
+        var simulation = new SimulationCoordinator();
+        var inventories = new InventoryStore();
+        simulation.RegisterSystem(new AutomaticResupplyDecisionSystem(inventories));
+        var cargo = new CargoTransportSystem(new LogisticsNetwork(), inventories);
+        EntityId provider = SupplyTruckFactory.Create(simulation.Entities, inventories,
+            Vector3.Zero, Owner, cargo);
+        SupplyTruck truck = simulation.Entities.GetComponent<SupplyTruck>(provider);
+        Assert.True(inventories.Add(truck.InventoryId, ResourceIds.Fuel, 110).Succeeded);
+        EntityId recipient = CreateRecipient(simulation, inventories, new Vector3(100, 0, 0),
+            BattlefieldSupplyPriority.High);
+        UnitFuelState propulsion = simulation.Entities.GetComponent<UnitFuelState>(provider);
+        UnitFuelState recipientFuel = simulation.Entities.GetComponent<UnitFuelState>(recipient);
+        double initialDriveFuel = inventories.GetQuantity(propulsion.InventoryId, ResourceIds.Fuel);
+
+        simulation.AdvanceOneTick();
+        SupplyRescueAssignment original = simulation.Entities.GetComponent<SupplyRescueAssignment>(provider);
+        Assert.Equal(recipient, original.Recipient);
+        Assert.Equal(original.Movement, simulation.Entities.GetComponent<MovementOrder>(provider));
+        // Model movement cleanup after the assignment was accepted.
+        simulation.Entities.RemoveComponent<MovementOrder>(provider);
+        simulation.AdvanceOneTick();
+
+        SupplyRescueAssignment replacement = simulation.Entities.GetComponent<SupplyRescueAssignment>(provider);
+        Assert.Equal(recipient, replacement.Recipient);
+        Assert.True(replacement.Movement.AcceptedAtTick > original.Movement.AcceptedAtTick);
+        Assert.Equal(replacement.Movement, simulation.Entities.GetComponent<MovementOrder>(provider));
+        Assert.Equal(provider, simulation.Entities.GetComponent<ResupplyOrder>(recipient).Provider);
+        Assert.Equal(110, inventories.GetQuantity(truck.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(initialDriveFuel, inventories.GetQuantity(propulsion.InventoryId, ResourceIds.Fuel));
+        Assert.Equal(2, inventories.GetQuantity(recipientFuel.InventoryId, ResourceIds.Fuel));
+    }
+
     private static EntityId CreateRecipient(
         SimulationCoordinator simulation,
         InventoryStore inventories,

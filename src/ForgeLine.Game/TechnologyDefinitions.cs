@@ -114,6 +114,10 @@ public readonly record struct TechnologyResourceCost
 
 public sealed record TechnologyDefinition
 {
+    public string EffectDescription { get; init; } = string.Empty;
+
+    public float RadarIdentificationMultiplier { get; init; } = 1.0f;
+
     public required TechnologyId Id { get; init; }
 
     public required string Key { get; init; }
@@ -140,6 +144,8 @@ public sealed record TechnologyDefinition
 
     public void Validate()
     {
+        if (!float.IsFinite(RadarIdentificationMultiplier) || RadarIdentificationMultiplier < 1.0f)
+            throw new InvalidOperationException("Radar identification multipliers must be finite and at least one.");
         if (!Id.IsSpecified)
         {
             throw new InvalidOperationException(
@@ -421,6 +427,7 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.IndustrialStandardization,
+                    EffectDescription = "Unlocks Combat Engineer production (Field Engineering).",
                     Key =
                         "directorate.technology.industrial_standardization",
                     DisplayName =
@@ -451,6 +458,7 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.LogisticsCoordination,
+                    EffectDescription = "Priority splitter routing awaits conveyor control integration; fair distribution is unrestricted.",
                     Key =
                         "directorate.technology.logistics_coordination",
                     DisplayName =
@@ -485,6 +493,7 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.MechanizedSystems,
+                    EffectDescription = "Unlocks Mobile Artillery production. Main Battle Tank remains unrestricted.",
                     Key =
                         "directorate.technology.mechanized_systems",
                     DisplayName =
@@ -519,6 +528,8 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.SensorFusion,
+                    EffectDescription = "Radar identification range x1.25, capped at detection range. Requires operating power.",
+                    RadarIdentificationMultiplier = 1.25f,
                     Key =
                         "directorate.technology.sensor_fusion",
                     DisplayName =

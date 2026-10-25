@@ -216,6 +216,17 @@ public sealed class DirectorateVerticalSliceSmokeTests
             simulation,
             vehicleFactory);
 
+        var mechanization = PlayerTechnologyActionCommand.Start(Player,
+            TechnologyIds.MechanizedSystems, vehicleFactory, source,
+            simulation.CurrentTick, technologies);
+        simulation.SubmitCommand(mechanization, simulation.CurrentTick.Next(),
+            new SimulationCommandSource(Player.Value));
+        simulation.RunTicks(technologies[TechnologyIds.MechanizedSystems].ResearchTicks,
+            TestContext.Current.CancellationToken);
+        Assert.True(mechanization.Accepted);
+        Assert.True(TechnologyStateQueries.IsCapabilityUnlocked(simulation.Entities,
+            Player, TechnologyCapabilityIds.MechanizedSystems));
+
         FundUnitProductionFacility(
             simulation,
             inventories,
