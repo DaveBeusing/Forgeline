@@ -17,6 +17,7 @@ $baseline = Join-Path ([System.IO.Path]::GetTempPath()) ('navigation-baseline-' 
 $project = 'benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj'
 $assembly = 'benchmarks/ForgeLine.Navigation.Benchmarks/bin/Release/net10.0/ForgeLine.Navigation.Benchmarks.dll'
 $created = $false
+$baselineCompatibility = @()
 
 function Invoke-Checked {
     param([string] $Executable, [string[]] $Parameters)
@@ -31,10 +32,37 @@ Push-Location $root
 try {
     $head = (& git rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve candidate revision.' }
-    Invoke-Checked git @('worktree', 'add', '--detach', $baseline, $BaseRef)
+    Invoke-Checked git @('worktree', 'add', '--detach', '--no-checkout', $baseline, $BaseRef)
     $created = $true
     Push-Location $baseline
     try {
+        Invoke-Checked git @('sparse-checkout', 'set', 'src', 'benchmarks', 'assets/maps')
+        # This uniquely created, initially empty checkout contains no user work.
+        Invoke-Checked git @('reset', '--hard', $BaseRef)
+        # Older regional sources fail the current CA1512 analyzer before measurement. Apply only
+        # the same mechanically equivalent guards as the candidate, keeping every analyzer active.
+        # Record the normalization rather than representing the cohort as an unmodified checkout.
+        foreach ($relative in @(
+            'src/ForgeLine.Navigation/Regional/RegionalChangeJournal.cs',
+            'src/ForgeLine.Navigation/Regional/RegionalUpdateCoordinator.cs')) {
+            $path = Join-Path $baseline $relative
+            if (!(Test-Path -LiteralPath $path)) { continue }
+            $beforeHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+            $source = [System.IO.File]::ReadAllText($path)
+            $pattern = 'if \(tick < (LastTick|_tick)\) throw new ArgumentOutOfRangeException\(nameof\(tick\)\);'
+            $guardMatches = [regex]::Matches($source, $pattern)
+            if ($guardMatches.Count -eq 0) { continue }
+            $normalized = [regex]::Replace($source, $pattern,
+                'ArgumentOutOfRangeException.ThrowIfLessThan(tick, $1);')
+            [System.IO.File]::WriteAllText($path, $normalized, [System.Text.UTF8Encoding]::new($false))
+            $baselineCompatibility += [ordered]@{
+                Path = $relative
+                Rule = 'CA1512 equivalent monotonic tick argument guard'
+                Replacements = $guardMatches.Count
+                OriginalSha256 = $beforeHash
+                MeasuredSha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+            }
+        }
         Invoke-Checked dotnet @('restore', $project)
         Invoke-Checked dotnet @('build', $project, '--configuration', 'Release', '--no-restore')
     }
@@ -64,6 +92,7 @@ try {
     [ordered]@{
         BaselineRevision = $BaseRef
         CandidateRevision = $head
+        BaselineCompatibility = $baselineCompatibility
         Rounds = $Rounds
         SamplesPerWorkload = $Samples
         Scope = 'Existing warmed Central Divide navigation CPU workloads; no graphics, collision or full-match throughput claim.'
