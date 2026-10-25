@@ -143,6 +143,39 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Fact]
+    public void QueueOwnerCanBackIntoItsOwnWaitingPoseWithItsRequiredAlignment()
+    {
+        Vector3 goal = new(25, .5f, 30);
+        var (simulation, _, unit) = Create(goal: goal);
+        var entities = simulation.Entities;
+        var initial = new WorldTransform(new(30, .5f, 30), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), new(3.2f, 2.2f, 6.4f));
+        entities.SetComponent(unit, initial);
+        entities.SetComponent(unit, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.SetComponent(unit, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        entities.SetComponent(unit, new MovementOrder(new PlayerId(1), goal, SimulationTick.Zero, new(1),
+            MovementOrderKind.LocalApproach, MathF.PI / 2));
+        var building = entities.CreateEntity();
+        var queue = new VehicleQueueEntry(building, new PlayerId(1), 1, SimulationTick.Zero,
+            VehicleQueueService.CargoPickup, Position: 1, WaitingCount: 1, Target: goal, Heading: MathF.PI / 2);
+        entities.AddComponent(unit, queue);
+        entities.AddComponent(unit, new VehicleQueueMotion(goal, goal, MathF.PI / 2, default, 2, 1));
+        var parked = entities.CreateEntity();
+        var parkedPose = initial with { Position = new(30, .5f, 33.6f) };
+        entities.AddComponent(parked, parkedPose);
+        entities.AddComponent(parked, entities.GetComponent<GroundMovement>(unit));
+        entities.AddComponent(parked, GroundMovementState.Stationary(MathF.PI / 2));
+        entities.AddComponent(parked, entities.GetComponent<UnitIdentity>(unit));
+        entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(unit));
+        entities.AddComponent(parked, new SpatialPresence(initial.Scale * .5f, new SpatialEntryMetadata(1, 1, SpatialMobility.Mobile)));
+        simulation.RunTicks(200, TestContext.Current.CancellationToken);
+        Assert.Equal(parkedPose, entities.GetComponent<WorldTransform>(parked));
+        Assert.Equal(queue, entities.GetComponent<VehicleQueueEntry>(unit));
+        Assert.False(entities.HasComponent<MovementOrder>(unit));
+        Assert.InRange(Vector3.Distance(entities.GetComponent<WorldTransform>(unit).Position, goal), 0, .11f);
+        Assert.InRange(MathF.Abs(GroundMovementState.NormalizeAngle(entities.GetComponent<GroundMovementState>(unit).HeadingRadians - MathF.PI / 2)), 0, MathF.PI / 90);
+    }
+
+    [Fact]
     public void ReplacementCommandGetsANewGenerationAndDestination()
     {
         var (simulation, movement, unit) = Create();

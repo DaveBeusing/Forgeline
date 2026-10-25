@@ -26,7 +26,8 @@ internal sealed partial class PredictiveTrafficPlanner
                     consumed++;
                     Vector3 a0 = paths[first][step - 1].Position, a1 = paths[first][step].Position;
                     Vector3 b0 = paths[second][step - 1].Position, b1 = paths[second][step].Position;
-                    if (!Conflicts(a0, a1, profiles[first], b0, b1, profiles[second])) continue;
+                    if (!Conflicts(paths[first][step - 1], paths[first][step], profiles[first],
+                        paths[second][step - 1], paths[second][step], profiles[second])) continue;
                     Vector2 relative = new(a0.X - b0.X, a0.Z - b0.Z);
                     Vector2 velocity = new(a1.X - a0.X - b1.X + b0.X, a1.Z - a0.Z - b1.Z + b0.Z);
                     float fraction = velocity.LengthSquared() > 0 ?

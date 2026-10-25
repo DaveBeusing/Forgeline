@@ -140,8 +140,8 @@ internal sealed partial class PredictiveTrafficPlanner
                     {
                         if (consumed == allowance) return false;
                         consumed++;
-                        if (Conflicts(simulated.Pose.Position, end.Position, vehicle.Profile,
-                            prior.Path[segment - 1].Position, prior.Path[segment].Position, prior.Profile)) return false;
+                        if (Conflicts(simulated.Pose, end, vehicle.Profile,
+                            prior.Path[segment - 1], prior.Path[segment], prior.Profile)) return false;
                     }
                 }
                 path.Add(end);

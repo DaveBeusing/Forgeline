@@ -9,6 +9,61 @@ namespace ForgeLine.Game.Tests;
 
 public sealed partial class PredictiveTrafficBatchTests
 {
+    [Fact]
+    public void DistantObstructionUsesItsVerifiedBrakingPrefixInsteadOfImmediateCrawl()
+    {
+        var (frame, intents) = Crossing();
+        var stationary = frame.Vehicles[0] with { Movement = GroundMovementState.Stationary(MathF.PI / 2) };
+        var single = new NavigationTrafficFrame(frame.Tick, frame.Collision, true, [stationary], [], Limits());
+        var directive = Assert.Single(new PredictiveTrafficPlanner().PlanBatch(single, [intents[0]],
+            new DistantGeometry(), 3, 10000, out _));
+        Assert.Equal(NavigationTrafficAction.Proceed, directive.Action);
+        Assert.Equal(NavigationBlockReason.MovingVehicle, directive.Reason);
+        Assert.InRange(directive.MaximumSpeed, 1.01f, frame.Vehicles[0].Profile.MaximumSpeed);
+        Assert.Equal(intents[0].Binding, directive.Binding);
+    }
+
+    private sealed class DistantGeometry : INavigationGeometryQuery
+    {
+        public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
+        public NavigationSweepResult Sweep(NavigationCollisionFrame frame, in NavigationSweep movement, int workAllowance) =>
+            movement.End.Position.X >= 17
+                ? new(NavigationGeometryStatus.Limited, frame.World.Revision, frame.Tick, .5f,
+                    NavigationBlockReason.MovingVehicle, NavigationReadAdapter.GetObstacleIdentity(new EntityId(99, 1)), 1)
+                : new(NavigationGeometryStatus.Clear, frame.World.Revision, frame.Tick, 1, NavigationBlockReason.None, null, 1);
+    }
+
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(45, false)]
+    [InlineData(0, true)]
+    public void ClearParallelAndFollowingLanesDoNotCreatePhantomIntersectionLeases(float degrees, bool following)
+    {
+        var (frame, intents) = Crossing();
+        float heading = degrees * MathF.PI / 180;
+        Vector3 forward = new(MathF.Sin(heading), 0, MathF.Cos(heading));
+        Vector3 side = new(MathF.Cos(heading), 0, -MathF.Sin(heading));
+        Vector3 first = new(20, 1.1f, 20);
+        Vector3 second = following ? first - forward * 7.2f : first + side * 5;
+        var profile = new NavigationVehicleProfile(new(1.6f, 1.1f, 3.2f), .25f, 6, 4, 4, 2);
+        var vehicles = frame.Vehicles.ToArray();
+        for (int i = 0; i < 2; i++)
+        {
+            Vector3 start = i == 0 ? first : second;
+            var order = intents[i].Binding.OriginalOrder with { WorldTarget = start + forward * 30 };
+            vehicles[i] = vehicles[i] with { Pose = new(start, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+                Profile = profile, Movement = GroundMovementState.Stationary(heading) with { Velocity = forward * 6 },
+                DirectOrder = order };
+            intents[i] = intents[i] with { Binding = intents[i].Binding with { OriginalOrder = order },
+                SteeringTarget = order.WorldTarget };
+        }
+        frame = new(frame.Tick, frame.Collision, true, vehicles, [], Limits());
+        var planner = new PredictiveTrafficPlanner();
+        var directives = planner.PlanBatch(frame, intents, new ClearGeometry(), 3, 10000, out _);
+        Assert.All(directives, directive => Assert.Equal(NavigationTrafficAction.Proceed, directive.Action));
+        Assert.Empty(planner.CaptureState().Leases);
+    }
+
     [Theory]
     [InlineData(1, false, true)]
     [InlineData(1, true, false)]

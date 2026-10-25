@@ -351,7 +351,14 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             vehicleTop,
             ref obstacleAdjustments);
 
-        if (order.TargetHeadingRadians.HasValue) steering = targetDirection;
+        // A queue target fixes the final alignment, not the entire remote approach.
+        // Before lane admission, retain ordinary obstacle/separation steering so the
+        // FIFO head can pass a follower already parked in its own tail bay.
+        bool freeQueueApproach = distanceToTarget > 2 &&
+            entities.TryGetComponent(entity, out VehicleQueueEntry approachQueue) && approachQueue.Generation > 0 &&
+            (!entities.TryGetComponent(entity, out VehicleDockVisit approachDock) ||
+                approachDock.Generation == 0 && !approachDock.LaneEntered);
+        if (order.TargetHeadingRadians.HasValue && !freeQueueApproach) steering = targetDirection;
 
         Vector3 desiredDirection =
             steering.LengthSquared() > MinimumDirectionLengthSquared
@@ -399,7 +406,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             // orbit a precise target forever. Shrink that radius with the
             // remaining approach distance while keeping normal braking/turn limits.
             float turningSpeed = remainingDistance * movement.TurnRateRadiansPerSecond * 0.5f;
-            maximumSpeed = MathF.Min(maximumSpeed, MathF.Min(1, turningSpeed));
+            maximumSpeed = MathF.Min(maximumSpeed, MathF.Min(freeQueueApproach ? 2 : 1, turningSpeed));
         }
 
         if (entities.TryGetComponent(
@@ -479,7 +486,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         // A close neighbor can prevent turning without blocking straight departure.
         // Keep the owned target and try only the current heading at the same bounded
         // speed; final heading alignment and entered service lanes retain their owner.
-        if (motionBlocked && _navigationControl is not null && speed > 0 && order.TargetHeadingRadians is null &&
+        if (motionBlocked && _navigationControl is not null && speed > 0 &&
+            (order.TargetHeadingRadians is null || freeQueueApproach) &&
             (!entities.TryGetComponent(entity, out VehicleDockVisit turnVisit) || !turnVisit.LaneEntered) &&
             (!entities.TryGetComponent(entity, out VehicleQueueEntry turnQueue) || !turnQueue.ArrivedAtService))
         {
@@ -495,11 +503,21 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 }
             }
         }
-        if (motionBlocked && _navigationControl is not null && order.TargetHeadingRadians is null &&
+        if (_navigationControl is not null &&
+            (order.TargetHeadingRadians is null || entities.HasComponent<VehicleQueueMotion>(entity)) &&
             _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, out var queueDeparture, out float queueHeading))
         {
-            candidate = queueDeparture.Position; candidateTransform = queueDeparture; heading = queueHeading;
-            motionBlocked = false;
+            Vector3 reverse = queueDeparture.Position;
+            if (TryApplyTerrain(ref reverse, movement))
+            {
+                var checkedDeparture = queueDeparture with { Position = reverse };
+                if (!VehicleDockingService.BlocksStagingStep(entities, entity, transform, checkedDeparture) &&
+                    _navigationControl.TryApproveLegacyPose(context, entity, transform, checkedDeparture))
+                {
+                    candidate = reverse; candidateTransform = checkedDeparture; heading = queueHeading;
+                    motionBlocked = false;
+                }
+            }
         }
         if (motionBlocked)
         {
