@@ -10,7 +10,7 @@ namespace ForgeLine.Navigation;
 /// </summary>
 public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 {
-    public const int AlgorithmRevision = 3;
+    public const int AlgorithmRevision = 4;
 
     private readonly NavigationWorldSnapshot _snapshot;
     private readonly NavigationTerrainEnvelope _terrain;
@@ -165,14 +165,49 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         Vector3 halfTranslation = (movement.End.Position - movement.Start.Position) * ((to - from) * 0.5f);
         // Every point's deviation from the middle rotation is bounded by the
         // chord of the enclosing sphere. Translation is projected separately.
-        float rotationExpansion = (float)(2 * radius * Math.Sin(angle * (to - from) * 0.25));
-        float padding = rotationExpansion +
-            NavigationCollisionBox.NumericalPadding(pose.Position, radius);
+        float numericalPadding = MathF.Max(NavigationCollisionBox.NumericalPadding(pose.Position, radius),
+            MathF.Max(NavigationCollisionBox.NumericalPadding(movement.Start.Position, radius),
+                NavigationCollisionBox.NumericalPadding(movement.End.Position, radius)));
+        double paddedRadius = radius + Math.Sqrt(3) * numericalPadding;
+        float rotationExpansion = (float)(2 * paddedRadius * Math.Sin(angle * (to - from) * 0.25));
+        float padding = rotationExpansion + numericalPadding;
+        // A rounded midpoint can shift the whole enclosure toward one endpoint.
+        // Preserve the numerical envelope of the returned poses as well as the
+        // physical body: its existing padding cannot also pay for that shift.
+        Vector3 first = Vector3.Lerp(movement.Start.Position, movement.End.Position, from);
+        Vector3 last = Vector3.Lerp(movement.Start.Position, movement.End.Position, to);
+        double exactMiddle = ((double)from + to) * .5;
+        double exactHalf = ((double)to - from) * .5;
+        double errorX = InterpolationRoundoff(movement.Start.Position.X, movement.End.Position.X,
+            pose.Position.X, halfTranslation.X, first.X, last.X, from, to, exactMiddle, exactHalf);
+        double errorY = InterpolationRoundoff(movement.Start.Position.Y, movement.End.Position.Y,
+            pose.Position.Y, halfTranslation.Y, first.Y, last.Y, from, to, exactMiddle, exactHalf);
+        double errorZ = InterpolationRoundoff(movement.Start.Position.Z, movement.End.Position.Z,
+            pose.Position.Z, halfTranslation.Z, first.Z, last.Z, from, to, exactMiddle, exactHalf);
         Vector3 extent = box.HalfExtents + new Vector3(
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisX)),
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisY)),
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisZ))) + new Vector3(padding);
+        extent = new(
+            AddRoundoff(extent.X, box.AxisX, errorX, errorY, errorZ),
+            AddRoundoff(extent.Y, box.AxisY, errorX, errorY, errorZ),
+            AddRoundoff(extent.Z, box.AxisZ, errorX, errorY, errorZ));
         return box with { HalfExtents = extent };
+    }
+
+    private static double InterpolationRoundoff(float start, float end, float middle, float half,
+        float first, float last, float from, float to, double exactMiddle, double exactHalf)
+    {
+        double delta = (double)end - start;
+        return Math.Abs(middle - (start + delta * exactMiddle)) +
+            Math.Abs(half - delta * exactHalf) +
+            Math.Max(Math.Abs(first - (start + delta * from)), Math.Abs(last - (start + delta * to)));
+    }
+
+    private static float AddRoundoff(float extent, Vector3 axis, double x, double y, double z)
+    {
+        double error = Math.Abs(axis.X) * x + Math.Abs(axis.Y) * y + Math.Abs(axis.Z) * z;
+        return error > 0 ? MathF.BitIncrement((float)(extent + error)) : extent;
     }
 
     private static bool TryObstacleEnvelope(in NavigationCollisionBody body, bool poseFixed, float duration,
