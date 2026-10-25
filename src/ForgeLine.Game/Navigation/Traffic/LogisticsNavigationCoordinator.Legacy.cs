@@ -222,6 +222,15 @@ internal sealed partial class LogisticsNavigationCoordinator
             Vector3 projected = Vector3.Abs(Vector3.Transform(Vector3.UnitX, body.Pose.Rotation)) * body.HalfExtents.X +
                 Vector3.Abs(Vector3.Transform(Vector3.UnitY, body.Pose.Rotation)) * body.HalfExtents.Y +
                 Vector3.Abs(Vector3.Transform(Vector3.UnitZ, body.Pose.Rotation)) * body.HalfExtents.Z;
+            // The narrow phase rounds both oriented envelopes. Its local padding
+            // can project sqrt(3) times onto a world axis. The coarse gate must
+            // cover both bodies' rounding, or a skipped sweep can admit a pose
+            // that the next full sweep considers initially obstructed.
+            Vector3 coordinates = Vector3.Max(Vector3.Max(Vector3.Abs(start.Position), Vector3.Abs(end.Position)), Vector3.Abs(body.Pose.Position));
+            double rounding = (Math.Max(Math.Max(coordinates.X, coordinates.Y), coordinates.Z) +
+                profile.HalfExtents.Length() + body.HalfExtents.Length() + 1d) * .000008d;
+            if (!double.IsFinite(rounding) || rounding > float.MaxValue) return false;
+            projected += new Vector3((float)rounding);
             Vector3 minimum = body.Pose.Position - projected, maximum = body.Pose.Position + projected;
             near |= swept.Minimum.X <= maximum.X && swept.Maximum.X >= minimum.X &&
                 swept.Minimum.Z <= maximum.Z && swept.Maximum.Z >= minimum.Z;
