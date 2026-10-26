@@ -4509,10 +4509,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         // Queued attackers cannot yet use a mature support fleet. Grow that
         // fleet after the paid core force exists, while the live minimum above
         // continues to take priority over combat production.
-        bool coreAssaultEstablished =
-            GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
-            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
-            GetUnitCount(owned, UnitIds.MobileArtillery) >= 1;
+        bool coreAssaultEstablished = HasLiveCoreAssaultForce(owned, configuration);
 
         if (coreAssaultEstablished &&
             supplyCount + pendingSupply <
@@ -4602,6 +4599,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             queued + 1;
     }
 
+    private static bool HasLiveCoreAssaultForce(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
+        GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
+        GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
+        GetUnitCount(owned, UnitIds.MobileArtillery) >= 1;
+
     private UnitId SelectUnitProductionGoal(
         SimulationContext context,
         OwnedState owned,
@@ -4658,8 +4660,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         owned,
                         UnitIds.SupplyTruck);
 
-                if (matureSupplyCount <
-                    matureSupplyTarget)
+                if (HasLiveCoreAssaultForce(owned, configuration) &&
+                    matureSupplyCount < matureSupplyTarget)
                 {
                     return UnitIds.SupplyTruck;
                 }
@@ -4684,9 +4686,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 [UnitIds.CombatEngineer] = 1,
                 [UnitIds.ScoutVehicle] = 2,
                 [UnitIds.CargoTruck] = ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true),
-                [UnitIds.SupplyTruck] =
-                    configuration.ResolveMatureSupplyTruckTarget(
-                        owned.SupplyDepots.Count),
+                [UnitIds.SupplyTruck] = HasLiveCoreAssaultForce(owned, configuration)
+                    ? configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count)
+                    : configuration.MinimumSupplyTrucks,
                 [UnitIds.MainBattleTank] = 4,
                 [UnitIds.MobileArtillery] = 2
             };

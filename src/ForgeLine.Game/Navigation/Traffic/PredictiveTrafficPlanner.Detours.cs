@@ -48,6 +48,24 @@ internal sealed partial class PredictiveTrafficPlanner
             }
             if (blocked) break;
         }
+        if (!blocked)
+            foreach (var lease in _passageLeases.Values)
+            {
+                int work = PredictionSteps + 1;
+                if (work > allowance - consumed) return false;
+                consumed += work;
+                if (lease.Owner == vehicle.Entity || !lease.Entered || lease.LastTick > frame.Tick.Value ||
+                    !actualBodies.TryGetValue(NavigationReadAdapter.GetObstacleIdentity(lease.Owner), out var occupant) ||
+                    occupant.Kind != NavigationObstacleKind.Vehicle || occupant.Velocity.LengthSquared() > .0025f ||
+                    !Occupies(lease.Passage, occupant.Pose, occupant.HalfExtents, 0) ||
+                    !Touches(lease.Passage, nominal, vehicle.Profile) ||
+                    IsOutwardDeparture(lease.Passage, nominal[0], nominal[1], vehicle.Profile)) continue;
+                // A parked owner can retain its physical admission indefinitely.
+                // Search around that region without entering it or moving its owner.
+                // Every candidate still checks this lease and the actual bodies.
+                blocked = true;
+                break;
+            }
         if (!blocked) return false;
         Vector3 origin = vehicle.Pose.Position, goal = intent.Binding.OriginalOrder.WorldTarget;
         float initialDistance = HorizontalDistance(origin, goal);
@@ -92,6 +110,24 @@ internal sealed partial class PredictiveTrafficPlanner
                 var key = (x, z, direction);
                 if (best.TryGetValue(key, out float prior) && prior <= cost) continue;
                 var end = new NavigationPose(position, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+                // Reject forbidden admission before spending the optional slice on a sweep.
+                bool reserved = false;
+                foreach (var reservation in frame.Reservations)
+                {
+                    int work = ServiceReservationCheckWork(2);
+                    if (work > allowance - consumed) return false;
+                    consumed += work;
+                    if (BlocksServiceReservation(vehicle, reservation, [node.Pose, end])) { reserved = true; break; }
+                }
+                if (reserved) continue;
+                if (!TryCheckPassage(vehicle.Entity, node.Pose, end, vehicle.Profile,
+                    allowance - consumed, out int passageWork, out bool complete))
+                {
+                    consumed += passageWork;
+                    if (!complete) return false;
+                    continue;
+                }
+                consumed += passageWork;
                 float duration = MathF.Max(length, turn / vehicle.Profile.MaximumYawRate);
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity),
                     node.Pose, end, vehicle.Profile, duration, PrefilterFixedBodies: true);
@@ -110,23 +146,6 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (result.Status is NavigationGeometryStatus.InvalidInput or NavigationGeometryStatus.Stale or NavigationGeometryStatus.Unavailable)
                 { valid = false; return false; }
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1) continue;
-                bool reserved = false;
-                foreach (var reservation in frame.Reservations)
-                {
-                    int work = ServiceReservationCheckWork(2);
-                    if (work > allowance - consumed) return false;
-                    consumed += work;
-                    if (BlocksServiceReservation(vehicle, reservation, [node.Pose, end])) { reserved = true; break; }
-                }
-                if (reserved) continue;
-                if (!TryCheckPassage(vehicle.Entity, node.Pose, end, vehicle.Profile,
-                    allowance - consumed, out int passageWork, out bool complete))
-                {
-                    consumed += passageWork;
-                    if (!complete) return false;
-                    continue;
-                }
-                consumed += passageWork;
                 if (allowance - consumed < 16) return false;
                 consumed += 16; // bounded priority-queue insertion/removal and state bookkeeping
                 best[key] = cost;

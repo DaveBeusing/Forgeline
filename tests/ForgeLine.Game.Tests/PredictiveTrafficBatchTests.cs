@@ -863,6 +863,46 @@ public sealed partial class PredictiveTrafficBatchTests
         else Assert.Empty(planner.CaptureState().Leases);
     }
 
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    public void AStationaryOccupiedForeignPassageCanTriggerAnAdvisoryDetour(bool occupied, bool movingOwner)
+    {
+        var (source,intents)=Crossing();
+        var root=intents[0].Binding.OriginalOrder with {WorldTarget=new(50,.5f,20)};
+        var intent=intents[0] with {Binding=intents[0].Binding with {OriginalOrder=root},SteeringTarget=root.WorldTarget};
+        var vehicle=source.Vehicles[0] with {DirectOrder=root,Movement=GroundMovementState.Stationary(MathF.PI/2)};
+        var owner=new EntityId(99,1);
+        var passage=new NavigationTrafficPassage(1,new(new(20,.5f,20),Quaternion.Identity),new(4,1,4));
+        var bodies=new List<NavigationCollisionBody> {
+            new(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity),NavigationObstacleKind.Vehicle,vehicle.Pose,vehicle.Profile.HalfExtents,Vector3.Zero) };
+        if(occupied) bodies.Add(new(NavigationReadAdapter.GetObstacleIdentity(owner),NavigationObstacleKind.Vehicle,new(new(20,.5f,24.2f),Quaternion.Identity),new(.5f),movingOwner?Vector3.UnitZ:Vector3.Zero));
+        var collision=new NavigationCollisionFrame(source.Collision.World,50,new AxisAlignedBounds(new(0,-10,0),new(64,10,64)),true,bodies.ToArray(),10,bodyPosesAreFixed:!movingOwner);
+        var frame=new NavigationTrafficFrame(new(50),collision,true,[vehicle],[],Limits() with {WorkPerSearch=32768},[passage]);
+        var terrain=new TerrainWorld(new WorldGridSettings {ChunkSizeMeters=64,HeightSamplesPerSide=17},
+            [new TerrainChunk(new(0,0),new TerrainHeightfield(17,64,new float[289]))]);
+        var geometry=new NavigationVehicleGeometry(collision.World,terrain,128,.5f);
+        var planner=new PredictiveTrafficPlanner();
+        planner.RestoreState(new(3,[],[new(passage,owner,1,1,1,1,true)]));
+        var directive=Assert.Single(planner.PlanBatch(frame,[intent],geometry,3,120000,out int work));
+        Assert.InRange(work,0,120000);
+        Assert.Equal(intent.Binding,directive.Binding);
+        Assert.True(directive.Action==(movingOwner?NavigationTrafficAction.Hold:NavigationTrafficAction.Proceed),$"directive={directive}; work={work}; state={string.Join(';',planner.CaptureState().Vehicles)}");
+        Assert.Equal(occupied&&!movingOwner,directive.SuggestedTarget.HasValue);
+        if(occupied)
+        {
+            Assert.Equal(owner,Assert.Single(planner.CaptureState().Leases).Owner);
+            Assert.True(Assert.Single(planner.CaptureState().Leases).Entered);
+            if(movingOwner) return;
+            Assert.InRange(directive.MaximumSpeed,.01f,1);
+            Assert.True(planner.TryCheckPassage(vehicle.Entity,vehicle.Pose,
+                vehicle.Pose with {Position=directive.SuggestedTarget!.Value},vehicle.Profile,1000,out _,out bool complete));
+            Assert.True(complete);
+        }
+        else { var lease=Assert.Single(planner.CaptureState().Leases); Assert.Equal(vehicle.Entity,lease.Owner); Assert.False(lease.Entered); }
+    }
+
     private static (NavigationTrafficFrame, NavigationTrafficIntent[]) OpposingPassage(ulong tick, float firstZ, float secondZ)
     {
         var (frame, intents) = Crossing();
