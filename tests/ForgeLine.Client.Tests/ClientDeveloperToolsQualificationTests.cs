@@ -19,6 +19,29 @@ public sealed partial class ClientSimulationHostTests
     }
 
     [Fact]
+    public void TransferredMenuPauseIgnoresAnOlderNativeFrameAssertion()
+    {
+        using var fixture = ClientHostFixture.Create(timeProvider: new ControlledHostTime());
+        var access = ActivateControls(fixture.Host);
+        using var backend = new ClientDeveloperMenuBackend(fixture.Scenario, fixture.Host, access, _ => false);
+        var model = new DeveloperMenuModel(backend.Providers, new DebugOverlayController(), backend);
+        RefreshMenu(model, fixture, access);
+        Assert.True(model.Open());
+        Assert.True(SpinWait.SpinUntil(() => { RefreshMenu(model, fixture, access); return model.OwnsMenuPause; }, TestTimeout));
+        Assert.True(fixture.Host.MenuPause.TrySetPaused(true));
+        Synchronize(fixture.Host);
+        Assert.Equal(ClientSimulationPauseReason.Developer, fixture.Host.CaptureControlStatus().PauseReasons);
+        ulong tick = fixture.Host.CurrentTick.Value;
+        model.SessionCommand(DeveloperOperation.SingleStep, DeveloperValue.FromUInt32(1));
+        Assert.True(SpinWait.SpinUntil(() => { RefreshMenu(model, fixture, access); return !model.SessionWriteBlocked; }, TestTimeout));
+        Assert.Equal(tick + 1, fixture.Host.CurrentTick.Value);
+        Assert.Contains("Applied", model.Feedback, StringComparison.Ordinal);
+        model.Close();
+        Assert.True(SpinWait.SpinUntil(() => { RefreshMenu(model, fixture, access); return !fixture.Host.CaptureControlStatus().MenuPauseTransferred; }, TestTimeout));
+        Assert.Equal(ClientSimulationPauseReason.Menu, fixture.Host.CaptureControlStatus().PauseReasons);
+    }
+
+    [Fact]
     public void IntegratedMenuCanStepAQueuedParameterAndRestartItsPendingProfile()
     {
         using var fixture = ClientHostFixture.Create(timeProvider: new ControlledHostTime());

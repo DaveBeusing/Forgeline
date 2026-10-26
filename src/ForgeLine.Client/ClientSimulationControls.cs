@@ -144,6 +144,9 @@ internal sealed partial class ClientSimulationHost
             changes = _pendingPauseChanges; values = _pendingPauseValues;
             _pendingPauseChanges = ClientSimulationPauseReason.None;
         }
+        // A frame may have observed the regular menu before its transfer was acknowledged.
+        // Only the explicit restore can return that owner while the developer holds its lease.
+        if (_menuPauseTransferred) changes &= ~ClientSimulationPauseReason.Menu;
         if (changes != ClientSimulationPauseReason.None) ApplyPauseReasons((_pauseReasons & ~changes) | (values & changes));
     }
 
