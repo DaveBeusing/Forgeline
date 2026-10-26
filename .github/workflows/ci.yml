@@ -88,6 +88,10 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Integrated developer tools and closed public variant
+        shell: pwsh
+        run: ./build/Test-DeveloperToolsQualification.ps1
+
       - name: Technology effects, paid research and opponent investment
         shell: pwsh
         run: |
@@ -437,6 +441,10 @@ jobs:
       - name: Publish reproducible pre-alpha package
         shell: pwsh
         run: ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime
+
+      - name: Public and internal developer package boundaries
+        shell: pwsh
+        run: ./build/Test-DeveloperToolsPackages.ps1
 
       - name: Packaged client fresh-install smoke
         if: runner.os == 'Windows'
