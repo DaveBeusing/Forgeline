@@ -183,6 +183,24 @@ public sealed class DeveloperGameplayTuningTests
         Apply(runtime.Simulation, provider, reset); Assert.Equal(DeveloperRestartStatus.None, provider.CaptureContribution().RestartStatus);
     }
 
+    private sealed class ChangingDispatcher : IDeveloperActionDispatcher
+    {
+        private int _reads;
+        public DeveloperProviderStatus Status => ++_reads == 1
+            ? new(DeveloperProviderAvailability.Available, DeveloperFailureReason.None) : DeveloperProviderStatus.Missing;
+        public DeveloperResult Submit(DeveloperSessionAccess access, DeveloperExecutionContext context, DeveloperRequest request) =>
+            DeveloperResult.Rejected(request, context.Revision, DeveloperFailureReason.ProviderUnavailable);
+    }
+    [Fact]
+    public void CaptureUsesOneAvailabilitySnapshot()
+    {
+        var fixture = new ConveyorTestFixture();
+        var provider = new DeveloperGameplayTuningProvider(fixture.Simulation, DeveloperRestartBuilder.ForExisting(Basis()), new ChangingDispatcher());
+        var snapshot = provider.Capture();
+        Assert.Equal(DeveloperProviderAvailability.Available, snapshot.Status.Availability);
+        Assert.NotEmpty(snapshot.Values);
+    }
+
     [Fact]
     public void CompleteRestartProfilesValidateAtomicallyAndPreserveUnchangedFields()
     {

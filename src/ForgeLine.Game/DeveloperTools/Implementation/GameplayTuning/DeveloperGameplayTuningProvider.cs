@@ -43,9 +43,10 @@ public sealed class DeveloperGameplayTuningProvider : IDeveloperParameterProvide
     public DeveloperParameterReadResult Capture()
     {
         var state = CaptureContribution();
-        return Status.Availability == DeveloperProviderAvailability.Available
-            ? new(Status, state.Values.Select(v => new DeveloperEffectiveParameter(v.Id, v.Target, v.Effective, state.Revision)).ToArray())
-            : new(Status, []);
+        var status = Status;
+        return status.Availability == DeveloperProviderAvailability.Available
+            ? new(status, state.Values.Select(v => new DeveloperEffectiveParameter(v.Id, v.Target, v.Effective, state.Revision)).ToArray())
+            : new(status, []);
     }
     public DeveloperResult Submit(DeveloperSessionAccess permission, DeveloperExecutionContext context, DeveloperRequest request)
     {
@@ -81,7 +82,7 @@ public sealed class DeveloperGameplayTuningProvider : IDeveloperParameterProvide
         return CaptureContribution().Conveyor;
     }
     private DeveloperExecutionContext ExecutionContext(DeveloperTuningContribution state) =>
-        new(Session, state.Revision, player => _initial.Settings.Participants.Any(p => p.Player == player), _simulation.Entities.IsAlive);
+        new(Session, state.Revision, player => _initial.Settings.Participants.Any(p => p.Player == player), _ => false);
     private DeveloperFailureReason ValidateRequest(DeveloperRequest request)
     {
         if (request.Operation == DeveloperOperation.ResetParameters)

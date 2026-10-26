@@ -3,7 +3,8 @@
 ## Scope and source
 
 Starts from master 9dd75d9a4133f576e3fe1a2838584e3fa98654a1 with the integrated
-developer foundation, research and logistics changes. The editor subset implements
+developer foundation, research and logistics changes. It is synchronized with
+master 715b513eab83374d98b5ebe8aa1971af4f5e7d48; the PR version is 0.1.481-dev. The editor subset implements
 13 existing Foundation IDs; it neither expands the shared registry nor defines a
 second request protocol. All implementation files reside below
 DeveloperTools/Implementation/GameplayTuning and are excluded publicly.
@@ -173,6 +174,11 @@ cannot satisfy it. Initial reset/retry, inactive/stale/invalid scope, atomic inv
 profiles and pending-only runtime isolation are included. No existing assertion,
 price, buffer, golden, deadline or gate was weakened. These targeted cases do not
 claim a full production-chain, save/replay, public-package or native campaign.
+After synchronization with master 715b513e, the complete Release solution build
+passed again (zero warnings/errors, 26.82s), along with the same 4/4 public
+and 26/26 developer cases. A final observation correction reads provider
+availability once and avoids a live ECS callback for unsupported entity scopes;
+the affected developer build and 11/11 targeted cases passed afterward.
 The PR records the exact published source and required CI. Central persistence/replay/hash integration,
 menu-driven production chains, full public/developer package exclusion and native
 interaction belong to the combined developer-tools qualification work.
