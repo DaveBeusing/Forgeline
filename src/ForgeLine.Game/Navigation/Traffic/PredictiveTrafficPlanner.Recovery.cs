@@ -85,26 +85,47 @@ internal sealed partial class PredictiveTrafficPlanner
         // A physical blocker outside the coarse wait graph can justify a verified
         // reverse arc. A service reservation alone is a logical admission wait; it
         // does not establish a physical deadlock. A copied same-tick physical veto
-        // in the opposite direction closes a mixed precise/coarse cycle.
+        // in the opposite direction closes a mixed precise/coarse cycle. A current
+        // physically occupied owned passage can separately justify outward departure.
         for (int i = 0; i < intents.Length; i++)
         {
-            if (targets[i] is not null || !CanRecover(i) || !waitingFor[i].IsValid ||
-                indices.ContainsKey(waitingFor[i]) ||
-                !(waits[i] is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle ||
-                  waits[i] == NavigationBlockReason.ReservedCorridor &&
-                  physicalCycles.TryGetValue(waitingFor[i], out var physicallyWaitingFor) &&
-                  physicallyWaitingFor == intents[i].Binding.Requester)) continue;
-            // The precise owner is physically blocked by this coarse waiter.
-            // A checked forward prefix can clear that owner even when the root's
-            // planned turn would enter its reservation. Do not replace the root.
-            if (waits[i] == NavigationBlockReason.ReservedCorridor &&
-                physicalCycles.TryGetValue(waitingFor[i], out var opposite) && opposite == intents[i].Binding.Requester)
+            if (targets[i] is not null || !CanRecover(i, allowForwardMotion: true) || !waitingFor[i].IsValid ||
+                indices.ContainsKey(waitingFor[i])) continue;
+            bool physicalCycle = physicalCycles.TryGetValue(waitingFor[i], out var opposite) &&
+                opposite == intents[i].Binding.Requester;
+            NavigationTrafficPassage? occupiedPassage = null;
+            var waiter = vehicles[intents[i].Binding.Requester];
+            if (waits[i] is NavigationBlockReason.ReservedCorridor or NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle)
+                foreach (var lease in leases.Values)
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (lease.Owner != waiter.Entity || !lease.Entered || lease.LastTick != frame.Tick.Value ||
+                        !Occupies(lease.Passage, waiter.Pose, waiter.Profile.HalfExtents, waiter.Profile.ClearanceMeters)) continue;
+                    foreach (var body in frame.Collision.Bodies)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (body.Identity == NavigationReadAdapter.GetObstacleIdentity(waiter.Entity) &&
+                            body.Pose == waiter.Pose && body.HalfExtents == waiter.Profile.HalfExtents)
+                        { occupiedPassage = lease.Passage; break; }
+                    }
+                    if (occupiedPassage.HasValue) break;
+                }
+            if (!occupiedPassage.HasValue && !CanRecover(i)) continue;
+            if (!(waits[i] is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle ||
+                  waits[i] == NavigationBlockReason.ReservedCorridor && (physicalCycle || occupiedPassage.HasValue))) continue;
+            // A physical mixed cycle, or this vehicle's currently occupied crossing,
+            // can justify a checked departure prefix. Occupied leases stay owned.
+            if (waits[i] == NavigationBlockReason.ReservedCorridor || occupiedPassage.HasValue)
             {
-                int forwardWork = ForwardClearance(frame, vehicles[intents[i].Binding.Requester], intents[i],
-                    geometry, leases, allowance - consumed, out bool clear, out Vector3 forwardTarget);
+                int forwardWork = ForwardClearance(frame, waiter, intents[i], geometry, leases,
+                    allowance - consumed, out bool clear, out Vector3 forwardTarget);
                 if (forwardWork < 0) return -1;
                 consumed += forwardWork;
-                if (clear)
+                bool outward = !occupiedPassage.HasValue || IsOutwardDeparture(occupiedPassage.Value,
+                    waiter.Pose, waiter.Pose with { Position = forwardTarget }, waiter.Profile);
+                if (clear && outward)
                 {
                     forwardTargets[i] = forwardTarget;
                     speedCaps[i] = MathF.Min(1, intents[i].MaximumSpeed);
@@ -112,7 +133,9 @@ internal sealed partial class PredictiveTrafficPlanner
                     waits[i] = NavigationBlockReason.None;
                     continue;
                 }
+                if (!physicalCycle) continue;
             }
+            if (!CanRecover(i)) continue;
             _ = TryTargets(i);
             if (consumed == allowance && targets[i] is null) return -1;
         }
@@ -131,13 +154,13 @@ internal sealed partial class PredictiveTrafficPlanner
             return TryEscape(index, vehicle.Pose.Position + back * MathF.Min(3, MathF.Max(1, vehicle.Profile.HalfExtents.Z * 2)));
         }
 
-        bool CanRecover(int index)
+        bool CanRecover(int index, bool allowForwardMotion = false)
         {
             var intent = intents[index];
             var vehicle = vehicles[intent.Binding.Requester];
             return intent.CanMove && intent.MaximumSpeed > 0 && waits[index] != NavigationBlockReason.None &&
                 !NavigationPrecisionOwnership.IsPrecise(vehicle) &&
-                vehicle.Movement.Velocity.LengthSquared() <= 0.0025f &&
+                vehicle.Movement.Velocity.LengthSquared() <= (allowForwardMotion ? 1.0001f : .0025f) &&
                 WaitingAge(intent.Binding, frame.Tick.Value) >= RecoveryWaitTicks;
         }
 
