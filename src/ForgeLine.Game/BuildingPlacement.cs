@@ -57,6 +57,8 @@ public readonly record struct BuildingPlacementPreview(
     EntityId ResourceDeposit)
 {
     public AxisAlignedBounds? LoadingCorridor { get; init; }
+    public ConveyorSocket? ConveyorInput { get; init; }
+    public ConveyorSocket? ConveyorOutput { get; init; }
 }
 
 public interface IBuildableAreaQuery
@@ -154,7 +156,22 @@ public sealed class BuildingPlacementService
             result.Bounds,
             result.IsValid,
             result.Failure,
-            result.ResourceDeposit) { LoadingCorridor = result.LoadingCorridor };
+            result.ResourceDeposit)
+        {
+            LoadingCorridor = result.LoadingCorridor,
+            ConveyorInput = PreviewPort(entities, result, true),
+            ConveyorOutput = PreviewPort(entities, result, false)
+        };
+    }
+
+    private static ConveyorSocket? PreviewPort(EntityRegistry entities, in BuildingPlacementResult result, bool input)
+    {
+        if (!Enum.IsDefined(result.Orientation)) return null;
+        if (result.BuildingId == BuildingIds.Extractor &&
+            (!entities.TryGetComponent(result.ResourceDeposit, out ResourceDeposit deposit) || !ConveyorSimulationSystem.Eligible(deposit.ResourceId)))
+            return null;
+        return ConveyorGeometry.TryGetBuildingPort(result.BuildingId, result.GroundPosition,
+            BuildingFootprint.GetRotation(result.Orientation), input, out var socket) ? socket : null;
     }
 
     public BuildingPlacementResult Evaluate(

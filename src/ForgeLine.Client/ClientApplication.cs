@@ -2364,6 +2364,9 @@ internal sealed class ClientApplication
                 0.15f,
                 1.0f);
 
+        if (buildingPlacementController.GridCenter is { } gridCenter)
+            ConstructionGridOverlay.Draw(gameplayDraw, terrain, gridCenter);
+
         if (buildingPlacementController.Preview is
             BuildingPlacementPreview placementPreview)
         {

@@ -113,7 +113,7 @@ public static class ConveyorNetworkOverlay
     private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port) =>
         DrawSocket(draw, port.Position, port.Facing, port.Input);
 
-    internal static void DrawSocket(DebugDraw draw, Vector3 position, Vector3 facing, bool input)
+    internal static void DrawSocket(DebugDraw draw, Vector3 position, Vector3 facing, bool input, string? label = null)
     {
         Vector3 outward = Vector3.Normalize(new Vector3(facing.X, 0, facing.Z));
         Vector3 side = Vector3.Cross(Vector3.UnitY, outward);
@@ -133,7 +133,7 @@ public static class ConveyorNetworkOverlay
         draw.Line(start, tip, color);
         draw.Line(tip, tip - direction * .9f + side * .65f, color);
         draw.Line(tip, tip - direction * .9f - side * .65f, color);
-        draw.Label(center + Vector3.UnitY * 1.15f + outward * .3f, input ? "IN" : "OUT", color);
+        draw.Label(center + Vector3.UnitY * 1.15f + outward * .3f, label ?? (input ? "IN" : "OUT"), color);
     }
 
     private static bool Finite(Vector3 point) => float.IsFinite(point.X) && float.IsFinite(point.Y) && float.IsFinite(point.Z);

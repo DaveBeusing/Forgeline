@@ -15,7 +15,7 @@ buildings no longer need matching horizontal 4m grid phases.
 
 Open the existing Build menu and select **Conveyor / Draw route**, or select a
 specific short/standard belt, curve hand, ramp, merger, splitter, I/O adapter,
-end cap or support. These entries use menu-only IDs starting at 2000, intercepted
+end cap, support or **Conveyor overpass**. These entries use menu-only IDs starting at 2000, intercepted
 before building placement; they do not masquerade as building definitions or go
 through SubmitBuild. The existing paginated Build menu handles the longer list.
 
@@ -31,6 +31,31 @@ through SubmitBuild. The existing paginated Build menu handles the longer list.
 | T | select carrier tier 0 or 1; endpoint snapping adopts the starting socket tier |
 | V | cycle Build → Remove → Replace → Repair; point at the owned part to edit |
 | Escape / right click | cancel the unsubmitted plan and leave placement |
+
+### Shared placement grid and crossing belts
+
+Building and conveyor pointer placement share a visible **4m grid**. The local
+48m-wide grid follows the terrain around the current placement; it disappears
+when placement ends. Buildings sample their foundation at the snapped position.
+Exact compatible sockets take priority over the grid, so older freely placed
+buildings and saved layouts remain connectable. Existing scripted construction
+and recorded commands retain their original requested coordinates.
+
+Select **Conveyor overpass** to cross a lower belt without joining its flow.
+The pointer marks the crossing center; Q/E rotates its travel direction. One
+confirmation builds a 24m assembly: an 8m rising ramp, an 8m upper straight, an
+8m descending ramp and four automatic feet. The raised deck is 2m above the lower
+deck. Its feet stand outside the center crossing. Both endpoints return to tier 0;
+the assembly cannot start at tier 1. Normal terrain, building, loading-lane,
+road/support, ownership and stock checks still apply to every part.
+
+The quote is **66 Steel** on flat free ground; an existing owned endpoint foot
+can reduce it. Construction pays and commits the complete assembly together.
+It uses the existing authored ramp, straight and support meshes. The saved world
+contains those ordinary pieces, so selection, damage, repair, individual removal,
+finite buffers and save/replay follow the same rules as manually built ramps.
+A crossing at the same height still fails the collision check. The two decks
+connect only through their own directed sockets and never mix cargo at the crossing.
 
 ### Connection feedback and snapping
 

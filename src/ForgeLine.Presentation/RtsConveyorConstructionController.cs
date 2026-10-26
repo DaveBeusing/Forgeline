@@ -47,6 +47,7 @@ public sealed class RtsConveyorConstructionController
     private Vector3? _pointerTarget;
     private double _availableSteel;
     public bool IsActive { get; private set; }
+    public Vector3? GridCenter => IsActive && Edit == ConveyorEdit.Build ? _pointerTarget : null;
     public ConveyorModule Module { get; private set; }
     public ConveyorEdit Edit { get; private set; }
     public BuildingOrientation Orientation { get; private set; }
@@ -58,10 +59,10 @@ public sealed class RtsConveyorConstructionController
     public string Hint => $"CONVEYOR {Edit} / {ConveyorGeometry.Name(Module)} / TIER {Tier} / "+
         (_awaiting?"REQUEST PENDING":Edit!=ConveyorEdit.Build?"CLICK OWN CONVEYOR":Module!=ConveyorModule.Route?
             "CLICK TO PLACE PART":_anchor.HasValue?"CLICK INPUT BUILDING OR ROUTE END":"CLICK OUTPUT BUILDING OR ROUTE START")+
-        " / Q E ROTATE / TAB BEND / T TIER / V EDIT / ESC CANCEL";
+        " / GRID 4 M / Q E ROTATE / TAB BEND / T TIER / V EDIT / ESC CANCEL";
     public void Begin(ConveyorModule module)
     {
-        Module=module; IsActive=true; Edit=ConveyorEdit.Build; _anchor=null;_anchorPointer=null;_sourcePort=default;
+        Module=module; if(module==ConveyorModule.Overpass)Tier=0; IsActive=true; Edit=ConveyorEdit.Build; _anchor=null;_anchorPointer=null;_sourcePort=default;
         _snappedEndpoint=null;_pointerTarget=null;
         _requested=null;Preview=null;Current=false; Feedback=string.Empty;
     }
@@ -266,7 +267,7 @@ public sealed class RtsConveyorConstructionController
         ConveyorFailure.InsufficientStock=>"NOT ENOUGH STEEL IN COMMAND CORE",
         ConveyorFailure.PortMismatch=>"PORTS DO NOT ALIGN / MATCH TIER AND IN-OUT DIRECTION",
         ConveyorFailure.Occupied=>"DRAIN CARGO BEFORE EDITING",ConveyorFailure.NotOwned=>"OWN INFRASTRUCTURE ONLY",
-        ConveyorFailure.UnsupportedTier=>"ONLY TIERS 0 AND 1 / RAMPS FROM TIER 0",
+        ConveyorFailure.UnsupportedTier=>"ONLY TIERS 0 AND 1 / RAMPS AND OVERPASS FROM TIER 0",
         ConveyorFailure.RouteTooLong=>"ROUTE MUST BE 4 TO 256 METRES",
         ConveyorFailure.InvalidSource=>"OWN COMPLETED COMMAND CORE WITH STOCK REQUIRED",
         ConveyorFailure.TargetUnavailable=>"POINT AT OWN CONVEYOR",ConveyorFailure.InvalidRequest=>"INVALID EDIT / CHECK PART AND REPAIR STATE",

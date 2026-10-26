@@ -24,7 +24,7 @@ public static class GameplayVisualAssetContract
         required["material.infrastructure.directorate.conveyor"] = RuntimeAssetType.Material;
         foreach (var module in Enum.GetValues<ConveyorModule>())
         {
-            if (module == ConveyorModule.Route) continue; // Planning action, not a placed module.
+            if (module is ConveyorModule.Route or ConveyorModule.Overpass) continue; // Planning actions expand into authored parts.
             var placement = new ConveyorPlacement(module, Vector3.Zero, default, 0);
             foreach (var status in Enum.GetValues<ConveyorLinkStatus>())
             {

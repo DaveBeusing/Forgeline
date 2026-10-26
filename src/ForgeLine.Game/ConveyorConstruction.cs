@@ -12,7 +12,7 @@ namespace ForgeLine.Game;
 public enum ConveyorModule : byte
 {
     Route, ShortSegment, Standard, CurveLeft, CurveRight, RampUp, RampDown,
-    Merger, Splitter, InputAdapter, OutputAdapter, Endcap, Support, RaisedSupport
+    Merger, Splitter, InputAdapter, OutputAdapter, Endcap, Support, RaisedSupport, Overpass
 }
 public enum ConveyorEdit : byte { Build, Remove, Replace, Repair }
 public enum ConveyorFailure : byte
@@ -99,6 +99,7 @@ public readonly record struct ConveyorOwnedPiece(EntityId Entity, ConveyorPiece 
 public static class ConveyorGeometry
 {
     public const uint MenuBase = 2000;
+    public const uint MenuCount = (uint)ConveyorModule.Overpass + 1;
     public static Vector3 BuildingPortDimensions(BuildingId id) =>
         id==BuildingIds.CommandCore?new(20,12,20):id==BuildingIds.Extractor?new(12,8,12):
         id==BuildingIds.StorageDepot?new(14,8,14):id==BuildingIds.Smelter?new(18,10,16):
@@ -117,6 +118,7 @@ public static class ConveyorGeometry
     };
     public static double Cost(ConveyorModule module) => module switch
     {
+        ConveyorModule.Overpass=>66,
         ConveyorModule.ShortSegment=>8, ConveyorModule.Standard=>14,
         ConveyorModule.Support=>4, ConveyorModule.RaisedSupport=>6,
         ConveyorModule.Merger or ConveyorModule.Splitter=>24,
@@ -128,6 +130,7 @@ public static class ConveyorGeometry
             Math.Pow(placement.RiseMeters/placement.HorizontalSpan,2))) : Cost(placement.Module);
     public static string Name(ConveyorModule module)=>module switch
     {
+        ConveyorModule.Overpass=>"Conveyor overpass",
         ConveyorModule.Route=>"Draw route",ConveyorModule.ShortSegment=>"Short belt",ConveyorModule.Standard=>"Standard belt",
         ConveyorModule.CurveLeft=>"Curve, left",ConveyorModule.CurveRight=>"Curve, right",
         ConveyorModule.RampUp=>"Ramp up",ConveyorModule.RampDown=>"Ramp down",
@@ -142,6 +145,7 @@ public static class ConveyorGeometry
         ConveyorSocket Out(float x,float y,float z,Vector3? facing=null)=>new(new(x,y,z),facing??Vector3.UnitZ,false);
         return module switch
         {
+            ConveyorModule.Overpass=>[In(0,5.8f,-12),Out(0,5.8f,12)],
             ConveyorModule.Support or ConveyorModule.RaisedSupport=>[],
             ConveyorModule.ShortSegment or ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter=>[In(0,5.8f,-2),Out(0,5.8f,2)],
             ConveyorModule.CurveLeft=>[In(-4,5.8f,0),Out(0,5.8f,4,Vector3.UnitX)],
@@ -156,6 +160,7 @@ public static class ConveyorGeometry
     }
     public static (Vector3 Minimum,Vector3 Maximum) LocalBounds(ConveyorModule module) => module switch
     {
+        ConveyorModule.Overpass=>(new(-1.4f,5.2f,-12),new(1.4f,8.3f,12)),
         ConveyorModule.Support=>(new(-.4f,0,-.4f),new(.4f,5.22f,.4f)),
         ConveyorModule.RaisedSupport=>(new(-.4f,0,-.4f),new(.4f,7.22f,.4f)),
         ConveyorModule.CurveLeft=>(new(-5.4f,5.2f,-.1f),new(.1f,6.3f,5.4f)),
@@ -166,7 +171,28 @@ public static class ConveyorGeometry
         ConveyorModule.ShortSegment or ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter=>(new(-1.4f,5.2f,-2),new(1.4f,6.3f,2)),
         _=>(new(-1.4f,5.2f,-4),new(1.4f,6.3f,4))
     };
-    public static Vector3 Snap(Vector3 p)=>new(MathF.Round(p.X/4)*4,p.Y,MathF.Round(p.Z/4)*4);
+    public static Vector3 Snap(Vector3 p)=>ConstructionGrid.Snap(p);
+
+    public static ConveyorPlacement[] Overpass(Vector3 pivot, BuildingOrientation orientation)
+    {
+        Vector3 forward = Vector3.Transform(Vector3.UnitZ, BuildingFootprint.GetRotation(orientation));
+        return [new(ConveyorModule.RampUp, pivot - forward * 8, orientation, 0),
+            new(ConveyorModule.Standard, pivot + Vector3.UnitY * 2, orientation, 1),
+            new(ConveyorModule.RampDown, pivot + forward * 8, orientation, 0)];
+    }
+
+    public static bool TryGetBuildingPort(BuildingId building, Vector3 ground, Quaternion rotation, bool input,
+        out ConveyorSocket socket)
+    {
+        Vector3 dimensions = BuildingPortDimensions(building);
+        socket = default;
+        if (dimensions == default || building == BuildingIds.Extractor && input ||
+            !input && (building == BuildingIds.Barracks || building == BuildingIds.VehicleFactory)) return false;
+        float sign = input ? -1 : 1;
+        socket = new(ground + Vector3.Transform(new Vector3(sign * dimensions.X / 2, 5.8f, 0), rotation),
+            Vector3.Transform(sign * Vector3.UnitX, rotation), input);
+        return true;
+    }
     public static BuildingOrientation Facing(Vector3 direction)=> MathF.Abs(direction.X)>MathF.Abs(direction.Z)
         ? direction.X>0?BuildingOrientation.East:BuildingOrientation.West
         : direction.Z>0?BuildingOrientation.North:BuildingOrientation.South;
@@ -265,7 +291,7 @@ public sealed class ConveyorConstructionService
             // Authored side sockets avoid the +Z truck bay. Unknown identities/scales opt out.
             Vector3 expected=ConveyorGeometry.BuildingPortDimensions(building.BuildingId);
             if(expected==default)continue;
-            float halfWidth=expected.X/2, halfHeight=expected.Y/2;
+            float halfHeight=expected.Y/2;
             WorldTransform transform=entities.GetComponent<WorldTransform>(e);
             if(Vector3.DistanceSquared(transform.Scale,expected)>.001f)continue;
             Vector3 origin=transform.Position-Vector3.UnitY*halfHeight;
@@ -274,9 +300,8 @@ public sealed class ConveyorConstructionService
                 if (building.BuildingId==BuildingIds.Extractor && (input ||
                     !entities.TryGetComponent(e,out ResourceExtractor extractor) || !ConveyorSimulationSystem.Eligible(extractor.ResourceId)))continue;
                 if (!input && (building.BuildingId==BuildingIds.Barracks || building.BuildingId==BuildingIds.VehicleFactory))continue;
-                float sign=input?-1:1;
-                ports.Add(new(e,owner,origin+Vector3.Transform(new Vector3(sign*halfWidth,5.8f,0),transform.Rotation),
-                    Vector3.Transform(sign*Vector3.UnitX,transform.Rotation),input));
+                if (ConveyorGeometry.TryGetBuildingPort(building.BuildingId, origin, transform.Rotation, input, out var socket))
+                    ports.Add(new(e,owner,socket.Position,socket.Facing,input));
             }
         }
         return ports.AsReadOnly();
@@ -288,11 +313,13 @@ public sealed class ConveyorConstructionService
         ConveyorPlan Fail(ConveyorFailure f,double cost=0)=>new(f,Array.AsReadOnly(pieces.ToArray()),cost);
         if (!owner.IsSpecified || !Enum.IsDefined(request.Module) || !Enum.IsDefined(request.Edit) ||
             !Enum.IsDefined(request.Orientation) || !Finite(request.Start) || !Finite(request.End)) return Fail(ConveyorFailure.InvalidRequest);
-        if (request.Tier is <0 or >1 || (request.Module is ConveyorModule.RampUp or ConveyorModule.RampDown && request.Tier!=0))
+        if (request.Tier is <0 or >1 || (request.Module is ConveyorModule.RampUp or ConveyorModule.RampDown or ConveyorModule.Overpass && request.Tier!=0))
             return Fail(ConveyorFailure.UnsupportedTier);
         if (!entities.TryGetComponent(payer,out InventoryStorage storage) || !_stock.Contains(storage.InventoryId) ||
             !entities.TryGetComponent(payer,out ControllableEntity sourceOwner) || sourceOwner.Owner!=owner ||
             !entities.HasComponent<CompletedBuilding>(payer)) return Fail(ConveyorFailure.InvalidSource);
+        if (request.Module == ConveyorModule.Overpass && request.Edit == ConveyorEdit.Replace)
+            return Fail(ConveyorFailure.InvalidRequest);
         if (request.AutomaticRouting && request.Edit == ConveyorEdit.Build && request.Module == ConveyorModule.Route)
             return PreviewAutomatic(entities, owner, request, storage);
         if (request.SnapToSocket)
@@ -311,7 +338,8 @@ public sealed class ConveyorConstructionService
                     port.Input != socket.Input && Vector3.DistanceSquared(port.Position, socket.Position) < .0004f &&
                     Vector3.Dot(port.Facing, socket.Facing) < -.999f));
             if (!matches) return Fail(ConveyorFailure.PortMismatch);
-            pieces.Add(placement);
+            if (request.Module == ConveyorModule.Overpass) pieces.AddRange(ConveyorGeometry.Overpass(placement.Pivot, placement.Orientation));
+            else pieces.Add(placement);
             return CompletePlan(entities, owner, request, storage, pieces,
                 placement.Pivot.Y - request.Tier * 2, default, existing);
         }
@@ -407,6 +435,8 @@ public sealed class ConveyorConstructionService
             }
             if(destinationAdapter.HasValue)pieces.Add(destinationAdapter.Value);
         }
+        else if (request.Module == ConveyorModule.Overpass)
+            pieces.AddRange(ConveyorGeometry.Overpass(start, request.Orientation));
         else
         {
             ConveyorModule module=request.Module==ConveyorModule.Support && request.Tier==1?ConveyorModule.RaisedSupport:request.Module;
