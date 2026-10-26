@@ -85,6 +85,15 @@ source correction and supplies no completed build evidence.
 The initial hardware inventory query was denied access to the Windows CIM
 resource; this provides no GPU or D3D12 capability evidence.
 
+The replay correction passed both integrated cases (2/2, no skips). The Public
+selection then passed 2/3 and reproduced acceptance of a bare DeveloperModified
+marker. The shared persistence guard now includes that marker and explicit
+initial-profile/audit presence in its Developer-data checks. A marker without
+corresponding state is also rejected as corrupt in an approved Developer host.
+The affected Public rejection and Developer recovery cases must be repeated.
+The first complete solution build stopped on missing cancellation tokens in the
+new Public tests; these were corrected without changing assertions.
+
 The integrated preset PR baseline at `49463f88` failed its required build-test
 at `TechnologyNormalMatchTests.NormalOpponentPaysForResearchAndReconstructsWhileProductionContinues`,
 line 49 (56/57 selected cases passed). The log reports MissingMaterials for the

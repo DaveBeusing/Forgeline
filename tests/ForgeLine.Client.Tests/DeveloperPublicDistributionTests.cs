@@ -17,8 +17,8 @@ public sealed class DeveloperPublicDistributionTests
         Assert.False(DeveloperToolsCapability.Current.IsCompiled);
         Assert.Null(typeof(ClientApplication).Assembly.GetType("ForgeLine.Client.ClientDeveloperMenuBackend"));
         Assert.Null(typeof(MatchRuntime).Assembly.GetType("ForgeLine.Game.DeveloperCommandGateway"));
-        Assert.Throws<InvalidOperationException>(() => MatchRuntime.Create(basis with { InitialDeveloperProfile = profile }));
-        using var runtime = MatchRuntime.Create(basis);
+        Assert.Throws<InvalidOperationException>(() => MatchRuntime.Create(basis with { InitialDeveloperProfile = profile }, TestContext.Current.CancellationToken));
+        using var runtime = MatchRuntime.Create(basis, TestContext.Current.CancellationToken);
         string before = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         var revision = new DeveloperStateRevision(DeveloperRevisionDomain.Simulation, 0);
         var request = new DeveloperRequest(runtime.Simulation.SessionId, Guid.NewGuid(), revision,
@@ -34,7 +34,7 @@ public sealed class DeveloperPublicDistributionTests
     [Fact]
     public void MarkedDeveloperSaveAndReplayAreRejectedWithoutChangingTheSourceMatch()
     {
-        using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 742026));
+        using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 742026), TestContext.Current.CancellationToken);
         string hash = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         var save = MatchPersistenceService.CaptureSave(runtime) with { DeveloperModified = true };
         var replay = MatchPersistenceService.CaptureReplay(runtime) with { DeveloperModified = true };
