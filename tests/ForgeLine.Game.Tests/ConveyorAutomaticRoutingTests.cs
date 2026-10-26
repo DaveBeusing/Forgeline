@@ -9,6 +9,79 @@ namespace ForgeLine.Game.Tests;
 public sealed class ConveyorAutomaticRoutingTests
 {
     [Theory]
+    [InlineData(ConveyorModule.ShortSegment)]
+    [InlineData(ConveyorModule.CurveLeft)]
+    [InlineData(ConveyorModule.CurveRight)]
+    [InlineData(ConveyorModule.Merger)]
+    [InlineData(ConveyorModule.Splitter)]
+    [InlineData(ConveyorModule.RampUp)]
+    [InlineData(ConveyorModule.Endcap)]
+    public void SnappedPartKeepsExactSocketAndPaysForValidatedConstruction(ConveyorModule module)
+    {
+        var fixture = new ConveyorTestFixture();
+        EntityId belt = fixture.Build(ConveyorModule.Standard, new(80, 0, 96), BuildingOrientation.East);
+        var output = fixture.Entities.GetComponent<ConveyorPiece>(belt).Placement.Sockets.Single(s => !s.Input);
+        var rotation = BuildingFootprint.GetRotation(BuildingOrientation.East);
+        var input = ConveyorGeometry.Sockets(module).First(s => s.Input);
+        Vector3 pivot = output.Position - Vector3.Transform(input.Position, rotation);
+        var request = new ConveyorBuildRequest(ConveyorEdit.Build, module, pivot, pivot,
+            BuildingOrientation.East, 0, true, SnapToSocket: true);
+        var preview = fixture.Construction.Preview(fixture.Entities, fixture.Player, request, fixture.Payer);
+        Assert.True(preview.IsValid, preview.Failure.ToString());
+        double before = fixture.Stock(fixture.Payer, ResourceIds.Steel);
+        var added = fixture.Build(request);
+        var piece = Assert.Single(added.Select(e => fixture.Entities.GetComponent<ConveyorPiece>(e)), p => p.Placement.Module == module);
+        Assert.Equal(pivot, piece.Placement.Pivot);
+        Assert.Equal(before - preview.Steel, fixture.Stock(fixture.Payer, ResourceIds.Steel), 8);
+        Assert.Contains(piece.Placement.Sockets, socket => socket.Input && Vector3.DistanceSquared(socket.Position, output.Position) < .0004f);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void SnappedAdaptersAttachToFreelyPlacedRotatedBuilding(bool input)
+    {
+        var fixture = new ConveyorTestFixture();
+        EntityId building = fixture.AddStorage(new(72.25f, 0, 94.5f), orientation: BuildingOrientation.West);
+        var port = fixture.Port(building, input);
+        var orientation = ConveyorGeometry.Facing(input ? -port.Facing : port.Facing);
+        var module = input ? ConveyorModule.OutputAdapter : ConveyorModule.InputAdapter;
+        var local = ConveyorGeometry.Sockets(module).Single(s => s.Input != input);
+        Vector3 pivot = port.Position - Vector3.Transform(local.Position, BuildingFootprint.GetRotation(orientation));
+        var request = new ConveyorBuildRequest(ConveyorEdit.Build, module, pivot, pivot, orientation, 0, true,
+            SourcePortBuilding: input ? default : building, DestinationPortBuilding: input ? building : default, SnapToSocket: true);
+        var added = fixture.Build(request);
+        var adapter = Assert.Single(added.Select(e => fixture.Entities.GetComponent<ConveyorPiece>(e)), p => p.Placement.Module == module);
+        Assert.Equal(building, adapter.Attachment);
+        Assert.Equal(pivot, adapter.Placement.Pivot);
+        var options = new JsonSerializerOptions { IncludeFields = true };
+        Assert.True(JsonSerializer.Deserialize<ConveyorBuildRequest>(JsonSerializer.Serialize(request, options), options).SnapToSocket);
+    }
+
+    [Fact]
+    public void MissingForeignOrMovedSnapTargetRejectsWithoutPayment()
+    {
+        var fixture = new ConveyorTestFixture();
+        EntityId belt = fixture.Build(ConveyorModule.Standard, new(80, 0, 96), BuildingOrientation.East, owner: fixture.OtherPlayer);
+        var output = fixture.Entities.GetComponent<ConveyorPiece>(belt).Placement.Sockets.Single(s => !s.Input);
+        Vector3 pivot = output.Position - Vector3.Transform(ConveyorGeometry.Sockets(ConveyorModule.ShortSegment)[0].Position,
+            BuildingFootprint.GetRotation(BuildingOrientation.East));
+        var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.ShortSegment, pivot, pivot,
+            BuildingOrientation.East, 0, true, SnapToSocket: true);
+        EntityId own = fixture.Build(ConveyorModule.Standard, new(120, 0, 96), BuildingOrientation.East);
+        var valid = request with { Start = pivot + Vector3.UnitX * 40, End = pivot + Vector3.UnitX * 40 };
+        Assert.True(fixture.Construction.Preview(fixture.Entities, fixture.Player, valid, fixture.Payer).IsValid);
+        double before = fixture.Stock(fixture.Payer, ResourceIds.Steel);
+        var pieces = fixture.Pieces;
+        Assert.False(fixture.Execute(request).Accepted);
+        Assert.False(fixture.Execute(request with { Start = pivot + Vector3.UnitX * .5f }).Accepted);
+        Assert.False(fixture.Execute(valid with { Start = valid.Start + Vector3.UnitX * .5f }).Accepted);
+        Assert.False(fixture.Execute(valid with { Target = own }).Accepted);
+        Assert.Equal(before, fixture.Stock(fixture.Payer, ResourceIds.Steel));
+        Assert.Equal(pieces, fixture.Pieces);
+    }
+
+    [Theory]
     [InlineData(BuildingOrientation.North, BuildingOrientation.North)]
     [InlineData(BuildingOrientation.North, BuildingOrientation.East)]
     [InlineData(BuildingOrientation.North, BuildingOrientation.South)]

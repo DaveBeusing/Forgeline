@@ -4,17 +4,19 @@ using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
-internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier);
+internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier,
+    Vector3 Facing = default, bool Input = false);
 
 /// <summary>Selects one copied endpoint; the construction preview still validates the connection.</summary>
 internal sealed class ConveyorEndpointPicker
 {
     private const float CarrierHeight = 5.8f;
-    private const float SnapRadiusPixels = 16;
+    private const float SnapRadiusPixels = 28;
     private readonly Dictionary<EntityId, RenderInstance> _visible = new();
 
     internal bool TryPick(PresentationSnapshot? snapshot, PlayerId player, RtsCamera camera,
-        Vector2 pointer, int width, int height, float scale, bool input, out ConveyorEndpoint endpoint)
+        Vector2 pointer, int width, int height, float scale, bool input, out ConveyorEndpoint endpoint,
+        bool includeBuildings = true)
     {
         endpoint = default;
         _visible.Clear();
@@ -32,10 +34,11 @@ internal sealed class ConveyorEndpointPicker
         CameraRay ray = camera.ScreenPointToWorldRay(pointer, width, height);
         float nearest = float.PositiveInfinity;
         EntityId chosen = default;
+        ConveyorEndpoint bodyEndpoint = default;
         // Clicking any visible part of the building selects its appropriate input/output socket.
         foreach (var port in network.Ports)
         {
-            if (!Usable(port, player, input) || !_visible.TryGetValue(port.Building, out var instance) ||
+            if (!includeBuildings || !Usable(port, player, input) || !_visible.TryGetValue(port.Building, out var instance) ||
                 (instance.Selectable.Category & ControllableEntityCategory.Building) == 0) continue;
             var bounds = PresentationBounds.ResolveAxisAlignedBounds(instance);
             if (!Finite(bounds.Minimum) || !Finite(bounds.Maximum) ||
@@ -43,21 +46,22 @@ internal sealed class ConveyorEndpointPicker
                 !Closer(distance, port.Building, nearest, chosen)) continue;
             nearest = distance;
             chosen = port.Building;
-            endpoint = new(port.Position - Vector3.UnitY * CarrierHeight, port.Building, 0);
+            bodyEndpoint = new(port.Position - Vector3.UnitY * CarrierHeight, port.Building, 0, port.Facing, input);
         }
-        if (chosen.IsValid) return true;
+        bool bodyFound = chosen.IsValid;
+        chosen = default;
 
         Matrix4x4 projection = camera.GetMatrices(width, height).ViewProjection;
         float radius = SnapRadiusPixels * (float.IsFinite(scale) ? Math.Clamp(scale, .5f, 4) : 1);
         nearest = radius * radius;
         foreach (var port in network.Ports)
         {
-            if (!Usable(port, player, input) || !_visible.ContainsKey(port.Building) ||
+            if (!includeBuildings || !Usable(port, player, input) || !_visible.ContainsKey(port.Building) ||
                 !TryScreenDistance(port.Position, projection, pointer, width, height, out float distance) ||
                 !Closer(distance, port.Building, nearest, chosen)) continue;
             nearest = distance;
             chosen = port.Building;
-            endpoint = new(port.Position - Vector3.UnitY * CarrierHeight, port.Building, 0);
+            endpoint = new(port.Position - Vector3.UnitY * CarrierHeight, port.Building, 0, port.Facing, input);
         }
         foreach (var row in network.Pieces)
         {
@@ -72,10 +76,12 @@ internal sealed class ConveyorEndpointPicker
                 chosen = row.Entity;
                 int rise = (int)MathF.Round((socket.Position.Y - row.Piece.Placement.Pivot.Y - CarrierHeight) / 2);
                 endpoint = new(socket.Position - Vector3.UnitY * CarrierHeight, EntityId.Invalid,
-                    Math.Clamp(row.Piece.Placement.Tier + rise, 0, 1));
+                    Math.Clamp(row.Piece.Placement.Tier + rise, 0, 1), socket.Facing, input);
             }
         }
-        return chosen.IsValid;
+        if (chosen.IsValid) return true;
+        endpoint = bodyEndpoint;
+        return bodyFound;
     }
 
     private static bool Usable(in ConveyorBuildingPort port, PlayerId player, bool input) =>

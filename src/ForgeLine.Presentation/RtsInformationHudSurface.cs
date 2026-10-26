@@ -42,7 +42,8 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
             context.PreAlphaUx,
             context.TacticalTargeting,
             context.PresentationTime,
-            context.AnimateNotifications);
+            context.AnimateNotifications,
+            context.GameplayOverlay);
     }
 
     public void Dispose() =>

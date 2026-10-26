@@ -21,12 +21,14 @@ public enum ConveyorFailure : byte
     SupportOnRoad, InsufficientStock, InvalidSource, TargetUnavailable, NotOwned,
     Occupied, UnsupportedTier, PortMismatch, MatchUnavailable, LimitReached
 }
+public enum ConveyorObstruction : byte { None, Building, Conveyor, VehicleOrObject, LoadingLane }
 public readonly record struct ConveyorBuildRequest(
     ConveyorEdit Edit, ConveyorModule Module, Vector3 Start, Vector3 End,
     BuildingOrientation Orientation, int Tier, bool XFirst,
     EntityId Target = default, EntityId SourcePortBuilding = default,
     EntityId DestinationPortBuilding = default,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool AutomaticRouting = false);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool AutomaticRouting = false,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool SnapToSocket = false);
 public readonly record struct ConveyorSocket(Vector3 Position, Vector3 Facing, bool Input);
 public readonly record struct ConveyorPlacement(ConveyorModule Module, Vector3 Pivot,
     BuildingOrientation Orientation, int Tier,
@@ -68,6 +70,8 @@ public readonly record struct ConveyorPiece(PlayerId Owner, ConveyorPlacement Pl
 public sealed record ConveyorPlan(ConveyorFailure Failure, IReadOnlyList<ConveyorPlacement> Pieces, double Steel)
 {
     public bool IsValid => Failure == ConveyorFailure.None;
+    public ConveyorObstruction Obstruction { get; init; }
+    public Vector3? FailurePosition { get; init; }
 }
 public enum ConveyorLinkStatus : byte { Structural, NoInput, Disconnected, Blocked, Congested, Damaged, Critical, Destroyed, Flowing, Offline }
 public readonly record struct ConveyorOwnedPiece(EntityId Entity, ConveyorPiece Piece, ConveyorLinkStatus Status=ConveyorLinkStatus.NoInput,
@@ -268,6 +272,26 @@ public sealed class ConveyorConstructionService
             !entities.HasComponent<CompletedBuilding>(payer)) return Fail(ConveyorFailure.InvalidSource);
         if (request.AutomaticRouting && request.Edit == ConveyorEdit.Build && request.Module == ConveyorModule.Route)
             return PreviewAutomatic(entities, owner, request, storage);
+        if (request.SnapToSocket)
+        {
+            if (request.Edit != ConveyorEdit.Build || request.Target.IsValid || request.Module is ConveyorModule.Route or
+                ConveyorModule.Support or ConveyorModule.RaisedSupport)
+                return Fail(ConveyorFailure.InvalidRequest);
+            var placement = new ConveyorPlacement(request.Module, request.Start, request.Orientation, request.Tier);
+            var ports = CapturePorts(entities, owner);
+            var existing = Capture(entities, owner);
+            bool matches = placement.Sockets.Any(socket =>
+                existing.Any(row => row.Status != ConveyorLinkStatus.Destroyed && row.Piece.Placement.Sockets.Any(mate =>
+                    socket.Input != mate.Input && Vector3.DistanceSquared(socket.Position, mate.Position) < .0004f &&
+                    Vector3.Dot(socket.Facing, mate.Facing) < -.999f)) ||
+                ports.Any(port => port.Building == (socket.Input ? request.SourcePortBuilding : request.DestinationPortBuilding) &&
+                    port.Input != socket.Input && Vector3.DistanceSquared(port.Position, socket.Position) < .0004f &&
+                    Vector3.Dot(port.Facing, socket.Facing) < -.999f));
+            if (!matches) return Fail(ConveyorFailure.PortMismatch);
+            pieces.Add(placement);
+            return CompletePlan(entities, owner, request, storage, pieces,
+                placement.Pivot.Y - request.Tier * 2, default, existing);
+        }
         ConveyorPiece old=default;
         if (request.Edit!=ConveyorEdit.Build)
         {
@@ -506,8 +530,11 @@ public sealed class ConveyorConstructionService
         ConveyorBuildRequest request, InventoryStorage storage, List<ConveyorPlacement> pieces,
         float ground, ConveyorPiece old, IReadOnlyList<ConveyorOwnedPiece> existingPieces)
     {
+        Vector3? failurePosition = null;
+        ConveyorObstruction obstruction = ConveyorObstruction.None;
         ConveyorPlan Fail(ConveyorFailure failure, double cost = 0) =>
-            new(failure, Array.AsReadOnly(pieces.ToArray()), cost);
+            new(failure, Array.AsReadOnly(pieces.ToArray()), cost)
+            { FailurePosition = failurePosition, Obstruction = obstruction };
         if (pieces.Any(piece => !float.IsFinite(piece.SpanMeters) || piece.SpanMeters != 0 &&
             (piece.Module != ConveyorModule.ShortSegment ||
              piece.SpanMeters < ConveyorAutomaticRouter.MinimumSpanMeters || piece.SpanMeters > 4)))
@@ -542,6 +569,7 @@ public sealed class ConveyorConstructionService
         for(int i=0;i<pieces.Count;i++)
         {
             ConveyorPlacement part=pieces[i]; AxisAlignedBounds bounds=part.Bounds;
+            failurePosition=bounds.Center;
             if (!_area.IsBuildable(owner,bounds)) return Fail(ConveyorFailure.OutsideBuildArea,price);
             // Dense bounded samples across actual footprint, including span underside.
             int xSteps=Math.Max(1,(int)MathF.Ceiling((bounds.Maximum.X-bounds.Minimum.X)/.5f));
@@ -560,13 +588,19 @@ public sealed class ConveyorConstructionService
             {
                 foreach(EntityId occupied in entities.Query<VehicleDockSlot>())
                     if(entities.GetComponent<VehicleDockSlot>(occupied).Pose.IntersectsLane(bounds))
+                    {
+                        obstruction=ConveyorObstruction.LoadingLane;
                         return Fail(ConveyorFailure.Obstructed,price);
+                    }
                 foreach(EntityId building in entities.Query<BuildingLoadingDock,WorldTransform>())
                 {
                     var design=WorldTransform.Identity with {Scale=new(3.4f,2.5f,6.8f)};
                     if(VehicleDockPose.TryCreate(entities.GetComponent<BuildingLoadingDock>(building),
                         entities.GetComponent<WorldTransform>(building),design,out var pose) && pose.IntersectsLane(bounds))
+                    {
+                        obstruction=ConveyorObstruction.LoadingLane;
                         return Fail(ConveyorFailure.Obstructed,price);
+                    }
                 }
             }
             _spatial.QueryAabb(bounds,_query,order:SpatialQueryOrder.StableEntityId);
@@ -593,13 +627,19 @@ public sealed class ConveyorConstructionService
                     // Only the explicit terminal adapter may touch its own building.
                     if(part.Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter)continue;
                 }
+                obstruction=entities.HasComponent<ConveyorPiece>(entity)?ConveyorObstruction.Conveyor:
+                    entities.HasComponent<CompletedBuilding>(entity)?ConveyorObstruction.Building:ConveyorObstruction.VehicleOrObject;
                 return Fail(ConveyorFailure.Obstructed,price);
             }
         }
         // Building endpoints require explicit authored sockets, never inferred proximity.
         foreach(var part in pieces.Where(p=>!p.IsSupport && p.Module!=ConveyorModule.Endcap))
             if(!pieces.Any(s=>CanSupport(s,part)) && !existingPieces.Any(s=>CanSupport(s.Piece.Placement,part)))
+            {
+                failurePosition=part.Bounds.Center;
                 return Fail(ConveyorFailure.SupportOnRoad,price);
+            }
+        failurePosition=null;
         if (!PortMatches(request.SourcePortBuilding,false,true) || !PortMatches(request.DestinationPortBuilding,true,false))
             return Fail(ConveyorFailure.PortMismatch,price);
         if (_stock.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel)<price)

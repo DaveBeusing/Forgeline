@@ -59,6 +59,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     public int LastGuidanceVertexCount { get; private set; }
     internal int LastWorldCorners { get; private set; }
     internal int LastWorldMeters { get; private set; }
+    private readonly HudRect[] _worldLabelBounds = new HudRect[64];
+    internal int LastWorldLabels { get; private set; }
 
     public void Render(
         IGraphicsCommandContext context,
@@ -72,7 +74,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         PreAlphaUxView preAlphaUx = default,
         TacticalTargetingView targeting = default,
         TimeSpan presentationTime = default,
-        bool animateNotifications = false)
+        bool animateNotifications = false,
+        DebugDraw? gameplayOverlay = null)
     {
         ThrowIfDisposed();
         _text.Begin();
@@ -86,6 +89,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         LastGuidanceTextSize = 0;
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
+        LastWorldLabels = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -111,7 +115,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale =
             layout.Scale;
 
-        if (preAlphaUx.Mode == PreAlphaUxMode.None) EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
+        if (preAlphaUx.Mode == PreAlphaUxMode.None)
+        {
+            EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
+            EmitGameplayLabels(camera, gameplayOverlay, layout, context.Width, context.Height);
+        }
         if (view.MinimapEnabled)
         {
             RtsMinimapFrame minimap =
@@ -1104,6 +1112,42 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
     }
 
+    private void EmitGameplayLabels(RtsCamera camera, DebugDraw? draw, in GameplayHudLayout layout, int width, int height)
+    {
+        if (draw is not { Enabled: true }) return;
+        float font = 14 * layout.Scale;
+        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
+        if (layout.SafeArea.Width < 16 * layout.Scale || layout.SafeArea.Height < line) return;
+        Span<char> text = stackalloc char[256];
+        foreach (var label in draw.Labels)
+        {
+            if (LastWorldLabels == _worldLabelBounds.Length) break;
+            var point = camera.WorldToScreen(label.Position, width, height);
+            if (!point.IsVisible) continue;
+            float maximumWidth = MathF.Min(400 * layout.Scale, layout.SafeArea.Width);
+            var visible = NotificationText.Ellipsized(label.Text, maximumWidth - 8 * layout.Scale, font, text);
+            float labelWidth = UiFontMetrics.Default.Measure(visible, font) + 8 * layout.Scale;
+            var bounds = new HudRect(Math.Clamp(point.Position.X - labelWidth * .5f, layout.SafeArea.X,
+                layout.SafeArea.Right - labelWidth), point.Position.Y - line, labelWidth, line + 4 * layout.Scale);
+            bool overlaps = false;
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                overlaps = false;
+                for (int i = 0; i < LastWorldLabels; i++) overlaps |= bounds.Intersects(_worldLabelBounds[i]);
+                if (!overlaps) break;
+                bounds = bounds with { Y = bounds.Y - bounds.Height };
+            }
+            if (overlaps || bounds.Y < layout.SafeArea.Y || bounds.Bottom > layout.SafeArea.Bottom ||
+                bounds.Intersects(layout.SecondaryView) || bounds.Intersects(layout.TopStatusBar) ||
+                bounds.Intersects(layout.Minimap) || bounds.Intersects(layout.OnboardingBounds)) continue;
+            _worldLabelBounds[LastWorldLabels++] = bounds;
+            EmitQuad(bounds.X, bounds.Y, bounds.Width, bounds.Height, new(.025f, .035f, .04f, .82f), width, height);
+            var content = bounds with { X = bounds.X + 4 * layout.Scale, Width = bounds.Width - 8 * layout.Scale };
+            if (!_text.AddCentered(visible, content, font, label.Color, width, height))
+                EmitText(visible, content.X, content.Y, content.Right, label.Color, layout.Scale, width, height);
+        }
+    }
+
     private void EmitPlacementHintBar(in PlacementContextFeedbackView placement, in GameplayHudLayout layout,
         int width, int height, TimeSpan now, bool animate)
     {
@@ -1112,12 +1156,13 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         float scale = MathF.Max(.875f, MathF.Min(layout.Scale, state.Panel.Height / 36));
         float font = 14 * scale, padding = 6 * scale;
         float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
-        var bounds = state.Panel with { Height = MathF.Min(state.Panel.Height, line + 2 * padding) };
+        bool conveyor = placement.Title == "CONVEYOR";
+        var bounds = state.Panel with { Height = MathF.Min(state.Panel.Height, line * (conveyor ? 3 : 1) + 2 * padding) };
         if (bounds.IsEmpty) return;
         ulong revision = unchecked((uint)HashCode.Combine(placement.State, placement.Title, placement.Reason, placement.Hint));
         var visual = new NotificationStackLayout(bounds, font, 1,
             new(new(default, Local: true), bounds, default, default, default, false, revision));
-        _placementMotion.Update(visual, placement.SessionId, layout, now, animate);
+        _placementMotion.Update(visual, placement.SessionId, layout, now, animate && !conveyor);
         float opacity = _placementMotion.Opacity(0);
         _guidanceClip = bounds; _text.Clip = bounds; _skin.PanelClip(bounds);
         int vertexStart = _vertexCount;
@@ -1144,17 +1189,33 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         text.Append(placement.Title ?? "");
         text.Append(" / ");
         text.Append(placement.Reason ?? "");
-        text.Append(" / ");
-        text.Append(placement.Hint ?? "");
+        if (!conveyor)
+        {
+            text.Append(" / ");
+            text.Append(placement.Hint ?? "");
+        }
         var content = new HudRect(bounds.X + padding * 2 + iconSize,
-            bounds.Y + (bounds.Height - line) * .5f,
+            conveyor ? bounds.Y + padding : bounds.Y + (bounds.Height - line) * .5f,
             MathF.Max(1, bounds.Width - padding * 3 - iconSize), line);
         Span<char> shortText = stackalloc char[512];
-        var ellipsized = NotificationText.Ellipsized(text.Written, content.Width, font, shortText);
-        if (!_text.AddCentered(ellipsized, content, font,
+        ReadOnlySpan<char> remaining = text.Written;
+        int rows = conveyor ? 3 : 1;
+        for (int row = 0; row < rows; row++)
+        {
+            if (conveyor && row == 2) remaining = placement.Hint.AsSpan();
+            scoped ReadOnlySpan<char> visible;
+            if (conveyor && row == 0)
+            {
+                visible = NotificationText.Line(remaining, content.Width, font, out int consumed);
+                remaining = remaining[consumed..];
+            }
+            else visible = NotificationText.Ellipsized(remaining, content.Width, font, shortText);
+            if (!_text.AddCentered(visible, content, font,
             GameplayHudVisualStyle.TextPrimary with { W = opacity }, width, height))
-            EmitText(ellipsized, content.X, content.Y, content.Right,
+                EmitText(visible, content.X, content.Y, content.Right,
                 GameplayHudVisualStyle.TextPrimary with { W = opacity }, scale, width, height);
+            content = content with { Y = content.Y + line };
+        }
         LastGuidanceVertexCount = _vertexCount - vertexStart;
         _guidanceClip = null; _text.Clip = null;
         _skin.PanelClip(new HudRect(0, 0, width, height));
