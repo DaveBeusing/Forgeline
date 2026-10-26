@@ -1,3 +1,4 @@
+using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Presentation;
 using ForgeLine.UI;
@@ -279,7 +280,7 @@ internal static class FrontendPresentationAdapter
     internal static FrontendSurfaceView Controls(
         RtsCameraBindings bindings,
         string footer = "ESC  BACK",
-        bool edgeScrollEnabled = true, GameplayBindingRegistry? gameplay = null)
+        bool edgeScrollEnabled = true, GameplayBindingRegistry? gameplay = null, bool? developerSessionActive = null)
     {
         ArgumentNullException.ThrowIfNull(bindings);
         gameplay ??= GameplayBindingRegistry.Default;
@@ -316,6 +317,13 @@ internal static class FrontendPresentationAdapter
             new("OPTIONAL GUIDE", "SHIFT + F12"),
             new("WORLD DEBUG", "F2")
         };
+        if (!DeveloperToolsCapability.Current.IsCompiled || developerSessionActive == false) lines.RemoveAll(line => line.Label == "WORLD DEBUG");
+        else
+        {
+            lines.Add(new("RENDER DEBUG", "SHIFT + F2"));
+            lines.Add(new("DEBUG CATEGORIES", "SHIFT + F4-F9"));
+            lines.Add(new("DEVELOPER TOOLS", "PAUSE / DEVELOPER TOOLS"));
+        }
         lines.AddRange(GameplayBindingRegistry.Definitions.Select(definition =>
             new FrontendDetailLineView(definition.Label, gameplay.Prompt(definition.Action))));
         if (RtsCameraFocusController.IsHomeCameraBinding(bindings))

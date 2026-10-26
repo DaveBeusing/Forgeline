@@ -70,7 +70,12 @@ internal sealed class ClientApplication
     private readonly string _settingsPath;
     private readonly StartupDiagnostics _startup;
 
-    internal DeveloperToolsProviders DeveloperTools { get; } = DeveloperToolsComposition.Create();
+    internal DeveloperToolsProviders DeveloperTools { get; private set; } = DeveloperToolsComposition.Create();
+    internal bool DeveloperSessionToolsEnabled { get; set; } = true;
+#if FORGELINE_DEVELOPER_TOOLS
+    internal Func<MatchRuntime, DeveloperToolsProviders>? DeveloperProviderFactory { get; init; }
+    internal Func<MatchRuntime, DeveloperToolsProviders, Func<MatchRuntimeSettings, bool>, IDeveloperMenuBackend?>? DeveloperMenuBackendFactory { get; init; }
+#endif
 
     internal bool DeveloperNavigationDiagnostics { get; }
 
@@ -432,7 +437,7 @@ internal sealed class ClientApplication
             new RtsMinimapInteractionController();
         var debugOverlay =
             new DebugOverlayController();
-        var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperNavigationDiagnostics);
+        var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperNavigationDiagnostics && DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled);
         var gameplayDraw =
             new DebugDraw();
         var debugDraw =
@@ -542,8 +547,21 @@ internal sealed class ClientApplication
         bool formationToggleHeld = false;
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
-        var pauseMenu =
-            new PauseMenuModel();
+#if FORGELINE_DEVELOPER_TOOLS
+        var suppliedDeveloperProviders = DeveloperProviderFactory?.Invoke(scenario) ?? DeveloperToolsComposition.Create();
+        DeveloperTools = new(DeveloperToolsCapability.Current, new DeveloperMenuCatalog(suppliedDeveloperProviders.Menu), suppliedDeveloperProviders.Sessions,
+            suppliedDeveloperProviders.Actions, suppliedDeveloperProviders.Parameters, suppliedDeveloperProviders.Presets);
+        using var developerMenu = new DeveloperMenuController(new(DeveloperTools, debugOverlay,
+            DeveloperMenuBackendFactory?.Invoke(scenario, DeveloperTools, settings =>
+            {
+                if (_pendingRestart.HasValue) return false;
+                settings.Validate();
+                _pendingRestart = ClientSessionRequest.Restart(settings);
+                return true;
+            })));
+#endif
+        bool developerSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
+        var pauseMenu = new PauseMenuModel(developerSessionActive);
         string saveDirectory =
             ResolveSaveDirectory();
         bool restartHeld = false;
@@ -650,6 +668,15 @@ internal sealed class ClientApplication
                 frameElapsed.TotalSeconds,
                 MaximumCameraDeltaSeconds);
 
+            bool nextDeveloperSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
+            if (nextDeveloperSessionActive != developerSessionActive)
+            {
+                developerSessionActive = nextDeveloperSessionActive;
+                navigationDiagnostics = new(DeveloperNavigationDiagnostics && developerSessionActive);
+                debugOverlay.SetEnabled(false);
+                inputState.SuppressHeldInput();
+            }
+            pauseMenu.SetDeveloperToolsAvailable(developerSessionActive);
             bool wasShellBlocking = pauseMenuActive;
             var guidanceLayout = GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
             var inputGuidance = guidance.Update(renderWorld.CurrentSnapshot, true, bindings: _gameplayBindings, layout: guidanceLayout);
@@ -681,7 +708,7 @@ internal sealed class ClientApplication
             UpdateMetricsOverlay(inputState, modalFrame, ref overlayEnabled, ref overlayToggleHeld);
             if (!modalFrame)
             {
-                UpdateDebugOverlayToggles(
+                if (developerSessionActive) UpdateDebugOverlayToggles(
                     inputState,
                     debugOverlay,
                     ref debugMasterToggleHeld,
@@ -717,7 +744,16 @@ internal sealed class ClientApplication
                 }
             }
 
-            bool settingsOwnedFrame = pauseSettings.Visible;
+            bool developerOwnedFrame = false;
+#if FORGELINE_DEVELOPER_TOOLS
+            developerOwnedFrame = developerMenu.Visible;
+            developerMenu.Model.Refresh(DeveloperTools.Capability.BindSession(simulationHost.SessionId, DeveloperSessionToolsEnabled),
+                renderWorld.CurrentSnapshot, selectionController.Selection, scenario.RuntimeSettings.Participants,
+                simulationHost.IsPaused, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
+            developerMenu.Update(inputState, modalLayout, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
+            developerOwnedFrame |= developerMenu.Visible;
+#endif
+            bool settingsOwnedFrame = pauseSettings.Visible || developerOwnedFrame;
             if (pauseSettings.Visible)
             {
                 ClientUserSettings? applied = pauseSettings.Update(inputState, modalLayout,
@@ -729,6 +765,13 @@ internal sealed class ClientApplication
                 }
             }
 
+#if FORGELINE_DEVELOPER_TOOLS
+            if (_pendingRestart.HasValue)
+            {
+                inputState.SuppressHeldInput();
+                return SessionRestartExitCode;
+            }
+#endif
             bool pausePressed =
                 ConsumeKeyPress(
                     inputState,
@@ -913,6 +956,13 @@ internal sealed class ClientApplication
                             pauseMenuFeedback =
                                 string.Empty;
                         }
+#if FORGELINE_DEVELOPER_TOOLS
+                        else if (pauseMenuCommand == PauseMenuCommand.DeveloperTools)
+                        {
+                            developerMenu.Open(inputState);
+                            pauseMenuCommand = null;
+                        }
+#endif
                         else if (pauseMenuCommand == PauseMenuCommand.Settings)
                         {
                             pauseSettings.Open(_settings);
@@ -1030,7 +1080,12 @@ internal sealed class ClientApplication
                 (shouldPauseForWindow ||
                  shellBlocksGameplay);
 
-            if (shouldPauseSimulation !=
+            bool developerOwnsPause = false;
+#if FORGELINE_DEVELOPER_TOOLS
+            developerOwnsPause = developerMenu.Model.OwnsMenuPause;
+            if (developerOwnsPause) simulationPaused = simulationHost.IsPaused;
+#endif
+            if (!developerOwnsPause && shouldPauseSimulation !=
                 simulationPaused)
             {
                 if (!simulationHost.TrySetPaused(
@@ -1117,6 +1172,13 @@ internal sealed class ClientApplication
 
                 if (pauseMenuActive)
                 {
+#if FORGELINE_DEVELOPER_TOOLS
+                    if (developerMenu.Visible)
+                    {
+                        frontendSurface = developerMenu.Surface(modalLayout);
+                    }
+                    else
+#endif
                     if (pauseSettings.Visible)
                     {
                         frontendSurface = pauseSettings.Surface;
@@ -1126,7 +1188,7 @@ internal sealed class ClientApplication
                         FrontendSurfaceView controlsSurface =
                             FrontendPresentationAdapter.Controls(
                                 _settings.CameraBindings,
-                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
+                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings, developerSessionActive: developerSessionActive);
                         FrontendLayout pauseLayout = modalLayout;
                         bool secondaryHovered =
                             inputState.HasPointerPosition &&
@@ -1654,7 +1716,7 @@ internal sealed class ClientApplication
                     currentSnapshot);
 
             NavigationDiagnosticsView navigationView = navigationDiagnostics.Update(
-                window.IsFocused && !window.IsMinimized && !simulationPaused && !modalFrame && !operationsController.View.Open,
+                developerSessionActive && window.IsFocused && !window.IsMinimized && !simulationPaused && !modalFrame && !operationsController.View.Open,
                 inputState.WasKeyPressedWithShift(PlatformKey.F10),
                 inputState.WasKeyPressedWithShift(PlatformKey.F11),
                 inputState.WasKeyPressedWithShift(PlatformKey.F12),
