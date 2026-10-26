@@ -4506,28 +4506,13 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         int matureSupplyTarget =
             configuration.ResolveMatureSupplyTruckTarget(
                 owned.SupplyDepots.Count);
+        // Queued attackers cannot yet use a mature support fleet. Grow that
+        // fleet after the paid core force exists, while the live minimum above
+        // continues to take priority over combat production.
         bool coreAssaultEstablished =
-            GetUnitCount(
-                owned,
-                UnitIds.ScoutVehicle) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.ScoutVehicle) >=
-                1 &&
-            GetUnitCount(
-                owned,
-                UnitIds.MainBattleTank) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.MainBattleTank) >=
-                configuration.MinimumObjectivePressureUnits &&
-            GetUnitCount(
-                owned,
-                UnitIds.MobileArtillery) +
-            GetPendingUnitCount(
-                owned,
-                UnitIds.MobileArtillery) >=
-                1;
+            GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
+            GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
+            GetUnitCount(owned, UnitIds.MobileArtillery) >= 1;
 
         if (coreAssaultEstablished &&
             supplyCount + pendingSupply <
