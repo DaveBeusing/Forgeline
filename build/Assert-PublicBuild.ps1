@@ -10,7 +10,10 @@ foreach ($required in @('ForgeLine.Client.dll', 'ForgeLine.Game.dll')) {
 $context = [System.Runtime.Loader.AssemblyLoadContext]::new("PublicBuild-$([Guid]::NewGuid())", $true)
 try {
     foreach ($file in @(Get-ChildItem -LiteralPath $root -Filter 'ForgeLine.*.dll' -File)) {
-        $assembly = $context.LoadFromAssemblyPath($file.FullName)
+        # Unloading is deferred by the runtime; inspect bytes without retaining a file lock.
+        $stream = [IO.MemoryStream]::new([IO.File]::ReadAllBytes($file.FullName), $false)
+        try { $assembly = $context.LoadFromStream($stream) }
+        finally { $stream.Dispose() }
         $metadata = @($assembly.GetCustomAttributes([System.Reflection.AssemblyMetadataAttribute], $false))
         $variant = @($metadata | Where-Object Key -eq 'BuildVariant')
         $capability = @($metadata | Where-Object Key -eq 'DeveloperToolsEnabled')
