@@ -3809,6 +3809,8 @@ internal sealed class ClientApplication
                 BuildingDemolitionFailure.InsufficientRefundCapacity => "COMMAND CORE NEEDS MORE STORAGE CAPACITY",
                 BuildingDemolitionFailure.ConstructionAlreadyCancelling => "CONSTRUCTION ALREADY CANCELLING",
                 BuildingDemolitionFailure.ProductionActive => "STOP PRODUCTION / RESEARCH FIRST",
+                BuildingDemolitionFailure.ConveyorRemovalRejected =>
+                    RtsConveyorConstructionController.Explain(targets[0].ConveyorFailure),
                 _ => "NO VALID BUILDINGS SELECTED"
             };
             return "DEMOLITION REJECTED - " + explanation;
