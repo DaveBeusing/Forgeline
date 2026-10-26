@@ -2,7 +2,7 @@
 
 ## Scope and source
 
-Starts from master9dd75d9a4133f576e3fe1a2838584e3fa98654a1 with the integrated
+Starts from master 9dd75d9a4133f576e3fe1a2838584e3fa98654a1 with the integrated
 developer foundation, research and logistics changes. The editor subset implements
 13 existing Foundation IDs; it neither expands the shared registry nor defines a
 second request protocol. All implementation files reside below
@@ -162,9 +162,17 @@ navigation, tick-duration and buffer editors remain separate future features.
 
 ## Qualification boundary
 
-Implementation uses only affected Game public/developer compiler paths. Tests,
-smokes and benchmarks are not added or run until the whole implementation is
-finished and scoped acceptance is explicitly opened. The PR records actual source,
-scoped results and required CI. Central persistence/replay/hash integration,
+Implementation used only affected Game compiler paths, with no new tests, test
+runs, smokes or benchmarks before the explicit scoped-acceptance boundary.
+Production source8c995045 then passed the canonical restore/reference checks,
+a complete Release solution build (zero warnings/errors,51.59s),4/4 unchanged
+public flow cases and26/26 developer cases (21 tuning cases plus5 existing raid
+configuration cases), no skips. The developer test build also has zero warnings/
+errors. The4x fixture at10Hz requires40 transfer rounds; the old32-round bound
+cannot satisfy it. Initial reset/retry, inactive/stale/invalid scope, atomic invalid
+profiles and pending-only runtime isolation are included. No existing assertion,
+price, buffer, golden, deadline or gate was weakened. These targeted cases do not
+claim a full production-chain, save/replay, public-package or native campaign.
+The PR records the exact published source and required CI. Central persistence/replay/hash integration,
 menu-driven production chains, full public/developer package exclusion and native
 interaction belong to the combined developer-tools qualification work.
