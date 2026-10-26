@@ -100,9 +100,10 @@ public sealed partial class PredictiveTrafficBatchTests
     }
 
     [Theory]
-    [InlineData(128, false)]
-    [InlineData(120000, true)]
-    public void LocalDetourKeepsTheBindingBudgetAndCheckpointWithoutInventingAReverse(int allowance, bool expectDetour)
+    [InlineData(128, false, 0)]
+    [InlineData(120000, true, 0)]
+    [InlineData(120000, true, 80)]
+    public void LocalDetourKeepsTheBindingBudgetAndCheckpointWithoutInventingAReverse(int allowance, bool expectDetour, int distantBodies)
     {
         var (source, intents) = Crossing();
         var vehicle = source.Vehicles[0] with { Movement = GroundMovementState.Stationary(MathF.PI / 2) };
@@ -113,8 +114,12 @@ public sealed partial class PredictiveTrafficBatchTests
             new(new(18, .5f, 20), Quaternion.Identity), new(.5f), Vector3.Zero);
         var body = new NavigationCollisionBody(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), NavigationObstacleKind.Vehicle,
             vehicle.Pose, vehicle.Profile.HalfExtents, Vector3.Zero);
+        var bodies = new List<NavigationCollisionBody> { body, obstacle };
+        for (int index = 0; index < distantBodies; index++)
+            bodies.Add(new(new(NavigationObstacleSource.Entity, (ulong)(100 + index), 1), NavigationObstacleKind.Structure,
+                new(new(52, .5f, 52), Quaternion.Identity), new(.5f), Vector3.Zero));
         var collision = new NavigationCollisionFrame(source.Collision.World, 50,
-            new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, [body, obstacle], 10);
+            new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, bodies.ToArray(), 128, bodyPosesAreFixed: true);
         var frame = new NavigationTrafficFrame(new(50), collision, true, [vehicle], [], Limits() with { WorkPerSearch = 32768 });
         var planner = new PredictiveTrafficPlanner();
         var geometry = new NavigationVehicleGeometry(collision.World, terrain, 128, .5f);

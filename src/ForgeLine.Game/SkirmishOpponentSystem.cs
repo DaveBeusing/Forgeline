@@ -3458,11 +3458,17 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 (GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks ||
                  GetUnitCount(owned, UnitIds.ScoutVehicle) < 1 ||
                  GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits);
+            long initialInfantry = Math.Max(1,
+                configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
+            // A light raid must leave its configured defenders at home. Funding
+            // only the main assault complement can strand the final paid squad.
+            if (configuration.Raids.Enabled)
+                initialInfantry = Math.Max(initialInfantry,
+                    (long)configuration.Raids.MinimumUnits + configuration.Raids.HomeDefenders);
             bool formingInitialForce = plannedUnit == UnitIds.RifleSquad &&
                 facility.Status == UnitProductionStatus.NoInput &&
                 context.Entities.TryGetComponent(entity, out PowerConsumer productionPower) && productionPower.State == PowerOperationalState.Powered &&
-                GetUnitCount(owned, UnitIds.RifleSquad) < Math.Max(1,
-                    configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
+                GetUnitCount(owned, UnitIds.RifleSquad) < initialInfantry;
             LogisticsStockPriority productionPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||

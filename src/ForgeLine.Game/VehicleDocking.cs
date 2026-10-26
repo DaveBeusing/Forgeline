@@ -451,7 +451,8 @@ public sealed partial class VehicleDockingService
             entities.RemoveComponent<VehicleDockVisit>(truck);
             return true;
         }
-        if (!LaneClear(entities, visit.Building, truck, visit.Pose))
+        Vector3 departureFrom = entities.GetComponent<WorldTransform>(truck).Position;
+        if (!LaneClear(entities, visit.Building, truck, visit.Pose, departureFrom))
         {
             StopDockMotion(entities, truck);
             Put(entities, truck, visit with { Status = VehicleDockStatus.Exiting, Reason = VehicleDockBlockReason.ExitBlocked });
@@ -691,7 +692,7 @@ public sealed partial class VehicleDockingService
         return true;
     }
 
-    private bool LaneClear(EntityRegistry entities, EntityId building, EntityId truck, in VehicleDockPose pose)
+    private bool LaneClear(EntityRegistry entities, EntityId building, EntityId truck, in VehicleDockPose pose, Vector3? departureFrom = null)
     {
         var bounds = pose.CorridorBounds;
         Vector3 minimum = bounds.Minimum;
@@ -720,6 +721,16 @@ public sealed partial class VehicleDockingService
                     Vector3 half = new(MathF.Abs(right.X) * transform.Scale.X * 0.5f + MathF.Abs(forward.X) * transform.Scale.Z * 0.5f,
                         transform.Scale.Y * 0.5f, MathF.Abs(right.Z) * transform.Scale.X * 0.5f + MathF.Abs(forward.Z) * transform.Scale.Z * 0.5f);
                     obstacle = new(transform.Position - half, transform.Position + half);
+                }
+                if (departureFrom is Vector3 departing)
+                {
+                    // An exiting owner moves only forward along the dock and then outward.
+                    // An obstacle wholly behind its centre cannot block the remaining lane.
+                    // GroundMovement still sweeps every actual translation and rotation.
+                    Vector3 forward = new(MathF.Sin(pose.Heading), 0, MathF.Cos(pose.Heading));
+                    float maximumAlong = Vector3.Dot(obstacle.Center - departing, forward) +
+                        MathF.Abs(forward.X) * obstacle.Extents.X + MathF.Abs(forward.Z) * obstacle.Extents.Z;
+                    if (maximumAlong < 0) continue;
                 }
                 if (pose.IntersectsLane(obstacle)) return false;
             }

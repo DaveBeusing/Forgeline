@@ -10,7 +10,7 @@ namespace ForgeLine.Navigation;
 /// </summary>
 public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 {
-    public const int AlgorithmRevision = 4;
+    public const int AlgorithmRevision = 5;
 
     private readonly NavigationWorldSnapshot _snapshot;
     private readonly NavigationTerrainEnvelope _terrain;
@@ -95,6 +95,47 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         if (!double.IsFinite(intervals) || !float.IsFinite((float)radius))
             return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
 
+        IReadOnlyList<NavigationCollisionBody> candidates = frame.Bodies;
+        if (movement.PrefilterFixedBodies && frame.BodyPosesAreFixed)
+        {
+            // Union the exact interval envelopes before scanning fixed bodies. A
+            // remote body is charged once rather than once per terrain interval.
+            // Keep the original interval checks and every nearby physical veto.
+            Vector3 minimum = new(float.PositiveInfinity), maximum = new(float.NegativeInfinity);
+            float previous = 0;
+            for (int interval = 0; interval < _maximumSweepIntervals && interval < intervals; interval++)
+            {
+                if (!work.TrySpend())
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                float fraction = (float)Math.Min(1, (interval + 1.0) / intervals);
+                if (fraction <= previous)
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                var envelope = Enclose(movement, startRotation, endRotation, angle, radius, previous, fraction);
+                envelope = envelope with { HalfExtents = envelope.HalfExtents + new Vector3(movement.Vehicle.ClearanceMeters) };
+                if (!Finite(envelope.Center) || !Finite(envelope.HalfExtents) || !FiniteBounds(envelope))
+                    return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+                var bounds = envelope.Bounds;
+                minimum = Vector3.Min(minimum, bounds.Minimum);
+                maximum = Vector3.Max(maximum, bounds.Maximum);
+                previous = fraction;
+            }
+            var relevant = new List<NavigationCollisionBody>();
+            foreach (var body in frame.Bodies)
+            {
+                if (!work.TrySpend())
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                if (body.Identity == movement.Mover) continue;
+                if (!TryObstacleEnvelope(body, true, movement.DurationSeconds, 0, 1, out var obstacle))
+                    return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+                var bounds = obstacle.Bounds;
+                if (bounds.Maximum.X < minimum.X || bounds.Minimum.X > maximum.X ||
+                    bounds.Maximum.Y < minimum.Y || bounds.Minimum.Y > maximum.Y ||
+                    bounds.Maximum.Z < minimum.Z || bounds.Minimum.Z > maximum.Z) continue;
+                relevant.Add(body);
+            }
+            candidates = relevant;
+        }
+
         float approved = 0;
         for (int interval = 0; interval < _maximumSweepIntervals && interval < intervals; interval++)
         {
@@ -119,7 +160,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 
             NavigationObstacleIdentity? blocker = null;
             NavigationBlockReason blockReason = NavigationBlockReason.None;
-            foreach (NavigationCollisionBody body in frame.Bodies)
+            foreach (NavigationCollisionBody body in candidates)
             {
                 if (!work.TrySpend())
                     return Result(frame, NavigationGeometryStatus.BudgetExhausted, approved, NavigationBlockReason.SearchWork, null, work);

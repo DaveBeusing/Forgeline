@@ -7,9 +7,11 @@ namespace ForgeLine.Navigation.Tests;
 public sealed class SweptEndpointContinuityTests
 {
     [Theory]
-    [InlineData(0, false)]
-    [InlineData(.002f, true)]
-    public void RoundedSweepCannotAdmitAnEndpointThatTheNextFixedPoseQueryBlocks(float extraGap, bool clear)
+    [InlineData(0, false, false)]
+    [InlineData(.002f, true, false)]
+    [InlineData(0, false, true)]
+    [InlineData(.002f, true, true)]
+    public void RoundedSweepCannotAdmitAnEndpointThatTheNextFixedPoseQueryBlocks(float extraGap, bool clear, bool prefilter)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };
         var terrain = new TerrainWorld(settings, [new TerrainChunk(new(8, 24), new TerrainHeightfield(17, 64, new float[289]))]);
@@ -28,7 +30,7 @@ public sealed class SweptEndpointContinuityTests
         var obstacle = new NavigationCollisionBody(new(NavigationObstacleSource.Entity, 1, 1), NavigationObstacleKind.Vehicle,
             scout, scoutHalf, Vector3.Zero);
         var frame = new NavigationCollisionFrame(snapshot, 1, coverage, true, [obstacle], 4, bodyPosesAreFixed: true);
-        var sweep = new NavigationSweep(new(NavigationObstacleSource.Entity, 2, 1), start, end, profile, .05f);
+        var sweep = new NavigationSweep(new(NavigationObstacleSource.Entity, 2, 1), start, end, profile, .05f, PrefilterFixedBodies: prefilter);
         Assert.Equal(NavigationGeometryStatus.Clear, geometry.Sweep(frame, sweep with { End = start }, 10000).Status);
         var result = geometry.Sweep(frame, sweep, 10000);
         Assert.Equal(clear ? NavigationGeometryStatus.Clear : NavigationGeometryStatus.Blocked, result.Status);
@@ -37,7 +39,7 @@ public sealed class SweptEndpointContinuityTests
             [obstacle with { Identity = new(NavigationObstacleSource.Entity, 2, 1), Pose = end, HalfExtents = supplyHalf }],
             4, bodyPosesAreFixed: true);
         var peer = geometry.Sweep(opposite, new(new(NavigationObstacleSource.Entity, 1, 1), scout, scout,
-            profile with { HalfExtents = scoutHalf }, 0), 10000);
+            profile with { HalfExtents = scoutHalf }, 0, PrefilterFixedBodies: prefilter), 10000);
         Assert.Equal(clear ? NavigationGeometryStatus.Clear : NavigationGeometryStatus.Blocked, next.Status);
         Assert.Equal(next.Status, peer.Status);
     }

@@ -11,7 +11,8 @@ internal sealed partial class PredictiveTrafficPlanner
     private int FindRecoveries(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
         Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationBlockReason[] waits,
         EntityId[] waitingFor, INavigationGeometryQuery geometry, IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases,
-        int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits)
+        int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
+        Vector3?[] forwardTargets, float[] speedCaps, NavigationBlockReason[] hazards)
     {
         int consumed = 0;
         var physicalCycles = new Dictionary<EntityId, EntityId>();
@@ -93,6 +94,25 @@ internal sealed partial class PredictiveTrafficPlanner
                   waits[i] == NavigationBlockReason.ReservedCorridor &&
                   physicalCycles.TryGetValue(waitingFor[i], out var physicallyWaitingFor) &&
                   physicallyWaitingFor == intents[i].Binding.Requester)) continue;
+            // The precise owner is physically blocked by this coarse waiter.
+            // A checked forward prefix can clear that owner even when the root's
+            // planned turn would enter its reservation. Do not replace the root.
+            if (waits[i] == NavigationBlockReason.ReservedCorridor &&
+                physicalCycles.TryGetValue(waitingFor[i], out var opposite) && opposite == intents[i].Binding.Requester)
+            {
+                int forwardWork = ForwardClearance(frame, vehicles[intents[i].Binding.Requester], intents[i],
+                    geometry, leases, allowance - consumed, out bool clear, out Vector3 forwardTarget);
+                if (forwardWork < 0) return -1;
+                consumed += forwardWork;
+                if (clear)
+                {
+                    forwardTargets[i] = forwardTarget;
+                    speedCaps[i] = MathF.Min(1, intents[i].MaximumSpeed);
+                    hazards[i] = NavigationBlockReason.MovingVehicle;
+                    waits[i] = NavigationBlockReason.None;
+                    continue;
+                }
+            }
             _ = TryTargets(i);
             if (consumed == allowance && targets[i] is null) return -1;
         }

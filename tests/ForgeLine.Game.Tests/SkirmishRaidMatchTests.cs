@@ -93,13 +93,18 @@ public sealed class SkirmishRaidMatchTests
                         west = entities.GetComponent<WorldTransform>(result.CommandCore).Position;
                     }
                     else
+                    {
+                        int parkedTruck = 0;
                         foreach (var unit in result.StartingUnits)
                             if (entities.GetComponent<UnitIdentity>(unit).UnitId == UnitIds.CargoTruck)
                             {
-                                entities.SetComponent(unit, new WorldTransform(west + new Vector3(600, 0, 0), Quaternion.Identity, Vector3.One));
+                                // The two exposed targets must start as separate physical bodies.
+                                // Stacking them makes ordinary collision admission reject either move.
+                                entities.SetComponent(unit, new WorldTransform(west + new Vector3(600, 0, parkedTruck++ * 12), Quaternion.Identity, Vector3.One));
                                 Assert.True(inventories.Transfer(result.StartingInventory,
                                     entities.GetComponent<CargoTransport>(unit).CargoInventory, ResourceIds.Fuel, 20).Succeeded);
                             }
+                    }
                     return result;
                 }
             };

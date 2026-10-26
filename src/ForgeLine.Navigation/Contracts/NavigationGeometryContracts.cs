@@ -78,7 +78,7 @@ public enum NavigationBlockReason : byte
 }
 public readonly record struct NavigationSweep(
     NavigationObstacleIdentity Mover, NavigationPose Start, NavigationPose End,
-    NavigationVehicleProfile Vehicle, float DurationSeconds);
+    NavigationVehicleProfile Vehicle, float DurationSeconds, bool PrefilterFixedBodies = false);
 public readonly record struct NavigationSweepResult(
     NavigationGeometryStatus Status, NavigationSnapshotRevision Revision, ulong FrameTick,
     float AllowedFraction, NavigationBlockReason Reason, NavigationObstacleIdentity? Blocker, int WorkConsumed);

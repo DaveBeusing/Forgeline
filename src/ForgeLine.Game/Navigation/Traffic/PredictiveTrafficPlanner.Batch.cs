@@ -289,7 +289,7 @@ internal sealed partial class PredictiveTrafficPlanner
                         result.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
                     {
                         int forwardWork = ForwardClearance(frame, vehicles[ordered[i].Binding.Requester],
-                            ordered[i], geometry, passagePlan.Leases, workAllowance - workConsumed, out bool clearForward);
+                            ordered[i], geometry, passagePlan.Leases, workAllowance - workConsumed, out bool clearForward, out _);
                         if (forwardWork < 0) { workConsumed = workAllowance; return Unavailable(NavigationBlockReason.SearchWork); }
                         workConsumed += forwardWork;
                         if (clearForward)
@@ -349,7 +349,7 @@ internal sealed partial class PredictiveTrafficPlanner
         // accepted reverse step again. No lateral displacement is ever authorized here.
         var recovery = new Vector3?[ordered.Length];
         var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry, passagePlan.Leases,
-            workAllowance - workConsumed, recovery, physicalWaits);
+            workAllowance - workConsumed, recovery, physicalWaits, localTargets, speedCaps, hazards);
         if (recoveryWork < 0)
         {
             workConsumed = workAllowance;
