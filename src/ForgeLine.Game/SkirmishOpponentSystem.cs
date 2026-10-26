@@ -4890,7 +4890,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     out InventoryStorage storage) ||
                 !_inventories.Contains(
                     storage.InventoryId) ||
-                !CanPay(
+                !SkirmishConstructionFunding.CanPay(context.Entities, _inventories, _units, entity,
                     storage.InventoryId,
                     definition))
             {
@@ -4911,7 +4911,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 out InventoryStorage preferredStorage) &&
             _inventories.Contains(
                 preferredStorage.InventoryId) &&
-            CanPay(
+            SkirmishConstructionFunding.CanPay(context.Entities, _inventories, _units, controller.PreferredConstructionSource,
                 preferredStorage.InventoryId,
                 definition))
         {
@@ -4935,29 +4935,6 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                         candidate.Entity)
                 .First()
                 .Entity;
-        return true;
-    }
-
-    private bool CanPay(
-        InventoryId inventory,
-        BuildingDefinition definition)
-    {
-        for (int index = 0;
-             index < definition.Costs.Count;
-             index++)
-        {
-            BuildingResourceCost cost =
-                definition.Costs[index];
-
-            if (_inventories.GetAvailableQuantity(
-                    inventory,
-                    cost.ResourceId) <
-                cost.Quantity)
-            {
-                return false;
-            }
-        }
-
         return true;
     }
 
