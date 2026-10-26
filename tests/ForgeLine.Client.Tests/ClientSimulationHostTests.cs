@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ForgeLine.Client.Tests;
 
-public sealed class ClientSimulationHostTests
+public sealed partial class ClientSimulationHostTests
 {
     [Fact]
     public void ResumeStartsAFullActiveIntervalAndRepeatedResumeDoesNotPostponeIt()

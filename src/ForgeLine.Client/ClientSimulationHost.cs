@@ -28,7 +28,7 @@ internal readonly record struct ClientSubmissionCompletion(
         Receipt?.Accepted == true;
 }
 
-internal sealed class ClientSimulationHost : IDisposable
+internal sealed partial class ClientSimulationHost : IDisposable
 {
     private const int DefaultBoundaryCapacity = 256;
     private const int MaximumCatchUpTicks = 5;
@@ -68,7 +68,8 @@ internal sealed class ClientSimulationHost : IDisposable
         PresentationSnapshotBuffer snapshots,
         int boundaryCapacity = DefaultBoundaryCapacity,
         bool asynchronousStartup = false,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        DeveloperSessionAccess? developerAccess = null)
     {
         _scenario =
             scenario ??
@@ -99,6 +100,7 @@ internal sealed class ClientSimulationHost : IDisposable
         _time = timeProvider ?? TimeProvider.System;
         _matchStateEntity =
             scenario.BattlefieldRuntime.MatchStateEntity;
+        InitializeSessionControls(developerAccess);
 
         _thread =
             new Thread(SimulationLoop)
@@ -139,6 +141,7 @@ internal sealed class ClientSimulationHost : IDisposable
     {
         _simulation.AdvanceOneTick();
         Interlocked.Increment(ref _completedTicks);
+        _lastCompletedTick = _simulation.CurrentTick;
     }
 
     public bool IsTerminalFrozen =>
@@ -150,10 +153,12 @@ internal sealed class ClientSimulationHost : IDisposable
         {
             lock (_boundaryGate)
             {
-                return
+                int count =
                     _queuedCount +
                     _inFlightSubmissions +
                     _completionCount;
+                AddDeveloperOutstanding(ref count);
+                return count;
             }
         }
     }
@@ -485,14 +490,9 @@ internal sealed class ClientSimulationHost : IDisposable
     {
         try
         {
-            AdvanceOneTick();
+            InitializeOwnerSnapshot();
             NotifyProgress();
             UpdateTerminalState();
-
-            _nextTickAt =
-                _time.GetTimestamp() +
-                ToHostTicks(
-                    _simulation.Clock.TickDuration);
 
             _started.Set();
             NotifyProgress();
@@ -506,7 +506,11 @@ internal sealed class ClientSimulationHost : IDisposable
                     break;
                 }
 
-                if (IsPaused ||
+                bool stepped = false;
+                ProcessDeveloperStep(ref stepped);
+                if (stepped) continue;
+
+                if (IsPaused || _pauseReasons != ClientSimulationPauseReason.None ||
                     IsTerminalFrozen)
                 {
                     _signal.WaitOne(
@@ -537,13 +541,14 @@ internal sealed class ClientSimulationHost : IDisposable
                        catchUpTicks <
                        MaximumCatchUpTicks &&
                        !IsPaused &&
+                       _pauseReasons == ClientSimulationPauseReason.None &&
                        !IsTerminalFrozen &&
                        Volatile.Read(ref _stopping) == 0)
                 {
                     DrainMessages();
                     now = _time.GetTimestamp();
 
-                    if (IsPaused ||
+                    if (IsPaused || _pauseReasons != ClientSimulationPauseReason.None ||
                         IsTerminalFrozen ||
                         Volatile.Read(ref _stopping) != 0 ||
                         now < _nextTickAt)
@@ -552,13 +557,13 @@ internal sealed class ClientSimulationHost : IDisposable
                     }
 
                     AdvanceOneTick();
+                    _pacedCompletedTicks++;
                     NotifyProgress();
                     UpdateTerminalState();
+                    PublishControlStatus();
 
                     catchUpTicks++;
-                    _nextTickAt +=
-                        ToHostTicks(
-                            _simulation.Clock.TickDuration);
+                    _nextTickAt = checked(_nextTickAt + PacingIntervalTicks());
                     now =
                         _time.GetTimestamp();
                 }
@@ -567,10 +572,7 @@ internal sealed class ClientSimulationHost : IDisposable
                         MaximumCatchUpTicks &&
                     now >= _nextTickAt)
                 {
-                    _nextTickAt =
-                        now +
-                        ToHostTicks(
-                            _simulation.Clock.TickDuration);
+                    _nextTickAt = checked(now + PacingIntervalTicks());
                 }
             }
         }
@@ -591,15 +593,25 @@ internal sealed class ClientSimulationHost : IDisposable
             {
                 Volatile.Write(ref _stopping, 1);
             }
+            try { StopDeveloperControls(_failure is not null); }
+            catch (Exception exception)
+            {
+                Interlocked.CompareExchange(ref _failure, ExceptionDispatchInfo.Capture(exception), null);
+                _faulted.Set();
+            }
             RejectRemainingSubmissions(
                 _failure is null ? ClientSubmissionFailure.Stopping : ClientSubmissionFailure.Faulted);
+            PublishControlStatus();
             NotifyProgress();
         }
     }
 
     private void DrainMessages()
     {
-        while (_messages.TryDequeue(
+        DrainPauseOwners();
+        DrainDeveloperAccess();
+        int budget = _capacity;
+        while (budget-- > 0 && _messages.TryDequeue(
                    out HostMessage message))
         {
             lock (_boundaryGate)
@@ -611,6 +623,7 @@ internal sealed class ClientSimulationHost : IDisposable
                 {
                     _inFlightSubmissions++;
                 }
+                DeveloperMessageDequeued(message);
             }
 
             switch (message.Kind)
@@ -641,8 +654,11 @@ internal sealed class ClientSimulationHost : IDisposable
                     break;
 
                 default:
-                    throw new InvalidOperationException(
+                    bool handled = false;
+                    ProcessDeveloperMessage(message, ref handled);
+                    if (!handled) throw new InvalidOperationException(
                         $"Unsupported simulation host message '{message.Kind}'.");
+                    break;
             }
         }
     }
@@ -692,33 +708,8 @@ internal sealed class ClientSimulationHost : IDisposable
 
     private void ProcessPauseChange(bool paused)
     {
-        if (IsTerminalFrozen)
-        {
-            return;
-        }
-
-        bool wasPaused = IsPaused;
-        var command =
-            new SetMatchPausedCommand(
-                _matchStateEntity,
-                paused);
-        _simulation.ExecuteControlCommand(
-            command);
-
-        if (!command.Accepted)
-        {
-            return;
-        }
-
-        // A real resume starts a full active tick interval. Discard any partial
-        // pre-pause interval without creating simulation debt or replay inputs.
-        if (wasPaused && !paused)
-            _nextTickAt = _time.GetTimestamp() + ToHostTicks(_simulation.Clock.TickDuration);
-
-        Volatile.Write(
-            ref _paused,
-            paused ? 1 : 0);
-        NotifyProgress();
+        ApplyPauseReasons(paused ? _pauseReasons | ClientSimulationPauseReason.Legacy :
+            _pauseReasons & ~ClientSimulationPauseReason.Legacy);
     }
 
     private void ProcessTerminalAcknowledgement(
@@ -767,6 +758,7 @@ internal sealed class ClientSimulationHost : IDisposable
         AdvanceOneTick();
         NotifyProgress();
         UpdateTerminalState();
+        PublishControlStatus();
     }
 
     private void UpdateTerminalState()
@@ -793,6 +785,7 @@ internal sealed class ClientSimulationHost : IDisposable
 
         if (previous != value)
         {
+            PublishControlStatus();
             NotifyProgress();
         }
     }
@@ -816,10 +809,7 @@ internal sealed class ClientSimulationHost : IDisposable
             {
                 return false;
             }
-            if (_queuedCount +
-                _inFlightSubmissions +
-                _completionCount >=
-                _capacity)
+            if (OutstandingHostMessages >= _capacity)
             {
                 return false;
             }
@@ -867,6 +857,7 @@ internal sealed class ClientSimulationHost : IDisposable
                 {
                     _inFlightSubmissions++;
                 }
+                DeveloperMessageDequeued(message);
             }
 
             if (message.Kind ==
@@ -877,6 +868,7 @@ internal sealed class ClientSimulationHost : IDisposable
                     failure,
                     receipt: null);
             }
+            else RejectDeveloperMessage(message, failure);
         }
     }
 
@@ -928,13 +920,6 @@ internal sealed class ClientSimulationHost : IDisposable
     private static TimeSpan StopwatchElapsed(long start, long end) =>
         TimeSpan.FromSeconds((end - start) / (double)Stopwatch.Frequency);
 
-    private long ToHostTicks(
-        TimeSpan duration) =>
-        checked(
-            (long)Math.Ceiling(
-                duration.TotalSeconds *
-                _time.TimestampFrequency));
-
     private TimeSpan HostElapsed(
         long start,
         long end) =>
@@ -955,7 +940,9 @@ internal sealed class ClientSimulationHost : IDisposable
         Pause = 2,
         Resume = 3,
         AcknowledgeTerminal = 4,
-        SmokeCompletion = 5
+        SmokeCompletion = 5,
+        DeveloperControl = 6,
+        DeveloperMenuTransfer = 7
     }
 
     private readonly record struct HostMessage(
@@ -965,7 +952,9 @@ internal sealed class ClientSimulationHost : IDisposable
         Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt>? Submission,
         PlayerId Issuer,
         SimulationTick ObservedTick,
-        EntityId SmokeCommandCore)
+        EntityId SmokeCommandCore,
+        DeveloperSessionAccess? DeveloperPermission = null,
+        DeveloperRequest? DeveloperRequest = null)
     {
         public static HostMessage CreateSubmission(
             ulong sequence,
