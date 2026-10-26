@@ -108,8 +108,8 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
             case PlayerActionPanelMode.Construction: id = actions.Construction[index].BuildingId.Value; break;
             case PlayerActionPanelMode.Production:
                 var production = actions.Production!;
-                if (index < production.Recipes.Count) { id = production.Recipes[index].RecipeId.Value; break; }
-                var request = production.Requests[index - production.Recipes.Count].RequestEntity;
+                if (index < production.QueueRecipes.Count) { id = production.QueueRecipes[index].RecipeId.Value; break; }
+                var request = production.Requests[index - production.QueueRecipes.Count].RequestEntity;
                 return new(2, request.Index, request.Generation);
             case PlayerActionPanelMode.UnitProduction:
                 var units = actions.UnitProduction!;

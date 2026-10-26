@@ -137,7 +137,7 @@ internal static class PlayerActionDockHudModel
                 }
 
                 return index <
-                    production.Recipes.Count
+                    production.QueueRecipes.Count
                     ? RtsUiIcon.BuildingProcessing
                     : RtsUiIcon.StatusAlert;
 
@@ -248,14 +248,14 @@ internal static class PlayerActionDockHudModel
                 }
 
                 if (index <
-                    production.Recipes.Count)
+                    production.QueueRecipes.Count)
                 {
-                    return production.Recipes[index].DisplayName;
+                    return production.QueueRecipes[index].DisplayName;
                 }
 
                 int productionRequestIndex =
                     index -
-                    production.Recipes.Count;
+                    production.QueueRecipes.Count;
 
                 return productionRequestIndex >= 0 &&
                        productionRequestIndex <
@@ -385,16 +385,16 @@ internal static class PlayerActionDockHudModel
                 }
 
                 if (index <
-                    production.Recipes.Count)
+                    production.QueueRecipes.Count)
                 {
-                    return production.Recipes[index].HasInputs
+                    return production.QueueRecipes[index].HasInputs
                         ? PlayerActionDockItemState.Enabled
                         : PlayerActionDockItemState.Disabled(
                             "MISSING INPUT");
                 }
 
                 return index <
-                       production.Recipes.Count +
+                       production.QueueRecipes.Count +
                        production.Requests.Count
                     ? PlayerActionDockItemState.Enabled
                     : PlayerActionDockItemState.Disabled(
@@ -536,9 +536,9 @@ internal static class PlayerActionDockHudModel
         mode switch
         {
             PlayerActionPanelMode.Construction => "PLACE",
-            PlayerActionPanelMode.Production when actions?.Production is { } production && index >= production.Recipes.Count &&
-                index - production.Recipes.Count < production.Requests.Count =>
-                production.Requests[index - production.Recipes.Count].Paused ? "RESUME" : "PAUSE",
+            PlayerActionPanelMode.Production when actions?.Production is { } production && index >= production.QueueRecipes.Count &&
+                index - production.QueueRecipes.Count < production.Requests.Count =>
+                production.Requests[index - production.QueueRecipes.Count].Paused ? "RESUME" : "PAUSE",
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.OrderStartIndex => "VIEW ORDER",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
@@ -568,9 +568,9 @@ internal static class PlayerActionDockHudModel
         {
             int requestIndex =
                 index -
-                production.Recipes.Count;
+                production.QueueRecipes.Count;
 
-            return requestIndex >= 0 &&
+            return !production.IsAutomatic && requestIndex >= 0 &&
                    requestIndex <
                        production.Requests.Count;
         }
@@ -611,7 +611,7 @@ internal static class PlayerActionDockHudModel
         mode switch
         {
             PlayerActionPanelMode.Production =>
-                actions?.Production is not null,
+                actions?.Production is { IsAutomatic: false },
             PlayerActionPanelMode.UnitProduction =>
                 actions?.UnitProduction is not null,
             PlayerActionPanelMode.Logistics =>
@@ -628,7 +628,7 @@ internal static class PlayerActionDockHudModel
         mode switch
         {
             PlayerActionPanelMode.Production =>
-                actions?.Production is not null,
+                actions?.Production is { IsAutomatic: false },
             PlayerActionPanelMode.Logistics =>
                 actions?.Logistics is not null,
             PlayerActionPanelMode.Supply =>
@@ -657,9 +657,9 @@ internal static class PlayerActionDockHudModel
             actions.Production is
                 PlayerProductionFacilityActionReadModel production &&
             index <
-                production.Recipes.Count)
+                production.QueueRecipes.Count)
         {
-            return production.Recipes[index]
+            return production.QueueRecipes[index]
                 .Outputs.Count >
                 0;
         }

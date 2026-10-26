@@ -10,6 +10,7 @@ public sealed class ProductionSystem : ISimulationSystem
 
     private readonly ProductionRecipeCatalog _recipes;
     private readonly InventoryStore _inventories;
+    private readonly bool _automaticProcessing;
     private readonly List<EntityId> _requestEntities = new();
     private readonly List<EntityId> _facilityEntities = new();
     private readonly List<ProductionFacilityReadModel> _readModels = new();
@@ -20,10 +21,12 @@ public sealed class ProductionSystem : ISimulationSystem
 
     public ProductionSystem(
         ProductionRecipeCatalog recipes,
-        InventoryStore inventories)
+        InventoryStore inventories,
+        bool automaticProcessing = false)
     {
         _recipes = recipes ?? throw new ArgumentNullException(nameof(recipes));
         _inventories = inventories ?? throw new ArgumentNullException(nameof(inventories));
+        _automaticProcessing = automaticProcessing;
     }
 
     public SimulationPhase Phase => SimulationPhase.Production;
@@ -241,6 +244,8 @@ public sealed class ProductionSystem : ISimulationSystem
             return;
         }
 
+        EnsureAutomaticRequest(context, facilityEntity, in facility);
+
         if (facility.ActiveRequest.IsValid)
         {
             if (!context.Entities.TryGetComponent(
@@ -316,6 +321,33 @@ public sealed class ProductionSystem : ISimulationSystem
             requestEntity,
             in request,
             recipe);
+    }
+
+    private void EnsureAutomaticRequest(SimulationContext context, EntityId facilityEntity, in ProductionFacility facility)
+    {
+        RecipeId recipe = _automaticProcessing ? AutomaticProcessing.RecipeFor(facility.Capabilities) : RecipeId.None;
+        if (!recipe.IsSpecified || !_recipes.TryGet(recipe, out _)) return;
+        if (facility.ActiveRequest.IsValid &&
+            context.Entities.TryGetComponent(facility.ActiveRequest, out ProductionRequest active) &&
+            active.Facility == facilityEntity && active.RecipeId == recipe && active.Mode == ProductionRequestMode.Repeat)
+            return;
+
+        bool found = false;
+        foreach (EntityId entity in _requestEntities)
+        {
+            if (!context.Entities.TryGetComponent(entity, out ProductionRequest request) ||
+                request.Facility != facilityEntity || request.RecipeId != recipe) continue;
+            found = true;
+            // Reuse legacy saved/queued work without resetting reservations, progress or explicit pauses.
+            if (request.Mode != ProductionRequestMode.Repeat)
+                context.Entities.SetComponent(entity, new ProductionRequest(facilityEntity, recipe, request.Priority,
+                    ProductionRequestMode.Repeat, request.SubmittedAtTick, paused: request.Paused));
+        }
+        if (found) return;
+
+        var command = new QueueProductionCommand(facilityEntity, recipe, context.Tick, mode: ProductionRequestMode.Repeat);
+        command.Execute(context);
+        if (command.Accepted) _requestEntities.Add(command.RequestEntity);
     }
 
     private bool TrySelectRequest(

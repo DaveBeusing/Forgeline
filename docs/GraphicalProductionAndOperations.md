@@ -1,5 +1,7 @@
 # Graphical production and operations interface
 
+Smelters, Refineries and Electronics Plants now process local raw materials automatically while powered and able to store output. Their action rings and contextual commands omit PROCESS, and its shortcut does not open a redundant production panel. Inspect their state and configure actual material deliveries through LOGISTICS and Operations. Other production facilities retain their existing order controls. See [industrial production](IndustrialProduction.md#automatic-raw-material-processing-in-matches).
+
 The current context and alert presentation uses separate bounded rows: a left placement-status hint (current/stale/pending/invalid/materials) and the right notification stack. Both use independent 0.30-opacity backgrounds, centered single-line content and 180 ms presentation-time easing; existing notification actions continue to access Operations and complete authorized details. The previous tall placement guidance panel is not a background hit target. Onboarding controls, authoritative alert severity, lifecycle, facility actions and request boundaries remain unchanged. Qualification evidence for previous layouts remains historical; current-source DPI and physical-monitor visual review is required.
 
 Current multi-selection controls use the shared [group action ring](GroupActionMenus.md). Rectangular group controls below describe historical parity; the inspector now retains read-only facts and exact command results.

@@ -156,9 +156,9 @@ internal static class HoverTooltipResolver
                     costs = actions.Construction[index].Costs;
                     requirement = actions.Construction[index].RequiresResourceDeposit ? "REQUIRES RESOURCE DEPOSIT" : string.Empty;
                     break;
-                case PlayerActionPanelMode.Production when actions.Production is { } production && index < production.Recipes.Count:
-                    costs = production.Recipes[index].Inputs;
-                    outputs = production.Recipes[index].Outputs;
+                case PlayerActionPanelMode.Production when actions.Production is { } production && index < production.QueueRecipes.Count:
+                    costs = production.QueueRecipes[index].Inputs;
+                    outputs = production.QueueRecipes[index].Outputs;
                     break;
                 case PlayerActionPanelMode.UnitProduction when actions.UnitProduction is { } units && index < units.Units.Count:
                     costs = units.Units[index].Costs;

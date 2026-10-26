@@ -13,9 +13,9 @@ internal readonly record struct EconomicCardVisual(UiSkinState State, string Lab
         if (actions is null || index < 0) return new(UiSkinState.Disabled, "NO DATA");
         // An in-flight command never declares work started or completed.
         if (pending || actions.PendingCommandCount > 0) return new(UiSkinState.Pending, "REQUEST PENDING");
-        if (mode == PlayerActionPanelMode.Production && actions.Production is { } p && index >= p.Recipes.Count && index < p.Recipes.Count + p.Requests.Count)
+        if (mode == PlayerActionPanelMode.Production && actions.Production is { } p && index >= p.QueueRecipes.Count && index < p.QueueRecipes.Count + p.Requests.Count)
         {
-            var job = p.Requests[index - p.Recipes.Count];
+            var job = p.Requests[index - p.QueueRecipes.Count];
             if (job.Paused) return new(UiSkinState.Warning, "QUEUED / PAUSED");
             if (!job.IsActive) return new(UiSkinState.Normal, "QUEUED");
             if (p.BlockReason != ProductionBlockReason.None)

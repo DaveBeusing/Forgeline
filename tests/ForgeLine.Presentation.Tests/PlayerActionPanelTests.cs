@@ -1405,6 +1405,56 @@ public sealed class PlayerActionPanelTests
             cancel.RequestEntity);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AutomaticProcessorsHideProcessAndIgnoreItsShortcut(bool automatic)
+    {
+        var facility = new PlayerProductionFacilityActionReadModel(new(10, 1), default, default,
+            ProductionStatus.NoInput, ProductionBlockReason.NoInput, 0,
+            [new PlayerProductionRecipeActionReadModel(RecipeIds.Steel, "Steel", [], [])], [], isAutomatic: automatic);
+        var snapshot = CreateSnapshot(production: facility);
+        Assert.Equal(automatic ? 0 : 1,
+            PlayerActionDockInteractionLayout.GetItemCount(PlayerActionPanelMode.Production, snapshot.PlayerActions));
+        Assert.Equal(!automatic, PlayerActionDockHudModel.CanCyclePrimary(PlayerActionPanelMode.Production, snapshot.PlayerActions));
+        Assert.Equal(!automatic, PlayerActionDockHudModel.CanCycleSecondary(PlayerActionPanelMode.Production, snapshot.PlayerActions));
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, GameplayBindingRegistry.Default.Key(GameplayAction.Process));
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal(automatic ? PlayerActionPanelMode.Closed : PlayerActionPanelMode.Production, controller.Mode);
+        Press(input, PlatformKey.Enter);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal(!automatic, controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
+    public void OperationsCanResumePausedAutomaticWorkWithoutOfferingRecipeOrders()
+    {
+        var request = new PlayerProductionRequestReadModel(new(11, 1), RecipeIds.Steel, "Steel",
+            ProductionPriority.Normal, ProductionRequestMode.Repeat, true, true);
+        var facility = new PlayerProductionFacilityActionReadModel(new(10, 1), request.RequestEntity, RecipeIds.Steel,
+            ProductionStatus.Paused, ProductionBlockReason.Paused, 0,
+            [new PlayerProductionRecipeActionReadModel(RecipeIds.Steel, "Steel", [], [])], [request], isAutomatic: true);
+        var snapshot = CreateSnapshot(production: facility);
+        Assert.Empty(facility.QueueRecipes);
+        Assert.False(PlayerActionDockHudModel.CanCancel(PlayerActionPanelMode.Production, 0, snapshot.PlayerActions));
+        Assert.Single(facility.Recipes); // Recipe inputs remain available to stock-policy inspection.
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        controller.OpenOperationsControls(PlayerActionPanelMode.Production);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal("RESUME", PlayerActionDockHudModel.ResolvePrimaryActionLabel(PlayerActionPanelMode.Production, 0, snapshot.PlayerActions));
+        Press(input, PlatformKey.Enter);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out var action));
+        Assert.Equal(PlayerActionRequestKind.SetProductionPaused, action.Kind);
+        Assert.Equal(request.RequestEntity, action.RequestEntity);
+        Assert.False(action.Paused);
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>

@@ -127,6 +127,7 @@ public sealed partial class PlayerActionPanelController
                     i == 0 ? PlayerActionPanelMode.Tactical : PlayerActionDockInteractionLayout.ModeForButton(i - 1) :
                     PlayerActionDockInteractionLayout.ModeForButton(i);
                 bool present = PlayerActionDockInteractionLayout.GetItemCount(mode, actions) > 0 &&
+                    (mode != PlayerActionPanelMode.Production || actions?.Production is { IsAutomatic: false }) &&
                     (mode != PlayerActionPanelMode.Tactical || actions?.Tactical is { } tactical &&
                         (tactical.CombatEligibleCount > 0 || tactical.Artillery.Count > 0));
                 slots[i] = new(new(PlayerActionDockControlKind.Mode, mode), default, Present: present);
