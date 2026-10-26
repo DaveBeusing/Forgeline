@@ -349,7 +349,7 @@ internal sealed partial class PredictiveTrafficPlanner
         // accepted reverse step again. No lateral displacement is ever authorized here.
         var recovery = new Vector3?[ordered.Length];
         var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry, passagePlan.Leases,
-            workAllowance - workConsumed, recovery, physicalWaits, localTargets, speedCaps, hazards);
+            crossingPlan.Passages, workAllowance - workConsumed, recovery, physicalWaits, localTargets, speedCaps, hazards);
         if (recoveryWork < 0)
         {
             workConsumed = workAllowance;

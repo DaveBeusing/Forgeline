@@ -827,6 +827,42 @@ public sealed partial class PredictiveTrafficBatchTests
         Assert.Single(result, static d => d.Action == NavigationTrafficAction.Recovery);
     }
 
+    [Theory]
+    [InlineData(true, false, false, true)]
+    [InlineData(false, false, false, false)]
+    [InlineData(true, true, false, false)]
+    [InlineData(true, false, true, false)]
+    public void AnOccupiedUnleasedPassageAllowsOnlyARecordedAndSweptOutwardPrefix(bool capturedBody, bool foreignLease, bool blocked, bool proceed)
+    {
+        var (source, intents) = Crossing();
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(10, .5f, 30) };
+        var vehicle = source.Vehicles[0] with { Pose = new(new(21, .5f, 17), Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(MathF.PI / 2) };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var other = new EntityId(99, 1);
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(4, 1, 4));
+        var bodies = new List<NavigationCollisionBody> {
+            new(NavigationReadAdapter.GetObstacleIdentity(other), NavigationObstacleKind.Vehicle, new(new(19, .5f, 22), Quaternion.Identity), new(.5f), Vector3.Zero) };
+        if (capturedBody) bodies.Add(new(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), NavigationObstacleKind.Vehicle, vehicle.Pose, vehicle.Profile.HalfExtents, Vector3.Zero));
+        // Exercise passage evacuation after the optional detour slice is exhausted.
+        NavigationTrafficFrame Frame(ulong tick) => new(new(tick), new(source.Collision.World, tick, new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, bodies.ToArray(), 10), true, [vehicle], [], Limits() with { WorkPerSearch = 1 }, [passage]);
+        var planner = new PredictiveTrafficPlanner();
+        var terrain = new TerrainWorld(new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 },
+            [new TerrainChunk(new(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
+        if (blocked) bodies.Add(new(new(NavigationObstacleSource.Entity, 100, 1), NavigationObstacleKind.Structure,
+            new(new(22, .5f, 17), Quaternion.Identity), new(.5f, 1, 4), Vector3.Zero));
+        INavigationGeometryQuery geometry = new NavigationVehicleGeometry(source.Collision.World, terrain, 128, .5f);
+        planner.PlanBatch(Frame(1), [intent], geometry, 3, 100000, out _);
+        if (foreignLease) planner.RestoreState(new(3, planner.CaptureState().Vehicles, [new(passage, other, 1, 1, 1, 1, true)]));
+        var directive = Assert.Single(planner.PlanBatch(Frame(50), [intent], geometry, 3, 100000, out int work));
+        Assert.InRange(work, 0, 100000);
+        Assert.Equal(intent.Binding, directive.Binding);
+        Assert.True(proceed == (directive.Action == NavigationTrafficAction.Proceed), $"directive={directive}; work={work}");
+        if (proceed) { Assert.True(directive.SuggestedTarget!.Value.X > vehicle.Pose.Position.X); Assert.InRange(directive.MaximumSpeed, .01f, 1); }
+        if (foreignLease) Assert.Equal(other, Assert.Single(planner.CaptureState().Leases).Owner);
+        else Assert.Empty(planner.CaptureState().Leases);
+    }
+
     private static (NavigationTrafficFrame, NavigationTrafficIntent[]) OpposingPassage(ulong tick, float firstZ, float secondZ)
     {
         var (frame, intents) = Crossing();

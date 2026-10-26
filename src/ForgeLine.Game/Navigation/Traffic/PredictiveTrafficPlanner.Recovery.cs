@@ -11,7 +11,7 @@ internal sealed partial class PredictiveTrafficPlanner
     private int FindRecoveries(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
         Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationBlockReason[] waits,
         EntityId[] waitingFor, INavigationGeometryQuery geometry, IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases,
-        int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
+        IReadOnlyList<NavigationTrafficPassage> passages, int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
         Vector3?[] forwardTargets, float[] speedCaps, NavigationBlockReason[] hazards)
     {
         int consumed = 0;
@@ -112,6 +112,40 @@ internal sealed partial class PredictiveTrafficPlanner
                     }
                     if (occupiedPassage.HasValue) break;
                 }
+            bool unleasedOccupancy = false;
+            if (!occupiedPassage.HasValue && waits[i] == NavigationBlockReason.ReservedCorridor)
+            {
+                // Multiple physical occupants can prevent any admission lease from being
+                // granted. A captured body may still evacuate its current region outward;
+                // it receives no lease, entry permission or reverse shortcut.
+                bool serviceWait = false;
+                foreach (var reservation in frame.Reservations)
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (reservation.Owner == waitingFor[i] && ReservationApplies(waiter, reservation))
+                    { serviceWait = true; break; }
+                }
+                foreach (var body in frame.Collision.Bodies)
+                {
+                    if (serviceWait) break;
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (body.Identity != NavigationReadAdapter.GetObstacleIdentity(waiter.Entity) ||
+                        body.Pose != waiter.Pose || body.HalfExtents != waiter.Profile.HalfExtents) continue;
+                    foreach (var passage in passages)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (leases.ContainsKey(passage.Id) || !Occupies(passage, waiter.Pose,
+                            waiter.Profile.HalfExtents, waiter.Profile.ClearanceMeters)) continue;
+                        occupiedPassage = passage;
+                        unleasedOccupancy = true;
+                        break;
+                    }
+                    break;
+                }
+            }
             if (!occupiedPassage.HasValue && !CanRecover(i)) continue;
             if (!(waits[i] is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle ||
                   waits[i] == NavigationBlockReason.ReservedCorridor && (physicalCycle || occupiedPassage.HasValue))) continue;
@@ -125,6 +159,15 @@ internal sealed partial class PredictiveTrafficPlanner
                 consumed += forwardWork;
                 bool outward = !occupiedPassage.HasValue || IsOutwardDeparture(occupiedPassage.Value,
                     waiter.Pose, waiter.Pose with { Position = forwardTarget }, waiter.Profile);
+                if (clear && outward && unleasedOccupancy)
+                    foreach (var passage in passages)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (Touches(passage, [waiter.Pose, waiter.Pose with { Position = forwardTarget }], waiter.Profile) &&
+                            !IsOutwardDeparture(passage, waiter.Pose, waiter.Pose with { Position = forwardTarget }, waiter.Profile))
+                        { outward = false; break; }
+                    }
                 if (clear && outward)
                 {
                     forwardTargets[i] = forwardTarget;
