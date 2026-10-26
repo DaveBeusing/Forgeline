@@ -2,7 +2,7 @@
 
 ## Scope and integration
 
-The foundation starts at master20a6e0f6cbf4dbfadf5f2143a7a782b0db3b2c26
+The foundation starts at master 20a6e0f6cbf4dbfadf5f2143a7a782b0db3b2c26
 (0.1.478-dev), after research, runtime assets, navigation and diagnostic integration.
 It adds build capability and contracts, not an operational menu, spawn handler,
 parameter editor, preset importer or new persistence format. Public diagnostics
@@ -46,6 +46,20 @@ ForgeLine assembly metadata with Assert-PublicBuild.ps1 before packaging.
 Provenance records buildVariant=Public and developerToolsEnabled=false. There is
 no internal artifact publication entry point or automatic distribution here.
 Full produced-package exclusion qualification belongs to the combined acceptance.
+
+## Existing command-line entry points
+
+Program's --validate-scenarios creates isolated scenario/recovery probes.
+The reference, action-ring, onboarding, feedback, command-dock, HUD, cinematic,
+frontend, skin, typography and navigation capture/timing entries own standalone
+qualification scenes. Their fixture setup does not attach to an existing player
+session. --author-menu-background constructs and exports presentation artwork,
+not authoritative entities. Normal scenario/smoke/render-stress launch options
+remain existing host/qualification entry points. None is a live-game developer
+mutation endpoint. These entries remain public; their presence and the observational
+--developer-navigation-diagnostics flag do not confer DeveloperSessionAccess.
+Future live-game mutating entry points must use the same compiled capability and
+execution-time request gate as menu actions.
 
 ## Assembly direction and composition
 
@@ -192,8 +206,23 @@ Do not duplicate adapters, parsers or dispatcher authority in parallel consumers
 
 ## Acceptance status
 
-Implementation-time work uses affected-product compiler builds only. No new tests,
-test runs, smoke runs or benchmarks occur before the explicitly opened acceptance.
-The scoped acceptance results and exact final source are recorded in the PR.
+Implementation used affected-product compiler builds only, with no test files,
+test/smoke runs or benchmarks before the explicit acceptance boundary.
+Scoped acceptance of production source fedefee3 then completed:
+
+- Canonical solution restore and unchanged project-reference validation succeeded.
+- Complete Release solution build: zero warnings/errors.
+- Public selection:24/24 Game cases (19 foundation,5 existing raid-configuration)
+  and2/2 existing ClientBuildIdentity cases passed, no skips.
+- Developer compilation:19/19 foundation cases passed from isolated Developer
+  outputs, including active permission and stale execution-time rejection.
+- Publisher contracts:4/4 passed (public assembly metadata, developer-output
+  rejection, explicit-enabled rejection, contradictory-environment rejection).
+  These metadata/early-rejection checks generated no package.
+- Exactly one PATCH:0.1.478 to0.1.479. No existing test assertion, cost, deadline,
+  version golden or required gate was changed.
+
+Acceptance-only coverage and final documentation are committed separately from
+that production source. The PR records the published head and its required CI.
 Common end-to-end, full variant/package, Save/Replay and native interaction
 qualification remain separate. A foundation compiler pass is not tool/UI delivery.

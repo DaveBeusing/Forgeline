@@ -17,7 +17,7 @@ Project-specific governance, source precedence, protection requirements, and unr
 The repository is pinned through `global.json`:
 
 ```text
-.NET SDK 10.0.401
+.NET SDK 10.0.402
 C# 14
 ```
 
