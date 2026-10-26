@@ -40,7 +40,7 @@ public static class DeveloperRestartBuilder
         }
         try
         {
-            var baseSettings = basis with { Scenario = DeveloperGameplayTuningSchema.Copy(basis.Scenario), Seed = metadata.Seed,
+            var baseSettings = basis with { InitialDeveloperProfile = null, Scenario = DeveloperGameplayTuningSchema.Copy(basis.Scenario), Seed = metadata.Seed,
                 Participants = Array.AsReadOnly(metadata.Participants.ToArray()) };
             var scenario = DeveloperGameplayTuningSchema.Copy(baseSettings.Scenario);
             var opponents = scenario.OpponentConfigurations.ToDictionary(p => p.Key, p => p.Value with { Raids = p.Value.Raids with { } });
@@ -83,7 +83,9 @@ public static class DeveloperRestartBuilder
                 metadata.Profile, metadata.Participants.ToArray(), metadata.RequiresDeveloperTools || overrides.Length != 0);
             var values = overrides.ToArray().OrderBy(v => v.Id).ThenBy(v => v.Target.Player.Value)
                 .Select(v => new DeveloperEffectiveParameter(v.Id, v.Target, v.Value, new(DeveloperRevisionDomain.Parameters, 0))).ToArray();
-            plan = new(baseSettings, settings, new(profileMetadata, values));
+            var initial = new DeveloperInitialProfile(profileMetadata, values);
+            settings = settings with { InitialDeveloperProfile = initial };
+            plan = new(baseSettings, settings, initial);
             failure = DeveloperFailureReason.None; return true;
         }
         catch (Exception error) when (error is ArgumentException or InvalidOperationException or OverflowException)

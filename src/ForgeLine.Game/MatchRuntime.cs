@@ -137,8 +137,19 @@ public sealed class MatchRuntime : IDisposable
 
     public SkirmishStartingBase GetBase(PlayerId player) => Initialization.GetBase(player);
 
-    public static MatchRuntime Create(MatchRuntimeSettings runtimeSettings, CancellationToken cancellationToken = default) =>
-        CreateInternal(runtimeSettings, null, cancellationToken);
+    public static MatchRuntime Create(MatchRuntimeSettings runtimeSettings, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(runtimeSettings);
+        if (runtimeSettings.InitialDeveloperProfile is { } initial)
+        {
+#if FORGELINE_DEVELOPER_TOOLS
+            return CreateDeveloper(runtimeSettings, initial, DeveloperToolsCapability.Current, cancellationToken);
+#else
+            throw new InvalidOperationException("Developer preset profiles are unavailable in Public builds.");
+#endif
+        }
+        return CreateInternal(runtimeSettings, null, cancellationToken);
+    }
 
     public static MatchRuntime CreateDeveloper(MatchRuntimeSettings basis, DeveloperInitialProfile profile,
         DeveloperToolsCapability capability, CancellationToken cancellationToken = default)
@@ -146,7 +157,7 @@ public sealed class MatchRuntime : IDisposable
         ArgumentNullException.ThrowIfNull(capability); ArgumentNullException.ThrowIfNull(profile);
         if (!capability.IsCompiled || !ReferenceEquals(capability, DeveloperToolsCapability.Current))
             throw new InvalidOperationException("An approved compiled host is required for initial developer overrides.");
-        return CreateInternal(basis, profile, cancellationToken);
+        return CreateInternal(basis with { InitialDeveloperProfile = null }, profile, cancellationToken);
     }
     private static MatchRuntime CreateInternal(MatchRuntimeSettings runtimeSettings, DeveloperInitialProfile? initial,
         CancellationToken cancellationToken)

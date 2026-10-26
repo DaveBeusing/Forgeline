@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using ForgeLine.Core;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
@@ -7,6 +8,9 @@ namespace ForgeLine.Headless;
 
 internal static class Program
 {
+#if FORGELINE_DEVELOPER_TOOLS
+    private static readonly JsonSerializerOptions s_reproductionJsonOptions = new() { WriteIndented = true };
+#endif
     public static int Main(string[] args)
     {
         try { return Run(args); }
@@ -42,6 +46,31 @@ internal static class Program
 
         var registry = options.ScenarioRoot is null ? ScenarioRegistry.Default :
             new ScenarioRegistry(options.ScenarioRoot, ScenarioRegistry.Default.Descriptors);
+
+#if FORGELINE_DEVELOPER_TOOLS
+        if (options.DeveloperPresetInput is { } presetPath)
+        {
+            if (!DeveloperToolsCapability.Current.IsCompiled)
+                throw new InvalidOperationException("Developer preset capability is unavailable in this build.");
+            DeveloperPresetDocument preset = DeveloperPresetCodec.Deserialize(ReadBoundedPreset(presetPath), registry.Resolve);
+            var metadata = preset.Profile.Metadata;
+            if (options.ScenarioWasSpecified && options.ScenarioKey != metadata.CompositionKey)
+                throw new ArgumentException("--scenario conflicts with the preset's registered base scenario.");
+            if (options.ProfileWasSpecified && options.Profile != metadata.Profile)
+                throw new ArgumentException("--profile conflicts with the preset's base profile.");
+            if (options.SeedWasSpecified && options.Seed != metadata.Seed)
+                throw new ArgumentException("--seed conflicts with the preset's seed.");
+            _ = DeveloperPresetCodec.ValidateAndBuildPlan(preset.Profile, registry.Resolve);
+            options = options with
+            {
+                Scenario = HeadlessScenarioKind.Match,
+                ScenarioKey = metadata.CompositionKey,
+                Profile = metadata.Profile,
+                Seed = metadata.Seed,
+                DeveloperPreset = preset
+            };
+        }
+#endif
 
         if (options.LoadInput is not null)
         {
@@ -155,9 +184,13 @@ internal static class Program
         HeadlessOptions options, ScenarioRegistry registry,
         CancellationToken cancellationToken)
     {
-        MatchScenarioSettings settings =
-            CentralDivideScenario.CreateSettings(
-                options.Profile);
+#if FORGELINE_DEVELOPER_TOOLS
+        DeveloperRestartPlan? presetPlan = options.DeveloperPreset is { } selectedPreset
+            ? DeveloperPresetCodec.ValidateAndBuildPlan(selectedPreset.Profile, registry.Resolve) : null;
+        MatchScenarioSettings settings = presetPlan?.Settings.Scenario ?? CentralDivideScenario.CreateSettings(options.Profile);
+#else
+        MatchScenarioSettings settings = CentralDivideScenario.CreateSettings(options.Profile);
+#endif
         var reports =
             new List<MatchExecutionReport>(
                 options.MatchCount);
@@ -177,19 +210,24 @@ internal static class Program
                 checked(
                     options.Seed +
                     (ulong)matchIndex);
-            MatchRuntimeSettings runtimeSettings =
-                CentralDivideScenario.CreateHeadless(
-                    settings.Profile,
-                    matchSeed,
-                    enableDiagnostics: true,
-                    enableDebugCapture:
-                        options.DiagnosticsOutput is not null ||
-                        options.SaveOutput is not null ||
-                        options.ReplayOutput is not null,
-                    composition: registry.Resolve(options.ScenarioKey)) with
+            MatchComposition composition = registry.Resolve(options.ScenarioKey);
+#if FORGELINE_DEVELOPER_TOOLS
+            MatchRuntimeSettings runtimeSettings = presetPlan is not null
+                ? presetPlan.Settings with
                 {
-                    Scenario = settings
-                };
+                    Composition = composition,
+                    EnableDiagnostics = true,
+                    EnableDebugCapture = options.DiagnosticsOutput is not null || options.SaveOutput is not null || options.ReplayOutput is not null
+                }
+                : CentralDivideScenario.CreateHeadless(settings.Profile, matchSeed, enableDiagnostics: true,
+                    enableDebugCapture: options.DiagnosticsOutput is not null || options.SaveOutput is not null || options.ReplayOutput is not null,
+                    composition: composition) with { Scenario = settings };
+#else
+            MatchRuntimeSettings runtimeSettings = CentralDivideScenario.CreateHeadless(settings.Profile, matchSeed,
+                enableDiagnostics: true,
+                enableDebugCapture: options.DiagnosticsOutput is not null || options.SaveOutput is not null || options.ReplayOutput is not null,
+                composition: composition) with { Scenario = settings };
+#endif
             using MatchRuntime scenario =
                 CentralDivideScenario.Create(
                     runtimeSettings,
@@ -322,6 +360,11 @@ internal static class Program
 
         overallStopwatch.Stop();
 
+#if FORGELINE_DEVELOPER_TOOLS
+        if (options.ReproductionOutput is { } reproductionOutput && options.DeveloperPreset is { } usedPreset)
+            WriteReproductionIdentity(reproductionOutput, options, usedPreset);
+#endif
+
         var overallReport =
             MatchHeadlessReport.Create(
                 options,
@@ -372,9 +415,15 @@ internal static class Program
             MatchSaveData save =
                 MatchPersistenceSerializer.ReadSave(
                     path);
-            using MatchRuntime restored =
-                MatchPersistenceService.Restore(
-                    save, resolver);
+#if FORGELINE_DEVELOPER_TOOLS
+            bool developerData = save.Configuration.DeveloperInitialProfile is not null || save.DeveloperModified ||
+                save.ParameterChanges is not null || save.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
+            using MatchRuntime restored = developerData
+                ? MatchPersistenceService.RestoreDeveloper(save, DeveloperToolsCapability.Current, resolver)
+                : MatchPersistenceService.Restore(save, resolver);
+#else
+            using MatchRuntime restored = MatchPersistenceService.Restore(save, resolver);
+#endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
                     restored);
@@ -405,9 +454,15 @@ internal static class Program
             MatchReplayData replay =
                 MatchPersistenceSerializer.ReadReplay(
                     path);
-            using MatchRuntime playback =
-                MatchPersistenceService.PlayReplay(
-                    replay, resolver);
+#if FORGELINE_DEVELOPER_TOOLS
+            bool developerData = replay.Configuration.DeveloperInitialProfile is not null || replay.DeveloperModified ||
+                replay.ParameterChanges is not null || replay.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
+            using MatchRuntime playback = developerData
+                ? MatchPersistenceService.PlayDeveloperReplay(replay, DeveloperToolsCapability.Current, resolver)
+                : MatchPersistenceService.PlayReplay(replay, resolver);
+#else
+            using MatchRuntime playback = MatchPersistenceService.PlayReplay(replay, resolver);
+#endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
                     playback);
@@ -429,6 +484,64 @@ internal static class Program
             return 4;
         }
     }
+
+#if FORGELINE_DEVELOPER_TOOLS
+    private static byte[] ReadBoundedPreset(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (stream.Length is < 1 or > DeveloperPresetCodec.MaximumDocumentBytes)
+            throw new DeveloperPresetException(DeveloperFailureReason.InvalidValue, "Preset file must be between 1 byte and 64 KiB.");
+        var bytes = new byte[(int)stream.Length]; stream.ReadExactly(bytes);
+        if (stream.ReadByte() != -1) throw new IOException("Preset file changed while it was read.");
+        return bytes;
+    }
+
+    private static void WriteReproductionIdentity(string path, HeadlessOptions options, DeveloperPresetDocument preset)
+    {
+        var metadata = preset.Profile.Metadata;
+        var output = new
+        {
+            SchemaVersion = 1,
+            ReproductionId = options.ReproductionId,
+            PresetKey = preset.Key,
+            PresetSchema = preset.SchemaVersion,
+            BuildRevision = preset.BuildRevision,
+            BaseScenarioKey = metadata.CompositionKey,
+            BaseScenarioIdentity = metadata.BaseIdentity,
+            BaseProfile = metadata.Profile.ToString(),
+            Seed = metadata.Seed,
+            Participants = metadata.Participants.Select(participant => new
+            {
+                PlayerId = participant.Player.Value, FactionId = participant.Faction.Value,
+                participant.StartIndex, participant.IsComputerControlled
+            }).ToArray(),
+            InitialOverrides = preset.Profile.Parameters.Select(parameter =>
+            {
+                _ = DeveloperGameplayTuningSchema.TryGet(parameter.Id, out var descriptor);
+                return new
+                {
+                    Key = descriptor.Contract.Key,
+                    Kind = parameter.Value.Kind.ToString(),
+                    Scope = parameter.Target.Kind == DeveloperTargetKinds.Global ? "global" : "player",
+                    PlayerId = parameter.Target.Kind == DeveloperTargetKinds.Player ? parameter.Target.Player.Value : (ulong?)null,
+                    Value = parameter.Value.Kind switch
+                    {
+                        DeveloperValueKind.Boolean => (object)parameter.Value.AsBoolean(),
+                        DeveloperValueKind.UnsignedNumber => parameter.Value.AsUInt32(),
+                        DeveloperValueKind.RealNumber => parameter.Value.AsDouble(),
+                        _ => throw new InvalidOperationException("Unsupported reproduction value kind.")
+                    }
+                };
+            }).ToArray(),
+            ReplayOutputIncluded = options.ReplayOutput is not null
+        };
+        string fullPath = Path.GetFullPath(path);
+        string? directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+        File.WriteAllText(fullPath, JsonSerializer.Serialize(output, s_reproductionJsonOptions));
+        Console.WriteLine($"Reproduction identity: {Path.GetFileName(fullPath)} ({options.ReproductionId}).");
+    }
+#endif
 
     private static void FinalizeHeadlessMatch(
         MatchRuntime scenario)
@@ -565,6 +678,11 @@ internal static class Program
         writer.WriteLine("  --scenario-root <path>         Registered compiled-map root (default: executable/maps).");
         writer.WriteLine("  --profile <gameplay|validation>");
         writer.WriteLine("                               Match balance profile (default: gameplay).");
+#if FORGELINE_DEVELOPER_TOOLS
+        writer.WriteLine("  --preset-input <path>        Load a validated Developer start-profile JSON.");
+        writer.WriteLine("  --reproduction-id <id>       Label a reproduction manifest (requires preset input).");
+        writer.WriteLine("  --reproduction-output <path> Write a path-free reproduction identity manifest.");
+#endif
         writer.WriteLine("  --ticks <count>              Ticks to execute, or maximum ticks per match (default: 1000).");
         writer.WriteLine("  --seed <value>               Deterministic simulation seed (default: 1).");
         writer.WriteLine("  --tick-rate <hz>             Logical simulation tick rate (default: 20).");
