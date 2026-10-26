@@ -27,6 +27,20 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         _observations.TryGetValue(entity, out observation);
 
     public const double NominalThroughput = 100;
+    public double EffectiveThroughput { get; private set; } = NominalThroughput;
+    public ulong TuningRevision { get; private set; }
+    public SimulationTick TuningAppliedTick { get; private set; }
+#if FORGELINE_DEVELOPER_TOOLS
+    private DeveloperGameplayTuningProvider? _developerTuning;
+    public void BindDeveloperTuning(DeveloperGameplayTuningProvider tuning)
+    {
+        ArgumentNullException.ThrowIfNull(tuning);
+        if (_developerTuning is not null && !ReferenceEquals(_developerTuning, tuning))
+            throw new InvalidOperationException("A conveyor system has one tuning owner.");
+        tuning.BindConveyor(this);
+        _developerTuning = tuning;
+    }
+#endif
     // Transfer every positive remainder; never discard fractional cargo to an epsilon.
     private const double Epsilon = 0;
     internal GameplayProgressJournal? Progress { get; set; }
@@ -48,6 +62,16 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     {
         _observations.Clear();
         ObservationTick = context.Tick;
+#if FORGELINE_DEVELOPER_TOOLS
+        if (_developerTuning is { } tuning)
+        {
+            var current = tuning.ReadConveyor(context);
+            EffectiveThroughput = NominalThroughput * current.Multiplier;
+            TuningRevision = current.Revision.Value;
+            TuningAppliedTick = current.AppliedTick;
+        }
+#endif
+        double throughput = EffectiveThroughput;
         var entities = context.Entities;
         double seconds = context.TickDuration.TotalSeconds;
         if (seconds <= 0 || !double.IsFinite(seconds)) return;
@@ -75,7 +99,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     if (brokenFeet.TryGetValue((piece.Owner, (int)MathF.Round(socket.Position.X * 10),
                         (int)MathF.Round(socket.Position.Z * 10)), out brokenSupport)) { scale = 0; break; }
             nodes.Add(new(e, piece.Owner, flow.Buffer, sockets, flow,
-                NominalThroughput * seconds * scale, piece.Attachment) { BrokenSupport = brokenSupport });
+                throughput * seconds * scale, piece.Attachment) { BrokenSupport = brokenSupport });
         }
         if (nodes.Count == 0) return;
         foreach (PlayerId owner in owners.OrderBy(o => o.Value))
@@ -85,7 +109,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 if (!_stock.Contains(inventory)) continue;
                 int cursor = entities.TryGetComponent(port.Building, out ConveyorPortArbitration arbitration) ? arbitration.ResourceCursor : 0;
                 var node=new Node(port.Building, owner, inventory, [new(port.Position, port.Facing, port.Input)],
-                    new(default, 0, ResourceCursor: cursor), NominalThroughput * seconds * OperationalScale(entities, port.Building),
+                    new(default, 0, ResourceCursor: cursor), throughput * seconds * OperationalScale(entities, port.Building),
                     default, port);
                 node.AllowedResources = AcceptedResources(entities, node);
                 nodes.Add(node);
@@ -148,7 +172,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         // Successful transfers alone advance cursors. Blocked branches are skipped; spare capacity is reused.
         // Two-port contention and each input resource's fractional tail need bounded extra rounds.
         int rounds = checked((int)Math.Min(100000,
-            Math.Ceiling(NominalThroughput * seconds) * 2 + EligibleResources.Count * 2 + 2));
+            Math.Ceiling(throughput * seconds) * 2 + EligibleResources.Count * 2 + 2));
         for (int round = 0; round < rounds; round++)
         {
             var offers = new Dictionary<Node, List<Link>>();
