@@ -547,13 +547,14 @@ internal sealed partial class ClientSimulationHost : IDisposable
                        catchUpTicks <
                        MaximumCatchUpTicks &&
                        !IsPaused &&
+                       _pauseReasons == ClientSimulationPauseReason.None &&
                        !IsTerminalFrozen &&
                        Volatile.Read(ref _stopping) == 0)
                 {
                     DrainMessages();
                     now = _time.GetTimestamp();
 
-                    if (IsPaused ||
+                    if (IsPaused || _pauseReasons != ClientSimulationPauseReason.None ||
                         IsTerminalFrozen ||
                         Volatile.Read(ref _stopping) != 0 ||
                         now < _nextTickAt)

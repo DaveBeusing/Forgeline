@@ -8,7 +8,7 @@ namespace ForgeLine.Client;
 internal sealed partial class ClientSimulationHost
 {
     private static readonly HashSet<DeveloperOperation> SessionOperations =
-        [DeveloperOperation.Pause, DeveloperOperation.Resume];
+        [DeveloperOperation.Pause, DeveloperOperation.Resume, DeveloperOperation.SingleStep];
     private readonly ConcurrentQueue<ClientDeveloperControlCompletion> _developerCompletions = new();
     private readonly HashSet<Guid> _pendingCorrelations = [];
     private DeveloperSessionAccess? _boundAccess, _pendingAccess;
@@ -38,7 +38,11 @@ internal sealed partial class ClientSimulationHost
         var failure = DeveloperRequestGate.Check(permission, new(SessionId, revision, _ => false, _ => false), request, SessionOperations);
         if (failure != DeveloperFailureReason.None) return failure;
         if (!ReferenceEquals(permission, _boundAccess) || !IsAuthorized(permission)) return DeveloperFailureReason.SessionNotActivated;
-        if (request.Target != DeveloperTarget.Global || request.Values.Count != 0) return DeveloperFailureReason.InvalidValue;
+        if (request.Target != DeveloperTarget.Global) return DeveloperFailureReason.InvalidTarget;
+        bool valid = request.Operation == DeveloperOperation.SingleStep
+            ? request.Values.Count == 1 && request.Values[0].Kind == DeveloperValueKind.UnsignedNumber && request.Values[0].AsUInt32() is 1 or 10 or 100
+            : request.Values.Count == 0;
+        if (!valid) return DeveloperFailureReason.InvalidValue;
         return DeveloperFailureReason.None;
     }
 
@@ -55,6 +59,7 @@ internal sealed partial class ClientSimulationHost
                 detail = _failure is not null ? ClientDeveloperControlFailure.Faulted :
                     _disposed || IsStopping ? ClientDeveloperControlFailure.Stopping :
                     IsTerminalFrozen ? ClientDeveloperControlFailure.Terminal :
+                    request.Operation == DeveloperOperation.SingleStep && CaptureControlStatus().IsStepping ? ClientDeveloperControlFailure.StepInProgress :
                     OutstandingHostMessages >= _capacity ? ClientDeveloperControlFailure.BoundaryFull :
                     _pendingCorrelations.Contains(request.Correlation) ? ClientDeveloperControlFailure.InvalidRequest : ClientDeveloperControlFailure.None;
                 failure = FoundationFailure(detail);
@@ -96,6 +101,7 @@ internal sealed partial class ClientSimulationHost
             _boundAccess = access;
         }
         _developerActivated = IsAuthorized(access);
+        FinishDeveloperStep(ClientDeveloperControlFailure.Cancelled);
         _controlRevision = checked(_controlRevision + 1);
         if (!_developerActivated)
         {
@@ -133,9 +139,12 @@ internal sealed partial class ClientSimulationHost
             detail = IsStopping ? ClientDeveloperControlFailure.Stopping : IsTerminalFrozen ? ClientDeveloperControlFailure.Terminal : ClientDeveloperControlFailure.None;
         if (detail != ClientDeveloperControlFailure.None)
         { CompleteDeveloper(message, detail, failure); return; }
+        if (request.Operation == DeveloperOperation.SingleStep)
+        { StartDeveloperStep(message); return; }
         try
         {
             bool pause = request.Operation == DeveloperOperation.Pause;
+            if (!pause) FinishDeveloperStep(ClientDeveloperControlFailure.Cancelled);
             var reasons = _pauseReasons;
             if (message.Kind == HostMessageKind.DeveloperMenuTransfer)
             {
@@ -162,17 +171,22 @@ internal sealed partial class ClientSimulationHost
     private DeveloperStateRevision CurrentControlRevision => new(DeveloperRevisionDomain.Session, _controlRevision);
 
     private void CompleteDeveloper(in HostMessage message, ClientDeveloperControlFailure detail,
-        DeveloperFailureReason failure = DeveloperFailureReason.None)
+        DeveloperFailureReason failure = DeveloperFailureReason.None, uint requested = 0, uint completed = 0)
     {
         var request = message.DeveloperRequest!;
-        var result = detail == ClientDeveloperControlFailure.None
+        bool applied = detail == ClientDeveloperControlFailure.None || detail == ClientDeveloperControlFailure.Terminal && completed > 0;
+        DeveloperAppliedValue[] values = completed > 0
+            ? [DeveloperAppliedValue.ForSession(DeveloperEffectKind.AdvancedTicks, DeveloperValue.FromUInt32(completed)),
+               DeveloperAppliedValue.ForSession(DeveloperEffectKind.Paused, DeveloperValue.FromBoolean(IsPaused))]
+            : [DeveloperAppliedValue.ForSession(DeveloperEffectKind.Paused, DeveloperValue.FromBoolean(IsPaused))];
+        var result = applied
             ? DeveloperResult.Applied(request, CurrentControlRevision, _lastCompletedTick,
-                [DeveloperAppliedValue.ForSession(DeveloperEffectKind.Paused, DeveloperValue.FromBoolean(IsPaused))])
+                values)
             : DeveloperResult.Rejected(request, CurrentControlRevision, failure != DeveloperFailureReason.None ? failure : FoundationFailure(detail));
         lock (_boundaryGate)
         {
             _developerInFlight--; _developerCompletionCount++;
-            _developerCompletions.Enqueue(new(result, detail, 0, 0, _lastCompletedTick, message.Sequence));
+            _developerCompletions.Enqueue(new(result, detail, requested, completed, _lastCompletedTick, message.Sequence));
         }
         NotifyProgress();
     }
