@@ -265,6 +265,20 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         {
             if (!Spend(allowance, ref consumed)) return false;
             Vector3 point = index < pointCount ? route.Waypoints[index] : input.Binding.OriginalOrder.WorldTarget;
+            if (finalSegment && index == pointCount && index > currentWaypoint)
+            {
+                Vector3 origin = index > 1 ? route.Waypoints[index - 2] : input.Vehicle.Pose.Position;
+                Vector3 approach = previous - origin, final = point - previous;
+                if ((double)approach.X * final.X + (double)approach.Z * final.Z < 0)
+                {
+                    // Blending a projected endpoint with a reversing original-target
+                    // leg can fold the lookahead back onto the current pose. Reach
+                    // the actual route endpoint before its existing local handoff.
+                    candidate = previous;
+                    last = index - 1;
+                    break;
+                }
+            }
             float length = HorizontalDistance(previous, point);
             if (!float.IsFinite(length)) { reason = NavigationBlockReason.Unknown; return false; }
             last = index;

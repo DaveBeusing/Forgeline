@@ -161,7 +161,7 @@ public sealed class HierarchicalPathfinder
                 grid,
                 local.Cells,
                 destination);
-        if (projectedStart)
+        if (projectedStart && waypoints[0] != grid.GetCellCenter(startCell))
         {
             waypoints = [grid.GetCellCenter(startCell), .. waypoints];
         }
