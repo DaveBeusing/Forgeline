@@ -116,7 +116,8 @@ at execution. The selected action retains its observed Simulation revision.
 
 Preset TrySubmitPreset receives a correlation, intent and optional selected entry.
 Import/export/compatibility and file ownership remain exclusively in the preset
-service. Publish the matching bounded PresetOutcome to confirm success or failure;
+service. Before restarting a selected entry, the menu invokes the existing
+IDeveloperPresetService.Validate again and displays that actual compatibility result. Publish the matching bounded PresetOutcome to confirm success or failure;
 submission alone remains Submitted and blocks another write. The restart callback
 passed to the backend validates proposed settings, queues ClientSessionRequest.Restart
 and returns through the normal session-loading loop. It creates no ad hoc runtime.
@@ -140,3 +141,28 @@ build/test/CI source and outcomes. Combined real-provider gameplay chains, compl
 Public/Developer package exclusion, Save/Replay and native/DPI qualification remain
 with the combined developer-tools qualification. A rendered menu with missing
 providers does not qualify their functionality.
+
+## Scoped acceptance evidence
+
+Implementation commits ba34443, 99276432 and 58a9222b precede the explicit scoped
+acceptance boundary. No tests, smokes or benchmarks ran during implementation.
+Both affected product client variants compiled with zero warnings/errors before
+acceptance (Developer31.95s, Public36.66s).
+
+Canonical solution restore and the unchanged reference validator passed (47 projects,
+including the two pre-existing ignored local probes; no cycles). The complete Public
+Release solution build passed with zero warnings/errors (80.76s). The selected Public
+client run passed3/3 and existing DebugOverlayState cases passed11/11, with no skips.
+The isolated Developer client test build passed with zero warnings/errors (65.60s)
+and its16/16 selected menu/capability cases passed (13.255s). They cover correlation,
+revision conflict, session/capability loss, held-input/lifecycle suppression, full
+entity generation, explicit typed actions, confirmed pause ownership, preset result
+matching, bounded history and rendering-only capture isolation.
+
+A narrow acceptance review then connected the existing preset validator before
+restart: the affected developer build passed (zero warnings/errors,15.22s) and2/2
+preset cases passed. A final help correction applies session activation to paused
+Controls as well as compiled capability; both affected client test builds passed
+with zero warnings/errors, and the capability case passed1/1 in each variant. No original assertion, price, golden, deadline or gate was
+relaxed. The PR identifies the exact published source and required CI result.
+No full native, package, save/replay or real-provider integration campaign is claimed.

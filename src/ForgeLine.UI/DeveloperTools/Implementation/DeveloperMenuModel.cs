@@ -171,11 +171,14 @@ public sealed class DeveloperMenuModel
         { Feedback = "Action payload adapter unavailable; no request submitted."; return; }
         Send(action.Operation, _target, DeveloperParameterId.None, _actionValues, _actionRevision);
     }
+    public DeveloperFailureReason PresetCompatibility => Preset is { } preset
+        ? preset.Compatibility != DeveloperFailureReason.None ? preset.Compatibility : _providers.Presets.Validate(preset.Metadata)
+        : DeveloperFailureReason.ProviderUnavailable;
     public void PresetCommand(DeveloperPresetIntent intent)
     {
         if (WriteBlocked || _providers.Presets.Status.Availability != DeveloperProviderAvailability.Available || _backend is null)
         { Feedback = "Preset I/O and session-loading adapter unavailable."; return; }
-        if (intent == DeveloperPresetIntent.RestartSameSeed && Preset is { Compatibility: not DeveloperFailureReason.None })
+        if (intent == DeveloperPresetIntent.RestartSameSeed && Preset is not null && PresetCompatibility != DeveloperFailureReason.None)
         { Feedback = "Select a compatible preset first."; return; }
         var correlation = Guid.NewGuid(); _presetInFlight = correlation;
         try

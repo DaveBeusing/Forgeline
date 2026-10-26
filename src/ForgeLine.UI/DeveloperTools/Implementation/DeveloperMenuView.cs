@@ -105,7 +105,7 @@ public static class DeveloperMenuView
                 Control("PRESET", model.Preset?.Label ?? "Unavailable", () => model.CyclePreset(1), model.Observation?.Presets.Count > 0, model.CyclePreset);
                 if (model.Preset is { } preset)
                 {
-                    Info("SCHEMA / COMPATIBILITY", preset.Metadata.Schema + " / " + preset.Compatibility);
+                    Info("SCHEMA / COMPATIBILITY", preset.Metadata.Schema + " / " + model.PresetCompatibility);
                     Info("COMPOSITION / SEED", preset.Metadata.CompositionKey + " / " + preset.Metadata.Seed);
                 }
                 foreach (var intent in Enum.GetValues<DeveloperPresetIntent>())

@@ -1188,7 +1188,7 @@ internal sealed class ClientApplication
                         FrontendSurfaceView controlsSurface =
                             FrontendPresentationAdapter.Controls(
                                 _settings.CameraBindings,
-                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings);
+                                "ESC  BACK TO PAUSE", _settings.EdgeScrollEnabled, gameplay: _gameplayBindings, developerSessionActive: developerSessionActive);
                         FrontendLayout pauseLayout = modalLayout;
                         bool secondaryHovered =
                             inputState.HasPointerPosition &&
