@@ -89,6 +89,7 @@ internal sealed partial class LogisticsNavigationCoordinator
                 !SamePhysicalWaitOwner(owner, observation.Owner) || blocker != observation.Blocker) continue;
             physicalWaits.Add(observation with { Owner = owner });
         }
+        CaptureBlockedServiceWaits(context, frame, candidates, physicalWaits, ref consumed);
         var directives = _traffic.PlanBatch(frame, intents, _geometry!, Limits.PlanningHorizonSeconds,
             Limits.WorkPerTick - consumed, out int trafficWork, CollectionsMarshal.AsSpan(physicalWaits));
         consumed += trafficWork;

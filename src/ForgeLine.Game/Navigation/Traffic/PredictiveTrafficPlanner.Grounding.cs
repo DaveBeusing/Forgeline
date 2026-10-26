@@ -5,7 +5,7 @@ namespace ForgeLine.Game;
 
 internal sealed partial class PredictiveTrafficPlanner
 {
-    private static NavigationSweepResult SweepGrounded(NavigationCollisionFrame frame,
+    internal static NavigationSweepResult SweepGrounded(NavigationCollisionFrame frame,
         INavigationGeometryQuery geometry, NavigationSweep sweep, int allowance, int depth = 0)
     {
         var result = geometry.Sweep(frame, sweep, allowance);
