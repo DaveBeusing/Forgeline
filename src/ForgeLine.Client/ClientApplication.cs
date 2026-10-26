@@ -70,6 +70,8 @@ internal sealed class ClientApplication
     private readonly string _settingsPath;
     private readonly StartupDiagnostics _startup;
 
+    internal DeveloperToolsProviders DeveloperTools { get; } = DeveloperToolsComposition.Create();
+
     internal bool DeveloperNavigationDiagnostics { get; }
 
     internal ClientApplication(
