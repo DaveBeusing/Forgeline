@@ -61,6 +61,8 @@ internal static class ClientSessionFactory
     {
         cancellationToken.ThrowIfCancellationRequested();
         reportProgress?.Invoke(new(ClientSessionLoadPhase.Configuration));
+        if (request.RuntimeSettings?.InitialDeveloperProfile is not null && !DeveloperToolsCapability.Current.IsCompiled)
+            throw new InvalidOperationException("Developer preset sessions require a Developer build.");
         if (request.Kind == ClientSessionRequestKind.NewGame)
         {
             ArgumentNullException.ThrowIfNull(jobScheduler);
@@ -117,8 +119,38 @@ internal static class ClientSessionFactory
             request.RuntimeSettings?.Composition ?? ScenarioRegistry.Default.Resolve(request.ScenarioKey);
         if (composition.Key != request.ScenarioKey || (request.Identity is not null && composition.Identity != request.Identity))
             throw new InvalidOperationException("Resolved scenario differs from the requested session identity.");
-        return (request.RuntimeSettings ?? CentralDivideScenario.CreateClient(scheduler, request.Seed, composition: composition))
-            with { Composition = composition };
+        MatchRuntimeSettings settings = request.RuntimeSettings ?? CentralDivideScenario.CreateClient(scheduler, request.Seed, composition: composition);
+#if FORGELINE_DEVELOPER_TOOLS
+        if (settings.InitialDeveloperProfile is { } initial)
+        {
+            if (!DeveloperToolsCapability.Current.IsCompiled)
+                throw new InvalidOperationException("Developer preset capability is unavailable immediately before session composition.");
+            var metadata = initial.Metadata;
+            if (metadata.CompositionKey != composition.Key || metadata.BaseIdentity != composition.Identity ||
+                settings.Seed != metadata.Seed || settings.Scenario.Profile != metadata.Profile ||
+                !settings.Participants.SequenceEqual(metadata.Participants))
+                throw new InvalidOperationException("Preset base identity, profile, seed or participants changed before composition.");
+            MatchRuntimeSettings basis = CentralDivideScenario.CreateClient(scheduler, metadata.Seed, settings.EnableDiagnostics, composition) with
+            {
+                Scenario = CentralDivideScenario.CreateSettings(metadata.Profile),
+                Participants = Array.AsReadOnly(metadata.Participants.ToArray()),
+                EnablePhaseTiming = settings.EnablePhaseTiming,
+                EnableDebugCapture = settings.EnableDebugCapture,
+                EnableSpatialQueryTiming = settings.EnableSpatialQueryTiming,
+                InitialEntityCapacity = settings.InitialEntityCapacity,
+                InitialDeveloperProfile = null
+            };
+            DeveloperTuningOverride[] overrides = initial.Parameters.Select(value =>
+                new DeveloperTuningOverride(value.Id, value.Target, value.Value)).ToArray();
+            if (!DeveloperRestartBuilder.TryBuild(basis, metadata, overrides, out var plan, out var failure))
+                throw new InvalidOperationException($"Developer preset failed final session validation ({failure}).");
+            settings = plan!.Settings;
+        }
+#else
+        if (settings.InitialDeveloperProfile is not null)
+            throw new InvalidOperationException("Developer preset sessions are unavailable in Public builds.");
+#endif
+        return settings with { Composition = composition };
     }
 
     private static MatchRuntime RestoreForGameplay(

@@ -12,6 +12,9 @@ public enum MatchSchedulerOwnership : byte
 
 public sealed record MatchRuntimeSettings
 {
+    /// <summary>Transient, typed Developer-build start profile; never a capability or persisted permission.</summary>
+    public DeveloperInitialProfile? InitialDeveloperProfile { get; init; }
+
     public required MatchComposition Composition { get; init; }
 
     public required MatchScenarioSettings Scenario { get; init; }
