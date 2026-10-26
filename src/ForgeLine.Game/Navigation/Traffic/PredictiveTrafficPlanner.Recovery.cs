@@ -11,7 +11,7 @@ internal sealed partial class PredictiveTrafficPlanner
     private int FindRecoveries(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
         Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationBlockReason[] waits,
         EntityId[] waitingFor, INavigationGeometryQuery geometry, IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases,
-        IReadOnlyList<NavigationTrafficPassage> passages, int allowance, Vector3?[] targets, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
+        IReadOnlyList<NavigationTrafficPassage> passages, int allowance, Vector3?[] targets, bool[] outwardReverse, bool[] capturedDepartures, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
         Vector3?[] forwardTargets, float[] speedCaps, NavigationBlockReason[] hazards)
     {
         int consumed = 0;
@@ -38,12 +38,14 @@ internal sealed partial class PredictiveTrafficPlanner
         var indices = new Dictionary<EntityId, int>();
         for (int i = 0; i < intents.Length; i++) indices.Add(intents[i].Binding.Requester, i);
         var visited = new bool[intents.Length];
+        var mixedCycles = new HashSet<int>();
         var claimedPaths = new List<(EntityId Owner, NavigationPose[] Path, NavigationVehicleProfile Profile)>();
         for (int start = 0; start < intents.Length; start++)
         {
             if (visited[start]) continue;
             var chain = new List<int>();
             var positions = new Dictionary<int, int>();
+            var physicalBridges = new HashSet<int>();
             int current = start;
             while (!visited[current])
             {
@@ -52,6 +54,11 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (positions.TryGetValue(current, out int cycleStart))
                 {
                     var cycle = chain.Skip(cycleStart).OrderBy(i => intents[i].Binding.Requester).ToArray();
+                    if (cycle.Any(physicalBridges.Contains))
+                    {
+                        foreach (int index in cycle) mixedCycles.Add(index);
+                        break;
+                    }
                     bool activeEscape = cycle.Any(i => _states.TryGetValue(intents[i].Binding.Requester, out var state) &&
                         state.CommandGeneration == intents[i].Binding.CommandGeneration && state.RecoveryTarget is not null);
                     if (activeEscape) break;
@@ -65,7 +72,18 @@ internal sealed partial class PredictiveTrafficPlanner
                 }
                 positions.Add(current, chain.Count);
                 chain.Add(current);
-                if (!indices.TryGetValue(waitingFor[current], out int next)) break;
+                EntityId nextEntity = waitingFor[current];
+                var external = new HashSet<EntityId>();
+                int next = -1;
+                while (!indices.TryGetValue(nextEntity, out next))
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (!external.Add(nextEntity) || !physicalCycles.TryGetValue(nextEntity, out nextEntity))
+                    { next = -1; break; }
+                    physicalBridges.Add(current);
+                }
+                if (next < 0) break;
                 current = next;
             }
             foreach (int index in chain) visited[index] = true;
@@ -82,6 +100,34 @@ internal sealed partial class PredictiveTrafficPlanner
             _ = TryEscape(i, target, verifyWholeRoute: false);
             if (consumed == allowance && targets[i] is null) return -1;
         }
+        var continuingReverse = new HashSet<int>();
+        for (int i = 0; i < intents.Length; i++)
+        {
+            var intent = intents[i];
+            var vehicle = vehicles[intent.Binding.Requester];
+            if (targets[i] is not null || !intent.CanMove || intent.MaximumSpeed <= 0 ||
+                NavigationPrecisionOwnership.IsPrecise(vehicle) || vehicle.Movement.Velocity.LengthSquared() > 1.0001f ||
+                !_states.TryGetValue(vehicle.Entity, out var priorShunt) || priorShunt.CommandGeneration != intent.Binding.CommandGeneration ||
+                priorShunt.LastRecoveryTick >= frame.Tick.Value || frame.Tick.Value - priorShunt.LastRecoveryTick != 1 ||
+                WaitingAge(intent.Binding,frame.Tick.Value) < RecoveryWaitTicks ||
+                Vector3.Dot(vehicle.Movement.Velocity,Vector3.Transform(Vector3.UnitZ,vehicle.Pose.Rotation)) >= -.01f) continue;
+            bool currentPhysicalWait = false;
+            foreach (EntityId blocker in physicalCycles.Values)
+            {
+                if (consumed == allowance) return -1;
+                consumed++;
+                if (blocker == vehicle.Entity) { currentPhysicalWait = true; break; }
+            }
+            if (!currentPhysicalWait) continue;
+            continuingReverse.Add(i);
+            if (TryTargets(i,capturedOnly:true))
+            {
+                capturedDepartures[i] = true;
+                if (waits[i] == NavigationBlockReason.None) waits[i] = NavigationBlockReason.MovingVehicle;
+            }
+            if (consumed == allowance && targets[i] is null) return -1;
+        }
+
         // A physical blocker outside the coarse wait graph can justify a verified
         // reverse arc. A service reservation alone is a logical admission wait; it
         // does not establish a physical deadlock. A copied same-tick physical veto
@@ -89,10 +135,11 @@ internal sealed partial class PredictiveTrafficPlanner
         // physically occupied owned passage can separately justify outward departure.
         for (int i = 0; i < intents.Length; i++)
         {
-            if (targets[i] is not null || !CanRecover(i, allowForwardMotion: true) || !waitingFor[i].IsValid ||
-                indices.ContainsKey(waitingFor[i])) continue;
-            bool physicalCycle = physicalCycles.TryGetValue(waitingFor[i], out var opposite) &&
+            if (continuingReverse.Contains(i) || targets[i] is not null || !CanRecover(i, allowForwardMotion: true) || !waitingFor[i].IsValid ||
+                indices.ContainsKey(waitingFor[i]) && !mixedCycles.Contains(i)) continue;
+            bool directPhysicalCycle = physicalCycles.TryGetValue(waitingFor[i], out var opposite) &&
                 opposite == intents[i].Binding.Requester;
+            bool physicalCycle = directPhysicalCycle || mixedCycles.Contains(i);
             NavigationTrafficPassage? occupiedPassage = null;
             var waiter = vehicles[intents[i].Binding.Requester];
             if (waits[i] is NavigationBlockReason.ReservedCorridor or NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle)
@@ -113,6 +160,7 @@ internal sealed partial class PredictiveTrafficPlanner
                     if (occupiedPassage.HasValue) break;
                 }
             bool unleasedOccupancy = false;
+            bool stationaryPhysicalBlocker = false;
             if (!occupiedPassage.HasValue && waits[i] == NavigationBlockReason.ReservedCorridor)
             {
                 // Multiple physical occupants can prevent any admission lease from being
@@ -128,7 +176,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 }
                 foreach (var body in frame.Collision.Bodies)
                 {
-                    if (serviceWait) break;
+                    if (serviceWait && !mixedCycles.Contains(i)) break;
                     if (consumed == allowance) return -1;
                     consumed++;
                     if (body.Identity != NavigationReadAdapter.GetObstacleIdentity(waiter.Entity) ||
@@ -141,6 +189,15 @@ internal sealed partial class PredictiveTrafficPlanner
                             waiter.Profile.HalfExtents, waiter.Profile.ClearanceMeters)) continue;
                         occupiedPassage = passage;
                         unleasedOccupancy = true;
+                        foreach (var otherBody in frame.Collision.Bodies)
+                        {
+                            if (consumed == allowance) return -1;
+                            consumed++;
+                            if (otherBody.Identity == NavigationReadAdapter.GetObstacleIdentity(waitingFor[i]) &&
+                                otherBody.Kind == NavigationObstacleKind.Vehicle && otherBody.Velocity.LengthSquared() <= .0025f &&
+                                Occupies(passage, otherBody.Pose, otherBody.HalfExtents, 0))
+                            { stationaryPhysicalBlocker = true; break; }
+                        }
                         break;
                     }
                     break;
@@ -154,12 +211,24 @@ internal sealed partial class PredictiveTrafficPlanner
             if (waits[i] == NavigationBlockReason.ReservedCorridor || occupiedPassage.HasValue)
             {
                 int forwardWork = ForwardClearance(frame, waiter, intents[i], geometry, leases,
-                    allowance - consumed, out bool clear, out Vector3 forwardTarget);
+                    allowance - consumed, out bool clear, out NavigationPose forwardPose);
                 if (forwardWork < 0) return -1;
                 consumed += forwardWork;
+                Vector3 forwardTarget = forwardPose.Position;
                 bool outward = !occupiedPassage.HasValue || IsOutwardDeparture(occupiedPassage.Value,
-                    waiter.Pose, waiter.Pose with { Position = forwardTarget }, waiter.Profile);
-                if (clear && outward && unleasedOccupancy)
+                    waiter.Pose, forwardPose, waiter.Profile);
+                bool capturedCycle = clear && physicalCycle && unleasedOccupancy && stationaryPhysicalBlocker;
+                if (capturedCycle)
+                {
+                    bool noEntry = TryCheckOutwardStep(waiter.Profile, waiter.Pose, forwardPose, passages,
+                        allowance - consumed, out int departureWork, out bool departureComplete, requireOutward: false);
+                    consumed += departureWork;
+                    if (!departureComplete) return -1;
+                    capturedCycle = noEntry;
+                    if (noEntry) outward = true;
+                }
+                if (clear && mixedCycles.Contains(i) && !directPhysicalCycle && !capturedCycle) clear = false;
+                if (clear && outward && unleasedOccupancy && !capturedCycle)
                     foreach (var passage in passages)
                     {
                         if (consumed == allowance) return -1;
@@ -171,9 +240,19 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (clear && outward)
                 {
                     forwardTargets[i] = forwardTarget;
+                    capturedDepartures[i] = capturedCycle;
                     speedCaps[i] = MathF.Min(1, intents[i].MaximumSpeed);
                     hazards[i] = NavigationBlockReason.MovingVehicle;
                     waits[i] = NavigationBlockReason.None;
+                    continue;
+                }
+                if (unleasedOccupancy && stationaryPhysicalBlocker)
+                {
+                    // Only a physically captured, already occupied unleased region
+                    // permits this shunt. Recompute it each tick; persist no target
+                    // that could grant authority after its occupancy disappears.
+                    if (TryTargets(i, outwardOnly: true)) outwardReverse[i] = true;
+                    if (consumed == allowance && targets[i] is null) return -1;
                     continue;
                 }
                 if (!physicalCycle) continue;
@@ -184,7 +263,7 @@ internal sealed partial class PredictiveTrafficPlanner
         }
         return consumed;
 
-        bool TryTargets(int index)
+        bool TryTargets(int index, bool outwardOnly = false, bool capturedOnly = false)
         {
             var vehicle = vehicles[intents[index].Binding.Requester];
             Vector3 back = Vector3.Transform(-Vector3.UnitZ, vehicle.Pose.Rotation); back.Y = 0;
@@ -192,9 +271,9 @@ internal sealed partial class PredictiveTrafficPlanner
             if (back.LengthSquared() < .0001f || side.LengthSquared() < .0001f) return false;
             back = Vector3.Normalize(back); side = Vector3.Normalize(side);
             float lateral = MathF.Max(6, vehicle.Profile.HalfExtents.Length() * 2 + 1);
-            if (TryEscape(index, vehicle.Pose.Position + back + side * lateral)) return true;
-            if (TryEscape(index, vehicle.Pose.Position + back - side * lateral)) return true;
-            return TryEscape(index, vehicle.Pose.Position + back * MathF.Min(3, MathF.Max(1, vehicle.Profile.HalfExtents.Z * 2)));
+            if (TryEscape(index, vehicle.Pose.Position + back + side * lateral, outwardOnly: outwardOnly, capturedOnly: capturedOnly)) return true;
+            if (TryEscape(index, vehicle.Pose.Position + back - side * lateral, outwardOnly: outwardOnly, capturedOnly: capturedOnly)) return true;
+            return TryEscape(index, vehicle.Pose.Position + back * MathF.Min(3, MathF.Max(1, vehicle.Profile.HalfExtents.Z * 2)), outwardOnly: outwardOnly, capturedOnly: capturedOnly);
         }
 
         bool CanRecover(int index, bool allowForwardMotion = false)
@@ -207,7 +286,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 WaitingAge(intent.Binding, frame.Tick.Value) >= RecoveryWaitTicks;
         }
 
-        bool TryEscape(int index, Vector3 target, bool verifyWholeRoute = true)
+        bool TryEscape(int index, Vector3 target, bool verifyWholeRoute = true, bool outwardOnly = false, bool capturedOnly = false)
         {
             if (consumed == allowance) return false;
             var vehicle = vehicles[intents[index].Binding.Requester];
@@ -232,6 +311,13 @@ internal sealed partial class PredictiveTrafficPlanner
                 consumed += result.WorkConsumed;
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1 ||
                     result.FrameTick != frame.Tick.Value || result.Revision != frame.Collision.World.Revision) return false;
+                if (outwardOnly || capturedOnly)
+                {
+                    bool outward = TryCheckOutwardStep(vehicle.Profile, simulated.Pose, end, passages,
+                        allowance - consumed, out int outwardWork, out bool outwardComplete, requireOutward: !capturedOnly);
+                    consumed += outwardWork;
+                    if (!outward) { if (!outwardComplete) consumed = allowance; return false; }
+                }
                 foreach (var reservation in frame.Reservations)
                 {
                     int checkWork = ServiceReservationCheckWork(2);

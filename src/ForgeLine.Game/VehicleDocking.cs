@@ -474,18 +474,40 @@ public sealed partial class VehicleDockingService
     {
         var entities = context.Entities;
         if (!entities.TryGetComponent(truck, out VehicleDockVisit visit)) return true;
-        if (TryRelease(entities, truck, visit.Building, visit.Generation)) return true;
-        if (!entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Generation != visit.Generation || slot.Truck != truck)
+        if (visit.Generation > 0 && TryRelease(entities, truck, visit.Building, visit.Generation))
         {
-            entities.RemoveComponent<VehicleDockVisit>(truck);
-            return true;
+            if (!entities.TryGetComponent(truck, out visit)) return true;
         }
-        Vector3 departureFrom = entities.GetComponent<WorldTransform>(truck).Position;
-        if (!LaneClear(entities, visit.Building, truck, visit.Pose, departureFrom))
+        PlayerId departureOwner;
+        bool releasedDeparture = visit.Generation == 0 && visit.Status == VehicleDockStatus.Exiting &&
+            (visit.LaneEntered || visit.ExitTurning) && visit.DepartureDistance > 0;
+        if (releasedDeparture)
         {
-            StopDockMotion(entities, truck);
-            Put(entities, truck, visit with { Status = VehicleDockStatus.Exiting, Reason = VehicleDockBlockReason.ExitBlocked });
-            return false;
+            if (!entities.TryGetComponent(truck, out WorldTransform current) ||
+                !FullyOutsideReservedLane(visit.Pose, current) || !TryGetDepartureOwner(entities, truck, out departureOwner))
+            { StopDockMotion(entities, truck); return false; }
+            if (!NeedsDepartureManeuver(visit, current))
+            {
+                StopDockMotion(entities, truck);
+                entities.RemoveComponent<VehicleDockVisit>(truck);
+                return true;
+            }
+        }
+        else
+        {
+            if (!entities.TryGetComponent(visit.Building, out VehicleDockSlot slot) || slot.Generation != visit.Generation || slot.Truck != truck)
+            {
+                entities.RemoveComponent<VehicleDockVisit>(truck);
+                return true;
+            }
+            departureOwner = slot.Owner;
+            Vector3 departureFrom = entities.GetComponent<WorldTransform>(truck).Position;
+            if (!LaneClear(entities, visit.Building, truck, visit.Pose, departureFrom))
+            {
+                StopDockMotion(entities, truck);
+                Put(entities, truck, visit with { Status = VehicleDockStatus.Exiting, Reason = VehicleDockBlockReason.ExitBlocked });
+                return false;
+            }
         }
         Vector3 forward = new(MathF.Sin(visit.Pose.Heading), 0, MathF.Cos(visit.Pose.Heading));
         Vector3 position = entities.GetComponent<WorldTransform>(truck).Position;
@@ -506,7 +528,7 @@ public sealed partial class VehicleDockingService
         if (_terrain is not null && _terrain.TrySampleHeight(target.X, target.Z, out float height) &&
             entities.TryGetComponent(truck, out GroundMovement ground)) target.Y = height + ground.HeightOffset;
         if (!entities.HasComponent<MovementOrder>(truck))
-            Put(entities, truck, new MovementOrder(slot.Owner, target, context.Tick, context.Tick, MovementOrderKind.LocalApproach,
+            Put(entities, truck, new MovementOrder(departureOwner, target, context.Tick, context.Tick, MovementOrderKind.LocalApproach,
                 visit.ExitTurning ? MathF.Atan2(outward.X, outward.Z) : visit.Pose.Heading));
         bool stopped = entities.TryGetComponent(truck, out GroundMovementState motion) &&
             motion.Status is GroundMovementStatus.OutOfFuel or GroundMovementStatus.Stuck;
@@ -659,24 +681,36 @@ public sealed partial class VehicleDockingService
 
     public bool TryRelease(EntityRegistry entities, EntityId truck, EntityId building, ulong generation)
     {
+        bool continueDeparture = false;
+        Vector3? clearedDepartureFrom = null;
         if (entities.TryGetComponent(truck, out VehicleDockVisit departure) && departure.Generation == generation &&
             departure.Building == building && departure.Status == VehicleDockStatus.Exiting)
         {
             if (!entities.TryGetComponent(truck, out WorldTransform departed)) return false;
-            Vector3 side = new(MathF.Cos(departure.Pose.Heading), 0, -MathF.Sin(departure.Pose.Heading));
-            float minimum = departure.Pose.HalfWidth +
-                MathF.Sqrt(departure.Pose.HalfLength * departure.Pose.HalfLength + departure.Pose.HalfWidth * departure.Pose.HalfWidth) + 2;
-            if ((departure.LaneEntered || departure.ExitTurning || departure.Pose.Contains(departed.Position, departure.Pose.HalfLength)) &&
-                (!departure.ExitTurning || MathF.Abs(Vector3.Dot(departed.Position - departure.Pose.Service, side)) <= minimum)) return false;
+            continueDeparture = NeedsDepartureManeuver(departure, departed);
+            if (continueDeparture)
+            {
+                if (!FullyOutsideReservedLane(departure.Pose, departed)) return false;
+                clearedDepartureFrom = departed.Position;
+            }
         }
         if (!entities.TryGetComponent(building, out VehicleDockSlot slot) || slot.Truck != truck || slot.Generation != generation || OwnerInLane(entities, slot) ||
-            !LaneClear(entities, building, slot.Truck, slot.Pose)) return false;
+            !LaneClear(entities, building, slot.Truck, slot.Pose, clearedDepartureFrom)) return false;
         entities.RemoveComponent<VehicleDockSlot>(building);
         RemoveQueueAssignment(entities, truck);
         if (entities.TryGetComponent(truck, out VehicleDockVisit visit) && visit.Building == building && visit.Generation == generation)
         {
-            if (visit.Status == VehicleDockStatus.Exiting) StopDockMotion(entities, truck);
-            entities.RemoveComponent<VehicleDockVisit>(truck);
+            if (continueDeparture)
+            {
+                // The lane is physically clear, but the old truck still owns its
+                // parking duty. Generation zero owns no bay or service admission.
+                Put(entities, truck, visit with { Generation = 0 });
+            }
+            else
+            {
+                if (visit.Status == VehicleDockStatus.Exiting) StopDockMotion(entities, truck);
+                entities.RemoveComponent<VehicleDockVisit>(truck);
+            }
         }
         return true;
     }
@@ -766,6 +800,53 @@ public sealed partial class VehicleDockingService
         }
         return true;
     }
+
+    private static bool NeedsDepartureManeuver(in VehicleDockVisit departure, in WorldTransform vehicle)
+    {
+        Vector3 side = new(MathF.Cos(departure.Pose.Heading), 0, -MathF.Sin(departure.Pose.Heading));
+        float minimum = departure.Pose.HalfWidth +
+            MathF.Sqrt(departure.Pose.HalfLength * departure.Pose.HalfLength + departure.Pose.HalfWidth * departure.Pose.HalfWidth) + 2;
+        return (departure.LaneEntered || departure.ExitTurning || departure.Pose.Contains(vehicle.Position, departure.Pose.HalfLength)) &&
+            (!departure.ExitTurning || MathF.Abs(Vector3.Dot(vehicle.Position - departure.Pose.Service, side)) <= minimum);
+    }
+
+    private static bool TryGetDepartureOwner(EntityRegistry entities, EntityId truck, out PlayerId owner)
+    {
+        owner = entities.TryGetComponent(truck, out ControllableEntity control) ? control.Owner :
+            entities.TryGetComponent(truck, out CargoTransport cargo) ? cargo.Owner :
+            entities.TryGetComponent(truck, out SupplyTruck supply) ? supply.Owner : default;
+        return owner.IsSpecified && OwnsTruck(entities, truck, owner);
+    }
+
+    private static bool FullyOutsideReservedLane(in VehicleDockPose pose, in WorldTransform vehicle)
+    {
+        if (!new NavigationPose(vehicle.Position, vehicle.Rotation).IsValid ||
+            !NavigationMotionCapture.Finite(vehicle.Scale) || vehicle.Scale.X <= 0 || vehicle.Scale.Y <= 0 || vehicle.Scale.Z <= 0 ||
+            !NavigationMotionCapture.Finite(pose.Entry) || !NavigationMotionCapture.Finite(pose.Service) ||
+            !NavigationMotionCapture.Finite(pose.Exit) || pose.ApproachStart is Vector3 approach && !NavigationMotionCapture.Finite(approach) ||
+            !float.IsFinite(pose.Heading) || !float.IsFinite(pose.HalfLength) || !float.IsFinite(pose.HalfWidth) ||
+            pose.HalfLength <= 0 || pose.HalfWidth <= 0) return false;
+        // Project all three current body axes into the world plane. This encloses
+        // the entire rotated body, including height on a tilted vehicle, without
+        // making an already clear straight truck wait for its circumsphere.
+        Vector3 right = Vector3.Transform(Vector3.UnitX, vehicle.Rotation);
+        Vector3 up = Vector3.Transform(Vector3.UnitY, vehicle.Rotation);
+        Vector3 forward = Vector3.Transform(Vector3.UnitZ, vehicle.Rotation);
+        var bounds = pose.CorridorBounds;
+        double scaleError = DockCoordinateSpacing(vehicle.Scale.X) + DockCoordinateSpacing(vehicle.Scale.Y) + DockCoordinateSpacing(vehicle.Scale.Z);
+        double radiusX = ((double)MathF.Abs(right.X) * vehicle.Scale.X + (double)MathF.Abs(up.X) * vehicle.Scale.Y +
+            (double)MathF.Abs(forward.X) * vehicle.Scale.Z) * .5 + 1 + 4 * (scaleError + DockCoordinateSpacing(vehicle.Position.X) +
+            DockCoordinateSpacing(bounds.Minimum.X) + DockCoordinateSpacing(bounds.Maximum.X));
+        double radiusZ = ((double)MathF.Abs(right.Z) * vehicle.Scale.X + (double)MathF.Abs(up.Z) * vehicle.Scale.Y +
+            (double)MathF.Abs(forward.Z) * vehicle.Scale.Z) * .5 + 1 + 4 * (scaleError + DockCoordinateSpacing(vehicle.Position.Z) +
+            DockCoordinateSpacing(bounds.Minimum.Z) + DockCoordinateSpacing(bounds.Maximum.Z));
+        return double.IsFinite(radiusX) && double.IsFinite(radiusZ) &&
+            (vehicle.Position.X < (double)bounds.Minimum.X - radiusX || vehicle.Position.X > (double)bounds.Maximum.X + radiusX ||
+             vehicle.Position.Z < (double)bounds.Minimum.Z - radiusZ || vehicle.Position.Z > (double)bounds.Maximum.Z + radiusZ);
+    }
+
+    private static double DockCoordinateSpacing(float value) =>
+        Math.Max((double)MathF.BitIncrement(value) - value, (double)value - MathF.BitDecrement(value));
 
     private static bool OwnerInLane(EntityRegistry entities, in VehicleDockSlot slot)
     {

@@ -70,6 +70,36 @@ Automatic construction source selection preserves one live, unpaused and uncance
 
 The recorded cadence40 bootstrap delivered120Steel and80Electronics to the Barracks, then reserved all of it for Radar construction from tick3202 through3311. Before the correction it produced only one Rifle by the original20000tick deadline. With the budget guard the same setup produces three by12606. The policy regression fails before the fix; ten budget controls and the original27 production-policy cases pass. No fixture deadline or stock assertion changes.
 
+## Captured clearance and three-vehicle departures
+
+Mixed wait cycles can bridge coarse participants through a same-tick physical wait
+reported by a precise service owner. Every bridge retains full identity, pose,
+profile and snapshot validation. A checked slow forward departure from an already
+occupied unleased region cannot enter another region. Its permission is ephemeral
+and is checked again on both the proposed and arbitrated actual step. A logical
+service wait, stale observation or rotation in place supplies no such permission.
+
+A vehicle already reversing may continue the existing bounded candidate search
+only with approval from the preceding tick, the same original command, the normal
+40-tick wait and a current physical owner wait naming that vehicle. It retains the
+1 m/s cap, fuel/tactical admission, full candidate and actual-step sweeps and all
+foreign ownership vetoes. Disappearance of the physical witness removes this
+additional permission. No recovery target is persisted for this captured departure.
+
+At low speed, a target quantized onto the captured forward or reverse ray preserves
+the checked quaternion instead of introducing a small unintended turn. A real
+lateral target still steers. Legacy accepted-motion reservations supply a physical
+oriented sweep with explicit midpoint, angular and arithmetic bounds; the ordinary
+collision query adds its full numerical padding once. Other occupancy callers keep
+their original padded representation. Physical clearance is unchanged.
+
+A dock releases its physical slot only after the complete rotated vehicle body,
+including tilt, clears the lane with the existing one-metre margin and conservative
+coordinate rounding. A queue body wholly behind that cleared departure no longer
+holds the old owner; it still prevents fresh lane admission. The remaining parking
+movement keeps its ordinary local order after physical release and finishes under
+normal collision and fuel rules. Slot identity and generation checks remain.
+
 ## Qualification status
 
 Navigation contracts passed53/53 on unchanged geometry6. The last service-capture traffic/dock/native selection passed143/143, including stale-generation rejection and finite-stock refueling. Ten construction-budget controls and the original27 production-policy cases now pass. Paid inputs, original damage and time bounds, physical clearances and work caps remain enforced.

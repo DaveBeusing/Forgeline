@@ -1,4 +1,5 @@
 using System.Numerics;
+using ForgeLine.Navigation;
 
 namespace ForgeLine.Game;
 
@@ -16,4 +17,16 @@ internal static class NavigationMotionNumerics
         x = (double)end.X - start.X; z = (double)end.Z - start.Z;
         return x * x + z * z <= maximumDistance * maximumDistance ? end : start;
     }
+    internal static bool IsCapturedForwardTarget(NavigationPose pose, Vector3 target)
+    {
+        Vector3 forward = Vector3.Transform(Vector3.UnitZ, pose.Rotation);
+        double dx = (double)target.X - pose.Position.X, dz = (double)target.Z - pose.Position.Z;
+        double lateral = dx * forward.Z - dz * forward.X;
+        double uncertainty = (CoordinateSpacing(target.X) + CoordinateSpacing(pose.Position.X)) * Math.Abs(forward.Z) +
+            (CoordinateSpacing(target.Z) + CoordinateSpacing(pose.Position.Z)) * Math.Abs(forward.X);
+        return dx * forward.X + dz * forward.Z > 0 && double.IsFinite(uncertainty) && Math.Abs(lateral) <= uncertainty;
+    }
+
+    private static double CoordinateSpacing(float value) =>
+        Math.Max((double)MathF.BitIncrement(value) - value, (double)value - MathF.BitDecrement(value));
 }

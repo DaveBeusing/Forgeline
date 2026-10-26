@@ -3458,13 +3458,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 (GetUnitCount(owned, UnitIds.SupplyTruck) < configuration.MinimumSupplyTrucks ||
                  GetUnitCount(owned, UnitIds.ScoutVehicle) < 1 ||
                  GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits);
-            long initialInfantry = Math.Max(1,
-                configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
-            // A light raid must leave its configured defenders at home. Funding
-            // only the main assault complement can strand the final paid squad.
-            if (configuration.Raids.Enabled)
-                initialInfantry = Math.Max(initialInfantry,
-                    (long)configuration.Raids.MinimumUnits + configuration.Raids.HomeDefenders);
+            int initialInfantry = ResolveInitialInfantryTarget(configuration);
             bool formingInitialForce = plannedUnit == UnitIds.RifleSquad &&
                 facility.Status == UnitProductionStatus.NoInput &&
                 context.Entities.TryGetComponent(entity, out PowerConsumer productionPower) && productionPower.State == PowerOperationalState.Powered &&
@@ -3570,6 +3564,23 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         double maximum,
         LogisticsStockPriority priority)
     {
+        bool idleInfantry = !facility.ActiveUnit.IsSpecified && !plannedUnit.IsSpecified &&
+            facility.Supports(UnitProductionCapability.Infantry) &&
+            !facility.Supports(UnitProductionCapability.Vehicle) &&
+            !facility.Supports(UnitProductionCapability.Logistics);
+        if (idleInfantry)
+        {
+            // An idle barracks must not compete with the unfinished core force
+            // for routine buffers. Explicit queued orders still receive their inputs.
+            minimum = 0;
+            foreach (EntityId requestEntity in context.Entities.Query<UnitProductionRequest>())
+            {
+                var request = context.Entities.GetComponent<UnitProductionRequest>(requestEntity);
+                if (request.Facility == entity && !context.Entities.HasComponent<UnitProductionCancellationRequest>(requestEntity))
+                    minimum = Math.Max(minimum, UnitCost(request.UnitId, resource));
+            }
+        }
+
         // A fixed refill threshold can leave stock above the minimum but below
         // the next unit's cost, permanently blocking an otherwise supplied factory.
         ApplyUnitCostMinimum(
@@ -3604,7 +3615,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             minimum,
             target,
             maximum,
-            priority);
+            priority,
+            enabled: !idleInfantry || minimum > 0);
     }
 
     private double UnitCost(UnitId unitId, ResourceId resource)
@@ -3868,7 +3880,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         double minimum,
         double target,
         double maximum,
-        LogisticsStockPriority priority)
+        LogisticsStockPriority priority,
+        bool enabled = true)
     {
         var command =
             PlayerLogisticsActionCommand.SetStockPolicy(
@@ -3879,7 +3892,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 target,
                 maximum,
                 priority,
-                enabled: true,
+                enabled: enabled,
                 submittedAtTick: context.Tick);
         command.Execute(context);
     }
@@ -4599,6 +4612,15 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             queued + 1;
     }
 
+    private static int ResolveInitialInfantryTarget(SkirmishOpponentConfiguration configuration)
+    {
+        long required = Math.Max(1L, (long)configuration.MinimumAttackUnits - configuration.MinimumObjectivePressureUnits);
+        // A raid must retain every configured home defender while its force is away.
+        if (configuration.Raids.Enabled)
+            required = Math.Max(required, (long)configuration.Raids.MinimumUnits + configuration.Raids.HomeDefenders);
+        return (int)Math.Min(int.MaxValue, required);
+    }
+
     private static bool HasLiveCoreAssaultForce(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
         GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
         GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
@@ -4682,15 +4704,19 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         var targets =
             new Dictionary<UnitId, int>
             {
-                [UnitIds.RifleSquad] = 6,
+                [UnitIds.RifleSquad] = HasLiveCoreAssaultForce(owned, configuration)
+                    ? Math.Max(6, ResolveInitialInfantryTarget(configuration))
+                    : ResolveInitialInfantryTarget(configuration),
                 [UnitIds.CombatEngineer] = 1,
-                [UnitIds.ScoutVehicle] = 2,
+                [UnitIds.ScoutVehicle] = HasLiveCoreAssaultForce(owned, configuration) ? 2 : 1,
                 [UnitIds.CargoTruck] = ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true),
                 [UnitIds.SupplyTruck] = HasLiveCoreAssaultForce(owned, configuration)
                     ? configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count)
                     : configuration.MinimumSupplyTrucks,
-                [UnitIds.MainBattleTank] = 4,
-                [UnitIds.MobileArtillery] = 2
+                [UnitIds.MainBattleTank] = HasLiveCoreAssaultForce(owned, configuration)
+                    ? Math.Max(4, configuration.MinimumObjectivePressureUnits)
+                    : configuration.MinimumObjectivePressureUnits,
+                [UnitIds.MobileArtillery] = HasLiveCoreAssaultForce(owned, configuration) ? 2 : 1
             };
 
         for (int index = 0;

@@ -220,6 +220,135 @@ public sealed partial class PredictiveTrafficBatchTests
         else Assert.Null(directive.SuggestedTarget);
     }
 
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(4, false)]
+    [InlineData(5, false)]
+    public void AReverseAlreadyInProgressCanContinueOnlyWithFreshPhysicalEvidence(int control, bool expectRecovery)
+    {
+        var (frame, intents) = Crossing();
+        float heading = -MathF.PI / 2;
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(10, .5f, 20) };
+        var vehicle = frame.Vehicles[0] with { Pose = new(new(21, .5f, 20), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(heading) with { Velocity = new(.5f,0,0) } };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var owner = vehicle with { Entity = new(99, 1), Pose = vehicle.Pose with { Position = new(18, .5f, 20) } };
+        var reservation = new NavigationTrafficReservation(7, owner.Entity, 1, 0, NavigationReservationKind.Dock,
+            new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2), SimulationTick.Zero, SimulationTick.Zero, true);
+        NavigationTrafficFrame Capture(ulong tick)
+        {
+            NavigationCollisionBody Body(NavigationVehicleObservation observed) => new(
+                NavigationReadAdapter.GetObstacleIdentity(observed.Entity), NavigationObstacleKind.Vehicle,
+                observed.Pose, observed.Profile.HalfExtents, Vector3.Zero);
+            var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true,
+                [Body(vehicle), Body(owner)], 10);
+            return new(new(tick), collision, true, [vehicle], [reservation], Limits(),
+                [new NavigationTrafficPassage(1,new(new(25,.5f,20),Quaternion.Identity),new(4,1,3))]);
+        }
+        if(control==2) vehicle=vehicle with { Movement=vehicle.Movement with { Velocity=new(-.5f,0,0) } };
+        if(control==5) intent=intent with { CanMove=false };
+        var planner = new PredictiveTrafficPlanner();
+        planner.RestoreState(new(3,[new(vehicle.Entity,1,49,1,control==3 ? 48UL : 49UL,NavigationBlockReason.ReservedCorridor,owner.Entity,null)],[]));
+        var evidence = new NavigationPhysicalWait(new(50), frame.Collision.World.Revision, owner, vehicle);
+        if(control==1) evidence=evidence with { Tick=new(49) };
+        INavigationGeometryQuery geometry=control==4 ? new BlockedGeometry() : new ClearGeometry();
+        var directive = Assert.Single(planner.PlanBatch(Capture(50), [intent], geometry, 3, 10000, out _, [evidence]));
+        Assert.Equal(expectRecovery,directive.Action==NavigationTrafficAction.Recovery);
+        Assert.Equal(intent.Binding, directive.Binding);
+        Assert.Empty(planner.CaptureState().Leases);
+        if (expectRecovery)
+        {
+            Assert.True(directive.CapturedCycleDepartureOnly);
+            Assert.False(directive.OutwardDepartureOnly);
+            Assert.Null(Assert.Single(planner.CaptureState().Vehicles).RecoveryTarget);
+            Assert.NotNull(directive.SuggestedTarget);
+            Assert.True(directive.SuggestedTarget.Value.X > vehicle.Pose.Position.X);
+            Assert.InRange(directive.MaximumSpeed, .01f, 1);
+        }
+        else Assert.Null(directive.SuggestedTarget);
+    }
+
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(4, false)]
+    [InlineData(5, false)]
+    [InlineData(6, false)]
+    public void MixedPhysicalChainLeavesOnlyItsCapturedRegionWithCurrentEvidence(int stalePart, bool expectDeparture)
+    {
+        var (frame, intents) = Crossing();
+        float heading = -MathF.PI / 2;
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(10, .5f, 20) };
+        var vehicle = frame.Vehicles[0] with { Pose = new(new(26, .5f, 20), Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(heading) };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var otherRoot = root with { WorldTarget = new(10,.5f,23) };
+        var other = vehicle with { Entity = new(3,1),Pose=vehicle.Pose with { Position=new(26,.5f,23) },DirectOrder=otherRoot };
+        var otherIntent = new NavigationTrafficIntent(new(other.Entity,otherRoot,3,1,0,0),otherRoot.WorldTarget,6,true);
+        var owner = vehicle with { Entity = new(2,1),Pose=vehicle.Pose with { Position=new(26,.5f,21.7f) } };
+        var reservation = new NavigationTrafficReservation(7, owner.Entity, 1, 0, NavigationReservationKind.Dock,
+            new(new(20, .5f, 20), Quaternion.Identity), new(2, 1, 2), SimulationTick.Zero, SimulationTick.Zero, true);
+        NavigationTrafficFrame Capture(ulong tick)
+        {
+            NavigationCollisionBody Body(NavigationVehicleObservation observed) => new(
+                NavigationReadAdapter.GetObstacleIdentity(observed.Entity), NavigationObstacleKind.Vehicle,
+                observed.Pose, observed.Profile.HalfExtents, Vector3.Zero);
+            var collision = new NavigationCollisionFrame(frame.Collision.World, tick, frame.Collision.Coverage, true,
+                [Body(vehicle), Body(owner), Body(other)], 10);
+            return new(new(tick), collision, true, [vehicle,other], [reservation], Limits(),
+                [new NavigationTrafficPassage(1,new(new(20,.5f,20),Quaternion.Identity),new(8,1,6))]);
+        }
+        var planner = new PredictiveTrafficPlanner();
+        Assert.All(planner.PlanBatch(Capture(1), [intent,otherIntent], new ClearGeometry(), 3, 10000, out _),d=>Assert.Equal(NavigationTrafficAction.Hold,d.Action));
+        var evidence = new NavigationPhysicalWait(new(50), frame.Collision.World.Revision, owner, other);
+        evidence = stalePart switch
+        {
+            1 => evidence with { Tick = new(49) },
+            2 => evidence with { Revision = evidence.Revision with { Costs = evidence.Revision.Costs + 1 } },
+            3 => evidence with { Owner = owner with { Pose = owner.Pose with { Position = owner.Pose.Position + Vector3.UnitX } } },
+            4 => evidence with { Blocker = other with { DirectOrder = otherRoot with { WorldTarget = otherRoot.WorldTarget + Vector3.UnitZ } } },
+            5 => evidence with { Owner = owner with { Entity = new(2, 2) } },
+            _ => evidence
+        };
+        var directives = planner.PlanBatch(Capture(50),[intent,otherIntent],new ClearGeometry(),3,10000,out _,stalePart==6 ? [] : [evidence]);
+        var directive = Assert.Single(directives,d=>d.Binding.Requester==other.Entity);
+        Assert.Equal(expectDeparture,directive.CapturedCycleDepartureOnly);
+        Assert.Equal(otherIntent.Binding,directive.Binding);
+        Assert.Empty(planner.CaptureState().Leases);
+        Assert.All(planner.CaptureState().Vehicles,state=>Assert.Null(state.RecoveryTarget));
+        if(expectDeparture)
+        {
+            Assert.Equal(NavigationTrafficAction.Proceed,directive.Action);
+            Assert.NotNull(directive.SuggestedTarget);
+            Assert.True(directive.SuggestedTarget.Value.X<other.Pose.Position.X);
+            Assert.InRange(directive.MaximumSpeed,.01f,1);
+        }
+    }
+
+    [Fact]
+    public void CapturedCycleStepCannotEnterAnotherRegionRotateInPlaceOrExhaustItsBudget()
+    {
+        var (frame,_) = Crossing();
+        var profile=frame.Vehicles[0].Profile;
+        var start=new NavigationPose(new(26,.5f,20),Quaternion.Identity);
+        var end=start with { Position=new(25.5f,.5f,20) };
+        var occupied=new NavigationTrafficPassage(1,new(new(20,.5f,20),Quaternion.Identity),new(8,1,6));
+        Assert.True(PredictiveTrafficPlanner.TryCheckOutwardStep(profile,start,end,[occupied],100,out _,out bool complete,requireOutward:false));
+        Assert.True(complete);
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile,start,end,[occupied],100,out _,out _,requireOutward:true));
+        var foreign=new NavigationTrafficPassage(2,new(new(24.7f,.5f,20),Quaternion.Identity),new(.4f,1,.4f));
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile,start,end,[occupied,foreign],100,out _,out complete,requireOutward:false));
+        Assert.True(complete);
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile,start,start with { Rotation=Quaternion.CreateFromAxisAngle(Vector3.UnitY,.1f) },[occupied],100,out _,out _,requireOutward:false));
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile,start,end,[occupied],0,out int work,out complete,requireOutward:false));
+        Assert.Equal(0,work);Assert.False(complete);
+    }
+
     [Fact]
     public void WaitingForAnExternalServiceReservationDoesNotInventAPhysicalReverseEscape()
     {
@@ -861,6 +990,76 @@ public sealed partial class PredictiveTrafficBatchTests
         if (proceed) { Assert.True(directive.SuggestedTarget!.Value.X > vehicle.Pose.Position.X); Assert.InRange(directive.MaximumSpeed, .01f, 1); }
         if (foreignLease) Assert.Equal(other, Assert.Single(planner.CaptureState().Leases).Owner);
         else Assert.Empty(planner.CaptureState().Leases);
+    }
+
+    [Theory]
+    [InlineData(true, false, false, true)]
+    [InlineData(false, false, false, false)]
+    [InlineData(true, true, false, false)]
+    [InlineData(true, false, true, false)]
+    public void AnOccupiedUnleasedPassageCanBackOutOnlyThroughARecordedAndSweptOutwardArc(bool capturedBody, bool foreignLease, bool blocked, bool recover)
+    {
+        var (source, intents) = Crossing();
+        var root = intents[0].Binding.OriginalOrder with { WorldTarget = new(10, .5f, 30) };
+        var vehicle = source.Vehicles[0] with { Pose = new(new(21, .5f, 17), Quaternion.CreateFromAxisAngle(Vector3.UnitY, -MathF.PI / 2)),
+            DirectOrder = root, Movement = GroundMovementState.Stationary(-MathF.PI / 2) };
+        var intent = intents[0] with { Binding = intents[0].Binding with { OriginalOrder = root }, SteeringTarget = root.WorldTarget };
+        var other = new EntityId(99, 1);
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(4, 1, 4));
+        var bodies = new List<NavigationCollisionBody> {
+            new(NavigationReadAdapter.GetObstacleIdentity(other), NavigationObstacleKind.Vehicle, new(new(19, .5f, 22), Quaternion.Identity), new(.5f), Vector3.Zero) };
+        if (capturedBody) bodies.Add(new(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), NavigationObstacleKind.Vehicle, vehicle.Pose, vehicle.Profile.HalfExtents, Vector3.Zero));
+        // Exercise passage evacuation after the optional detour slice is exhausted.
+        NavigationTrafficFrame Frame(ulong tick) => new(new(tick), new(source.Collision.World, tick, new AxisAlignedBounds(new(0, -10, 0), new(64, 10, 64)), true, bodies.ToArray(), 10), true, [vehicle], [], Limits() with { WorkPerSearch = 1 }, [passage]);
+        var planner = new PredictiveTrafficPlanner();
+        var terrain = new TerrainWorld(new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 },
+            [new TerrainChunk(new(0, 0), new TerrainHeightfield(17, 64, new float[289]))]);
+        if (blocked) bodies.Add(new(new(NavigationObstacleSource.Entity, 100, 1), NavigationObstacleKind.Structure,
+            new(new(22, .5f, 17), Quaternion.Identity), new(.5f, 1, 4), Vector3.Zero));
+        INavigationGeometryQuery geometry = new NavigationVehicleGeometry(source.Collision.World, terrain, 128, .5f);
+        planner.PlanBatch(Frame(1), [intent], geometry, 3, 100000, out _);
+        if (foreignLease) planner.RestoreState(new(3, planner.CaptureState().Vehicles, [new(passage, other, 1, 1, 1, 1, true)]));
+        var directive = Assert.Single(planner.PlanBatch(Frame(50), [intent], geometry, 3, 100000, out int work));
+        Assert.InRange(work, 0, 100000);
+        Assert.Equal(intent.Binding, directive.Binding);
+        Assert.True(recover == (directive.Action == NavigationTrafficAction.Recovery), $"directive={directive}; work={work}");
+        if (foreignLease) Assert.Equal(other, Assert.Single(planner.CaptureState().Leases).Owner);
+        else Assert.Empty(planner.CaptureState().Leases);
+        if (recover)
+        {
+            Assert.True(directive.OutwardDepartureOnly);
+            Assert.True(directive.SuggestedTarget!.Value.X > vehicle.Pose.Position.X);
+            Assert.InRange(directive.MaximumSpeed, .01f, 1);
+            Assert.Null(Assert.Single(planner.CaptureState().Vehicles).RecoveryTarget);
+            var transferred = new PredictiveTrafficPlanner();
+            transferred.RestoreState(planner.CaptureState());
+            bodies.Clear();
+            var next = Assert.Single(planner.PlanBatch(Frame(51), [intent], geometry, 3, 100000, out _));
+            var restoredNext = Assert.Single(transferred.PlanBatch(Frame(51), [intent], geometry, 3, 100000, out _));
+            Assert.Equal(next, restoredNext);
+            Assert.NotEqual(NavigationTrafficAction.Recovery, next.Action);
+            Assert.False(next.OutwardDepartureOnly);
+        }
+        else Assert.False(directive.OutwardDepartureOnly);
+
+    }
+
+    [Fact]
+    public void OutwardOnlyActualStepsRejectInwardMotionNewEntryRotationAndInsufficientWork()
+    {
+        var (frame, _) = Crossing();
+        var profile = frame.Vehicles[0].Profile;
+        var start = new NavigationPose(new(21, .5f, 17), Quaternion.Identity);
+        var end = start with { Position = new(23, .5f, 17) };
+        var passage = new NavigationTrafficPassage(1, new(new(20, .5f, 20), Quaternion.Identity), new(4, 1, 4));
+        Assert.True(PredictiveTrafficPlanner.TryCheckOutwardStep(profile, start, end, [passage], 100, out int work, out bool complete));
+        Assert.True(complete); Assert.InRange(work, 1, 100);
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile, start, start with { Position = new(20, .5f, 17) }, [passage], 100, out _, out _));
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile, start, start with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, 1) }, [passage], 100, out _, out _));
+        var other = new NavigationTrafficPassage(2, new(new(24, .5f, 17), Quaternion.Identity), new(.5f, 1, 4));
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile, start, end, [passage, other], 100, out _, out _));
+        Assert.False(PredictiveTrafficPlanner.TryCheckOutwardStep(profile, start, end, [passage], 1, out work, out complete));
+        Assert.False(complete); Assert.InRange(work, 0, 1);
     }
 
     [Theory]

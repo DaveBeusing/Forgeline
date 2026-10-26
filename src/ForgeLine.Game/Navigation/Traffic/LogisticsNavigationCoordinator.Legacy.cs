@@ -305,7 +305,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         var from = new NavigationPose(start.Position, start.Rotation);
         var to = new NavigationPose(end.Position, end.Rotation);
         if (!profile.IsValid || !from.IsValid || !to.IsValid ||
-            !NavigationMotionArbitrator.TryBuildSweptOccupancy(from, to, profile, out var pose, out var half))
+            !NavigationMotionArbitrator.TryBuildSweptOccupancy(from, to, profile, out var pose, out var half, includeNumericalPadding: false))
         { _legacyComplete = false; return; }
         _legacyEnvelopes.Add(new(new(NavigationObstacleSource.TrafficReservation, (ulong)entity.Index + 1, entity.Generation),
             NavigationObstacleKind.Reservation, pose, half, Vector3.Zero));

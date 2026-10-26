@@ -195,4 +195,21 @@ internal sealed partial class PredictiveTrafficPlanner
         }
         return false;
     }
+    internal static bool TryCheckOutwardStep(in NavigationVehicleProfile profile, in NavigationPose start,
+        in NavigationPose end, IReadOnlyList<NavigationTrafficPassage> passages, int allowance, out int work, out bool complete, bool requireOutward = true)
+    {
+        work = 0; complete = true;
+        if (!requireOutward && start.Position.X == end.Position.X && start.Position.Z == end.Position.Z) return false;
+        ReadOnlySpan<NavigationPose> path = [start, end];
+        foreach (var passage in passages)
+        {
+            if (allowance - work < 2) { work = allowance; complete = false; return false; }
+            work += 2;
+            if (Touches(passage, path, profile) && (requireOutward
+                ? !IsOutwardDeparture(passage, start, end, profile)
+                : !Occupies(passage, start, profile.HalfExtents, profile.ClearanceMeters))) return false;
+        }
+        return true;
+    }
+
 }
