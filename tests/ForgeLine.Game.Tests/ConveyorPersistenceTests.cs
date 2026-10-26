@@ -15,6 +15,32 @@ public sealed class ConveyorPersistenceTests
     private static readonly PlayerId Player = new(1);
     private static readonly ulong[] ContinuationTicks = [1, 7, 24];
 
+    [Fact]
+    public void PlayerDemolitionRemovesConveyorAndReplaysThroughTheNormalCommandBoundary()
+    {
+        using MatchRuntime runtime = CreateRuntime(17);
+        var gateway = new PlayerCommandGateway(runtime.Simulation, runtime.Services.BuildingCommands,
+            runtime.BattlefieldRuntime.MatchStateEntity, demolition: runtime.Services.Demolition);
+        runtime.Simulation.RegisterTickObserver(gateway);
+        ExecuteConveyor(runtime, new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Standard,
+            new(160, 0, 80), new(160, 0, 80), BuildingOrientation.North, 0, true));
+        ConveyorOwnedPiece target = Assert.Single(Carriers(runtime));
+        InventoryId buffer = runtime.Simulation.Entities.GetComponent<ConveyorFlowState>(target.Entity).Buffer;
+
+        Assert.True(gateway.SubmitDemolition(Player, [target.Entity], runtime.Simulation.CurrentTick).Accepted);
+        runtime.Simulation.AdvanceOneTick();
+
+        Assert.True(gateway.Results.TryRead(out var result));
+        Assert.Equal(1, result.AcceptedTargets);
+        Assert.Equal(0, result.RejectedTargets);
+        Assert.Empty(Assert.Single(result.DemolitionTargets!).Refunded);
+        Assert.False(runtime.Simulation.Entities.IsAlive(target.Entity));
+        Assert.False(runtime.Inventories.Contains(buffer));
+        Assert.Empty(Pieces(runtime));
+        Assert.Contains(runtime.Replay.CaptureCommands(), command => command.Kind == ReplayCommandKind.Demolition);
+        AssertRoundTripsAndContinues(runtime);
+    }
+
     [Theory]
     [InlineData(17UL)]
     [InlineData(831UL)]

@@ -17,13 +17,15 @@ public enum BuildingDemolitionFailure : byte
     InventoryNotEmpty = 6,
     InsufficientRefundCapacity = 7,
     ConstructionAlreadyCancelling = 8,
-    ProductionActive = 9
+    ProductionActive = 9,
+    ConveyorRemovalRejected = 10
 }
 
 public readonly record struct BuildingDemolitionTargetResult(
     EntityId Target,
     BuildingDemolitionFailure Failure,
-    BuildingResourceCost[] Refunded)
+    BuildingResourceCost[] Refunded,
+    ConveyorFailure ConveyorFailure = ConveyorFailure.None)
 {
     public bool Accepted => Failure == BuildingDemolitionFailure.None;
 }
@@ -85,17 +87,20 @@ public sealed class BuildingDemolitionSystem : ISimulationSystem
     private readonly InventoryStore _inventories;
     private readonly SpatialGridIndex _spatialIndex;
     private readonly IReadOnlyDictionary<PlayerId, EntityId> _commandCores;
+    private readonly ConveyorConstructionService _conveyors;
     private readonly List<EntityId> _requests = [];
     private readonly Dictionary<PlayerCommandCorrelationId, BuildingDemolitionBatchResult> _results = [];
 
     public BuildingDemolitionSystem(
         InventoryStore inventories,
         SpatialGridIndex spatialIndex,
-        IReadOnlyDictionary<PlayerId, EntityId> commandCores)
+        IReadOnlyDictionary<PlayerId, EntityId> commandCores,
+        ConveyorConstructionService conveyors)
     {
         _inventories = inventories ?? throw new ArgumentNullException(nameof(inventories));
         _spatialIndex = spatialIndex ?? throw new ArgumentNullException(nameof(spatialIndex));
         _commandCores = commandCores ?? throw new ArgumentNullException(nameof(commandCores));
+        _conveyors = conveyors ?? throw new ArgumentNullException(nameof(conveyors));
     }
 
     public SimulationPhase Phase => SimulationPhase.OrderProcessing;
@@ -142,12 +147,26 @@ public sealed class BuildingDemolitionSystem : ISimulationSystem
             new(entity, reason, []);
 
         if (!context.Entities.IsAlive(entity) ||
-            !context.Entities.TryGetComponent(entity, out ControllableEntity controlled) ||
-            controlled.Category != ControllableEntityCategory.Building)
+            !context.Entities.TryGetComponent(entity, out ControllableEntity controlled))
             return Fail(BuildingDemolitionFailure.InvalidTarget);
 
         if (controlled.Owner != issuer)
             return Fail(BuildingDemolitionFailure.NotOwned);
+
+        if (context.Entities.TryGetComponent(entity, out ConveyorPiece conveyor))
+        {
+            if (!_commandCores.TryGetValue(issuer, out EntityId payer))
+                return Fail(BuildingDemolitionFailure.CommandCoreUnavailable);
+            ConveyorPlacement placement = conveyor.Placement;
+            var removal = new ConveyorBuildRequest(ConveyorEdit.Remove, placement.Module,
+                placement.Pivot, placement.Pivot, placement.Orientation, placement.Tier, true, entity);
+            ConveyorFailure failure = _conveyors.Apply(context, issuer, removal, payer);
+            return new(entity, failure == ConveyorFailure.None ? BuildingDemolitionFailure.None :
+                BuildingDemolitionFailure.ConveyorRemovalRejected, [], failure);
+        }
+
+        if (controlled.Category != ControllableEntityCategory.Building)
+            return Fail(BuildingDemolitionFailure.InvalidTarget);
 
         if (context.Entities.TryGetComponent(entity, out ConstructionSite site))
         {

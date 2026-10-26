@@ -381,12 +381,6 @@ public sealed class MatchRuntime : IDisposable
                 battlefieldRuntime,
                 matchConfiguration,
                 settings.StartingStock);
-        var demolition = new BuildingDemolitionSystem(
-            inventories,
-            spatialIndex,
-            matchConfiguration.Participants.ToDictionary(
-                participant => participant.Player,
-                participant => initialization.GetBase(participant.Player).CommandCore));
         AxisAlignedBounds[] entityObstacles =
             CollectStaticNavigationObstacles(
                 simulation);
@@ -435,6 +429,13 @@ public sealed class MatchRuntime : IDisposable
 
         var conveyors = new ConveyorConstructionService(simulation, terrain, spatialIndex, inventories, battlefield)
         { NavigationChanged = strategicInfrastructure.RefreshConveyorNavigation };
+        var demolition = new BuildingDemolitionSystem(
+            inventories,
+            spatialIndex,
+            matchConfiguration.Participants.ToDictionary(
+                participant => participant.Player,
+                participant => initialization.GetBase(participant.Player).CommandCore),
+            conveyors);
 
         var combatRuntime =
             new CombatRuntime();
