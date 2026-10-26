@@ -229,3 +229,13 @@ The early Operations chain diagnosis and safe focus CI step checks transient con
 ## Alternate battlefield
 
 Central Divide remains the default; Split Basin is selected in New Game or via `--scenario split-basin` in client/headless. Both use the same compiled registry, save/replay and deployed package contracts. See [Split Basin](SplitBasinBattlefield.md) for actual-data geography, normal-stock opening, route measurements and reproducible checks. The early Split Basin gate adds focused geography/runtime tests and map compilation without removing any existing gates.
+
+## Developer tools foundation
+
+The default public build excludes developer implementations. Internal Release builds
+opt in with -p:ForgeLineEnableDeveloperTools=true and use isolated bin/Developer
+and obj/Developer roots. Use the same property for restore and dependent builds.
+The public publisher forces false and verifies assembly variant metadata.
+See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
+request/result, parameter, preset and provider contracts and ownership handoffs.
+No menu or mutating tool is implied by these contracts.

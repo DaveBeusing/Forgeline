@@ -3,10 +3,15 @@ param(
     [string]$Configuration = "Release",
     [string]$OutputRoot = "artifacts/prealpha",
     [switch]$VerifyReproducible,
+    [bool]$ForgeLineEnableDeveloperTools = $false,
     [string]$RuntimeAssetRoot
 )
 
 $ErrorActionPreference = "Stop"
+if ($ForgeLineEnableDeveloperTools -or
+    ($env:ForgeLineEnableDeveloperTools -and $env:ForgeLineEnableDeveloperTools -ine 'false')) {
+    throw 'The public publisher refuses developer-tools configuration. Use separate internal distribution.'
+}
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/Versioning.ps1"
 $buildVersion = if ($env:FORGELINE_BUILD_VERSION) { $env:FORGELINE_BUILD_VERSION } else { "$(Get-ProductVersion)-dev" }
@@ -48,6 +53,7 @@ function Publish-Client {
         "--self-contained", "false",
         "-p:ContinuousIntegrationBuild=true",
         "-p:Deterministic=true",
+        "-p:ForgeLineEnableDeveloperTools=false",
         "--output", $Destination
     )
 
@@ -57,6 +63,7 @@ function Publish-Client {
         throw "dotnet publish failed with exit code $LASTEXITCODE."
     }
 
+    & "$PSScriptRoot/Assert-PublicBuild.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Validate-ScenarioPackage.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Validate-UiFonts.ps1" -PublishRoot $Destination
     & "$PSScriptRoot/Test-WindowsApplicationIcon.ps1" -ClientPath (Join-Path $Destination 'ForgeLine.Client.exe')
@@ -105,6 +112,7 @@ function Publish-Client {
         runUrl = if ($env:GITHUB_RUN_ID) { "https://github.com/DaveBeusing/Forgeline/actions/runs/$env:GITHUB_RUN_ID" } else { $null }
         targetFramework = "net10.0-windows"; runtimeIdentifier = "win-x64"
         configuration = $Configuration; sdk = $sdk; sourceTreeClean = ($dirty.Count -eq 0)
+        buildVariant = "Public"; developerToolsEnabled = $false
         runtimeAssetSignature = $runtimeManifest.contentSignature; runtimeAssetCompiler = $runtimeManifest.compilerVersion
         scenarioMaps = @(Get-ChildItem -LiteralPath (Join-Path $Destination 'maps') -Filter '*.flmap.json' -File | Sort-Object Name | ForEach-Object {
             @{ file = $_.Name; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }

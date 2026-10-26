@@ -381,3 +381,13 @@ Presentation owns shared creating-thread page leases, ordered UiSkinBatch geomet
 and the representative menu control. Graphics retains device, descriptors and
 fence/resource retirement. UI retains input geometry and commands. No Simulation
 or Headless project references change. See [compiled UI atlases](UiAtlasRendering.md).
+
+## Developer tools foundation
+
+The default public build excludes developer implementations. Internal Release builds
+opt in with -p:ForgeLineEnableDeveloperTools=true and use isolated bin/Developer
+and obj/Developer roots. Use the same property for restore and dependent builds.
+The public publisher forces false and verifies assembly variant metadata.
+See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
+request/result, parameter, preset and provider contracts and ownership handoffs.
+No menu or mutating tool is implied by these contracts.
