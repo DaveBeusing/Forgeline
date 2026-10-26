@@ -15,7 +15,7 @@ Project-specific approval metadata is intentionally not fabricated. Until this d
 - **Integration branch:** `master`
 - **Language baseline:** C# 14
 - **Runtime baseline:** .NET 10 LTS
-- **Configured SDK:** .NET SDK 10.0.401 selected by `global.json`
+- **Configured SDK:** .NET SDK 10.0.402 selected by `global.json`
 - **Package management:** centrally managed through `Directory.Packages.props`
 - **Versioning:** SemVer `MAJOR.MINOR.PATCH`, centrally defined in `Directory.Build.props`; baseline `0.1.0`
 - **Interactive host baseline:** Windows x64

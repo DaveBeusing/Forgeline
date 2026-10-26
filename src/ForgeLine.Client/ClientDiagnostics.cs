@@ -44,6 +44,8 @@ internal static class ClientDiagnostics
             builder.AppendLine(ClientBuildIdentity.SourceRevision);
             builder.Append("BuildId: ");
             builder.AppendLine(ClientBuildIdentity.BuildId);
+            builder.Append("BuildVariant: ");
+            builder.AppendLine(ClientBuildIdentity.BuildVariant);
             builder.Append("OS: ");
             builder.AppendLine(
                 RuntimeInformation.OSDescription);

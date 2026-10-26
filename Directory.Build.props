@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ForgeLineVersionMajor>0</ForgeLineVersionMajor>
     <ForgeLineVersionMinor>1</ForgeLineVersionMinor>
-    <ForgeLineVersionPatch>479</ForgeLineVersionPatch>
+    <ForgeLineVersionPatch>480</ForgeLineVersionPatch>
     <VersionPrefix>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).$(ForgeLineVersionPatch)</VersionPrefix>
     <Version Condition="'$(FORGELINE_BUILD_VERSION)' != ''">$(FORGELINE_BUILD_VERSION)</Version>
     <Version Condition="'$(Version)' == ''">$(VersionPrefix)-dev</Version>
@@ -11,6 +11,14 @@
     <FileVersion>$(VersionPrefix).0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    <ForgeLineEnableDeveloperTools Condition="'$(ForgeLineEnableDeveloperTools)' == ''">false</ForgeLineEnableDeveloperTools>
+    <ForgeLineBuildVariant Condition="'$(ForgeLineEnableDeveloperTools)' == 'true'">Developer</ForgeLineBuildVariant>
+    <ForgeLineBuildVariant Condition="'$(ForgeLineEnableDeveloperTools)' != 'true'">Public</ForgeLineBuildVariant>
+    <BaseOutputPath Condition="'$(ForgeLineEnableDeveloperTools)' == 'true'">bin/Developer/</BaseOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(ForgeLineEnableDeveloperTools)' == 'true'">obj/Developer/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath Condition="'$(ForgeLineEnableDeveloperTools)' == 'true'">$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)/obj/**;$(MSBuildProjectDirectory)/bin/**</DefaultItemExcludes>
+    <DefineConstants Condition="'$(ForgeLineEnableDeveloperTools)' == 'true'">$(DefineConstants);FORGELINE_DEVELOPER_TOOLS</DefineConstants>
     <LangVersion>14.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -21,6 +29,8 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <ItemGroup>
+    <AssemblyMetadata Include="BuildVariant" Value="$(ForgeLineBuildVariant)" />
+    <AssemblyMetadata Include="DeveloperToolsEnabled" Value="$(ForgeLineEnableDeveloperTools)" />
     <AssemblyMetadata Include="BuildId" Value="$(GITHUB_RUN_ID).$(GITHUB_RUN_ATTEMPT)" Condition="'$(GITHUB_RUN_ID)' != ''" />
   </ItemGroup>
 </Project>
