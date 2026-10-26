@@ -215,6 +215,7 @@ public sealed class ConveyorAutomaticRoutingTests
         var options = new JsonSerializerOptions { IncludeFields = true };
         string legacy = JsonSerializer.Serialize(request, options);
         Assert.DoesNotContain("AutomaticRouting", legacy, StringComparison.Ordinal);
+        Assert.DoesNotContain("AutomaticHeight", legacy, StringComparison.Ordinal);
         Assert.False(JsonSerializer.Deserialize<ConveyorBuildRequest>(legacy, options).AutomaticRouting);
         string automatic = JsonSerializer.Serialize(request with { AutomaticRouting = true }, options);
         Assert.True(JsonSerializer.Deserialize<ConveyorBuildRequest>(automatic, options).AutomaticRouting);

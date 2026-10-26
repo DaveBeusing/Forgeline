@@ -74,7 +74,8 @@ internal sealed class ConveyorEndpointPicker
                     !Closer(distance, row.Entity, nearest, chosen)) continue;
                 nearest = distance;
                 chosen = row.Entity;
-                int rise = (int)MathF.Round((socket.Position.Y - row.Piece.Placement.Pivot.Y - CarrierHeight) / 2);
+                int rise = row.Piece.Placement.RiseMeters!=0?0:
+                    (int)MathF.Round((socket.Position.Y - row.Piece.Placement.Pivot.Y - CarrierHeight) / 2);
                 endpoint = new(socket.Position - Vector3.UnitY * CarrierHeight, EntityId.Invalid,
                     Math.Clamp(row.Piece.Placement.Tier + rise, 0, 1), socket.Facing, input);
             }

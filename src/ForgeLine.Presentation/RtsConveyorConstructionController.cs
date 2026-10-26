@@ -160,7 +160,8 @@ public sealed class RtsConveyorConstructionController
             }
         }
         var request=new ConveyorBuildRequest(Edit,Module,_anchor??target,target,Orientation,Tier,XFirst,entity,
-            _sourcePort,destination,AutomaticRouting:Module==ConveyorModule.Route,SnapToSocket:snapModule);
+            _sourcePort,destination,AutomaticRouting:Module==ConveyorModule.Route,SnapToSocket:snapModule,
+            AutomaticHeight:Edit==ConveyorEdit.Build);
         if(_requested!=request)
         {
             _requested=request;_requestId++;
@@ -259,7 +260,7 @@ public sealed class RtsConveyorConstructionController
     }
     public static string Explain(ConveyorFailure failure)=>failure switch
     {
-        ConveyorFailure.None=>"READY",ConveyorFailure.LimitReached=>"INFRASTRUCTURE LIMIT: REMOVE UNUSED PARTS",ConveyorFailure.Terrain=>"TERRAIN: KEEP 5M CLEARANCE AND LEVEL SUPPORT FEET",
+        ConveyorFailure.None=>"READY",ConveyorFailure.LimitReached=>"INFRASTRUCTURE LIMIT: REMOVE UNUSED PARTS",ConveyorFailure.Terrain=>"TERRAIN EXCEEDS SUPPORT OR SLOPE LIMITS / CHANGE ROUTE",
         ConveyorFailure.SupportOnRoad=>"SUPPORT BLOCKS ROAD / MOVE THE ROUTE",
         ConveyorFailure.OutsideBuildArea=>"OUTSIDE OWN BUILD AREA / MOVE CLOSER TO BASE",ConveyorFailure.Obstructed=>"BLOCKED BY BUILDING, VEHICLE OR BELT / MOVE ROUTE",
         ConveyorFailure.InsufficientStock=>"NOT ENOUGH STEEL IN COMMAND CORE",

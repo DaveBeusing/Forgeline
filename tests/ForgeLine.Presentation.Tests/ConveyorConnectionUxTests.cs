@@ -170,6 +170,7 @@ public sealed class ConveyorConnectionUxTests
         Assert.Equal(source.Entity, preview.Request.SourcePortBuilding);
         Assert.Equal(destination.Entity, preview.Request.DestinationPortBuilding);
         Assert.True(preview.Request.AutomaticRouting);
+        Assert.True(preview.Request.AutomaticHeight);
         var confirmed = Snapshot([source, destination], ports, requestId: preview.Id,
             preview: new(ConveyorFailure.None,
                 [new(ConveyorModule.Standard, Vector3.Zero, BuildingOrientation.East, 0)], 14));

@@ -28,26 +28,45 @@ public readonly record struct ConveyorBuildRequest(
     EntityId Target = default, EntityId SourcePortBuilding = default,
     EntityId DestinationPortBuilding = default,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool AutomaticRouting = false,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool SnapToSocket = false);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool SnapToSocket = false,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool AutomaticHeight = false);
 public readonly record struct ConveyorSocket(Vector3 Position, Vector3 Facing, bool Input);
 public readonly record struct ConveyorPlacement(ConveyorModule Module, Vector3 Pivot,
     BuildingOrientation Orientation, int Tier,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] float SpanMeters = 0)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] float SpanMeters = 0,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] float RiseMeters = 0,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] float SupportHeightMeters = 0)
 {
     public bool IsSupport => Module is ConveyorModule.Support or ConveyorModule.RaisedSupport;
-    public Quaternion Rotation => BuildingFootprint.GetRotation(Orientation);
+    public Quaternion Rotation => RiseMeters == 0 ? BuildingFootprint.GetRotation(Orientation) :
+        Quaternion.Concatenate(Quaternion.CreateFromAxisAngle(Vector3.UnitX,-MathF.Atan2(RiseMeters,HorizontalSpan)),
+            BuildingFootprint.GetRotation(Orientation));
     [JsonIgnore]
-    public Vector3 LocalScale => Module == ConveyorModule.ShortSegment && SpanMeters > 0
-        ? new(1, 1, SpanMeters / 4) : Vector3.One;
-    public Vector3 Point(Vector3 local) => Pivot + Vector3.Transform(
-        SpanMeters == 0 ? local : local * LocalScale, Rotation);
+    public float HorizontalSpan => Module == ConveyorModule.Standard ? 8 : SpanMeters > 0 ? SpanMeters : 4;
+    [JsonIgnore]
+    public Vector3 LocalScale => new(1,
+        IsSupport && SupportHeightMeters > 0 ? SupportHeightMeters / ConveyorGeometry.LocalBounds(Module).Maximum.Y : 1,
+        RiseMeters != 0 ? MathF.Sqrt(HorizontalSpan*HorizontalSpan+RiseMeters*RiseMeters)/(Module==ConveyorModule.Standard?8:4) :
+        Module == ConveyorModule.ShortSegment && SpanMeters > 0 ? SpanMeters/4 : 1);
+    [JsonIgnore]
+    public Vector3 RenderPivot => RiseMeters == 0 ? Pivot : Pivot + Vector3.UnitY*5.8f -
+        Vector3.Transform(Vector3.UnitY*5.8f*LocalScale,Rotation);
+    public Vector3 Point(Vector3 local) => RenderPivot + Vector3.Transform(local * LocalScale, Rotation);
+    public float UndersideAt(float x, float z)
+    {
+        if(RiseMeters==0)return Pivot.Y+ConveyorGeometry.LocalBounds(Module).Minimum.Y*LocalScale.Y;
+        Vector3 direction=Vector3.Transform(Vector3.UnitZ,BuildingFootprint.GetRotation(Orientation));
+        float along=(x-Pivot.X)*direction.X+(z-Pivot.Z)*direction.Z;
+        float grade=RiseMeters/HorizontalSpan;
+        return Pivot.Y+5.8f+along*grade-.6f*MathF.Sqrt(1+grade*grade);
+    }
     public ConveyorSocket[] Sockets
     {
         get
         {
             ConveyorPlacement placement=this;
             return ConveyorGeometry.Sockets(Module).Select(s => new ConveyorSocket(
-                placement.Point(s.Position), Vector3.Transform(s.Facing, placement.Rotation), s.Input)).ToArray();
+                placement.Point(s.Position), Vector3.Transform(s.Facing, BuildingFootprint.GetRotation(placement.Orientation)), s.Input)).ToArray();
         }
     }
     public AxisAlignedBounds Bounds
@@ -103,6 +122,10 @@ public static class ConveyorGeometry
         ConveyorModule.Merger or ConveyorModule.Splitter=>24,
         ConveyorModule.Endcap=>4, _=>16
     };
+    public static double Cost(ConveyorPlacement placement) => placement.SupportHeightMeters > 0 ?
+        Cost(placement.Module)*Math.Max(1,Math.Ceiling(placement.SupportHeightMeters/LocalBounds(placement.Module).Maximum.Y)) :
+        placement.RiseMeters != 0 ? Math.Ceiling(Cost(placement.Module)*Math.Sqrt(1+
+            Math.Pow(placement.RiseMeters/placement.HorizontalSpan,2))) : Cost(placement.Module);
     public static string Name(ConveyorModule module)=>module switch
     {
         ConveyorModule.Route=>"Draw route",ConveyorModule.ShortSegment=>"Short belt",ConveyorModule.Standard=>"Standard belt",
@@ -301,7 +324,7 @@ public sealed class ConveyorConstructionService
                 request=ResolveReplacementRequest(request,old);
             if (TryGetAdapterReattachment(entities, owner, request, old, out _))
             {
-                double cost = ConveyorGeometry.Cost(old.Placement.Module);
+                double cost = ConveyorGeometry.Cost(old.Placement);
                 return new(_stock.GetAvailableQuantity(storage.InventoryId, ResourceIds.Steel) < cost ?
                     ConveyorFailure.InsufficientStock : ConveyorFailure.None,
                     Array.AsReadOnly(new[] { old.Placement }), cost);
@@ -403,7 +426,9 @@ public sealed class ConveyorConstructionService
             else
             pieces.Add(new(module,module is ConveyorModule.Support or ConveyorModule.RaisedSupport?
                 start with {Y=ground}:start,request.Orientation,module==ConveyorModule.RaisedSupport?1:request.Tier,
-                SpanMeters:request.Edit==ConveyorEdit.Replace && module==old.Placement.Module?old.Placement.SpanMeters:0));
+                SpanMeters:request.Edit==ConveyorEdit.Replace && module==old.Placement.Module?old.Placement.SpanMeters:0,
+                RiseMeters:request.Edit==ConveyorEdit.Replace && module==old.Placement.Module?old.Placement.RiseMeters:0,
+                SupportHeightMeters:request.Edit==ConveyorEdit.Replace && module==old.Placement.Module?old.Placement.SupportHeightMeters:0));
         }
         return CompletePlan(entities, owner, request, storage, pieces, ground, old, existingPieces);
 
@@ -436,7 +461,7 @@ public sealed class ConveyorConstructionService
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
                 port.Building == request.SourcePortBuilding && !port.Input);
-            if (!port.Building.IsValid || request.Tier != 0 ||
+            if (!port.Building.IsValid || !request.AutomaticHeight && request.Tier!=0 ||
                 Vector3.DistanceSquared(port.Position, start + Vector3.UnitY * 5.8f) >= .0004f)
                 return Fail(ConveyorFailure.PortMismatch);
             sourcePort = port;
@@ -449,7 +474,7 @@ public sealed class ConveyorConstructionService
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
                 port.Building == request.DestinationPortBuilding && port.Input);
-            if (!port.Building.IsValid || request.Tier != 0 ||
+            if (!port.Building.IsValid || !request.AutomaticHeight && request.Tier!=0 ||
                 Vector3.DistanceSquared(port.Position, end + Vector3.UnitY * 5.8f) >= .0004f)
                 return Fail(ConveyorFailure.PortMismatch);
             destinationPort = port;
@@ -462,10 +487,16 @@ public sealed class ConveyorConstructionService
         if (destinationPort is null && !endSocket) end = start + ConveyorGeometry.Snap(end - start);
         if (!_terrain.TrySampleHeight(start.X, start.Z, out float ground)) return Fail(ConveyorFailure.Terrain);
         if (sourcePort is not null || startSocket) ground = start.Y - request.Tier * 2;
-        if ((destinationPort is not null || endSocket) && MathF.Abs(end.Y - ground - request.Tier * 2) > .02f)
-            return Fail(ConveyorFailure.PortMismatch);
-        start.Y = ground + request.Tier * 2;
-        end.Y = start.Y;
+        if(!request.AutomaticHeight && (destinationPort is not null || endSocket) &&
+            MathF.Abs(end.Y-ground-request.Tier*2)>.02f)return Fail(ConveyorFailure.PortMismatch);
+        start.Y = !request.AutomaticHeight || (sourcePort is null && !startSocket) ? ground+request.Tier*2 : start.Y;
+        if(!request.AutomaticHeight)end.Y=start.Y;
+        else if(destinationPort is null && !endSocket)
+        {
+            if(!_terrain.TrySampleHeight(end.X,end.Z,out float endGround))return Fail(ConveyorFailure.Terrain);
+            end.Y=endGround+request.Tier*2;
+        }
+        float startHeight=start.Y,endHeight=end.Y;
 
         ConveyorPlacement? sourceAdapter = null, destinationAdapter = null;
         if (sourcePort is { } output)
@@ -483,7 +514,7 @@ public sealed class ConveyorConstructionService
         float adapterLength = (sourceAdapter.HasValue ? 4 : 0) + (destinationAdapter.HasValue ? 4 : 0);
         if (MathF.Abs(end.X - start.X) + MathF.Abs(end.Z - start.Z) + adapterLength > 256)
             return Fail(ConveyorFailure.RouteTooLong);
-        var candidates = ConveyorAutomaticRouter.CreateCandidates(start, end, departure, arrival,
+        var candidates = ConveyorAutomaticRouter.CreateCandidates(start, end with {Y=start.Y}, departure, arrival,
             request.Tier, request.XFirst, 256 - adapterLength);
         ConveyorPlan? firstFailure = null, affordableFailure = null;
         foreach (ConveyorRouteCandidate candidate in candidates)
@@ -493,6 +524,12 @@ public sealed class ConveyorConstructionService
             if (sourceAdapter.HasValue) pieces.Add(sourceAdapter.Value);
             pieces.AddRange(candidate.Pieces);
             if (destinationAdapter.HasValue) pieces.Add(destinationAdapter.Value);
+            if(request.AutomaticHeight)
+            {
+                if(!ConveyorTerrainRouter.TryFit(pieces,startHeight,endHeight,_terrain,out var fitted))
+                {firstFailure??=Fail(ConveyorFailure.Terrain);continue;}
+                pieces=fitted;
+            }
             if (pieces.Count == 0 || !ConveyorAutomaticRouter.IsConnected(pieces) ||
                 ConveyorAutomaticRouter.HasSelfIntersection(pieces)) continue;
             ConveyorPlan plan = CompletePlan(entities, owner, request, storage, pieces, ground, default, existing);
@@ -535,12 +572,20 @@ public sealed class ConveyorConstructionService
         ConveyorPlan Fail(ConveyorFailure failure, double cost = 0) =>
             new(failure, Array.AsReadOnly(pieces.ToArray()), cost)
             { FailurePosition = failurePosition, Obstruction = obstruction };
-        if (pieces.Any(piece => !float.IsFinite(piece.SpanMeters) || piece.SpanMeters != 0 &&
+        if (pieces.Any(piece => !float.IsFinite(piece.RiseMeters) || !float.IsFinite(piece.SupportHeightMeters) ||
+            piece.SupportHeightMeters < 0 || piece.SupportHeightMeters > ConveyorTerrainRouter.MaximumSupportHeight ||
+            piece.SupportHeightMeters > 0 && !piece.IsSupport ||
+            piece.RiseMeters != 0 && (piece.Module is not (ConveyorModule.Standard or ConveyorModule.ShortSegment or
+                ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter) ||
+                MathF.Abs(piece.RiseMeters)>piece.HorizontalSpan*ConveyorTerrainRouter.MaximumGrade+.001f) ||
+            !float.IsFinite(piece.SpanMeters) || piece.SpanMeters != 0 &&
             (piece.Module != ConveyorModule.ShortSegment ||
              piece.SpanMeters < ConveyorAutomaticRouter.MinimumSpanMeters || piece.SpanMeters > 4)))
             return Fail(ConveyorFailure.InvalidRequest);
         IReadOnlyList<ConveyorBuildingPort> ports = CapturePorts(entities, owner);
-        // Real supports at carrier ends, never a ground-blocking span AABB.
+        bool localSupports=request.AutomaticHeight || old.Placement.RiseMeters!=0 ||
+            old.Placement.SupportHeightMeters>0;
+        // Each footing reaches the local ground, including independently elevated building foundations.
         foreach (ConveyorPlacement part in pieces.ToArray())
         {
             if (part.IsSupport || part.Module==ConveyorModule.Endcap) continue;
@@ -553,11 +598,25 @@ public sealed class ConveyorConstructionService
                     (port.Building==request.SourcePortBuilding || port.Building==request.DestinationPortBuilding) &&
                     Vector3.DistanceSquared(port.Position,socket.Position)<.0004f))continue;
                 if (pieces.Any(v=>v.IsSupport && Vector3.DistanceSquared(v.Pivot,foot)<.01f)) continue;
+                float supportHeight=0;
+                if(localSupports)
+                {
+                    if(!_terrain.TrySampleHeight(p.X,p.Z,out float localGround))return Fail(ConveyorFailure.Terrain);
+                    foot.Y=localGround;
+                    supportHeight=p.Y+5.22f-localGround;
+                    if(!float.IsFinite(supportHeight) || supportHeight<=0 || supportHeight>ConveyorTerrainRouter.MaximumSupportHeight)
+                        return Fail(ConveyorFailure.Terrain);
+                    tier=supportHeight>5.221f?1:0;
+                    float nominal=tier==0?5.22f:7.22f;
+                    if(MathF.Abs(supportHeight-nominal)<.001f)supportHeight=0;
+                    if(pieces.Any(v=>v.IsSupport && Vector3.DistanceSquared(v.Pivot,foot)<.01f))continue;
+                }
                 // Skip road footings; only a bounded 16m support interval may bridge them.
-                if(!OnRoad(foot))pieces.Add(new(tier==0?ConveyorModule.Support:ConveyorModule.RaisedSupport,foot,BuildingOrientation.North,tier));
+                if(!OnRoad(foot))pieces.Add(new(tier==0?ConveyorModule.Support:ConveyorModule.RaisedSupport,foot,
+                    BuildingOrientation.North,tier,SupportHeightMeters:supportHeight));
             }
         }
-        double price=pieces.Sum(p=>ConveyorGeometry.Cost(p.Module));
+        double price=pieces.Sum(ConveyorGeometry.Cost);
         if(entities.GetComponentCount<ConveyorPiece>()+pieces.Count>4096)return Fail(ConveyorFailure.LimitReached,price);
         if (request.Edit==ConveyorEdit.Replace)
         {
@@ -580,7 +639,8 @@ public sealed class ConveyorConstructionService
                     float x=float.Lerp(bounds.Minimum.X,bounds.Maximum.X,(float)xi/xSteps);
                     float z=float.Lerp(bounds.Minimum.Z,bounds.Maximum.Z,(float)zi/zSteps);
                     if (!_terrain.TrySampleHeight(x,z,out float height)) return Fail(ConveyorFailure.Terrain,price);
-                    if (part.IsSupport?MathF.Abs(height-part.Pivot.Y)>.2f:height>bounds.Minimum.Y-5)
+                    if (part.IsSupport?MathF.Abs(height-part.Pivot.Y)>.2f:
+                        height>(part.RiseMeters==0?bounds.Minimum.Y:part.UndersideAt(x,z))-5)
                         return Fail(ConveyorFailure.Terrain,price);
                 }
             if (part.IsSupport && OnRoad(part.Pivot)) return Fail(ConveyorFailure.SupportOnRoad,price);
@@ -610,8 +670,14 @@ public sealed class ConveyorConstructionService
                 if (entities.TryGetComponent(entity,out ConveyorPiece existing))
                 {
                     if (part.IsSupport && existing.Placement.IsSupport && existing.Owner==owner &&
-                        Vector3.DistanceSquared(part.Pivot,existing.Placement.Pivot)<.01f && part.Module==existing.Placement.Module)
-                    { pieces.RemoveAt(i--); price-=ConveyorGeometry.Cost(part.Module); break; }
+                        Vector3.DistanceSquared(part.Pivot,existing.Placement.Pivot)<.01f && part.Module==existing.Placement.Module &&
+                        MathF.Abs(part.Bounds.Maximum.Y-existing.Placement.Bounds.Maximum.Y)<.01f)
+                    { pieces.RemoveAt(i--); price-=ConveyorGeometry.Cost(part); break; }
+                    // A graded carrier's conservative AABB includes the space below its high end.
+                    // Its own exact endpoint mount is a valid contact, not an obstruction.
+                    if(existing.Owner==owner && (part.RiseMeters!=0 || part.SupportHeightMeters>0 ||
+                        existing.Placement.RiseMeters!=0 || existing.Placement.SupportHeightMeters>0) &&
+                        (Mounts(part,existing.Placement) || Mounts(existing.Placement,part)))continue;
                     foreach(var a in part.Sockets)
                         foreach(var b in existing.Placement.Sockets)
                             if(Vector3.DistanceSquared(a.Position,b.Position)<.0004f &&
@@ -649,6 +715,10 @@ public sealed class ConveyorConstructionService
         static bool CanSupport(ConveyorPlacement foot,ConveyorPlacement carrier)=>foot.IsSupport &&
             foot.Bounds.Maximum.Y>=carrier.Bounds.Minimum.Y-.03f && foot.Bounds.Maximum.Y<=carrier.Bounds.Maximum.Y &&
             Vector2.Distance(new(foot.Pivot.X,foot.Pivot.Z),new(carrier.Bounds.Center.X,carrier.Bounds.Center.Z))<=8;
+
+        static bool Mounts(ConveyorPlacement carrier,ConveyorPlacement foot)=>!carrier.IsSupport && foot.IsSupport &&
+            carrier.Sockets.Any(socket=>Vector2.Distance(new(socket.Position.X,socket.Position.Z),
+                new(foot.Pivot.X,foot.Pivot.Z))<.02f && MathF.Abs(foot.Bounds.Maximum.Y-(socket.Position.Y-.58f))<.02f);
 
         bool PortMatches(EntityId building,bool input,bool first)
         {
@@ -763,7 +833,7 @@ public sealed class ConveyorConstructionService
                     new SpatialEntryMetadata(owner.Value,(ulong)ControllableEntityCategory.Logistics,SpatialMobility.Static));
                 EntityId attachment=part.Module==ConveyorModule.InputAdapter?request.SourcePortBuilding:
                     part.Module==ConveyorModule.OutputAdapter?request.DestinationPortBuilding:EntityId.Invalid;
-                context.Entities.AddComponent(e,new ConveyorPiece(owner,part,ConveyorGeometry.Cost(part.Module),attachment,
+                context.Entities.AddComponent(e,new ConveyorPiece(owner,part,ConveyorGeometry.Cost(part),attachment,
                     AutomaticSupport:part.IsSupport && request.Module is not (ConveyorModule.Support or ConveyorModule.RaisedSupport)));
                 if (!part.IsSupport && part.Module!=ConveyorModule.Endcap)
                 {
