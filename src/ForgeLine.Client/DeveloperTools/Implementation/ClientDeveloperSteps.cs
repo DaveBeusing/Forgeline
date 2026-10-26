@@ -71,7 +71,8 @@ internal sealed partial class ClientSimulationHost
         _activeStep = null;
         _remainingSteps = 0;
         _controlRevision = checked(_controlRevision + 1);
-        try { SynchronizeLifecyclePause(); }
+        // A failed tick has no completed snapshot boundary to republish through a control command.
+        try { if (failure != ClientDeveloperControlFailure.Faulted) SynchronizeLifecyclePause(); }
         catch { failure = ClientDeveloperControlFailure.Faulted; throw; }
         finally
         {
