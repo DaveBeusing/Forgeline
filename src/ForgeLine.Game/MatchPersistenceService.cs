@@ -46,8 +46,7 @@ public static class MatchPersistenceService
 
         return new MatchReplayData(
             MatchPersistenceSerializer.CurrentSchemaVersion,
-            PersistedMatchConfiguration.Capture(
-                scenario.RuntimeSettings),
+            CaptureConfiguration(scenario),
             scenario.Simulation.CurrentTick.Value,
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),

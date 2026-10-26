@@ -66,6 +66,28 @@ UI model or WARP readback is not a physical native product acceptance result.
 
 ## Results
 
-No combined acceptance result is claimed before the explicit acceptance boundary.
+The explicit combined acceptance boundary is product commit `88c4c3bd`.
+Both affected Client Release variants compiled without warnings/errors before it.
+Canonical solution restore with normal NuGet auditing and the 47-project reference
+validator passed. The first runner attempt was blocked by the local named-pipe
+permission boundary and ran no tests; the canonical runner then executed with
+the required local permission.
+
+The first two integrated cases produced one pass and one failure. The menu/step/
+pending-profile/new-session case passed. The recovery case showed that Save/Load
+preserved the initial override while Replay exported current RuntimeSettings and
+lost the original profile. `MatchPersistenceService.CaptureReplay` now uses the
+same existing `CaptureConfiguration` path as Save. This Game persistence correction
+requires the integrated replay/hash case to be repeated; no schema, assertion or
+golden is changed. An in-progress Public solution build was cancelled for this
+source correction and supplies no completed build evidence.
+
 The initial hardware inventory query was denied access to the Windows CIM
 resource; this provides no GPU or D3D12 capability evidence.
+
+The integrated preset PR baseline at `49463f88` failed its required build-test
+at `TechnologyNormalMatchTests.NormalOpponentPaysForResearchAndReconstructsWhileProductionContinues`,
+line 49 (56/57 selected cases passed). The log reports MissingMaterials for the
+third technology. Its four auxiliary workflows passed; native-reference was
+skipped by workflow policy. This pre-existing research blocker is independent
+of the developer composition and is not waived.
