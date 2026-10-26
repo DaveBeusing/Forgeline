@@ -59,10 +59,12 @@ public sealed class ConveyorPersistenceTests
         AssertRoundTripsAndContinues(runtime);
     }
 
-    [Fact]
-    public void AutomaticRouteBetweenFreelyPlacedBuildingsDeliversAndReplaysPaidAcceptedAndRejectedRequests()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void AutomaticRouteBetweenFreelyPlacedBuildingsDeliversAndReplaysPaidAcceptedAndRejectedRequests(bool sloped)
     {
-        using MatchRuntime runtime = CreateRuntime(seed: 4137);
+        using MatchRuntime runtime = CreateRuntime(seed: 4137,sloped:sloped);
         _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 64));
         EntityId destination = Build(runtime, BuildingIds.StorageDepot, new(145.25f, 0, 112.5f));
         EntityId source = runtime.GetBase(Player).CommandCore;
@@ -73,7 +75,7 @@ public sealed class ConveyorPersistenceTests
         var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
             output.Position - Vector3.UnitY * 5.8f, input.Position - Vector3.UnitY * 5.8f,
             BuildingOrientation.North, 0, true, SourcePortBuilding: source,
-            DestinationPortBuilding: destination, AutomaticRouting: true);
+            DestinationPortBuilding: destination, AutomaticRouting: true,AutomaticHeight:sloped);
 
         // The unchanged legacy request cannot connect this deliberately non-grid layout.
         Assert.Equal(ConveyorFailure.PortMismatch, runtime.Services.Conveyors.Preview(
@@ -91,6 +93,11 @@ public sealed class ConveyorPersistenceTests
         ConveyorPlan plan = runtime.Services.Conveyors.Preview(
             runtime.Simulation.Entities, Player, request, source);
         Assert.True(plan.IsValid, plan.Failure.ToString());
+        if(sloped)
+        {
+            Assert.Contains(plan.Pieces,p=>p.RiseMeters!=0);
+            Assert.Contains(plan.Pieces,p=>p.SupportHeightMeters>0);
+        }
         ExecuteConveyor(runtime, request);
         Assert.Equal(steel - plan.Steel, TotalSteel(runtime), precision: 8);
         Assert.Contains(Carriers(runtime), row => row.Piece.Placement.SpanMeters > 0);
@@ -324,10 +331,10 @@ public sealed class ConveyorPersistenceTests
         }
     }
 
-    private static MatchRuntime CreateRuntime(ulong seed) => MatchRuntime.Create(
+    private static MatchRuntime CreateRuntime(ulong seed,bool sloped=false) => MatchRuntime.Create(
         CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, seed) with
         {
-            Composition = CreateComposition(),
+            Composition = CreateComposition(sloped),
             Participants = CentralDivideScenario.CreateDefaultParticipants(false, false),
             Scenario = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Gameplay) with
             {
@@ -336,9 +343,10 @@ public sealed class ConveyorPersistenceTests
         }, TestContext.Current.CancellationToken);
 
     private static MatchComposition ResolveComposition(string key) => key == CompositionKey
-        ? CreateComposition() : throw new InvalidOperationException($"Unknown conveyor composition: {key}");
+        ? CreateComposition() : key==CompositionKey+".sloped"?CreateComposition(true):
+        throw new InvalidOperationException($"Unknown conveyor composition: {key}");
 
-    private static MatchComposition CreateComposition()
+    private static MatchComposition CreateComposition(bool sloped=false)
     {
         MatchComposition original = CentralDivideScenario.CreateComposition();
         BattlefieldStartPosition[] starts =
@@ -355,9 +363,9 @@ public sealed class ConveyorPersistenceTests
                 start.Player, start.CommandCorePosition)).ToArray(), [], original.Battlefield.TerrainVisual);
         return original with
         {
-            Key = CompositionKey,
+            Key = sloped?CompositionKey+".sloped":CompositionKey,
             Battlefield = battlefield,
-            CreateTerrain = static _ => CreateTerrain(),
+            CreateTerrain = _ => CreateTerrain(sloped),
             CreateStartingBase = CreateStartingBase
         };
     }
@@ -377,15 +385,22 @@ public sealed class ConveyorPersistenceTests
         return side with { StartingUnits = [.. side.StartingUnits, unit] };
     }
 
-    private static TerrainWorld CreateTerrain()
+    private static TerrainWorld CreateTerrain(bool sloped=false)
     {
         var grid = new WorldGridSettings { ChunkSizeMeters = 256, HeightSamplesPerSide = 17 };
         var chunks = new List<TerrainChunk>();
         for (int x = 0; x < 2; x++)
         for (int z = 0; z < 2; z++)
+        {
+            var heights=new float[grid.HeightSamplesPerSide*grid.HeightSamplesPerSide];
+            if(sloped)
+                for(int row=0;row<grid.HeightSamplesPerSide;row++)
+                for(int column=0;column<grid.HeightSamplesPerSide;column++)
+                    heights[row*grid.HeightSamplesPerSide+column]=MathF.Max(0,(x*256+column*16-96)*.025f);
             chunks.Add(new TerrainChunk(new ChunkCoordinate(x, z),
                 new TerrainHeightfield(grid.HeightSamplesPerSide, grid.ChunkSizeMeters,
-                    new float[grid.HeightSamplesPerSide * grid.HeightSamplesPerSide])));
+                    heights)));
+        }
         return new TerrainWorld(grid, chunks);
     }
 }

@@ -91,6 +91,35 @@ another edit. Cancellation cannot retract a command that has already been submit
 
 ## Deterministic geometry decisions
 
+### Automatic terrain height
+
+New interactive routes keep both building sockets at their actual foundation
+heights. The planner fits inclined straight carriers and adapters between them,
+keeps corners level, and raises the intermediate span when terrain requires it.
+Each support samples its own local ground height and extends to the carrier
+mount. Connecting a mine output to a higher or lower smelter input therefore
+does not require manual tiers, ramps or support placement.
+
+Inclines retain the full 5m underside clearance at each terrain sample; the
+validator uses the actual inclined underside instead of the lowest point of
+the whole segment's bounding box. The bounded height fitter permits grades up
+to 1:4 and support heights up to 32m. Roads, loading lanes, build areas, occupied
+volumes and support intervals retain their placement checks. Unsupported cliffs
+can still reject a route, with an explicit support/slope-limit message.
+
+Carrier rise and support height are authoritative geometry shared by rendering,
+collision bounds, sockets, payment, replacement and save/replay reconstruction.
+Longer inclined carriers and extended supports include their material cost in
+the confirmed Steel quote. The normal light/raised support meshes scale from
+their ground pivots; carriers rotate about the deck center to meet both socket
+heights. No new mesh or texture family is introduced.
+
+New UI commands explicitly record `AutomaticHeight`. Its default is false and
+is omitted from historical command JSON, preserving the previous planar routing
+and fixed-footing decisions when old saves and replays reconstruct commands.
+
+### Shared routing rules
+
 - Automatic routing respects the outgoing source tangent and incoming destination
   tangent, including existing belt sockets. A bounded deterministic set of
   cardinal routes is ordered by length and piece count and checked through the
@@ -104,8 +133,8 @@ another edit. Cancellation cannot retract a command that has already been submit
   introduced. Existing fixed-size pieces and manually selected modules retain
   their dimensions.
 - An automatic route is bounded to 4–256m including terminal adapters. A match
-  contains at most 4096 constructed pieces, including feet. Height mismatches, unsupported tier
-  jumps and physically obstructed candidates remain explicit placement failures.
+  contains at most 4096 constructed pieces, including feet. Unsupported terrain,
+  invalid sockets and physically obstructed candidates remain explicit placement failures.
   New routes check their consecutive directed sockets and reject self-crossings.
 - Merger/splitter modules are explicit single placements. They retain all three
   typed/directed sockets and can receive separately drawn branches. They are not
@@ -124,10 +153,10 @@ another edit. Cancellation cannot retract a command that has already been submit
   buffer occupancy guard. Render extraction alone applies the source scale18.
 
 The validator samples footprint edges and interior with spacing at most 0.5m,
-including both boundary edges. It requires at least 5m beneath the conservative
-carrier envelope and ground variation within 0.2m under each rigid foot. Ramps
-use their conservative lowest underside; arbitrary terrain-following deformation
-is not offered. Spatial obstruction checks cover world objects, existing pieces
+including both boundary edges. It requires at least 5m beneath the carrier
+underside and ground variation within 0.2m under each rigid foot. Automatically
+inclined carriers use their actual underside plane; explicit ramp modules retain
+their conservative lowest underside. Spatial obstruction checks cover world objects, existing pieces
 and units intersecting the actual elevated or support volume. New footings also
 respect both designed and occupied vehicle loading corridors. Road centerline
 protection uses a 5m half-corridor plus the 0.4m footing radius.

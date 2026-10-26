@@ -18,7 +18,8 @@ internal sealed class ConveyorTestFixture
     private readonly Dictionary<PlayerId, EntityId> _payers = new();
     private readonly HashSet<InventoryId> _inventories = new();
 
-    public ConveyorTestFixture(ulong seed = 17, int ticksPerSecond = 20, bool simulateTrucks = false)
+    public ConveyorTestFixture(ulong seed = 17, int ticksPerSecond = 20, bool simulateTrucks = false,
+        Func<float, float, float>? terrainHeight = null)
     {
         Simulation = new SimulationCoordinator(ticksPerSecond, seed);
         Inventories = new InventoryStore();
@@ -26,7 +27,7 @@ internal sealed class ConveyorTestFixture
         Cargo = new CargoTransportSystem(Network, Inventories);
         Distribution = new AutomatedDistributionSystem(Network, Inventories, Cargo,
             retryDelayTicks: 5, fairnessAgingTicks: 20);
-        Terrain = CreateFlatTerrain();
+        Terrain = CreateTerrain(terrainHeight);
         Spatial = new SpatialGridIndex();
         Construction = new ConveyorConstructionService(Simulation, Terrain, Spatial, Inventories, CreateBattlefield());
         Recipes = InitialProductionRecipes.CreateCatalog();
@@ -270,15 +271,22 @@ internal sealed class ConveyorTestFixture
         return payer;
     }
 
-    private static TerrainWorld CreateFlatTerrain()
+    private static TerrainWorld CreateTerrain(Func<float, float, float>? height)
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 9 };
         var chunks = new List<TerrainChunk>();
         for (int x = 0; x < 4; x++)
         for (int z = 0; z < 4; z++)
+        {
+            var samples = new float[settings.HeightSamplesPerSide * settings.HeightSamplesPerSide];
+            for (int row = 0; row < settings.HeightSamplesPerSide; row++)
+            for (int column = 0; column < settings.HeightSamplesPerSide; column++)
+                samples[row * settings.HeightSamplesPerSide + column] = height?.Invoke(
+                    x * 64 + column * 8, z * 64 + row * 8) ?? 0;
             chunks.Add(new TerrainChunk(new ChunkCoordinate(x, z),
                 new TerrainHeightfield(settings.HeightSamplesPerSide, settings.ChunkSizeMeters,
-                    new float[settings.HeightSamplesPerSide * settings.HeightSamplesPerSide])));
+                    samples)));
+        }
         return new TerrainWorld(settings, chunks);
     }
 
