@@ -9,9 +9,10 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishMatureSupplyPlanningTests
 {
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void AdditionalSupplyGrowthRequiresTheActualCoreForce(bool artilleryBuilt)
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void AdditionalSupplyGrowthRequiresTheActualCoreForce(bool artilleryBuilt, bool minimumSupplyMissing)
     {
         var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
         var owner = new PlayerId(1);
@@ -31,7 +32,7 @@ public sealed class SkirmishMatureSupplyPlanningTests
         Assert.True(configuration.ResolveMatureSupplyTruckTarget(3) > configuration.MinimumSupplyTrucks);
         var units = DirectorateContent.CreateUnitCatalog();
         Ensure(UnitIds.CargoTruck, Math.Max(configuration.MinimumCargoTrucks, 3));
-        Ensure(UnitIds.SupplyTruck, configuration.MinimumSupplyTrucks);
+        Ensure(UnitIds.SupplyTruck, configuration.MinimumSupplyTrucks - (minimumSupplyMissing ? 1 : 0));
         Ensure(UnitIds.ScoutVehicle, 1);
         Ensure(UnitIds.MainBattleTank, configuration.MinimumObjectivePressureUnits);
         if (artilleryBuilt) Ensure(UnitIds.MobileArtillery, 1);
@@ -52,13 +53,16 @@ public sealed class SkirmishMatureSupplyPlanningTests
         entities.AddComponent(factory, new PowerConsumer(1, PowerPriority.Industrial, enabled: true));
         scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
         bool criticalSupply = false;
+        bool anySupply = false;
         foreach (var entity in entities.Query<UnitProductionRequest>())
         {
             var queued = entities.GetComponent<UnitProductionRequest>(entity);
+            anySupply |= queued.Facility == factory && queued.UnitId == UnitIds.SupplyTruck;
             criticalSupply |= queued.Facility == factory && queued.UnitId == UnitIds.SupplyTruck && queued.Priority == ProductionPriority.High;
         }
-        Assert.Equal(artilleryBuilt, criticalSupply);
-        Assert.Equal(artilleryBuilt ? UnitIds.SupplyTruck : UnitIds.MobileArtillery,
+        Assert.Equal(artilleryBuilt || minimumSupplyMissing, criticalSupply);
+        Assert.Equal(artilleryBuilt || minimumSupplyMissing, anySupply);
+        Assert.Equal(artilleryBuilt || minimumSupplyMissing ? UnitIds.SupplyTruck : UnitIds.MobileArtillery,
             entities.GetComponent<UnitProductionFacility>(factory).ActiveUnit);
         Assert.Equal(0, scenario.Inventories.GetQuantity(input, ResourceIds.Steel));
 
