@@ -25,13 +25,12 @@ public static class MatchPersistenceService
 
         return new MatchSaveData(
             MatchPersistenceSerializer.CurrentSchemaVersion,
-            PersistedMatchConfiguration.Capture(
-                scenario.RuntimeSettings),
+            CaptureConfiguration(scenario),
             scenario.Simulation.CurrentTick.Value,
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),
             state,
-            stateHash);
+            stateHash) { DeveloperModified = CaptureModified(scenario), ParameterChanges = CaptureParameterChanges(scenario) };
     }
 
     public static MatchReplayData CaptureReplay(
@@ -53,7 +52,8 @@ public static class MatchPersistenceService
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),
             scenario.GetMatchState(),
-            state.ComputeSha256(), MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+            state.ComputeSha256(), MatchAuthoritativeSnapshot.CurrentSchemaVersion)
+            { DeveloperModified = CaptureModified(scenario), ParameterChanges = CaptureParameterChanges(scenario) };
     }
 
     public static MatchRuntime Restore(
@@ -61,16 +61,22 @@ public static class MatchPersistenceService
         Func<string, MatchComposition>? resolveComposition = null) =>
         RestoreCancellable(save, CancellationToken.None, resolveComposition: resolveComposition);
 
-    public static MatchRuntime RestoreCancellable(
-        MatchSaveData save,
-        CancellationToken cancellationToken,
-        Action<MatchRestorationProgress>? reportProgress = null,
-        Func<string, MatchComposition>? resolveComposition = null)
+    public static MatchRuntime RestoreCancellable(MatchSaveData save, CancellationToken cancellationToken,
+        Action<MatchRestorationProgress>? reportProgress = null, Func<string, MatchComposition>? resolveComposition = null) =>
+        RestoreCore(save, reportProgress, resolveComposition, null, cancellationToken);
+
+    public static MatchRuntime RestoreDeveloper(MatchSaveData save, DeveloperToolsCapability capability,
+        Func<string, MatchComposition>? resolveComposition = null, Action<MatchRestorationProgress>? reportProgress = null,
+        CancellationToken cancellationToken = default) => RestoreCore(save, reportProgress, resolveComposition, capability, cancellationToken);
+
+    private static MatchRuntime RestoreCore(MatchSaveData save, Action<MatchRestorationProgress>? reportProgress,
+        Func<string, MatchComposition>? resolveComposition, DeveloperToolsCapability? capability, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         reportProgress?.Invoke(new(MatchRestorationPhase.Configuration));
         ValidateSave(
             save);
+        RequireRecoveryCapability(save.Configuration, save.Commands, save.ParameterChanges, save.State.Domains, capability);
         cancellationToken.ThrowIfCancellationRequested();
 
         return Reconstruct(
@@ -80,15 +86,21 @@ public static class MatchPersistenceService
             save.Commands,
             save.StateSha256,
             save.State,
-            resolveComposition, reportProgress, cancellationToken);
+            resolveComposition, reportProgress, capability, save.ParameterChanges, cancellationToken);
     }
 
-    public static MatchRuntime PlayReplay(
-        MatchReplayData replay,
-        Func<string, MatchComposition>? resolveComposition = null)
+    public static MatchRuntime PlayReplay(MatchReplayData replay, Func<string, MatchComposition>? resolveComposition = null) =>
+        PlayReplayCore(replay, resolveComposition, null);
+
+    public static MatchRuntime PlayDeveloperReplay(MatchReplayData replay, DeveloperToolsCapability capability,
+        Func<string, MatchComposition>? resolveComposition = null) => PlayReplayCore(replay, resolveComposition, capability);
+
+    private static MatchRuntime PlayReplayCore(MatchReplayData replay, Func<string, MatchComposition>? resolveComposition,
+        DeveloperToolsCapability? capability)
     {
         ValidateReplay(
             replay);
+        RequireRecoveryCapability(replay.Configuration, replay.Commands, replay.ParameterChanges, null, capability);
 
         MatchRuntime? scenario = null;
 
@@ -98,12 +110,13 @@ public static class MatchPersistenceService
                 CreateAndSchedule(
                     replay.Configuration,
                     replay.Commands,
-                    resolveComposition);
+                    resolveComposition, developerCapability: capability);
             RunToTickWithControls(
                 scenario,
                 replay.FinalTick,
                 replay.Commands);
 
+            VerifyParameterChanges(scenario, replay.ParameterChanges);
             if (scenario.Simulation.Random.State !=
                 replay.FinalRandomState)
             {
@@ -263,6 +276,7 @@ public static class MatchPersistenceService
         MatchAuthoritativeSnapshot expectedState,
         Func<string, MatchComposition>? resolveComposition,
         Action<MatchRestorationProgress>? reportProgress,
+        DeveloperToolsCapability? developerCapability, IReadOnlyList<DeveloperParameterAuditData>? expectedChanges,
         CancellationToken cancellationToken)
     {
         MatchRuntime? scenario = null;
@@ -275,7 +289,7 @@ public static class MatchPersistenceService
                 CreateAndSchedule(
                     configuration,
                     commands,
-                    resolveComposition, cancellationToken);
+                    resolveComposition, developerCapability, cancellationToken);
             RunToTickWithControls(
                 scenario,
                 targetTick,
@@ -283,6 +297,7 @@ public static class MatchPersistenceService
 
             cancellationToken.ThrowIfCancellationRequested();
             reportProgress?.Invoke(new(MatchRestorationPhase.HashVerification, targetTick, targetTick));
+            VerifyParameterChanges(scenario, expectedChanges);
 
             if (scenario.Simulation.Random.State !=
                 expectedRandomState)
@@ -349,19 +364,24 @@ public static class MatchPersistenceService
         PersistedMatchConfiguration configuration,
         IReadOnlyList<RecordedSimulationCommand> commands,
         Func<string, MatchComposition>? resolveComposition,
-        CancellationToken cancellationToken = default)
+        DeveloperToolsCapability? developerCapability = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(commands);
 
-        MatchRuntimeSettings runtime =
-            configuration.CreateHeadlessRuntimeSettings(resolveComposition);
-        MatchRuntime scenario =
-            MatchRuntime.Create(
-                runtime, cancellationToken);
+        RequireRecoveryCapability(configuration, commands, null, null, developerCapability);
+        MatchRuntimeSettings runtime = configuration.CreateHeadlessRuntimeSettings(resolveComposition);
+        MatchRuntime scenario = configuration.DeveloperInitialProfile is { Parameters.Length: > 0 } initial
+            ? MatchRuntime.CreateDeveloper(runtime, initial.ToProfile(), developerCapability!, cancellationToken)
+            : MatchRuntime.Create(runtime, cancellationToken);
 
         try
         {
+#if FORGELINE_DEVELOPER_TOOLS
+            if (DeveloperPersistenceGuard.Requires(configuration, commands))
+                scenario.Services.DeveloperActions.BindAccess(
+                    developerCapability!.BindSession(scenario.Simulation.SessionId, true));
+#endif
             RecordedSimulationCommand[] scheduled =
                 commands
                     .Where(
@@ -563,6 +583,7 @@ public static class MatchPersistenceService
         }
 
         MatchPersistenceValidation.State(save.State);
+        DeveloperPersistenceGuard.Validate(save.SchemaVersion, save.Configuration, save.Commands, save.ParameterChanges, save.State.Domains);
         MatchPersistenceValidation.Require(MatchPersistenceValidation.Hash(save.StateSha256), "Invalid checkpoint checksum.");
 
         if (save.SavedTick !=
@@ -603,6 +624,7 @@ public static class MatchPersistenceService
         ValidateScenarioIdentity(replay.SchemaVersion, replay.Configuration);
         MatchPersistenceValidation.Commands(replay.Commands);
         MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
+        DeveloperPersistenceGuard.Validate(replay.SchemaVersion, replay.Configuration, replay.Commands, replay.ParameterChanges);
 
         ValidateCommandHistory(
             replay.Commands,
@@ -614,6 +636,40 @@ public static class MatchPersistenceService
                 MatchPersistenceFailureReason.CorruptDocument,
                 "Replay final-state checksum is missing.");
         }
+    }
+
+    private static PersistedMatchConfiguration CaptureConfiguration(MatchRuntime runtime) =>
+        PersistedMatchConfiguration.Capture(runtime.PersistenceBaseSettings) with
+        { DeveloperInitialProfile = runtime.InitialDeveloperProfile is null ? null : DeveloperInitialProfileData.Capture(runtime.InitialDeveloperProfile) };
+    private static bool CaptureModified(MatchRuntime runtime)
+    {
+#if FORGELINE_DEVELOPER_TOOLS
+        return runtime.Services.DeveloperActions is DeveloperCommandGateway gateway && gateway.DeveloperModified;
+#else
+        return false;
+#endif
+    }
+    private static DeveloperParameterAuditData[]? CaptureParameterChanges(MatchRuntime runtime)
+    {
+#if FORGELINE_DEVELOPER_TOOLS
+        if (runtime.Services.DeveloperActions is DeveloperCommandGateway gateway && gateway.CaptureParameterChanges() is { Count: > 0 } changes)
+            return changes.ToArray();
+#endif
+        return null;
+    }
+    private static void RequireRecoveryCapability(PersistedMatchConfiguration configuration, IReadOnlyList<RecordedSimulationCommand> commands,
+        IReadOnlyList<DeveloperParameterAuditData>? changes, IReadOnlyList<AuthoritativeDomainSnapshot>? domains, DeveloperToolsCapability? capability)
+    {
+        if (DeveloperPersistenceGuard.Requires(configuration, commands, changes, domains) &&
+            (capability is null || !capability.IsCompiled || !ReferenceEquals(capability, DeveloperToolsCapability.Current)))
+            throw Failure(MatchPersistenceFailureReason.IncompatibleVersion, "This recovery requires explicit approval from a compiled developer host.");
+    }
+    private static void VerifyParameterChanges(MatchRuntime runtime, IReadOnlyList<DeveloperParameterAuditData>? expected)
+    {
+        var actual = CaptureParameterChanges(runtime);
+        if (System.Text.Json.JsonSerializer.Serialize(expected ?? Array.Empty<DeveloperParameterAuditData>()) !=
+            System.Text.Json.JsonSerializer.Serialize(actual ?? Array.Empty<DeveloperParameterAuditData>()))
+            throw Failure(MatchPersistenceFailureReason.StateMismatch, "The ordered parameter audit does not match reconstructed changes.");
     }
 
     private static void ValidateScenarioIdentity(int schema, PersistedMatchConfiguration configuration)

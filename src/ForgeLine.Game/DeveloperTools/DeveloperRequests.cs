@@ -6,7 +6,7 @@ namespace ForgeLine.Game;
 public enum DeveloperOperation : byte
 {
     SetParameter = 1, ResetParameter, ResetParameters, Pause, Resume, SingleStep, SetHostSpeed,
-    StartMatch, ApplyPreset, SpawnUnit, GrantResource
+    StartMatch, ApplyPreset, SpawnUnit, GrantResource, RepairEntity, RefillUnit, DamageEntity
 }
 public enum DeveloperRevisionDomain : byte { Presentation = 1, Parameters, Session, Simulation }
 public readonly record struct DeveloperStateRevision(DeveloperRevisionDomain Domain, ulong Value)
@@ -59,7 +59,7 @@ public enum DeveloperRequestStatus : byte { Accepted = 1, Pending, Applied, Reje
 public enum DeveloperFailureReason : byte
 {
     None, CapabilityUnavailable, SessionNotActivated, StaleSession, StaleRevision, InvalidTarget,
-    UnsupportedOperation, UnsupportedParameter, InvalidValue, InvalidApplyMode, ProviderUnavailable, Cancelled, Failed
+    UnsupportedOperation, UnsupportedParameter, InvalidValue, InvalidApplyMode, ProviderUnavailable, Cancelled, Failed, BoundaryFull, InvalidInventoryRole, PositionBlocked, TerminalSession
 }
 public readonly record struct DeveloperEffectiveParameter(DeveloperParameterId Id, DeveloperTarget Target,
     DeveloperValue Value, DeveloperStateRevision Revision);
@@ -124,7 +124,8 @@ public static class DeveloperRequestGate
         {
             DeveloperOperation.SetParameter or DeveloperOperation.ResetParameter => request.ExpectedRevision.Domain,
             DeveloperOperation.ResetParameters => DeveloperRevisionDomain.Parameters,
-            DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource => DeveloperRevisionDomain.Simulation,
+            DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource or DeveloperOperation.RepairEntity or
+                DeveloperOperation.RefillUnit or DeveloperOperation.DamageEntity => DeveloperRevisionDomain.Simulation,
             _ => DeveloperRevisionDomain.Session
         };
         if (request.ExpectedRevision.Domain != expectedDomain) return DeveloperFailureReason.InvalidApplyMode;

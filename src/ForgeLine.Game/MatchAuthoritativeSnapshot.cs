@@ -72,6 +72,11 @@ public sealed record MatchAuthoritativeSnapshot(
         if (scenario.Services.GroundMovement.NavigationConnected)
             domains.Add(CaptureDomain("navigation.traffic", scenario.Services.GroundMovement.CaptureNavigationState()));
 
+#if FORGELINE_DEVELOPER_TOOLS
+        if (scenario.Services.DeveloperActions is DeveloperCommandGateway developer && developer.HasAuthoritativeState)
+            domains.Add(CaptureDomain("developer.state.v1", developer.CaptureAuthoritative()));
+#endif
+
         return new MatchAuthoritativeSnapshot(
             CurrentSchemaVersion,
             scenario.Battlefield.Metadata.Key,

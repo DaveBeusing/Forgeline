@@ -46,6 +46,8 @@ public sealed record PersistedMatchConfiguration(
     string CompositionKey)
 {
     public ScenarioIdentity? Identity { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DeveloperInitialProfileData? DeveloperInitialProfile { get; init; }
 
     public static PersistedMatchConfiguration Capture(
         MatchRuntimeSettings settings)
@@ -122,7 +124,13 @@ public sealed record MatchSaveData(
     ulong RandomState,
     IReadOnlyList<RecordedSimulationCommand> Commands,
     MatchAuthoritativeSnapshot State,
-    string StateSha256);
+    string StateSha256)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool DeveloperModified { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DeveloperParameterAuditData[]? ParameterChanges { get; init; }
+}
 
 public sealed record MatchReplayData(
     int SchemaVersion,
@@ -132,7 +140,13 @@ public sealed record MatchReplayData(
     IReadOnlyList<RecordedSimulationCommand> Commands,
     MatchState FinalMatchState,
     string FinalStateSha256,
-    int AuthoritativeSchemaVersion = 1);
+    int AuthoritativeSchemaVersion = 1)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool DeveloperModified { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DeveloperParameterAuditData[]? ParameterChanges { get; init; }
+}
 
 internal sealed record MatchPersistenceEnvelope(
     string Magic,

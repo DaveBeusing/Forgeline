@@ -30,7 +30,7 @@ internal readonly record struct PendingCombatDamage(
     WeaponId Weapon,
     Vector3 Position,
     Vector3 IncomingDirection,
-    DamagePayload Damage);
+    DamagePayload Damage, Guid DeveloperCorrelation = default);
 
 internal readonly record struct PendingCombatDestruction(
     EntityId Entity,
@@ -63,6 +63,8 @@ public sealed class CombatRuntime
     private ulong _totalHits;
     private double _totalDamageApplied;
     private ulong _totalDestructions;
+
+    internal event Action<Guid, EntityId, double>? DeveloperDamageApplied;
 
     public SimulationTick CurrentTick => _tick;
 
@@ -185,7 +187,7 @@ public sealed class CombatRuntime
         WeaponId weapon,
         Vector3 position,
         Vector3 incomingDirection,
-        in DamagePayload damage)
+        in DamagePayload damage, Guid developerCorrelation = default)
     {
         _pendingDamage.Add(
             new PendingCombatDamage(
@@ -195,7 +197,7 @@ public sealed class CombatRuntime
                 weapon,
                 position,
                 incomingDirection,
-                damage));
+                damage, developerCorrelation));
     }
 
     internal void RecordDamage(
@@ -217,6 +219,7 @@ public sealed class CombatRuntime
                 request.Weapon,
                 request.Position,
                 appliedDamage));
+        if (request.DeveloperCorrelation != Guid.Empty) DeveloperDamageApplied?.Invoke(request.DeveloperCorrelation, request.Target, appliedDamage);
     }
 
     internal void QueueHealthDestruction(
