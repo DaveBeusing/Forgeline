@@ -32,6 +32,40 @@ through SubmitBuild. The existing paginated Build menu handles the longer list.
 | V | cycle Build → Remove → Replace → Repair; point at the owned part to edit |
 | Escape / right click | cancel the unsubmitted plan and leave placement |
 
+### Connection feedback and snapping
+
+The pointer catches compatible building and conveyor sockets within 28 physical
+pixels at UI scale 1 (scaled with the UI). A nearby socket takes priority over
+the fallback of clicking a building body. A white ring and **INPUT SNAPPED** or
+**OUTPUT SNAPPED** identify the actual selected connection before confirmation.
+Routes retain the exact socket position and departure/arrival direction.
+
+Individual carriers, curves, branches, ramps and end caps also align to existing
+conveyor outputs. Output adapters align to inputs; input/output adapters can snap
+to the corresponding real building port. Rotation and height come from opposing
+sockets, including the high end of ramps. Supports remain ground placements.
+The command records `SnapToSocket` only for these exact single-part placements;
+the construction service rechecks a currently owned, non-destroyed mate, terrain,
+obstructions, supports and stock before charging. This does not bypass placement
+rules or create a connection by proximity alone. Legacy commands omit the flag.
+
+Construction and selection display cyan **IN** and amber **OUT** markers on
+existing belts as well as buildings. Arrows use the actual flow direction and
+larger 3m stems. Gameplay world labels are drawn by the normal HUD independently
+of the development overlay, with readable backgrounds, overlap avoidance and a
+64-label screen budget. Building and belt socket geometry each have a separate
+64-port budget; offscreen ports do not consume it.
+
+The conveyor hint panel reserves two rows for the current instruction or failure
+and a separate row for controls. Changing the preview does not fade this panel
+out. After choosing an output, the target phase starts only once the pointer
+moves beyond a small 4px UI-scaled dead zone; a nearby input cannot immediately
+take over the unchanged pointer. It carries the current session and tick so the
+normal HUD freshness checks accept it. Rejected previews distinguish a building,
+another belt, a vehicle/object and a loading lane, mark the failing part and offer
+a corrective action. Missing stock shows required and available Steel. A rejected
+click retains the preview and does not submit or pay for construction.
+
 The hint bar names the mode, variant, tier and next click. Its placement context
 shows validity/reason and exact Steel cost from the copied preview. World-space
 cages use green/red plus text and IN/OUT arrows, so color is not the only cue.

@@ -9,6 +9,7 @@ public static class ConveyorNetworkOverlay
     public const int MaximumFocusedPieces = 32;
     public const int MaximumLabels = 8;
     public const int MaximumBuildingPorts = 64;
+    public const int MaximumBeltPorts = 64;
 
     public static void Draw(DebugDraw draw, PresentationSnapshot? snapshot,
         IReadOnlyCollection<EntityId> selection, EntityId hovered, bool showAllPorts = false,
@@ -32,6 +33,23 @@ public static class ConveyorNetworkOverlay
                 if (!focus[..count].Contains(entity)) focus[count++] = entity;
             }
         DrawBuildingPorts(draw, snapshot, network, experience.Player, focus[..count], showAllPorts, viewProjection);
+        int beltPorts = 0;
+        foreach (var row in network.Pieces)
+        {
+            if (row.Piece.Owner != experience.Player || row.Status == ConveyorLinkStatus.Destroyed ||
+                (!showAllPorts && !focus[..count].Contains(row.Entity)) ||
+                !OperationsWorldOverlay.CanFocus(snapshot, row.Entity)) continue;
+            foreach (var socket in row.Piece.Placement.Sockets)
+            {
+                if (beltPorts == MaximumBeltPorts) break;
+                if (!Finite(socket.Position) || !Finite(socket.Facing) ||
+                    socket.Facing.LengthSquared() < .5f ||
+                    viewProjection.HasValue && !InView(socket.Position, viewProjection.Value)) continue;
+                DrawSocket(draw, socket.Position, socket.Facing, socket.Input);
+                beltPorts++;
+            }
+            if (beltPorts == MaximumBeltPorts) break;
+        }
         foreach (var entity in focus[..count])
         {
             var row = network.Pieces.FirstOrDefault(p => p.Entity == entity);
@@ -92,12 +110,15 @@ public static class ConveyorNetworkOverlay
             clip.Y >= -clip.W && clip.Y <= clip.W && clip.Z >= 0 && clip.Z <= clip.W;
     }
 
-    private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port)
+    private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port) =>
+        DrawSocket(draw, port.Position, port.Facing, port.Input);
+
+    internal static void DrawSocket(DebugDraw draw, Vector3 position, Vector3 facing, bool input)
     {
-        Vector3 outward = Vector3.Normalize(new Vector3(port.Facing.X, 0, port.Facing.Z));
+        Vector3 outward = Vector3.Normalize(new Vector3(facing.X, 0, facing.Z));
         Vector3 side = Vector3.Cross(Vector3.UnitY, outward);
-        Vector4 color = port.Input ? new(.2f, .8f, 1, 1) : new(1, .72f, .18f, 1);
-        Vector3 center = port.Position;
+        Vector4 color = input ? new(.2f, .8f, 1, 1) : new(1, .72f, .18f, 1);
+        Vector3 center = position;
         Vector3 up = Vector3.UnitY * .75f;
         Vector3 across = side * .75f;
         draw.Line(center - across - up, center + across - up, color);
@@ -106,13 +127,13 @@ public static class ConveyorNetworkOverlay
         draw.Line(center - across + up, center - across - up, color);
         Vector3 inner = center + outward * .2f;
         Vector3 outer = center + outward * 3;
-        Vector3 start = port.Input ? outer : inner;
-        Vector3 tip = port.Input ? inner : outer;
-        Vector3 direction = port.Input ? -outward : outward;
+        Vector3 start = input ? outer : inner;
+        Vector3 tip = input ? inner : outer;
+        Vector3 direction = input ? -outward : outward;
         draw.Line(start, tip, color);
         draw.Line(tip, tip - direction * .9f + side * .65f, color);
         draw.Line(tip, tip - direction * .9f - side * .65f, color);
-        draw.Label(center + Vector3.UnitY * 1.15f + outward * .3f, port.Input ? "IN" : "OUT", color);
+        draw.Label(center + Vector3.UnitY * 1.15f + outward * .3f, input ? "IN" : "OUT", color);
     }
 
     private static bool Finite(Vector3 point) => float.IsFinite(point.X) && float.IsFinite(point.Y) && float.IsFinite(point.Z);

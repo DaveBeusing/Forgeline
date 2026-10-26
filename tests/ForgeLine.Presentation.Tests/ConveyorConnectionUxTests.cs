@@ -15,6 +15,141 @@ public sealed class ConveyorConnectionUxTests
     private static readonly bool[] PortRoles = [true, false];
 
     [Fact]
+    public void ExistingBeltSocketSnapsAtTwentyFourPixelsAndOverridesBuildingBodyFallback()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var placement = new ConveyorPlacement(ConveyorModule.Standard, Vector3.Zero, BuildingOrientation.East, 0);
+        var piece = new ConveyorOwnedPiece(new(3, 1), new(Player, placement, 16));
+        var building = Building(1, Vector3.Zero);
+        var snapshot = Snapshot([building, Piece(piece)], Ports(building), [piece]);
+        var output = placement.Sockets.Single(s => !s.Input);
+        Vector2 point = camera.WorldToScreen(output.Position, Width, Height).Position;
+        var picker = new ConveyorEndpointPicker();
+        Assert.True(picker.TryPick(snapshot, Player, camera, point, Width, Height, 1, false, out var exact));
+        Assert.False(exact.Building.IsValid);
+        Assert.Equal(output.Position - Vector3.UnitY * 5.8f, exact.Position);
+
+        snapshot = Snapshot([Piece(piece)], [], [piece]);
+        Assert.True(picker.TryPick(snapshot, Player, camera, point + new Vector2(24, 0),
+            Width, Height, 1, false, out var nearby));
+        Assert.Equal(exact.Position, nearby.Position);
+    }
+
+    [Theory]
+    [InlineData(ConveyorModule.Standard, 0)]
+    [InlineData(ConveyorModule.ShortSegment, 1)]
+    [InlineData(ConveyorModule.CurveLeft, 0)]
+    [InlineData(ConveyorModule.CurveRight, 0)]
+    [InlineData(ConveyorModule.Merger, 0)]
+    [InlineData(ConveyorModule.Splitter, 0)]
+    [InlineData(ConveyorModule.RampUp, 0)]
+    [InlineData(ConveyorModule.RampDown, 1)]
+    [InlineData(ConveyorModule.Endcap, 1)]
+    [InlineData(ConveyorModule.OutputAdapter, 0)]
+    public void IndividualPartSnapsWithOpposingSocketAndActualHeight(ConveyorModule module, int tier)
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var placement = new ConveyorPlacement(ConveyorModule.Standard, new(0, tier * 2, 0), BuildingOrientation.West, tier);
+        var piece = new ConveyorOwnedPiece(new(3, 1), new(Player, placement, 16));
+        bool input = module == ConveyorModule.OutputAdapter;
+        var mate = placement.Sockets.Single(s => s.Input == input);
+        var snapshot = Snapshot([Piece(piece)], [], [piece]);
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(module);
+        Move(controller, interaction, snapshot, camera, mate.Position);
+        var request = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest()).Request;
+        Assert.True(request.SnapToSocket);
+        var snapped = new ConveyorPlacement(module, request.Start, request.Orientation, request.Tier);
+        Assert.Contains(snapped.Sockets, s => s.Input != mate.Input &&
+            Vector3.DistanceSquared(s.Position, mate.Position) < .0004f && Vector3.Dot(s.Facing, mate.Facing) < -.999f);
+        Assert.Equal(module == ConveyorModule.RampDown ? 0 : tier, request.Tier);
+        var draw = new DebugDraw();
+        controller.Draw(draw);
+        Assert.Contains(draw.Labels, label => label.Text == (input ? "INPUT SNAPPED" : "OUTPUT SNAPPED"));
+    }
+
+    [Theory]
+    [InlineData(ConveyorModule.InputAdapter, false)]
+    [InlineData(ConveyorModule.OutputAdapter, true)]
+    public void AdapterSnapsToRotatedBuildingAndRetainsAttachment(ConveyorModule module, bool input)
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var building = Building(1, Vector3.Zero, BuildingOrientation.West);
+        var ports = Ports(building);
+        var port = ports.Single(p => p.Input == input);
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(module);
+        Move(controller, interaction, Snapshot([building], ports), camera, port.Position);
+        var request = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest()).Request;
+        Assert.True(request.SnapToSocket);
+        Assert.Equal(building.Entity, input ? request.DestinationPortBuilding : request.SourcePortBuilding);
+        var part = new ConveyorPlacement(module, request.Start, request.Orientation, request.Tier);
+        Assert.Contains(part.Sockets, s => s.Input != input && Vector3.DistanceSquared(s.Position, port.Position) < .0004f &&
+            Vector3.Dot(s.Facing, port.Facing) < -.999f);
+    }
+
+    [Fact]
+    public void ExistingBeltsShowDirectedPortsWithoutAFlowRecordDuringConstruction()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var placement = new ConveyorPlacement(ConveyorModule.Standard, Vector3.Zero, BuildingOrientation.East, 0);
+        var piece = new ConveyorOwnedPiece(new(3, 1), new(Player, placement, 16));
+        var draw = new DebugDraw { Enabled = true };
+        ConveyorNetworkOverlay.Draw(draw, Snapshot([Piece(piece)], [], [piece]), [], default, true,
+            camera.GetMatrices(Width, Height).ViewProjection);
+        Assert.Contains(draw.Labels, label => label.Text == "IN");
+        Assert.Contains(draw.Labels, label => label.Text == "OUT");
+        foreach (var socket in placement.Sockets)
+            Assert.Contains(draw.Lines.ToArray(), line => Vector3.DistanceSquared(line.Start, line.End) > 4 &&
+                Vector3.Dot(Vector3.Normalize(line.End-line.Start), socket.Input ? -socket.Facing : socket.Facing) > .99f);
+    }
+
+    [Theory]
+    [InlineData(ConveyorFailure.InsufficientStock, ConveyorObstruction.None, "NEED 1200 STEEL / AVAILABLE 1000")]
+    [InlineData(ConveyorFailure.Obstructed, ConveyorObstruction.Building, "BUILDING BLOCKS")]
+    [InlineData(ConveyorFailure.Obstructed, ConveyorObstruction.LoadingLane, "LOADING LANE")]
+    [InlineData(ConveyorFailure.PortMismatch, ConveyorObstruction.None, "PORTS DO NOT ALIGN")]
+    public void InvalidPreviewExplainsWhyAtTheFailureEvenWhenItHasNoPieces(
+        ConveyorFailure failure, ConveyorObstruction obstruction, string explanation)
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(ConveyorModule.Standard);
+        Move(controller, interaction, Snapshot([], []), camera, Vector3.Zero);
+        var request = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+        Vector3 location = new(12, 6, 8);
+        var confirmed = Snapshot([], [], requestId: request.Id, preview: new(failure, [], 1200)
+        { Obstruction = obstruction, FailurePosition = location });
+        Move(controller, interaction, confirmed, camera, Vector3.Zero, click: true);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Contains(explanation, controller.Context(confirmed).Reason);
+        Assert.Equal(confirmed.SessionId, controller.Context(confirmed).SessionId);
+        Assert.Equal(confirmed.Tick, controller.Context(confirmed).Tick);
+        var draw = new DebugDraw();
+        controller.Draw(draw);
+        var label = Assert.Single(draw.Labels);
+        Assert.Contains(explanation, label.Text);
+        Assert.Equal(location + Vector3.UnitY * 4, label.Position);
+    }
+
+    private static void Move(RtsConveyorConstructionController controller, PresentationInteractionState interaction,
+        PresentationSnapshot snapshot, RtsCamera camera, Vector3 target, bool click = false)
+    {
+        var input = new InputState();
+        Vector2 point = camera.WorldToScreen(target, Width, Height).Position;
+        int x = (int)MathF.Round(point.X), y = (int)MathF.Round(point.Y);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(x, y));
+        if (click) input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,
+            PlatformMouseButton.Left, x, y));
+        controller.Update(input, camera, new SameTypeSelectionTests.FlatTerrain(), snapshot, interaction,
+            Player, Width, Height, false, 1);
+    }
+
+    [Fact]
     public void TwoBuildingClicksSubmitOneAutomaticRouteWithItsConfirmedPreview()
     {
         var camera = SameTypeSelectionTests.Camera();
@@ -29,6 +164,7 @@ public sealed class ConveyorConnectionUxTests
 
         Update(source.Transform.Position, true, snapshot);
         Assert.False(controller.TryTakeRequest(out _));
+        Assert.Equal(snapshot.SessionId, controller.Context(snapshot).SessionId);
         Update(destination.Transform.Position, false, snapshot);
         var preview = interaction.CaptureConveyorRequest() ?? throw new InvalidOperationException("Missing route preview.");
         Assert.Equal(source.Entity, preview.Request.SourcePortBuilding);
@@ -56,6 +192,57 @@ public sealed class ConveyorConnectionUxTests
             controller.Update(input, camera, new SameTypeSelectionTests.FlatTerrain(), current, interaction,
                 Player, Width, Height, false, 1);
         }
+    }
+
+    [Fact]
+    public void ChoosingRouteEndpointsDoesNotDisplayAnUnbuiltZeroLengthFailure()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(ConveyorModule.Route);
+        var snapshot = Snapshot([], []);
+        Move(controller, interaction, snapshot, camera, Vector3.Zero);
+        var initial = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+        snapshot = Snapshot([], [], requestId: initial.Id, preview: new(ConveyorFailure.PortMismatch, [], 0));
+        Move(controller, interaction, snapshot, camera, Vector3.Zero, click: true);
+        Move(controller, interaction, snapshot, camera, Vector3.Zero);
+        var next = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+        snapshot = Snapshot([], [], requestId: next.Id, preview: new(ConveyorFailure.PortMismatch, [], 0));
+        Move(controller, interaction, snapshot, camera, Vector3.Zero);
+        Assert.Contains("CHOOSE INPUT", controller.Context(snapshot).Reason);
+        Assert.Equal(PlacementContextState.Pending, controller.Context(snapshot).State);
+        var draw = new DebugDraw();
+        controller.Draw(draw);
+        Assert.Empty(draw.Labels);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
+    public void UnmovedPointerAfterOutputClickDoesNotSnapToTheNearbyInput()
+    {
+        var camera = new RtsCamera(new RtsCameraSettings { EdgeScrollEnabled = false, InitialDistance = 240 });
+        var placement = new ConveyorPlacement(ConveyorModule.ShortSegment, Vector3.Zero, BuildingOrientation.East, 0);
+        var piece = new ConveyorOwnedPiece(new(3, 1), new(Player, placement, 16));
+        var output = placement.Sockets.Single(s => !s.Input);
+        var input = placement.Sockets.Single(s => s.Input);
+        Assert.InRange(Vector2.Distance(camera.WorldToScreen(output.Position, Width, Height).Position,
+            camera.WorldToScreen(input.Position, Width, Height).Position), 0, 28);
+        var snapshot = Snapshot([Piece(piece)], [], [piece]);
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(ConveyorModule.Route);
+        Move(controller, interaction, snapshot, camera, output.Position, click: true);
+        Move(controller, interaction, snapshot, camera, output.Position);
+        var request = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+        Assert.Equal(request.Request.Start, request.Request.End);
+        Assert.Contains("CHOOSE INPUT", controller.Context(snapshot).Reason);
+        var draw = new DebugDraw();
+        controller.Draw(draw);
+        Assert.DoesNotContain(draw.Labels, l => l.Text == "INPUT SNAPPED");
+        Move(controller, interaction, snapshot, camera, output.Position + Vector3.UnitX * 24);
+        var moved = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+        Assert.NotEqual(moved.Request.Start, moved.Request.End);
     }
 
     [Theory]
