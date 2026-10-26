@@ -63,7 +63,7 @@ internal sealed partial class LogisticsNavigationCoordinator
                 consumed += stageCost;
                 var transform = context.Entities.GetComponent<WorldTransform>(candidate.Vehicle.Entity);
                 var end = transform with { Position = proposal.End.Position, Rotation = proposal.End.Rotation };
-                if (VehicleDockingService.BlocksStagingStep(context.Entities, candidate.Vehicle.Entity, transform, end))
+                if (VehicleDockingService.BlocksStagingStep(context.Entities, candidate.Vehicle.Entity, transform, end, candidate.Vehicle))
                     proposal = Hold(input, collision, NavigationBlockReason.ReservedCorridor);
             }
             proposals[i] = proposal;

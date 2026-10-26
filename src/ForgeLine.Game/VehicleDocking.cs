@@ -2,6 +2,7 @@ using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Combat;
 using ForgeLine.Ecs;
+using ForgeLine.Navigation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
 
@@ -423,7 +424,8 @@ public sealed partial class VehicleDockingService
         return false;
     }
 
-    internal static bool BlocksStagingStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next)
+    internal static bool BlocksStagingStep(EntityRegistry entities, EntityId truck, in WorldTransform current, in WorldTransform next,
+        NavigationVehicleObservation? trafficVehicle = null)
     {
         if (BlocksQueueStep(entities, truck, current, next)) return true;
         if (!entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Generation != 0) return false;
@@ -436,9 +438,36 @@ public sealed partial class VehicleDockingService
         {
             var slot = entities.GetComponent<VehicleDockSlot>(building);
             if (slot.Truck == truck || slot.Pose.IntersectsLane(first)) continue;
-            if (slot.Pose.IntersectsLane(swept)) return true;
+            if (slot.Pose.IntersectsLane(swept) &&
+                !MayEvacuateClearanceBand(entities, building, slot, truck, current, next, first, trafficVehicle)) return true;
         }
         return false;
+    }
+
+    private static bool MayEvacuateClearanceBand(EntityRegistry entities, EntityId building, in VehicleDockSlot slot,
+        EntityId truck, in WorldTransform current, in WorldTransform next, in AxisAlignedBounds occupied,
+        NavigationVehicleObservation? trafficVehicle)
+    {
+        // Only the predictive integration supplies a current, complete body profile.
+        // Physical collision sweeps remain separate mandatory vetoes. This aligns
+        // the final admission check with the already checked outward service rule.
+        if (trafficVehicle is not { } vehicle || vehicle.Entity != truck || !vehicle.Profile.IsValid ||
+            vehicle.Profile.ClearanceMeters <= 0 || vehicle.Profile.HalfExtents != current.Scale * .5f ||
+            vehicle.Pose != new NavigationPose(current.Position, current.Rotation) || current.Scale != next.Scale ||
+            !new NavigationPose(next.Position, next.Rotation).IsValid || !OwnsTruck(entities, truck, vehicle.Owner) ||
+            !entities.TryGetComponent(truck, out WorldTransform actual) || actual != current ||
+            slot.Generation == 0 || !OwnsTruck(entities, slot.Truck, slot.Owner) ||
+            !entities.TryGetComponent(building, out CompletedBuilding source) || source.Owner != slot.Owner ||
+            !entities.TryGetComponent(slot.Truck, out VehicleDockVisit ownerVisit) || ownerVisit.Building != building ||
+            ownerVisit.Generation != slot.Generation || ownerVisit.Pose != slot.Pose) return false;
+        var clearance = new Vector3(vehicle.Profile.ClearanceMeters);
+        if (!slot.Pose.IntersectsLane(new AxisAlignedBounds(occupied.Minimum - clearance, occupied.Maximum + clearance))) return false;
+        var bounds = slot.Pose.CorridorBounds;
+        var reservation = new NavigationTrafficReservation(0xD000000000000000UL | ((ulong)building.Index + 1),
+            slot.Truck, slot.Generation, 0, NavigationReservationKind.Dock, new(bounds.Center, Quaternion.Identity),
+            new(bounds.Extents.X, MathF.Max(1, bounds.Extents.Y), bounds.Extents.Z), SimulationTick.Zero, SimulationTick.Zero, true, false, false);
+        return !PredictiveTrafficPlanner.BlocksServiceReservation(vehicle, reservation,
+            [vehicle.Pose, new NavigationPose(next.Position, next.Rotation)]);
     }
 
     public bool Exit(SimulationContext context, EntityId truck)

@@ -5,10 +5,20 @@ namespace ForgeLine.Game;
 
 public sealed partial class ContinuousNavigationMotionPlanner
 {
-    private NavigationMotionProposal ProposeForwardClearance(in NavigationMotionInput input,
+    private NavigationMotionProposal ProposeForwardClearance(in NavigationMotionInput sourceInput,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry, NavigationRouteProposal route,
         float groundOffset, int allowance, ref int consumed, NavigationBlockReason reason, float brakingDistance)
     {
+        var input = sourceInput;
+        // The independently swept motion horizon can discover a parked body that
+        // the traffic prediction missed. A stopped or slowly advancing mover may probe
+        // the same slow clearance fan; every candidate and actual tick is swept.
+        if (reason == NavigationBlockReason.MovingVehicle &&
+            input.Traffic.Availability == NavigationModuleAvailability.Available &&
+            input.Traffic.Action == NavigationTrafficAction.Proceed &&
+            input.Traffic.Reason == NavigationBlockReason.None &&
+            input.Vehicle.Movement.Velocity.LengthSquared() <= 1.0001f)
+            input = input with { Traffic = input.Traffic with { MaximumSpeed = MathF.Min(1, input.Traffic.MaximumSpeed), Reason = reason } };
         if (reason is not (NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain) ||
             input.Traffic.Reason is not (NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain) ||
             input.Traffic.MaximumSpeed > 1 || input.Traffic.MaximumSpeed <= 0 ||
