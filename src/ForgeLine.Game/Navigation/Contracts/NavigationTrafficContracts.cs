@@ -82,7 +82,12 @@ public sealed class NavigationTrafficFrame
 public enum NavigationTrafficAction : byte { Hold = 0, Proceed = 1, Yield = 2, Recovery = 3, Brake = 4 }
 public readonly record struct NavigationTrafficDirective(
     NavigationModuleAvailability Availability, NavigationOrderBinding Binding, SimulationTick Tick,
-    NavigationTrafficAction Action, float MaximumSpeed, Vector3? SuggestedTarget, NavigationBlockReason Reason);
+    NavigationTrafficAction Action, float MaximumSpeed, Vector3? SuggestedTarget, NavigationBlockReason Reason)
+{
+    // Ephemeral restriction; never persisted as recovery authority.
+    public bool OutwardDepartureOnly { get; init; }
+    public bool CapturedCycleDepartureOnly { get; init; }
+}
 
 public interface INavigationTrafficPlanner<TCheckpoint> : INavigationStateTransfer<TCheckpoint> where TCheckpoint : class
 {

@@ -210,8 +210,12 @@ internal sealed partial class LogisticsNavigationCoordinator
                 _legacyWork += result.WorkConsumed;
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1 ||
                     result.FrameTick != context.Tick.Value || result.Revision != collision.World.Revision) break;
-                simulated = simulated with { Pose = pose, Movement = simulated.Movement with
-                    { Velocity = (pose.Position - simulated.Pose.Position) / .125f, HeadingRadians = yaw } };
+                simulated = simulated with
+                {
+                    Pose = pose,
+                    Movement = simulated.Movement with
+                    { Velocity = (pose.Position - simulated.Pose.Position) / .125f, HeadingRadians = yaw }
+                };
                 if (Vector3.DistanceSquared(pose.Position, target) <= .04f) { reached = true; break; }
             }
             Vector3 firstTarget = Vector2.Distance(new(start.Position.X, start.Position.Z), new(blocker.Pose.Position.X, blocker.Pose.Position.Z)) < straightRange
@@ -305,7 +309,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         var from = new NavigationPose(start.Position, start.Rotation);
         var to = new NavigationPose(end.Position, end.Rotation);
         if (!profile.IsValid || !from.IsValid || !to.IsValid ||
-            !NavigationMotionArbitrator.TryBuildSweptOccupancy(from, to, profile, out var pose, out var half))
+            !NavigationMotionArbitrator.TryBuildSweptOccupancy(from, to, profile, out var pose, out var half, includeNumericalPadding: false))
         { _legacyComplete = false; return; }
         _legacyEnvelopes.Add(new(new(NavigationObstacleSource.TrafficReservation, (ulong)entity.Index + 1, entity.Generation),
             NavigationObstacleKind.Reservation, pose, half, Vector3.Zero));

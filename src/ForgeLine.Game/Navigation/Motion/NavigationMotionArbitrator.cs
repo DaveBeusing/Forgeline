@@ -229,7 +229,7 @@ internal sealed class NavigationMotionArbitrator
     // One oriented enclosure contains the complete accepted physical motion. Unlike
     // its broad-phase AABB, it does not fill empty corners beside a yawed vehicle.
     internal static bool TryBuildSweptOccupancy(in NavigationPose start, in NavigationPose end,
-        in NavigationVehicleProfile profile, out NavigationPose pose, out Vector3 half)
+        in NavigationVehicleProfile profile, out NavigationPose pose, out Vector3 half, bool includeNumericalPadding = true)
     {
         pose = new(Vector3.Lerp(start.Position, end.Position, .5f), Quaternion.Normalize(Quaternion.Slerp(start.Rotation, end.Rotation, .5f)));
         half = default;
@@ -242,6 +242,27 @@ internal sealed class NavigationMotionArbitrator
         float scale = MathF.Max(MathF.Max(MathF.Abs(pose.Position.X), MathF.Abs(pose.Position.Y)), MathF.Abs(pose.Position.Z));
         float padding = (float)(2 * radius * Math.Sin(angle * .25) + (scale + radius + 1) * .000002);
         half = profile.HalfExtents + Vector3.Abs(local) + new Vector3(padding);
+        if (!includeNumericalPadding)
+        {
+            // Collision-frame queries add their own position-scaled numerical
+            // padding. Bound the physical sweep and midpoint/axis roundoff here
+            // without charging the position-scaled padding a second time.
+            Quaternion rotation = Quaternion.Normalize(pose.Rotation);
+            Vector3 center = pose.Position;
+            Vector3 startPosition = start.Position, endPosition = end.Position;
+            Vector3 axisX = Vector3.Transform(Vector3.UnitX, rotation);
+            Vector3 axisY = Vector3.Transform(Vector3.UnitY, rotation);
+            Vector3 axisZ = Vector3.Transform(Vector3.UnitZ, rotation);
+            double rotationPadding = 2 * radius * Math.Sin(angle * .25) + (radius + 1) * .000002;
+            float Extent(float physical, Vector3 axis)
+            {
+                double Project(Vector3 point) => ((double)point.X - center.X) * axis.X +
+                    ((double)point.Y - center.Y) * axis.Y + ((double)point.Z - center.Z) * axis.Z;
+                double offset = Math.Max(Math.Abs(Project(startPosition)), Math.Abs(Project(endPosition)));
+                return MathF.BitIncrement((float)(physical + offset + rotationPadding));
+            }
+            half = new(Extent(profile.HalfExtents.X, axisX), Extent(profile.HalfExtents.Y, axisY), Extent(profile.HalfExtents.Z, axisZ));
+        }
         return NavigationMotionCapture.Finite(half) && half.X > 0 && half.Y > 0 && half.Z > 0;
     }
 

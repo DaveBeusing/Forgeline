@@ -13,6 +13,109 @@ namespace ForgeLine.Game.Tests;
 public sealed class VehicleDockingTests
 {
     [Theory]
+    [InlineData(0f, true, false, true)]
+    [InlineData(1.5707964f, true, false, true)]
+    [InlineData(1.5707964f, false, false, false)]
+    [InlineData(0f, true, true, false)]
+    public void EarlyReleaseUsesTheCompleteRotatedBodyAndRetainsTheFullClearanceMargin(float heading, bool clear, bool tilted, bool releases)
+    {
+        var fixture = new Fixture();
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var visit));
+            var current = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            float offset = tilted ? 5 : (heading == 0 ? 1.6f : 3.2f) + 1 + (clear ? .05f : -.05f);
+            fixture.SetTruck(new(visit.Pose.CorridorBounds.Maximum.X + offset, current.Position.Y, visit.Pose.Service.Z), heading, 0);
+            if (tilted)
+            {
+                current = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+                context.Entities.SetComponent(fixture.Truck, current with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, .6f), Scale = new(3.2f, 40, 6.4f) });
+            }
+            context.Entities.SetComponent(fixture.Truck, visit with { Status = VehicleDockStatus.Exiting, LaneEntered = true, DepartureDistance = 999 });
+            var before = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            Assert.Equal(releases, fixture.Docks.TryRelease(context.Entities, fixture.Truck, fixture.Building, visit.Generation));
+            Assert.Equal(before, context.Entities.GetComponent<WorldTransform>(fixture.Truck));
+            Assert.Equal(!releases, context.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        });
+    }
+
+    [Theory]
+    [InlineData(true, false, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, true, false)]
+    public void FullyDepartedOwnerCanReleasePastARearQueueWithoutGrantingNewEntry(bool clear, bool stale, bool releases)
+    {
+        var spatial = new SpatialGridIndex();
+        var fixture = new Fixture(new VehicleDockingService(spatial: spatial));
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var visit));
+            var initial = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            fixture.SetTruck(new(visit.Pose.CorridorBounds.Maximum.X + (clear ? 4.4f : 3.9f), initial.Position.Y, visit.Pose.Service.Z), MathF.PI / 2, 0);
+            context.Entities.SetComponent(fixture.Truck, visit with { Status = VehicleDockStatus.Exiting, LaneEntered = true, DepartureDistance = 999 });
+            var queuePose = new WorldTransform(visit.Pose.Service, Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathF.PI / 2), new(3.2f, 2.4f, 6.4f));
+            context.Entities.SetComponent(fixture.OtherTruck, queuePose);
+            var presence = new SpatialPresence(new(1.6f, 1.2f, 3.2f), new(1, 0, SpatialMobility.Mobile));
+            context.Entities.AddComponent(fixture.OtherTruck, presence);
+            spatial.Upsert(presence.CreateEntry(fixture.OtherTruck, queuePose));
+            var departed = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            Assert.Equal(releases, fixture.Docks.TryRelease(context.Entities, fixture.Truck, fixture.Building, visit.Generation + (stale ? 1UL : 0UL)));
+            Assert.Equal(departed, context.Entities.GetComponent<WorldTransform>(fixture.Truck));
+            Assert.Equal(queuePose, context.Entities.GetComponent<WorldTransform>(fixture.OtherTruck));
+            Assert.Equal(!releases, context.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+            if (releases)
+            {
+                Assert.Equal(0UL, context.Entities.GetComponent<VehicleDockVisit>(fixture.Truck).Generation);
+                var next = context.Entities.CreateEntity();
+                context.Entities.AddComponent(next, initial with { Position = visit.Pose.Entry - new Vector3(30, 0, 0) });
+                context.Entities.AddComponent(next, GroundMovementState.Stationary(MathF.PI / 2));
+                Assert.False(fixture.Docks.TryReserve(context, next, fixture.Building, new(1), out var nextVisit));
+                Assert.Equal(VehicleDockBlockReason.Obstructed, nextVisit.Reason);
+            }
+        });
+    }
+
+    [Fact]
+    public void AnUnreservedExitCannotAcquireAReleasedParkingDutyOrReleaseAnotherOwner()
+    {
+        var fixture = new Fixture();
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.OtherTruck, fixture.Building, new(1), out var owner));
+            context.Entities.AddComponent(fixture.Truck, new VehicleDockVisit(fixture.Building, 0, VehicleDockStatus.Exiting,
+                VehicleDockBlockReason.None, owner.Pose));
+            Assert.True(fixture.Docks.Exit(context, fixture.Truck));
+            Assert.False(context.Entities.HasComponent<VehicleDockVisit>(fixture.Truck));
+            var slot = context.Entities.GetComponent<VehicleDockSlot>(fixture.Building);
+            Assert.Equal(fixture.OtherTruck, slot.Truck);
+            Assert.Equal(owner.Generation, slot.Generation);
+        });
+    }
+
+    [Theory]
+    [InlineData(true, false, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, true, false)]
+    public void ACompletePhysicalExitCanReleaseWithoutFinishingAnUnusedParkingWaypoint(bool clear, bool stale, bool releases)
+    {
+        var fixture = new Fixture();
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var visit));
+            var current = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            var radius = current.Scale.Length() * .5f;
+            var bounds = visit.Pose.CorridorBounds;
+            var position = new Vector3(bounds.Maximum.X + (clear ? radius + 2 : radius * .5f), current.Position.Y, visit.Pose.Service.Z);
+            fixture.SetTruck(position, .68524665f, 0);
+            context.Entities.SetComponent(fixture.Truck, visit with { Status = VehicleDockStatus.Exiting, LaneEntered = true, DepartureDistance = 999 });
+            var before = context.Entities.GetComponent<WorldTransform>(fixture.Truck);
+            Assert.Equal(releases, fixture.Docks.TryRelease(context.Entities, fixture.Truck, fixture.Building, visit.Generation + (stale ? 1UL : 0UL)));
+            Assert.Equal(before, context.Entities.GetComponent<WorldTransform>(fixture.Truck));
+            Assert.Equal(!releases, context.Entities.HasComponent<VehicleDockSlot>(fixture.Building));
+        });
+    }
+
+    [Theory]
     [InlineData(BuildingOrientation.North)]
     [InlineData(BuildingOrientation.East)]
     [InlineData(BuildingOrientation.South)]
@@ -496,11 +599,11 @@ public sealed class VehicleDockingTests
         var waitingPoint = entities.GetComponent<VehicleDockVisit>(fixture.OtherTruck).Pose.ApproachStart;
         Assert.True(waitingPoint.HasValue);
         entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with
-            { Position = waitingPoint.GetValueOrDefault() });
+        { Position = waitingPoint.GetValueOrDefault() });
         fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
         var queued = entities.GetComponent<VehicleQueueEntry>(fixture.OtherTruck);
         entities.SetComponent(fixture.OtherTruck, entities.GetComponent<WorldTransform>(fixture.OtherTruck) with
-            { Position = queued.Target, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, queued.Heading) });
+        { Position = queued.Target, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, queued.Heading) });
         entities.SetComponent(fixture.OtherTruck, GroundMovementState.Stationary(queued.Heading));
         fixture.Step(context => Assert.False(fixture.Docks.Approach(context, fixture.OtherTruck, fixture.Building, new(1))));
         Assert.Equal(queued.Target, entities.GetComponent<VehicleQueueEntry>(fixture.OtherTruck).Target);

@@ -348,8 +348,10 @@ internal sealed partial class PredictiveTrafficPlanner
         // deterministic and remains advisory: the movement owner must brake first and sweep each
         // accepted reverse step again. No lateral displacement is ever authorized here.
         var recovery = new Vector3?[ordered.Length];
+        var outwardReverse = new bool[ordered.Length];
+        var capturedDepartures = new bool[ordered.Length];
         var recoveryWork = FindRecoveries(frame, ordered, vehicles, waits, waitingFor, geometry, passagePlan.Leases,
-            crossingPlan.Passages, workAllowance - workConsumed, recovery, physicalWaits, localTargets, speedCaps, hazards);
+            crossingPlan.Passages, workAllowance - workConsumed, recovery, outwardReverse, capturedDepartures, physicalWaits, localTargets, speedCaps, hazards);
         if (recoveryWork < 0)
         {
             workConsumed = workAllowance;
@@ -373,18 +375,20 @@ internal sealed partial class PredictiveTrafficPlanner
                     _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with { WaitingFor = waitingFor[i], RecoveryTarget = null };
                 }
                 directives[i] = new(NavigationModuleAvailability.Available, intent.Binding, frame.Tick,
-                    NavigationTrafficAction.Proceed, speedCaps[i], localTargets[i], hazards[i]);
+                    NavigationTrafficAction.Proceed, speedCaps[i], localTargets[i], hazards[i])
+                { CapturedCycleDepartureOnly = capturedDepartures[i] };
             }
             else
             {
                 var hold = Waiting(intent.Binding, frame.Tick, waits[i], 0);
                 _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with
                 {
-                    WaitingFor = waitingFor[i], RecoveryTarget = recovery[i],
+                    WaitingFor = waitingFor[i],
+                    RecoveryTarget = outwardReverse[i] || capturedDepartures[i] ? null : recovery[i],
                     LastRecoveryTick = recovery[i] is not null ? frame.Tick.Value : _states[intent.Binding.Requester].LastRecoveryTick
                 };
                 directives[i] = recovery[i] is Vector3 escape
-                    ? hold with { Action = NavigationTrafficAction.Recovery, SuggestedTarget = escape, MaximumSpeed = MathF.Min(1, profiles[i].MaximumSpeed) }
+                    ? hold with { Action = NavigationTrafficAction.Recovery, SuggestedTarget = escape, MaximumSpeed = MathF.Min(1, profiles[i].MaximumSpeed), OutwardDepartureOnly = outwardReverse[i], CapturedCycleDepartureOnly = capturedDepartures[i] }
                     : hold with { Action = waits[i] == NavigationBlockReason.MovingVehicle ? NavigationTrafficAction.Yield : NavigationTrafficAction.Hold };
             }
         }
@@ -439,8 +443,12 @@ internal sealed partial class PredictiveTrafficPlanner
         {
             if (!NavigationReverseMotion.TryStep(vehicle, target, maximumSpeed, dt, world, out var end, out _, out float heading)) return null;
             poses[step] = end;
-            vehicle = vehicle with { Pose = end, Movement = vehicle.Movement with
-                { Velocity = (end.Position - vehicle.Pose.Position) / dt, HeadingRadians = heading } };
+            vehicle = vehicle with
+            {
+                Pose = end,
+                Movement = vehicle.Movement with
+                { Velocity = (end.Position - vehicle.Pose.Position) / dt, HeadingRadians = heading }
+            };
         }
         failure = NavigationBlockReason.None;
         return poses;

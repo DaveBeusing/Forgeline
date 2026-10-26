@@ -24,7 +24,17 @@ internal static class NavigationReverseMotion
         float current = new Vector2(vehicle.Movement.Velocity.X, vehicle.Movement.Velocity.Z).Length();
         if (!float.IsFinite(distance) || !float.IsFinite(current) || current > vehicle.Profile.MaximumSpeed + 0.01f) return false;
         if (distance <= arrivalTolerance) return true;
-        float desiredHeading = MathF.Atan2(-delta.X, -delta.Z);
+        // A target formed on the reverse ray is rounded to world-coordinate
+        // floats. Do not turn a straight reverse solely to chase that rounding.
+        // This changes steering only; the complete selected motion is still swept.
+        double dx = (double)target.X - vehicle.Pose.Position.X;
+        double dz = (double)target.Z - vehicle.Pose.Position.Z;
+        double lateral = dx * forward.Z - dz * forward.X;
+        double uncertainty = (CoordinateSpacing(target.X) + CoordinateSpacing(vehicle.Pose.Position.X)) * Math.Abs(forward.Z) +
+            (CoordinateSpacing(target.Z) + CoordinateSpacing(vehicle.Pose.Position.Z)) * Math.Abs(forward.X);
+        bool straight = -dx * forward.X - dz * forward.Z > 0 && double.IsFinite(uncertainty) &&
+            Math.Abs(lateral) <= uncertainty;
+        float desiredHeading = straight ? heading : MathF.Atan2(-delta.X, -delta.Z);
         float angle = GroundMovementState.NormalizeAngle(desiredHeading - heading);
         heading = GroundMovementState.NormalizeAngle(heading + Math.Clamp(angle,
             -vehicle.Profile.MaximumYawRate * deltaSeconds, vehicle.Profile.MaximumYawRate * deltaSeconds));
@@ -42,7 +52,10 @@ internal static class NavigationReverseMotion
         position.Y = height + vehicle.Pose.Position.Y - startHeight;
         if (!NavigationMotionCapture.Finite(position)) return false;
         speed = new Vector2(position.X - vehicle.Pose.Position.X, position.Z - vehicle.Pose.Position.Z).Length() / deltaSeconds;
-        end = new(position, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+        end = new(position, straight ? vehicle.Pose.Rotation : Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
         return end.IsValid;
     }
+    private static double CoordinateSpacing(float value) =>
+        Math.Max((double)MathF.BitIncrement(value) - value, (double)value - MathF.BitDecrement(value));
+
 }

@@ -60,6 +60,15 @@ internal sealed partial class LogisticsNavigationCoordinator
                     Limits.WorkPerTick - consumed, out int passageWork, out bool passageComplete))
                     proposal = Hold(input, collision, passageComplete ? NavigationBlockReason.ReservedCorridor : NavigationBlockReason.SearchWork);
                 consumed += passageWork;
+                if (traffic.OutwardDepartureOnly || traffic.CapturedCycleDepartureOnly)
+                {
+                    bool outward = PredictiveTrafficPlanner.TryCheckOutwardStep(candidate.Vehicle.Profile,
+                        proposal.Start, proposal.End, frame.Passages, Limits.WorkPerTick - consumed,
+                        out int outwardWork, out bool outwardComplete, requireOutward: !traffic.CapturedCycleDepartureOnly);
+                    consumed += outwardWork;
+                    if (!outward) proposal = Hold(input, collision,
+                        outwardComplete ? NavigationBlockReason.ReservedCorridor : NavigationBlockReason.SearchWork);
+                }
                 int stageCost = Math.Max(1, frame.Collision.Bodies.Count);
                 if (stageCost > Limits.WorkPerTick - consumed) return Unavailable(NavigationBlockReason.SearchWork, consumed);
                 consumed += stageCost;
@@ -100,6 +109,15 @@ internal sealed partial class LogisticsNavigationCoordinator
                     final = Hold(inputs[i], frame.Collision, NavigationBlockReason.ReservedCorridor);
                     break;
                 }
+            }
+            if (final.Start != final.End && (inputs[i].Traffic.OutwardDepartureOnly || inputs[i].Traffic.CapturedCycleDepartureOnly))
+            {
+                bool outward = PredictiveTrafficPlanner.TryCheckOutwardStep(candidates[i].Vehicle.Profile,
+                    final.Start, final.End, frame.Passages, Limits.WorkPerTick - consumed,
+                    out int outwardWork, out bool outwardComplete, requireOutward: !inputs[i].Traffic.CapturedCycleDepartureOnly);
+                consumed += outwardWork;
+                if (!outwardComplete) return Unavailable(NavigationBlockReason.SearchWork, consumed);
+                if (!outward) final = Hold(inputs[i], frame.Collision, NavigationBlockReason.ReservedCorridor);
             }
             motions[i] = new(inputs[i], final, current[i], used[i], horizons?[i]);
         }

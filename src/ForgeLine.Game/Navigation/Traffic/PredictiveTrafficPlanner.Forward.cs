@@ -7,7 +7,7 @@ internal sealed partial class PredictiveTrafficPlanner
 {
     private static int ForwardClearance(NavigationTrafficFrame frame, NavigationVehicleObservation vehicle,
         NavigationTrafficIntent intent, INavigationGeometryQuery geometry,
-        IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases, int allowance, out bool clear, out Vector3 target)
+        IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases, int allowance, out bool clear, out NavigationPose target)
     {
         clear = false; target = default;
         if (!intent.CanMove || NavigationPrecisionOwnership.IsPrecise(vehicle) ||
@@ -59,7 +59,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 if (lease.Owner != vehicle.Entity && Touches(lease.Passage, [vehicle.Pose, end], vehicle.Profile)) reserved = true;
             }
             if (reserved) continue;
-            clear = true; target = end.Position;
+            clear = true; target = end;
             return consumed;
         }
         return consumed;

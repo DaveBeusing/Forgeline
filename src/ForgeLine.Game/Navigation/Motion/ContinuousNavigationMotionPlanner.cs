@@ -158,7 +158,10 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         float targetDistance = HorizontalLength(difference);
         if (!float.IsFinite(targetDistance) || targetDistance <= DirectionEpsilon)
             return Hold(input, collision, Availability, horizonReason, brakingDistance);
-        float desiredHeading = MathF.Atan2(difference.X, difference.Z);
+        bool straightClearance = input.Traffic.Action == NavigationTrafficAction.Proceed &&
+            input.Traffic.MaximumSpeed <= 1 && input.Traffic.SuggestedTarget.HasValue &&
+            NavigationMotionNumerics.IsCapturedForwardTarget(start, target);
+        float desiredHeading = straightClearance ? input.Vehicle.Movement.HeadingRadians : MathF.Atan2(difference.X, difference.Z);
         float headingChange = GroundMovementState.NormalizeAngle(desiredHeading - input.Vehicle.Movement.HeadingRadians);
         float curvature = 2 * MathF.Sin(headingChange) / targetDistance;
         float turnSpeed = MathF.Abs(curvature) > DirectionEpsilon
@@ -202,7 +205,7 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         if (!collision.World.TrySampleHeight(candidate.X, candidate.Z, out float height) || !float.IsFinite(height))
             return Hold(input, collision, Availability, NavigationBlockReason.Terrain, brakingDistance);
         candidate.Y = height + groundOffset;
-        NavigationPose end = new(candidate, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+        NavigationPose end = new(candidate, straightClearance ? start.Rotation : Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
         if (!end.IsValid)
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.Terrain, brakingDistance);
         var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(input.Vehicle.Entity),
@@ -380,14 +383,18 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
             if (collision.World.TrySampleHeight(candidate.X, candidate.Z, out float height) && float.IsFinite(height))
             {
                 candidate.Y = height + groundOffset;
-                float desiredHeading = MathF.Atan2(candidate.X - input.Vehicle.Pose.Position.X, candidate.Z - input.Vehicle.Pose.Position.Z);
+                bool straightClearance = input.Traffic.Action == NavigationTrafficAction.Proceed &&
+                    input.Traffic.MaximumSpeed <= 1 && input.Traffic.SuggestedTarget.HasValue &&
+                    NavigationMotionNumerics.IsCapturedForwardTarget(input.Vehicle.Pose, candidate);
+                float desiredHeading = straightClearance ? input.Vehicle.Movement.HeadingRadians :
+                    MathF.Atan2(candidate.X - input.Vehicle.Pose.Position.X, candidate.Z - input.Vehicle.Pose.Position.Z);
                 float duration = MathF.Max(input.DeltaSeconds, distance / maximumSpeed);
                 float yaw = input.Vehicle.Profile.MaximumYawRate * duration;
                 if (!float.IsFinite(duration) || !float.IsFinite(yaw))
                 { reason = NavigationBlockReason.Unknown; return false; }
                 float change = GroundMovementState.NormalizeAngle(desiredHeading - input.Vehicle.Movement.HeadingRadians);
                 float heading = GroundMovementState.NormalizeAngle(input.Vehicle.Movement.HeadingRadians + Math.Clamp(change, -yaw, yaw));
-                NavigationPose end = new(candidate, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+                NavigationPose end = new(candidate, straightClearance ? input.Vehicle.Pose.Rotation : Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(input.Vehicle.Entity),
                     input.Vehicle.Pose, end, input.Vehicle.Profile, duration);
                 // Each retry starts at this tick's observed pose. No downstream
