@@ -94,6 +94,14 @@ The affected Public rejection and Developer recovery cases must be repeated.
 The first complete solution build stopped on missing cancellation tokens in the
 new Public tests; these were corrected without changing assertions.
 
+At `fe31c0c1`, the Public selections passed 19/19 Game and 3/3 Client cases.
+All seven isolated build entries, including ordinary Debug without the Developer
+property, passed. Developer Game passed 47/48; the remaining old tuning fixture
+attempted to bind a second provider to a fully composed runtime. It now consumes
+the runtime's existing registered provider. The single-owner production invariant
+and every assertion remain intact. The first runner report is retained as
+`artifacts/developer-tools/qualification-fe31-first.json`.
+
 The integrated preset PR baseline at `49463f88` failed its required build-test
 at `TechnologyNormalMatchTests.NormalOpponentPaysForResearchAndReconstructsWhileProductionContinues`,
 line 49 (56/57 selected cases passed). The log reports MissingMaterials for the
