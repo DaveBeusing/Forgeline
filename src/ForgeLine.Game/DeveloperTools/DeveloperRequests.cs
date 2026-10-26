@@ -124,7 +124,8 @@ public static class DeveloperRequestGate
         {
             DeveloperOperation.SetParameter or DeveloperOperation.ResetParameter => request.ExpectedRevision.Domain,
             DeveloperOperation.ResetParameters => DeveloperRevisionDomain.Parameters,
-            DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource => DeveloperRevisionDomain.Simulation,
+            DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource or DeveloperOperation.RepairEntity or
+                DeveloperOperation.RefillUnit or DeveloperOperation.DamageEntity => DeveloperRevisionDomain.Simulation,
             _ => DeveloperRevisionDomain.Session
         };
         if (request.ExpectedRevision.Domain != expectedDomain) return DeveloperFailureReason.InvalidApplyMode;

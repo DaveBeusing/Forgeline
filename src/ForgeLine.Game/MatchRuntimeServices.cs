@@ -74,6 +74,10 @@ public sealed class MatchRuntimeServices
         RegisteredSystemTypes = registeredSystemTypes;
     }
 
+    public IDeveloperActionDispatcher DeveloperActions { get; internal set; } = MissingDeveloperProvider.Instance;
+    public IDeveloperParameterProvider DeveloperParameters { get; internal set; } = MissingDeveloperProvider.Instance;
+    public IDeveloperMenuCatalog DeveloperCatalog { get; internal set; } = MissingDeveloperProvider.Instance;
+
     public ResourceCatalog Resources { get; }
 
     public BuildingDefinitionCatalog BuildingDefinitions { get; }

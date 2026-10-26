@@ -22,7 +22,8 @@ public enum ReplayCommandKind : byte
     Demolition = 11,
     CancelConstruction = 12,
     OperationsRule = 13,
-    ConveyorConstruction = 14
+    ConveyorConstruction = 14,
+    DeveloperAction = 15
 }
 
 public sealed record RecordedSimulationCommand
@@ -102,6 +103,9 @@ public sealed record RecordedSimulationCommand
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public ConveyorBuildRequest ConveyorRequest { get; init; }
 
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DeveloperCommandPayload? DeveloperPayload { get; init; }
+
     public ulong OperationsRuleId { get; init; }
     public uint OperationsRuleRevision { get; init; }
     public uint OperationsCooldownTicks { get; init; }
@@ -115,6 +119,7 @@ public sealed class MatchReplayRecorder : IDisposable
     private readonly List<RecordedSimulationCommand> _commands = new();
     private readonly HashSet<string> _unsupported =
         new(StringComparer.Ordinal);
+    private readonly Dictionary<ulong, IDeveloperRecordedCommand> _developerSources = new();
     private ulong _nextRecordingOrder = 1;
     private bool _disposed;
 
@@ -151,6 +156,8 @@ public sealed class MatchReplayRecorder : IDisposable
 
     public IReadOnlyList<RecordedSimulationCommand> CaptureCommands() =>
         _commands
+            .Select(command => _developerSources.TryGetValue(command.RecordingOrder, out var source)
+                ? command with { DeveloperPayload = source.CapturePayload() } : command)
             .OrderBy(
                 static command =>
                     command.RecordingOrder)
@@ -179,6 +186,7 @@ public sealed class MatchReplayRecorder : IDisposable
                     envelope,
                     out RecordedSimulationCommand? command))
             {
+                if (envelope.Command is IDeveloperRecordedCommand developer) _developerSources.Add(_nextRecordingOrder, developer);
                 _commands.Add(
                     command! with
                     {
@@ -262,6 +270,12 @@ public static class ReplayCommandCodec
 
         switch (envelope.Command)
         {
+#if FORGELINE_DEVELOPER_TOOLS
+            case DeveloperSimulationCommand command:
+                if (envelope.Sequence == 0) { recorded = null; return false; }
+                recorded = Base(ReplayCommandKind.DeveloperAction) with { DeveloperPayload = command.CapturePayload() };
+                return true;
+#endif
             case MoveEntitiesCommand command:
                 recorded =
                     Base(
@@ -558,6 +572,7 @@ public static class ReplayCommandCodec
 
         return command.Kind switch
         {
+            ReplayCommandKind.DeveloperAction => DecodeDeveloper(command, scenario),
             ReplayCommandKind.Movement =>
                 new MoveEntitiesCommand(
                     command.Issuer,
@@ -653,6 +668,17 @@ public static class ReplayCommandCodec
                 throw new InvalidDataException(
                     $"Replay command kind '{command.Kind}' is not supported.")
         };
+    }
+
+    private static ISimulationCommand DecodeDeveloper(RecordedSimulationCommand command, MatchRuntime scenario)
+    {
+        if (command.DeveloperPayload is null || command.IsControl)
+            throw new MatchPersistenceException(MatchPersistenceFailureReason.CorruptDocument, "Invalid developer command payload or control placement.");
+#if FORGELINE_DEVELOPER_TOOLS
+        if (scenario.Services.DeveloperActions is DeveloperCommandGateway gateway)
+            return gateway.ReconstructCommand(command.DeveloperPayload);
+#endif
+        throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion, "Developer command handlers are absent in this build.");
     }
 
     private static PlayerProductionActionCommand DecodeProduction(

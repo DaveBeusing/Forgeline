@@ -83,7 +83,7 @@ public sealed record DeveloperInitialProfileData
     };
     public DeveloperInitialProfile ToProfile()
     {
-        if (SchemaVersion != 1 || Parameters is null || Parameters.Length > DeveloperInitialProfile.MaximumParameters || Participants is null)
+        if (SchemaVersion != 1 || Parameters is null || Parameters.Length > DeveloperInitialProfile.MaximumParameters || Parameters.Any(p => p is null) || Participants is null)
             throw new ArgumentException("Invalid initial developer profile.");
         var metadata = new DeveloperPresetMetadata(1, CompositionKey, BaseIdentity, Seed, Profile, Participants, RequiresDeveloperTools);
         return new(metadata, Parameters.Select(p => new DeveloperEffectiveParameter(p.Id, p.Target.ToTarget(), p.Value.ToValue(),
@@ -93,4 +93,18 @@ public sealed record DeveloperInitialProfileData
 internal interface IDeveloperRecordedCommand
 {
     DeveloperCommandPayload CapturePayload();
+}
+
+public sealed record DeveloperParameterAuditData(DeveloperParameterId Id, DeveloperStoredTarget Target, DeveloperStoredValue Before,
+    DeveloperStoredValue After, DeveloperStoredValue? PendingBefore, DeveloperStoredValue? PendingAfter, bool IsReset, ulong Tick, ulong Revision)
+{
+    public const int MaximumEntries = 4096;
+    public ulong Sequence { get; init; }
+    public Guid Correlation { get; init; }
+#if FORGELINE_DEVELOPER_TOOLS
+    internal static DeveloperParameterAuditData FromChange(DeveloperTuningChange change) => new(change.Id, DeveloperStoredTarget.From(change.Target),
+        DeveloperStoredValue.From(change.Before), DeveloperStoredValue.From(change.After),
+        change.PendingBefore.HasValue ? DeveloperStoredValue.From(change.PendingBefore.Value) : null,
+        change.PendingAfter.HasValue ? DeveloperStoredValue.From(change.PendingAfter.Value) : null, change.IsReset, change.RecordedTick.Value, change.Revision.Value);
+#endif
 }

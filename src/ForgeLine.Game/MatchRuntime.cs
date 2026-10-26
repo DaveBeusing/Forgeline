@@ -44,6 +44,7 @@ public sealed class MatchRuntime : IDisposable
         SkirmishMatchInitialization initialization, GameplayProgressJournal progress)
     {
         RuntimeSettings = runtimeSettings;
+        PersistenceBaseSettings = runtimeSettings;
         MatchConfiguration = matchConfiguration;
         Scheduler = scheduler;
         _ownedScheduler =
@@ -79,6 +80,8 @@ public sealed class MatchRuntime : IDisposable
     public GameplayProgressJournal Progress { get; }
 
     public MatchRuntimeSettings RuntimeSettings { get; }
+    internal MatchRuntimeSettings PersistenceBaseSettings { get; private set; }
+    public DeveloperInitialProfile? InitialDeveloperProfile { get; private set; }
 
     public MatchConfiguration MatchConfiguration { get; }
 
@@ -134,12 +137,36 @@ public sealed class MatchRuntime : IDisposable
 
     public SkirmishStartingBase GetBase(PlayerId player) => Initialization.GetBase(player);
 
-    public static MatchRuntime Create(
-        MatchRuntimeSettings runtimeSettings,
-        CancellationToken cancellationToken = default)
+    public static MatchRuntime Create(MatchRuntimeSettings runtimeSettings, CancellationToken cancellationToken = default) =>
+        CreateInternal(runtimeSettings, null, cancellationToken);
+
+    public static MatchRuntime CreateDeveloper(MatchRuntimeSettings basis, DeveloperInitialProfile profile,
+        DeveloperToolsCapability capability, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(capability); ArgumentNullException.ThrowIfNull(profile);
+        if (!capability.IsCompiled || !ReferenceEquals(capability, DeveloperToolsCapability.Current))
+            throw new InvalidOperationException("An approved compiled host is required for initial developer overrides.");
+        return CreateInternal(basis, profile, cancellationToken);
+    }
+    private static MatchRuntime CreateInternal(MatchRuntimeSettings runtimeSettings, DeveloperInitialProfile? initial,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(runtimeSettings);
         runtimeSettings.Validate();
+#if FORGELINE_DEVELOPER_TOOLS
+        DeveloperRestartPlan? developerPlan = null;
+        if (initial is not null)
+        {
+            var overrides = initial.Parameters.Select(p => new DeveloperTuningOverride(p.Id, p.Target, p.Value)).ToArray();
+            if (!DeveloperRestartBuilder.TryBuild(runtimeSettings, initial.Metadata, overrides, out developerPlan, out var failure))
+                throw new ArgumentException("Invalid initial developer overrides: " + failure, nameof(initial));
+            runtimeSettings = developerPlan!.Settings;
+        }
+        else if (runtimeSettings.Composition.Identity is not null && ScenarioRegistry.Default.Descriptors.Any(d => d.Key == runtimeSettings.Composition.Key))
+            developerPlan = DeveloperRestartBuilder.ForExisting(runtimeSettings);
+#else
+        if (initial is not null) throw new InvalidOperationException("Developer initial overrides are unavailable publicly.");
+#endif
         cancellationToken.ThrowIfCancellationRequested();
 
         JobScheduler? scheduler =
@@ -161,11 +188,19 @@ public sealed class MatchRuntime : IDisposable
 
         try
         {
-            return CreateCore(
-                runtimeSettings,
-                scheduler,
-                ownsScheduler,
-                cancellationToken);
+            var runtime = CreateCore(runtimeSettings, scheduler, ownsScheduler, cancellationToken);
+#if FORGELINE_DEVELOPER_TOOLS
+            try
+            {
+                runtime.PersistenceBaseSettings = developerPlan?.BaseSettings ?? runtimeSettings;
+                runtime.InitialDeveloperProfile = developerPlan?.InitialOverrides.Parameters.Count > 0 ? developerPlan.InitialOverrides : null;
+                var gateway = new DeveloperCommandGateway(runtime, developerPlan);
+                runtime.Services.DeveloperActions = gateway; runtime.Services.DeveloperParameters = gateway.Parameters;
+                runtime.Services.DeveloperCatalog = gateway;
+            }
+            catch { runtime.Dispose(); throw; }
+#endif
+            return runtime;
         }
         catch
         {
@@ -841,6 +876,9 @@ public sealed class MatchRuntime : IDisposable
         }
 
         _disposed = true;
+#if FORGELINE_DEVELOPER_TOOLS
+        (Services.DeveloperActions as DeveloperCommandGateway)?.Dispose();
+#endif
         Replay.Dispose();
         OperationsRules.Dispose();
         _ownedScheduler?.Dispose();

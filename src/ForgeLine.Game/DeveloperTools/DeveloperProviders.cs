@@ -14,7 +14,11 @@ public interface IDeveloperSessionController : IDeveloperProvider
 }
 public interface IDeveloperActionDispatcher : IDeveloperProvider
 {
+    /// <summary>The simulation owner binds or revokes this session at its execution boundary.</summary>
+    void BindAccess(DeveloperSessionAccess access) { ArgumentNullException.ThrowIfNull(access); }
     DeveloperResult Submit(DeveloperSessionAccess permission, DeveloperExecutionContext context, DeveloperRequest request);
+    /// <summary>Returns a bounded snapshot of correlated results published by the simulation owner.</summary>
+    IReadOnlyList<DeveloperResult> CaptureResults() => Array.Empty<DeveloperResult>();
 }
 public sealed class DeveloperParameterReadResult
 {
@@ -75,6 +79,7 @@ internal sealed class MissingDeveloperProvider : IDeveloperMenuCatalog, IDevelop
     private MissingDeveloperProvider() { }
     public DeveloperProviderStatus Status => DeveloperProviderStatus.Missing;
     public IReadOnlyList<DeveloperOperationDescriptor> Operations => Array.Empty<DeveloperOperationDescriptor>();
+    public IReadOnlyList<DeveloperResult> CaptureResults() => Array.Empty<DeveloperResult>();
     public IReadOnlyList<DeveloperParameterDescriptor> Descriptors => DeveloperParameterCatalog.Descriptors;
     public DeveloperParameterReadResult Capture() => new(Status, Array.Empty<DeveloperEffectiveParameter>());
     public DeveloperFailureReason Validate(DeveloperPresetMetadata metadata)
