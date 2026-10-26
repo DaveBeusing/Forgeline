@@ -66,6 +66,30 @@ public sealed class FixedPoseOccupancyTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void OptionalPrefilterPreservesContactRotationCoverageAndCanonicalBlockers(bool fixedPoses)
+    {
+        var (world, geometry, body, profile, coverage) = Setup();
+        foreach (float heading in new[] { 0f, .1f, .8f, 1.7f, 3.1f })
+        foreach (var delta in new[] { Vector3.Zero, new Vector3(3, 0, 0), new Vector3(0, 0, 6) })
+        foreach (bool near in new[] { false, true })
+        {
+            var obstacle = body with { Pose = new(new(near ? 22 : 52, .5f, near ? 20 : 52),
+                Quaternion.CreateFromAxisAngle(Vector3.UnitY, -heading)), Velocity = fixedPoses ? Vector3.Zero : Vector3.UnitX };
+            var lowerIdentity = obstacle with { Identity = new(NavigationObstacleSource.Entity, 1, 1) };
+            var frame = new NavigationCollisionFrame(world, 1, coverage, true, [obstacle, lowerIdentity], 4, fixedPoses);
+            var start = new NavigationPose(new(20, .5f, 20), Quaternion.Identity);
+            var end = new NavigationPose(start.Position + delta, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+            var sweep = new NavigationSweep(new(NavigationObstacleSource.Entity, 3, 1), start, end, profile, 2);
+            var expected = geometry.Sweep(frame, sweep, 100000);
+            var actual = geometry.Sweep(frame, sweep with { PrefilterFixedBodies = true }, 100000);
+            Assert.Equal(expected with { WorkConsumed = 0 }, actual with { WorkConsumed = 0 });
+            Assert.InRange(actual.WorkConsumed, 1, 100000);
+        }
+    }
+
     private static (NavigationWorldSnapshot, NavigationVehicleGeometry, NavigationCollisionBody, NavigationVehicleProfile, AxisAlignedBounds) Setup()
     {
         var settings = new WorldGridSettings { ChunkSizeMeters = 64, HeightSamplesPerSide = 17 };

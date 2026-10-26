@@ -663,6 +663,30 @@ public sealed class VehicleDockingTests
         fixture.Step(context => Assert.True(fixture.Docks.TryReserve(context, fixture.OtherTruck, neighbor, new(1), out _)));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void DepartureChecksRemainingLaneWithoutWaitingForAnObstacleBehind(bool ahead)
+    {
+        var spatial = new SpatialGridIndex();
+        var fixture = new Fixture(new VehicleDockingService(spatial: spatial));
+        fixture.Step(context =>
+        {
+            Assert.True(fixture.Docks.TryReserve(context, fixture.Truck, fixture.Building, new(1), out var visit));
+            fixture.SetTruck(visit.Pose.Exit + Vector3.UnitX, MathF.PI / 2, 0);
+            var obstacle = context.Entities.CreateEntity();
+            var pose = new WorldTransform(visit.Pose.Exit + Vector3.UnitX * (ahead ? 6 : -4), Quaternion.Identity, new(2, 2, 2));
+            var presence = new SpatialPresence(Vector3.One, new(1, 0, SpatialMobility.Mobile));
+            context.Entities.AddComponent(obstacle, pose);
+            context.Entities.AddComponent(obstacle, presence);
+            spatial.Upsert(presence.CreateEntry(obstacle, pose));
+            Assert.False(fixture.Docks.Exit(context, fixture.Truck));
+            Assert.Equal(!ahead, context.Entities.HasComponent<MovementOrder>(fixture.Truck));
+            Assert.Equal(fixture.Truck, context.Entities.GetComponent<VehicleDockSlot>(fixture.Building).Truck);
+            Assert.Equal(visit.Generation, context.Entities.GetComponent<VehicleDockVisit>(fixture.Truck).Generation);
+        });
+    }
+
     private sealed class Fixture : ISimulationSystem
     {
         private Action<SimulationContext>? _action;

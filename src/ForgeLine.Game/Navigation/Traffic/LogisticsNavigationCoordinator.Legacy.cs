@@ -140,8 +140,16 @@ internal sealed partial class LogisticsNavigationCoordinator
                     (visit.Building != queue.Building || vehicle.BuildingSlot is not { } slot || slot.Truck != entity ||
                      slot.Generation != visit.Generation || slot.Owner != vehicle.Owner)) return false;
         }
-        else if (entities.HasComponent<VehicleQueueEntry>(entity) || entities.HasComponent<VehicleDockVisit>(entity) ||
-            order.Kind != MovementOrderKind.Strategic || order.TargetHeadingRadians.HasValue) return false;
+        else
+        {
+            bool ownedFormation = order.Kind == MovementOrderKind.FormationLocal &&
+                entities.TryGetComponent(entity, out MovementGroupMember member) &&
+                entities.TryGetComponent(member.Group, out MovementGroupOrder group) &&
+                group.Issuer == vehicle.Owner && group.SubmittedAtTick == order.SubmittedAtTick &&
+                order.AcceptedAtTick >= group.AcceptedAtTick;
+            if (entities.HasComponent<VehicleQueueEntry>(entity) || entities.HasComponent<VehicleDockVisit>(entity) ||
+                order.Kind != MovementOrderKind.Strategic && !ownedFormation || order.TargetHeadingRadians.HasValue) return false;
+        }
         Vector3 direction = order.WorldTarget - start.Position; direction.Y = 0;
         if (direction.LengthSquared() < .0001f) return false;
         direction = Vector3.Normalize(direction);

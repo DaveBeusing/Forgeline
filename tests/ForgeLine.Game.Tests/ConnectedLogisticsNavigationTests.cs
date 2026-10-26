@@ -179,9 +179,12 @@ public sealed class ConnectedLogisticsNavigationTests
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void InfantryBesideAStoppedTruckCanClearWithoutMovingTheTruck(bool canMove)
+    [InlineData(true, false, true)]
+    [InlineData(false, false, true)]
+    [InlineData(true, true, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, false)]
+    public void InfantryBesideAStoppedTruckCanClearWithoutMovingTheTruck(bool canMove, bool formed, bool validBinding)
     {
         Vector3 goal = new(9.7246f, .9f, 31.9791f);
         var (simulation, movement, unit) = Create(goal: goal);
@@ -201,12 +204,26 @@ public sealed class ConnectedLogisticsNavigationTests
         entities.AddComponent(parked, new UnitIdentity(UnitIds.SupplyTruck, default));
         entities.AddComponent(parked, entities.GetComponent<ControllableEntity>(unit));
         entities.AddComponent(parked, new SpatialPresence(parkedPose.Scale * .5f, new SpatialEntryMetadata(1, 4, SpatialMobility.Mobile)));
+        EntityId group = default;
+        if (formed)
+        {
+            group = entities.CreateEntity();
+            entities.AddComponent(group, new MovementGroupOrder(validBinding ? new(1) : new(2), goal, FormationTemplate.Column, SimulationTick.Zero, new(1)));
+            entities.AddComponent(unit, new MovementGroupMember(group, 0));
+            entities.SetComponent(unit, new MovementOrder(new(1), goal, SimulationTick.Zero, new(1), MovementOrderKind.FormationLocal));
+        }
         if (!canMove) entities.AddComponent(unit, new SupplyMovementConstraint(0, false));
         simulation.RunTicks(600, TestContext.Current.CancellationToken);
         Assert.Equal(parkedPose, entities.GetComponent<WorldTransform>(parked));
+        if (formed) Assert.Equal(group, entities.GetComponent<MovementGroupMember>(unit).Group);
         if (!canMove)
         {
             Assert.Equal(initial, entities.GetComponent<WorldTransform>(unit));
+            Assert.True(entities.HasComponent<MovementOrder>(unit));
+            return;
+        }
+        if (formed && !validBinding)
+        {
             Assert.True(entities.HasComponent<MovementOrder>(unit));
             return;
         }

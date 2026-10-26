@@ -11,6 +11,44 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishProductionPolicyTests
 {
     [Theory]
+    [InlineData(false, 1, 2, LogisticsStockPriority.High)]
+    [InlineData(true, 1, 2, LogisticsStockPriority.Critical)]
+    [InlineData(true, 2, 3, LogisticsStockPriority.Critical)]
+    [InlineData(true, 2, 4, LogisticsStockPriority.High)]
+    public void InitialInfantryFundingRetainsTheConfiguredHomeDefenderDuringRaids(bool raidsEnabled, int homeDefenders, int existingInfantry, LogisticsStockPriority expected)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        var owner = new PlayerId(1);
+        var configurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(settings.OpponentConfigurations);
+        configurations[owner.Value] = configurations[owner.Value] with
+        {
+            MinimumAttackUnits = 4, MinimumObjectivePressureUnits = 2,
+            Raids = configurations[owner.Value].Raids with { Enabled = raidsEnabled, MinimumUnits = 2, HomeDefenders = homeDefenders }
+        };
+        using var scenario = CentralDivideScenario.Create(settings with { OpponentConfigurations = configurations }, seed: 2026);
+        var entities = scenario.Simulation.Entities;
+        var home = entities.GetComponent<WorldTransform>(scenario.GetBase(owner).CommandCore);
+        for (int index = 0; index < existingInfantry; index++)
+            scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.RifleSquad], home.Position + new Vector3(200, 0, 200 + index * 12), owner);
+        Assert.Equal(existingInfantry, scenario.CountUnits(owner, UnitIds.RifleSquad));
+        var input = scenario.Inventories.CreateInventory(new InventorySpecification(4000));
+        var barracks = entities.CreateEntity();
+        entities.AddComponent(barracks, home with { Position = home.Position + new Vector3(300, 0, 300) });
+        entities.AddComponent(barracks, new CompletedBuilding(BuildingIds.Barracks, owner, SimulationTick.Zero));
+        entities.AddComponent(barracks, new ControllableEntity(owner, ControllableEntityCategory.Building));
+        entities.AddComponent(barracks, new UnitProductionFacility(input, UnitProductionCapability.Infantry, owner, Vector3.Zero, SimulationTick.Zero));
+        entities.AddComponent(barracks, new PowerNetworkMembership(new PowerNetworkId(10999)));
+        entities.AddComponent(barracks, new PowerGenerator(10));
+        entities.AddComponent(barracks, new PowerConsumer(1, PowerPriority.Industrial, enabled: true));
+        scenario.Simulation.SubmitCommand(new QueueUnitProductionCommand(owner, barracks, UnitIds.RifleSquad, SimulationTick.Zero), SimulationTick.Zero.Next());
+        scenario.Simulation.RunTicks(42, TestContext.Current.CancellationToken);
+        Assert.Equal(UnitProductionStatus.NoInput, entities.GetComponent<UnitProductionFacility>(barracks).Status);
+        Assert.Equal(expected, FindStockPolicy(entities, barracks, ResourceIds.Steel).Priority);
+        Assert.Equal(0, scenario.Inventories.GetQuantity(input, ResourceIds.Steel));
+    }
+
+
+    [Theory]
     [InlineData(true, false, true, LogisticsStockPriority.Critical)]
     [InlineData(true, true, true, LogisticsStockPriority.High)]
     [InlineData(false, false, false, LogisticsStockPriority.High)]

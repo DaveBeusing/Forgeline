@@ -94,7 +94,7 @@ internal sealed partial class PredictiveTrafficPlanner
                 var end = new NavigationPose(position, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
                 float duration = MathF.Max(length, turn / vehicle.Profile.MaximumYawRate);
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity),
-                    node.Pose, end, vehicle.Profile, duration);
+                    node.Pose, end, vehicle.Profile, duration, PrefilterFixedBodies: true);
                 var result = SweepGrounded(collision, geometry, sweep, allowance - consumed);
                 if (result.WorkConsumed <= 0 || result.WorkConsumed > allowance - consumed ||
                     result.FrameTick != frame.Tick.Value || result.Revision != collision.World.Revision ||
