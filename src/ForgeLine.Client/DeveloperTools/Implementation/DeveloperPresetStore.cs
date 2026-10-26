@@ -20,6 +20,7 @@ internal sealed class DeveloperPresetStore
     }
 
     internal string Root => _root;
+    internal string? ImportFailure { get; private set; }
 
     internal IReadOnlyList<DeveloperPresetDocument> List()
     {
@@ -27,7 +28,7 @@ internal sealed class DeveloperPresetStore
         {
             EnsureRoot();
             var files = Directory.EnumerateFiles(_root, "*.json", SearchOption.TopDirectoryOnly)
-                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase).ToArray();
+                .Take(MaximumVisiblePresets + 1).OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase).ToArray();
             if (files.Length > MaximumVisiblePresets) throw new IOException("Developer preset store exceeds its 64-file limit.");
             var documents = new List<DeveloperPresetDocument>(files.Length);
             foreach (string file in files)
@@ -50,6 +51,53 @@ internal sealed class DeveloperPresetStore
             EnsureRoot(); EnsureRegularFile(path);
             return DeveloperPresetCodec.Deserialize(ReadBounded(path), _resolveComposition);
         }
+    }
+
+    internal IReadOnlyList<DeveloperPresetDocument> ListIncoming()
+    {
+        lock (s_gate)
+        {
+            string root = EnsureImportRoot();
+            ImportFailure = null;
+            var files = Directory.EnumerateFiles(root, "*.json", SearchOption.TopDirectoryOnly).Take(MaximumVisiblePresets + 1).ToArray();
+            if (files.Length > MaximumVisiblePresets) throw new IOException("Preset import directory exceeds its 64-file limit.");
+            var documents = new List<DeveloperPresetDocument>();
+            foreach (string file in files.Order(StringComparer.OrdinalIgnoreCase))
+            {
+                string key = Path.GetFileNameWithoutExtension(file);
+                if (!DeveloperPresetCodec.IsPresetKey(key)) throw new IOException("Import filenames must be stable preset keys.");
+                EnsureRegularFile(file);
+                DeveloperPresetDocument document;
+                try { document = DeveloperPresetCodec.Deserialize(ReadBounded(file), _resolveComposition); }
+                catch (Exception error) when (error is DeveloperPresetException or IOException)
+                { ImportFailure = "An incoming preset is invalid or incompatible; existing presets are unchanged."; continue; }
+                if (document.Key != key) throw new IOException("Import filename must match its preset key.");
+                documents.Add(document);
+            }
+            return documents.AsReadOnly();
+        }
+    }
+
+    internal DeveloperPresetDocument ImportIncoming(string key)
+    {
+        if (!DeveloperPresetCodec.IsPresetKey(key)) throw new ArgumentException("Invalid import key.", nameof(key));
+        lock (s_gate)
+        {
+            string path = Path.Combine(EnsureImportRoot(), key + ".json");
+            EnsureRegularFile(path);
+            return Import(ReadBounded(path));
+        }
+    }
+
+    private string EnsureImportRoot()
+    {
+        EnsureRoot();
+        string directory = Path.Combine(_root, "Import");
+        if (Directory.Exists(directory) && (File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0)
+            throw new IOException("Preset import directory cannot be a link.");
+        Directory.CreateDirectory(directory);
+        if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) throw new IOException("Preset import directory cannot be a link.");
+        return directory;
     }
 
     internal DeveloperPresetDocument Import(ReadOnlySpan<byte> utf8)

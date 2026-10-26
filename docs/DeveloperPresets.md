@@ -89,9 +89,11 @@ for registering the adapter as `IDeveloperPresetService`, paired with
 `ClientApplication.DeveloperMenuBackendFactory` for menu intents. That owner must
 compose the adapter with its session/action backend, surface store and validation
 errors to the menu, and submit returned requests via the existing restart callback.
-Until that composition commit is made, the preset codec, store and headless
-workflow are available in Developer builds, while native menu actions for
-import/export/restart are an explicit integration boundary.
+The combined qualification integration supplies that composition through
+`ClientDeveloperMenuBackend`: explicit local import, original export, saving
+current values and each restart enter the real provider/loader paths. Native
+and packaged acceptance results are recorded in
+[Developer tools qualification](DeveloperToolsQualification.md).
 
 ## Acceptance boundary
 

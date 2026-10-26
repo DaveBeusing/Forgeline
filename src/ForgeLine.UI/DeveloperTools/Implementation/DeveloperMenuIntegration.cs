@@ -4,7 +4,7 @@ using ForgeLine.Simulation;
 namespace ForgeLine.UI;
 
 public enum DeveloperMenuSection : byte { Session, Parameters, Actions, Visualization, Presets }
-public enum DeveloperPresetIntent : byte { Import, Export, RestartSameSeed, ReturnToBasis }
+public enum DeveloperPresetIntent : byte { Import, Export, RestartSameSeed, ReturnToBasis, SaveCurrentValues, RestartSelected }
 public sealed record DeveloperMenuChoice(string Label, DeveloperValue Value);
 public sealed record DeveloperMenuActionField(string Label, DeveloperValue Default, DeveloperValue Minimum, DeveloperValue Maximum, DeveloperValue Step, IReadOnlyList<DeveloperMenuChoice>? Choices = null);
 public sealed record DeveloperMenuPresetOutcome(Guid Correlation, bool Succeeded, string Message);
@@ -12,7 +12,7 @@ public sealed class DeveloperMenuActionForm
 {
     public DeveloperMenuActionForm(DeveloperOperation operation, ReadOnlySpan<DeveloperMenuActionField> fields)
     {
-        if (operation is not (DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource) || fields.Length > DeveloperRequest.MaximumValues)
+        if (operation is not (DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource or DeveloperOperation.RepairEntity or DeveloperOperation.RefillUnit or DeveloperOperation.DamageEntity) || fields.Length > DeveloperRequest.MaximumValues)
             throw new ArgumentException("Unsupported action form.");
         foreach (var f in fields)
             if (string.IsNullOrWhiteSpace(f.Label) || f.Label.Length > 64 || !f.Default.IsValid || f.Minimum.Kind != f.Default.Kind ||
@@ -31,6 +31,8 @@ public sealed class DeveloperMenuActionForm
     public IReadOnlyList<DeveloperMenuActionField> Fields { get; }
 }
 public sealed record DeveloperMenuPreset(string Key, string Label, DeveloperPresetMetadata Metadata, DeveloperFailureReason Compatibility);
+public sealed record DeveloperMenuParameterState(DeveloperParameterId Id, DeveloperTarget Target,
+    DeveloperValue Basis, DeveloperValue Initial, DeveloperValue? Pending);
 
 /// <summary>Copied observations supplied by the actual host/dispatcher/preset owners. No UI authority.</summary>
 public sealed class DeveloperMenuBackendSnapshot
@@ -38,7 +40,8 @@ public sealed class DeveloperMenuBackendSnapshot
     public DeveloperMenuBackendSnapshot(SimulationSessionId session, SimulationTick tick,
         ReadOnlySpan<DeveloperStateRevision> revisions, ReadOnlySpan<DeveloperResult> results,
         ReadOnlySpan<DeveloperMenuPreset> presets, double? speed = null, uint? remainingSteps = null,
-        bool loading = false, bool menuPauseTransferred = false, DeveloperMenuPresetOutcome? presetOutcome = null)
+        bool loading = false, bool menuPauseTransferred = false, DeveloperMenuPresetOutcome? presetOutcome = null,
+        IReadOnlyList<DeveloperMenuParameterState>? parameters = null, string? presetAvailability = null)
     {
         if (!session.IsSpecified || revisions.Length > 4 || results.Length > 64 || presets.Length > 64 ||
             revisions.ToArray().Any(r => !r.IsValid) || revisions.ToArray().Select(r => r.Domain).Distinct().Count() != revisions.Length ||
@@ -49,11 +52,17 @@ public sealed class DeveloperMenuBackendSnapshot
         if (presetOutcome is { } outcome && (outcome.Correlation == Guid.Empty || outcome.Message.Length > 256))
             throw new ArgumentException("Invalid preset outcome.");
         PresetOutcome = presetOutcome;
+        if (parameters?.Count > DeveloperInitialProfile.MaximumParameters || presetAvailability?.Length > 200)
+            throw new ArgumentException("Developer observations exceed their bounds.");
+        Parameters = Array.AsReadOnly(parameters?.ToArray() ?? []);
+        PresetAvailability = presetAvailability;
         Session = session; Tick = tick; Revisions = Array.AsReadOnly(revisions.ToArray()); Results = Array.AsReadOnly(results.ToArray());
         Presets = Array.AsReadOnly(presets.ToArray()); Speed = speed; RemainingSteps = remainingSteps;
         Loading = loading; MenuPauseTransferred = menuPauseTransferred;
     }
     public DeveloperMenuPresetOutcome? PresetOutcome { get; }
+    public IReadOnlyList<DeveloperMenuParameterState> Parameters { get; }
+    public string? PresetAvailability { get; }
     public SimulationSessionId Session { get; }
     public SimulationTick Tick { get; }
     public IReadOnlyList<DeveloperStateRevision> Revisions { get; }
@@ -68,6 +77,7 @@ public sealed class DeveloperMenuBackendSnapshot
 /// <summary>Client integration bridge, not a second simulation request protocol or preset implementation.</summary>
 public interface IDeveloperMenuBackend
 {
+    void AcquireMenuOwnership() { }
     DeveloperMenuBackendSnapshot? Capture();
     IReadOnlyList<DeveloperMenuActionForm> ActionForms { get; }
     // The session adapter owns separate window/focus and menu pause reasons and cancels steps while blocked.

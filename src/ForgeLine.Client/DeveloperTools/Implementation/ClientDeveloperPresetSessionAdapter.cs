@@ -19,6 +19,7 @@ internal sealed class ClientDeveloperPresetSessionAdapter : IDeveloperPresetServ
 
     public DeveloperProviderStatus Status => DeveloperToolsCapability.Current.IsCompiled
         ? new(DeveloperProviderAvailability.Available, DeveloperFailureReason.None) : DeveloperProviderStatus.Missing;
+    internal string? ImportFailure => _store.ImportFailure;
 
     public DeveloperFailureReason Validate(DeveloperPresetMetadata metadata)
     {
@@ -40,8 +41,19 @@ internal sealed class ClientDeveloperPresetSessionAdapter : IDeveloperPresetServ
     internal IReadOnlyList<DeveloperMenuPreset> CaptureMenuPresets()
     {
         EnsureDeveloperBuild();
-        return Array.AsReadOnly(_store.List().Select(document => new DeveloperMenuPreset(
-            document.Key, document.DisplayName, document.Profile.Metadata, Validate(document.Profile.Metadata))).ToArray());
+        var stored = _store.List();
+        var keys = stored.Select(d => d.Key).ToHashSet(StringComparer.Ordinal);
+        return Array.AsReadOnly(stored.Select(document => new DeveloperMenuPreset(
+            document.Key, document.DisplayName, document.Profile.Metadata, Validate(document.Profile.Metadata)))
+            .Concat(_store.ListIncoming().Where(d => !keys.Contains(d.Key)).Select(document => new DeveloperMenuPreset(
+                "incoming:" + document.Key, "Import: " + document.DisplayName, document.Profile.Metadata, DeveloperFailureReason.ProviderUnavailable)))
+            .OrderBy(entry => entry.Label, StringComparer.OrdinalIgnoreCase).Take(DeveloperPresetStore.MaximumVisiblePresets).ToArray());
+    }
+
+    internal DeveloperPresetDocument ImportSelected(string key)
+    {
+        EnsureDeveloperBuild();
+        return key.StartsWith("incoming:", StringComparison.Ordinal) ? _store.ImportIncoming(key[9..]) : _store.Load(key);
     }
 
     internal DeveloperPresetDocument Import(ReadOnlySpan<byte> utf8)
