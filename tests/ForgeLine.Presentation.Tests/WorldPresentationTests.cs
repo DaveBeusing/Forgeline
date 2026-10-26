@@ -35,7 +35,8 @@ public sealed class WorldPresentationTests
         Assert.NotEqual(historicalSchemaTwo, hash);
         // Independently captured from the authoritative seed-831 match at tick 4 without an observer.
         Assert.NotEqual("C215439B40D364B018404DAEFDABD65039595E4AF88F087AB67F41878B31A407", hash);
-        Assert.Equal("26F32C324EAEF026D560BD7354789A53524D9ECE454AC368109111CAEC33EF15", hash);
+        Assert.NotEqual("26F32C324EAEF026D560BD7354789A53524D9ECE454AC368109111CAEC33EF15", hash);
+        Assert.Equal("954107A5D4F4648BF08110F48824AB7C702A42871863B2501852EC6417C58FF4", hash);
         Assert.True(buffer.TryReadLatest(out var snapshot));
         var dressing = snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U).ToArray();
         int authoredDressing=scenario.Battlefield.WorldObjects.Count(x=>x.PresentationOnly);

@@ -365,11 +365,15 @@ public sealed partial class VehicleDockingService
         bool settled = visit.Pose.IsSettled(transform, movement) && LaneClear(entities, visit.Building, truck, visit.Pose);
         if (visit.LastObservedTick == context.Tick.Value && settled) return visit.SettledTicks >= 2;
         int ticks = settled ? (visit.LastObservedTick + 1 == context.Tick.Value ? visit.SettledTicks + 1 : 1) : 0;
-        visit = visit with { LastObservedTick = context.Tick.Value, SettledTicks = ticks,
+        visit = visit with
+        {
+            LastObservedTick = context.Tick.Value,
+            SettledTicks = ticks,
             Status = ticks >= 2 ? VehicleDockStatus.Docked : VehicleDockStatus.Aligning,
             Reason = !settled && visit.SettledTicks > 0 ? VehicleDockBlockReason.PoseLost : VehicleDockBlockReason.None,
             ServiceStartedTick = settled ? visit.ServiceStartedTick : 0,
-            ServiceProgress = settled ? visit.ServiceProgress : 0 };
+            ServiceProgress = settled ? visit.ServiceProgress : 0
+        };
         Put(entities, truck, visit);
         return ticks >= 2;
     }
@@ -532,8 +536,11 @@ public sealed partial class VehicleDockingService
                 visit.ExitTurning ? MathF.Atan2(outward.X, outward.Z) : visit.Pose.Heading));
         bool stopped = entities.TryGetComponent(truck, out GroundMovementState motion) &&
             motion.Status is GroundMovementStatus.OutOfFuel or GroundMovementStatus.Stuck;
-        Put(entities, truck, visit with { Status = VehicleDockStatus.Exiting,
-            Reason = stopped ? VehicleDockBlockReason.ExitBlocked : VehicleDockBlockReason.None });
+        Put(entities, truck, visit with
+        {
+            Status = VehicleDockStatus.Exiting,
+            Reason = stopped ? VehicleDockBlockReason.ExitBlocked : VehicleDockBlockReason.None
+        });
         return false;
     }
 
@@ -583,8 +590,10 @@ public sealed partial class VehicleDockingService
         if (entities.TryGetComponent(truck, out CargoTransportRuntimeState cargoState))
             Put(entities, truck, cargoState with
             {
-                Lifecycle = CargoTransportLifecycleState.Idle, WaitReason = CargoTransportWaitReason.None,
-                FailureReason = CargoTransportFailureReason.None, AnchorNode = ForgeLine.Logistics.LogisticsNodeId.None,
+                Lifecycle = CargoTransportLifecycleState.Idle,
+                WaitReason = CargoTransportWaitReason.None,
+                FailureReason = CargoTransportFailureReason.None,
+                AnchorNode = ForgeLine.Logistics.LogisticsNodeId.None,
                 LoadedQuantity = 0
             });
         CargoDeliveryFuelPolicy.ClearTravelState(entities, truck);

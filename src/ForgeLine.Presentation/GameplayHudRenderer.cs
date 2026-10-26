@@ -36,6 +36,7 @@ public sealed class GameplayHudRenderer : IDisposable
             prepared.Add(new SelectedUnitOrderStatusSurface(graphics));
             prepared.Add(new WorldHoverTooltipSurface(graphics, runtimeAssets));
             prepared.Add(new OperationsHudSurface(graphics, runtimeAssets));
+            prepared.Add(new NavigationDiagnosticsHudSurface(graphics));
             _surfaces = prepared.ToArray();
         }
         catch
@@ -122,7 +123,7 @@ public sealed class GameplayHudRenderer : IDisposable
         TimeSpan presentationTime = default,
         bool animateNotifications = false,
         bool animateOperations = false,
-        NotificationExpansion notificationExpansion = default)
+        NotificationExpansion notificationExpansion = default, NavigationDiagnosticsView navigationDiagnostics = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
@@ -171,7 +172,7 @@ public sealed class GameplayHudRenderer : IDisposable
                 presentationTime,
                 animateNotifications,
                 animateOperations,
-                notificationExpansion);
+                notificationExpansion, navigationDiagnostics);
 
         foreach (IGameplayHudSurface surface in _surfaces)
         {

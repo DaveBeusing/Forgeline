@@ -109,8 +109,8 @@ internal sealed partial class PredictiveTrafficPlanner
                 NavigationPrecisionOwnership.IsPrecise(vehicle) || vehicle.Movement.Velocity.LengthSquared() > 1.0001f ||
                 !_states.TryGetValue(vehicle.Entity, out var priorShunt) || priorShunt.CommandGeneration != intent.Binding.CommandGeneration ||
                 priorShunt.LastRecoveryTick >= frame.Tick.Value || frame.Tick.Value - priorShunt.LastRecoveryTick != 1 ||
-                WaitingAge(intent.Binding,frame.Tick.Value) < RecoveryWaitTicks ||
-                Vector3.Dot(vehicle.Movement.Velocity,Vector3.Transform(Vector3.UnitZ,vehicle.Pose.Rotation)) >= -.01f) continue;
+                WaitingAge(intent.Binding, frame.Tick.Value) < RecoveryWaitTicks ||
+                Vector3.Dot(vehicle.Movement.Velocity, Vector3.Transform(Vector3.UnitZ, vehicle.Pose.Rotation)) >= -.01f) continue;
             bool currentPhysicalWait = false;
             foreach (EntityId blocker in physicalCycles.Values)
             {
@@ -120,7 +120,7 @@ internal sealed partial class PredictiveTrafficPlanner
             }
             if (!currentPhysicalWait) continue;
             continuingReverse.Add(i);
-            if (TryTargets(i,capturedOnly:true))
+            if (TryTargets(i, capturedOnly: true))
             {
                 capturedDepartures[i] = true;
                 if (waits[i] == NavigationBlockReason.None) waits[i] = NavigationBlockReason.MovingVehicle;
@@ -343,8 +343,12 @@ internal sealed partial class PredictiveTrafficPlanner
                     }
                 }
                 path.Add(end);
-                simulated = simulated with { Pose = end, Movement = simulated.Movement with
-                    { Velocity = (end.Position - simulated.Pose.Position) / dt, HeadingRadians = heading } };
+                simulated = simulated with
+                {
+                    Pose = end,
+                    Movement = simulated.Movement with
+                    { Velocity = (end.Position - simulated.Pose.Position) / dt, HeadingRadians = heading }
+                };
                 if (HorizontalDistance(end.Position, target) <= .2f) { reached = true; break; }
             }
             if (verifyWholeRoute && !reached) return false;

@@ -210,8 +210,12 @@ internal sealed partial class LogisticsNavigationCoordinator
                 _legacyWork += result.WorkConsumed;
                 if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1 ||
                     result.FrameTick != context.Tick.Value || result.Revision != collision.World.Revision) break;
-                simulated = simulated with { Pose = pose, Movement = simulated.Movement with
-                    { Velocity = (pose.Position - simulated.Pose.Position) / .125f, HeadingRadians = yaw } };
+                simulated = simulated with
+                {
+                    Pose = pose,
+                    Movement = simulated.Movement with
+                    { Velocity = (pose.Position - simulated.Pose.Position) / .125f, HeadingRadians = yaw }
+                };
                 if (Vector3.DistanceSquared(pose.Position, target) <= .04f) { reached = true; break; }
             }
             Vector3 firstTarget = Vector2.Distance(new(start.Position.X, start.Position.Z), new(blocker.Pose.Position.X, blocker.Pose.Position.Z)) < straightRange

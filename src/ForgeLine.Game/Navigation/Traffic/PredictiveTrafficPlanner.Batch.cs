@@ -375,14 +375,16 @@ internal sealed partial class PredictiveTrafficPlanner
                     _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with { WaitingFor = waitingFor[i], RecoveryTarget = null };
                 }
                 directives[i] = new(NavigationModuleAvailability.Available, intent.Binding, frame.Tick,
-                    NavigationTrafficAction.Proceed, speedCaps[i], localTargets[i], hazards[i]) { CapturedCycleDepartureOnly = capturedDepartures[i] };
+                    NavigationTrafficAction.Proceed, speedCaps[i], localTargets[i], hazards[i])
+                { CapturedCycleDepartureOnly = capturedDepartures[i] };
             }
             else
             {
                 var hold = Waiting(intent.Binding, frame.Tick, waits[i], 0);
                 _states[intent.Binding.Requester] = _states[intent.Binding.Requester] with
                 {
-                    WaitingFor = waitingFor[i], RecoveryTarget = outwardReverse[i] || capturedDepartures[i] ? null : recovery[i],
+                    WaitingFor = waitingFor[i],
+                    RecoveryTarget = outwardReverse[i] || capturedDepartures[i] ? null : recovery[i],
                     LastRecoveryTick = recovery[i] is not null ? frame.Tick.Value : _states[intent.Binding.Requester].LastRecoveryTick
                 };
                 directives[i] = recovery[i] is Vector3 escape
@@ -441,8 +443,12 @@ internal sealed partial class PredictiveTrafficPlanner
         {
             if (!NavigationReverseMotion.TryStep(vehicle, target, maximumSpeed, dt, world, out var end, out _, out float heading)) return null;
             poses[step] = end;
-            vehicle = vehicle with { Pose = end, Movement = vehicle.Movement with
-                { Velocity = (end.Position - vehicle.Pose.Position) / dt, HeadingRadians = heading } };
+            vehicle = vehicle with
+            {
+                Pose = end,
+                Movement = vehicle.Movement with
+                { Velocity = (end.Position - vehicle.Pose.Position) / dt, HeadingRadians = heading }
+            };
         }
         failure = NavigationBlockReason.None;
         return poses;

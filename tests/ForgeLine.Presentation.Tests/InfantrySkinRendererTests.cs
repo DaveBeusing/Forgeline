@@ -39,6 +39,74 @@ public sealed class InfantrySkinRendererTests
         Assert.All(device.Buffers.Skip(2),b=>Assert.True(b.Disposed));Assert.False(((FakeBuffer)bindVertex).Disposed);Assert.False(((FakeBuffer)index).Disposed);
         mesh.Dispose();Assert.All(device.Buffers,b=>Assert.True(b.Disposed));
     }
+    [Fact]
+    public void RetainedPoseCrossesFrameSlotsWithoutSharingUploadsAndAssetReplacementInvalidatesIt()
+    {
+        var device = new FakeDevice();
+        using var mesh = CreateMesh(device, 0.1f);
+        using var replacement = CreateMesh(device, 0.8f);
+        using var cache = new SkinFrameCache(device);
+        var id = AssetId.Parse("unit.test.infantry");
+        var pose = new InfantryAnimationPose(true, InfantryAction.Walk, 0.5, true);
+        cache.Begin(0, false);
+        var first = cache.Resolve(id, mesh, pose, 1, out _);
+        var firstUpload = Assert.IsType<FakeBuffer>(first.VertexBuffer);
+        Assert.Equal(1, firstUpload.UploadCount);
+        Assert.Equal(1, cache.DeformationEvaluations);
+        byte[] original = firstUpload.Upload.ToArray();
+
+        cache.Begin(1, false);
+        var second = cache.Resolve(id, mesh, pose, 1, out _);
+        var secondUpload = Assert.IsType<FakeBuffer>(second.VertexBuffer);
+        Assert.NotSame(firstUpload, secondUpload);
+        Assert.Equal(original, secondUpload.Upload);
+        Assert.Equal(1, secondUpload.UploadCount);
+        Assert.Equal(0, cache.DeformationEvaluations);
+        Assert.Equal(1, cache.ReusedPoses);
+        Assert.Equal(1, firstUpload.UploadCount);
+
+        cache.Begin(0, false);
+        Assert.Same(firstUpload, cache.Resolve(id, mesh, pose with { Phase = 0.50001 }, 1, out _).VertexBuffer);
+        Assert.Equal(1, firstUpload.UploadCount);
+        Assert.Equal(1, cache.ReusedUploads);
+        Assert.Equal(0, cache.DeformationEvaluations);
+
+        cache.Begin(0, false);
+        var changed = cache.Resolve(id, replacement, pose, 1, out _);
+        Assert.Equal(1, cache.DeformationEvaluations);
+        Assert.False(original.AsSpan().SequenceEqual(Assert.IsType<FakeBuffer>(changed.VertexBuffer).Upload));
+        // Replacing the current slot cannot write into a different in-flight slot.
+        Assert.Equal(original, secondUpload.Upload);
+        Assert.Equal(1, secondUpload.UploadCount);
+        Assert.False(secondUpload.Disposed);
+
+        cache.Begin(1, false);
+        cache.Resolve(id, mesh, pose with { Phase = 0.75 }, 1, out _);
+        Assert.Equal(1, cache.DeformationEvaluations);
+        Assert.Equal(2, secondUpload.UploadCount);
+        Assert.False(original.AsSpan().SequenceEqual(secondUpload.Upload));
+    }
+
+    private static RuntimeMeshBuffers CreateMesh(FakeDevice device, float translation)
+    {
+        RuntimeMeshVertex[] vertices =
+        [new(.1f, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1),
+         new(0, .1f, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1),
+         new(0, 0, .1f, 0, 1, 0, 0, 0, 1, 0, 0, 1)];
+        var data = new RuntimeMeshData(RuntimeMeshAttributes.Normal | RuntimeMeshAttributes.Uv0 | RuntimeMeshAttributes.Tangent,
+            vertices, [0, 1, 2], [], [new(0, 3, -1)]);
+        SkinJoint[] joints = [new("root", -1, Vector3.Zero, Quaternion.Identity, Matrix4x4.Identity)];
+        var skin = new RuntimeSkinData(data, joints,
+            Enumerable.Repeat(new SkinInfluence(0, 0, 0, 0, new(1, 0, 0, 0)), 3).ToArray(), []);
+        string[] names = ["idle", "walk", "run", "aim", "fire", "reload", "hit", "suppression", "death"];
+        var clips = names.Select(name => new RuntimeAnimationData(name, [new AnimationNode("root", -1)],
+            [new AnimationChannel(0, AnimationPath.Translation, AnimationInterpolation.Linear, [0, 1],
+                [Vector4.Zero, new(translation, 0, 0, 0)])], RuntimeSkinData.RigSignature(joints)));
+        return new RuntimeMeshBuffers(device.CreateBuffer(new(144, GraphicsBufferMemory.Upload)),
+            device.CreateBuffer(new(12, GraphicsBufferMemory.Upload)), 48, 3, data.Attributes, default, false, false, 1)
+            { Skin = new(skin, clips) };
+    }
+
     private sealed class FakeDevice : IGraphicsDevice
     {
         public List<FakeBuffer> Buffers { get; } = [];
@@ -56,7 +124,12 @@ public sealed class InfantrySkinRendererTests
         public GraphicsBufferDescription Description => description;
         public byte[] Upload { get; private set; } = [];
         public bool Disposed { get; private set; }
-        public void SetData<T>(ReadOnlySpan<T> data, int offsetInBytes = 0) where T : unmanaged => Upload = MemoryMarshal.AsBytes(data).ToArray();
+        public int UploadCount { get; private set; }
+        public void SetData<T>(ReadOnlySpan<T> data, int offsetInBytes = 0) where T : unmanaged
+        {
+            UploadCount++;
+            Upload = MemoryMarshal.AsBytes(data).ToArray();
+        }
         public void Dispose() => Disposed = true;
     }
     private sealed class FakePipeline(GraphicsPipelineDescription description) : IGraphicsPipeline

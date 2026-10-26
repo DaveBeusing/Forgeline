@@ -12,3 +12,5 @@ For the compiled central-divide validation scenario, seed 2026, independent runt
 | Tick 20 | B994E0FD0195766BB241EF64957B83B7F11352272D6913AA0D575E61DAD516A3 | BBE06AEF61EBDF3E6798DDDA9EF0EB19AEAEC227E83DBA943DDDAC2EC4C1F29C |
 
 Transient captured body frames, fixed-pose occupancy checks, swept enclosures and diagnostic veto observations are rebuilt each tick. They do not introduce serialized wall-clock timings or presentation state. The authoritative traffic checkpoint validates its bounded full-identity records before replacing live state.
+
+The combined lifecycle/traffic branch also independently compares seed 831 at tick 4 with and without a presentation observer. Its current hash is `954107A5D4F4648BF08110F48824AB7C702A42871863B2501852EC6417C58FF4`; the lifecycle-only checkpoint `26F32C324EAEF026D560BD7354789A53524D9ECE454AC368109111CAEC33EF15` is retained as a rejected historical value. The two independent current captures agree before the fixed checkpoint is checked.

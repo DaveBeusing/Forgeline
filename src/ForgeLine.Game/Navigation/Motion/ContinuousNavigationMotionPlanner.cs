@@ -24,13 +24,14 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
     public NavigationMotionProposal Propose(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         int workAllowance, out int workConsumed) =>
-        ProposeCore(input, collision, geometry, workAllowance, out workConsumed, out _, out _, out _);
+        ProposeCore(input, collision, geometry, workAllowance, out workConsumed, out _, out _, out _, out _);
 
     /// <summary>Simulation-only trace; waypoint indices are not permission to advance route ownership.</summary>
     internal NavigationMotionProposal ProposeCore(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         int workAllowance, out int workConsumed, out Vector3 usedWaypoint,
-        out int currentWaypointIndex, out int usedWaypointIndex)
+        out int currentWaypointIndex, out int usedWaypointIndex, out NavigationCheckedHorizon? checkedHorizon,
+        bool captureDiagnostics = false)
     {
         ArgumentNullException.ThrowIfNull(collision);
         ArgumentNullException.ThrowIfNull(geometry);
@@ -39,6 +40,7 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         usedWaypoint = input.Vehicle.Pose.Position;
         currentWaypointIndex = -1;
         usedWaypointIndex = -1;
+        checkedHorizon = null;
 
         if (!ValidInput(input, collision))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.StaleSnapshot);
@@ -94,8 +96,9 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
             if (input.Traffic.MaximumSpeed > 1 || HorizontalDistance(input.Vehicle.Pose.Position, localTarget) > 6 ||
                 !TryGroundedHorizon(input, collision, geometry, localTarget, groundOffset, maximumSpeed,
                     workAllowance / 2, ref workConsumed, out var checkedTarget, out float checkedDistance,
-                    out var checkedReason, out bool clear) || !clear)
+                    out var checkedReason, out bool clear, captureDiagnostics, out var localHorizon) || !clear)
                 return Hold(input, collision, Availability, NavigationBlockReason.ReservedCorridor, brakingDistance);
+            checkedHorizon = localHorizon;
             usedWaypoint = checkedTarget;
             usedWaypointIndex = -1;
             return ProposeStep(input, collision, geometry, route, checkedTarget, checkedDistance,
@@ -114,7 +117,8 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
 
         if (!TryLookahead(input, collision, geometry, route, currentWaypoint, groundOffset,
             lookahead, maximumSpeed, workAllowance, ref workConsumed, out Vector3 steeringTarget,
-            out float safeDistance, out NavigationBlockReason horizonReason, out int steeringIndex))
+            out float safeDistance, out NavigationBlockReason horizonReason, out int steeringIndex,
+            captureDiagnostics, out var queryHorizon))
         {
             usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
             usedWaypointIndex = currentWaypoint;
@@ -132,6 +136,7 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
             usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
             usedWaypointIndex = currentWaypoint;
         }
+        if (!forwardClearance) checkedHorizon = queryHorizon;
         return proposal;
     }
 
@@ -242,12 +247,14 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
     private bool TryLookahead(in NavigationMotionInput input, NavigationCollisionFrame collision,
         INavigationGeometryQuery geometry, NavigationRouteProposal route, int currentWaypoint,
         float groundOffset, float lookahead, float maximumSpeed, int allowance, ref int consumed,
-        out Vector3 target, out float safeDistance, out NavigationBlockReason reason, out int usedWaypoint)
+        out Vector3 target, out float safeDistance, out NavigationBlockReason reason, out int usedWaypoint,
+        bool captureDiagnostics, out NavigationCheckedHorizon? checkedHorizon)
     {
         target = input.Vehicle.Pose.Position;
         safeDistance = 0;
         reason = NavigationBlockReason.SearchWork;
         usedWaypoint = -1;
+        checkedHorizon = null;
         int pointCount = route.Waypoints.Count;
         bool finalSegment = route.ResolvedDestination != input.Binding.OriginalOrder.WorldTarget;
         if (finalSegment && pointCount == int.MaxValue) return false;
@@ -299,13 +306,14 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
         {
             if (TryGroundedHorizon(input, collision, geometry, candidate, groundOffset, maximumSpeed,
                 horizonWorkLimit, ref consumed, out Vector3 candidateTarget, out float candidateDistance,
-                out reason, out bool fullyCleared))
+                out reason, out bool fullyCleared, captureDiagnostics, out var candidateHorizon))
             {
                 if (fullyCleared)
                 {
                     target = candidateTarget;
                     safeDistance = candidateDistance;
                     usedWaypoint = index;
+                    checkedHorizon = candidateHorizon;
                     return true;
                 }
                 if (candidateDistance > safeDistance)
@@ -314,6 +322,7 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
                     safeDistance = candidateDistance;
                     usedWaypoint = index;
                     partialReason = reason;
+                    checkedHorizon = candidateHorizon;
                 }
             }
             if (reason == NavigationBlockReason.MissingGeometry) return false;
@@ -336,9 +345,11 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
             if (!float.IsFinite(length) || length <= DirectionEpsilon) continue;
             Vector3 alternate = length > lookahead ? input.Vehicle.Pose.Position + delta * (lookahead / length) : point;
             if (TryGroundedHorizon(input, collision, geometry, alternate, groundOffset, maximumSpeed,
-                horizonWorkLimit, ref consumed, out var nextTarget, out float nextDistance, out var nextReason, out bool clear) && clear)
+                horizonWorkLimit, ref consumed, out var nextTarget, out float nextDistance, out var nextReason, out bool clear,
+                captureDiagnostics, out var nextHorizon) && clear)
             {
                 target = nextTarget; safeDistance = nextDistance; usedWaypoint = index; reason = nextReason;
+                checkedHorizon = nextHorizon;
                 return true;
             }
             if (nextReason == NavigationBlockReason.MissingGeometry) { reason = nextReason; return false; }
@@ -351,12 +362,13 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
     private bool TryGroundedHorizon(in NavigationMotionInput input, NavigationCollisionFrame collision,
         INavigationGeometryQuery geometry, Vector3 candidate, float groundOffset, float maximumSpeed,
         int allowance, ref int consumed, out Vector3 target, out float safeDistance,
-        out NavigationBlockReason reason, out bool fullyCleared)
+        out NavigationBlockReason reason, out bool fullyCleared, bool captureDiagnostics, out NavigationCheckedHorizon? checkedHorizon)
     {
         target = input.Vehicle.Pose.Position;
         safeDistance = 0;
         reason = NavigationBlockReason.Terrain;
         fullyCleared = false;
+        checkedHorizon = null;
         NavigationBlockReason approvedReason = reason;
         int refinement = 0;
         while (true)
@@ -405,6 +417,9 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
                     target = candidate;
                     safeDistance = distance;
                     fullyCleared = true;
+                    if (captureDiagnostics) checkedHorizon = new(input.Binding,
+                        new(NavigationModuleAvailability.Available, input.Tick, collision.World.Revision),
+                        input.Vehicle.Pose, end, input.Vehicle.Profile, duration, result.AllowedFraction);
                     return true;
                 }
                 if (approved > safeDistance)
@@ -412,6 +427,9 @@ public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotio
                     target = candidate;
                     safeDistance = approved;
                     approvedReason = reason;
+                    if (captureDiagnostics) checkedHorizon = new(input.Binding,
+                        new(NavigationModuleAvailability.Available, input.Tick, collision.World.Revision),
+                        input.Vehicle.Pose, end, input.Vehicle.Profile, duration, result.AllowedFraction);
                 }
                 if (reason is not (NavigationBlockReason.Terrain or NavigationBlockReason.OutsideWorld))
                 {

@@ -4,6 +4,7 @@ using ForgeLine.Navigation;
 using ForgeLine.World;
 using Xunit;
 namespace ForgeLine.Game.Tests;
+
 public sealed class AcceptedDockMotionEnvelopeTests
 {
     [Theory]

@@ -1956,6 +1956,11 @@ public sealed class CargoTransportSystem : ISimulationSystem
         in CargoTransportRuntimeState state,
         SimulationTick tick)
     {
+        if (entities.TryGetComponent(entity, out CargoTransport transport) &&
+            entities.TryGetComponent(entity, out CargoTransportOrder completedOrder) &&
+            _network.TryGetNode(completedOrder.Destination, out var destination))
+            Progress?.ObserveCompletedCargoDelivery(transport.Owner, entity, destination.Entity, state.DeliveredQuantity, tick);
+
         ClearNavigation(
             entities,
             entity);

@@ -14,7 +14,7 @@ internal readonly record struct LogisticsNavigationActorState(
 internal sealed record LogisticsNavigationCheckpoint(
     int Revision, ulong Tick, LogisticsNavigationActorState[] Actors, PredictiveTrafficCheckpoint Traffic);
 internal readonly record struct NavigationApprovedMotion(
-    NavigationMotionInput Input, NavigationMotionProposal Proposal, int CurrentWaypoint, int UsedWaypoint);
+    NavigationMotionInput Input, NavigationMotionProposal Proposal, int CurrentWaypoint, int UsedWaypoint, NavigationCheckedHorizon? Horizon = null);
 internal sealed record LogisticsNavigationPlan(
     IReadOnlyList<NavigationApprovedMotion> Motions, bool Complete, int WorkConsumed, NavigationBlockReason Reason);
 
@@ -34,6 +34,15 @@ internal sealed partial class LogisticsNavigationCoordinator
     private readonly Dictionary<EntityId, LogisticsNavigationActorState> _actors = new();
     private readonly List<EntityId> _active = new(MaximumVehicles);
     private readonly Dictionary<EntityId, RouteCache> _routes = new();
+    private readonly Dictionary<EntityId, NavigationMotionProposal> _diagnosticMotions = new();
+    private readonly Dictionary<EntityId, NavigationDiagnosticReplan> _diagnosticReplans = new();
+    private readonly Dictionary<EntityId, NavigationCheckedHorizon> _diagnosticHorizons = new();
+    private bool DiagnosticObservationsEnabled { get; set; }
+    internal void SetDiagnosticObservations(bool enabled)
+    {
+        DiagnosticObservationsEnabled = enabled;
+        if (!enabled) { _diagnosticMotions.Clear(); _diagnosticReplans.Clear(); _diagnosticHorizons.Clear(); }
+    }
     private NavigationWorld? _sourceWorld;
     private NavigationWorldSnapshot? _snapshot;
     private NavigationVehicleGeometry? _geometry;
@@ -79,11 +88,12 @@ internal sealed partial class LogisticsNavigationCoordinator
     {
         var previouslyActive = _actors.Values.Where(static a => a.Active).Select(static a => a.Entity).ToHashSet();
         _tick = context.Tick.Value; _active.Clear(); _overflow = false;
+        _diagnosticMotions.Clear(); _diagnosticHorizons.Clear();
         _legacyEnvelopes.Clear(); _legacyVetoes.Clear(); _physicalWaits.Clear(); _legacyComplete = true; _legacyWork = 0;
         _protectedLogistics.Clear(); _protectedComplete = true;
         foreach (var key in _actors.Keys.ToArray())
         {
-            if (!context.Entities.IsAlive(key)) { _actors.Remove(key); _routes.Remove(key); }
+            if (!context.Entities.IsAlive(key)) { _actors.Remove(key); _routes.Remove(key); _diagnosticReplans.Remove(key); }
             else _actors[key] = _actors[key] with { Active = false, LastTick = _tick };
         }
         foreach (var entity in context.Entities.Query<WorldTransform, GroundMovementState>(QueryIterationOrder.StableByEntityIndex))
@@ -161,7 +171,7 @@ internal sealed partial class LogisticsNavigationCoordinator
         _traffic.RestoreState(validated.CaptureState());
         _actors.Clear();
         foreach (var pair in actors) _actors.Add(pair.Key, pair.Value);
-        _tick = checkpoint.Tick; _active.Clear(); _routes.Clear(); _overflow = false;
+        _tick = checkpoint.Tick; _active.Clear(); _routes.Clear(); _diagnosticMotions.Clear(); _diagnosticReplans.Clear(); _diagnosticHorizons.Clear(); _overflow = false;
     }
 
     internal void ObserveCommit(SimulationContext context, in NavigationApprovedMotion accepted, bool progressed)
@@ -169,6 +179,11 @@ internal sealed partial class LogisticsNavigationCoordinator
         var binding = accepted.Input.Binding;
         if (!_actors.TryGetValue(binding.Requester, out var actor) || actor.Generation != binding.CommandGeneration ||
             actor.OriginalOrder != binding.OriginalOrder || actor.RequestId != binding.RequestId) return;
+        if (DiagnosticObservationsEnabled && (_diagnosticMotions.Count < MaximumVehicles || _diagnosticMotions.ContainsKey(binding.Requester)))
+        {
+            _diagnosticMotions[binding.Requester] = accepted.Proposal;
+            if (accepted.Horizon is { } horizon) _diagnosticHorizons[binding.Requester] = horizon;
+        }
         actor = actor with { LastTick = context.Tick.Value, LastAction = accepted.Input.Traffic.Action,
             LastReason = accepted.Proposal.Reason, LastProgressTick = progressed ? context.Tick.Value : actor.LastProgressTick };
         // Expected FIFO/passage waits are not failed searches. An active escape keeps its route.
@@ -179,7 +194,15 @@ internal sealed partial class LogisticsNavigationCoordinator
             accepted.Proposal.End == accepted.Proposal.Start &&
             accepted.Proposal.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain &&
             _navigation.TryRequestTrafficReplan(context, binding))
+        {
             actor = actor with { LastReplanTick = context.Tick.Value, ReplanCount = checked(actor.ReplanCount + 1) };
+            if (DiagnosticObservationsEnabled && (_diagnosticReplans.Count < MaximumHistory || _diagnosticReplans.ContainsKey(binding.Requester)) &&
+                context.Entities.TryGetComponent(binding.Requester, out NavigationPendingPath pending))
+                _diagnosticReplans[binding.Requester] = new(
+                    new(NavigationModuleAvailability.Available, context.Tick, new(pending.Request.NavigationVersion, _snapshot?.Revision.Costs ?? 0)),
+                    binding.Requester, binding.RequestId, pending.Request.RequestId, pending.OriginalOrder,
+                    accepted.Proposal.Reason, actor.ReplanCount);
+        }
         _actors[binding.Requester] = actor;
     }
 

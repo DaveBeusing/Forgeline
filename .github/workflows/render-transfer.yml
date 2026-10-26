@@ -1,0 +1,48 @@
+name: Render preparation compilation
+on:
+  push:
+    branches: [performance/render-frame-reuse]
+    paths:
+      - 'src/ForgeLine.Client/ClientRenderPublication.cs'
+      - '.github/workflows/render-transfer.yml'
+permissions:
+  contents: read
+concurrency:
+  group: render-preparation-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  compile:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            src
+            assets/maps
+            assets/source/branding
+            assets/source/ui/fonts
+            assets/source/audio
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Compile current production Windows client without executing programs or tests
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/render-transfer | Out-Null
+          git rev-parse HEAD | Out-File artifacts/render-transfer/source-commit.txt -Encoding utf8
+          dotnet --info | Out-File artifacts/render-transfer/runtime.txt -Encoding utf8
+          dotnet build src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release 2>&1 | Tee-Object -FilePath artifacts/render-transfer/release-build.log
+          $code = $LASTEXITCODE
+          exit $code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-compilation-${{ github.sha }}
+          path: artifacts/render-transfer/
+          retention-days: 14

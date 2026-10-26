@@ -57,7 +57,9 @@ public sealed class BootstrapReconnaissancePlanningTests
         entities.AddComponent(factory, new UnitProductionFacility(input, UnitProductionCapability.Vehicle | UnitProductionCapability.Logistics,
             owner, Vector3.Zero, SimulationTick.Zero)
         {
-            ActiveRequest = request, ActiveUnit = UnitIds.MainBattleTank, Status = UnitProductionStatus.NoInput
+            ActiveRequest = request,
+            ActiveUnit = UnitIds.MainBattleTank,
+            Status = UnitProductionStatus.NoInput
         });
         entities.AddComponent(factory, new PowerNetworkMembership(new PowerNetworkId(10003)));
         entities.AddComponent(factory, new PowerGenerator(10));

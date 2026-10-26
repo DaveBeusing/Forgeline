@@ -4,6 +4,7 @@ using ForgeLine.Economy;
 using ForgeLine.Simulation;
 using Xunit;
 namespace ForgeLine.Game.Tests;
+
 public sealed class BootstrapInfantryPlanningTests
 {
     [Theory]
