@@ -176,6 +176,7 @@ internal sealed partial class ClientSimulationHost
 
     private void InitializeOwnerSnapshot()
     {
+        BindDeveloperRuntime();
         MatchState state = _scenario.GetMatchState();
         if (state.Lifecycle == MatchLifecyclePhase.Paused)
         { _pauseReasons = ClientSimulationPauseReason.Legacy; Volatile.Write(ref _paused, 1); }
@@ -221,6 +222,7 @@ internal sealed partial class ClientSimulationHost
     }
 
     partial void InitializeDeveloperSession(DeveloperSessionAccess? access, ref IDeveloperSessionController controller);
+    partial void BindDeveloperRuntime();
     partial void SubmitDeveloperCore(DeveloperSessionAccess permission, DeveloperRequest request, bool transfer, ref ClientDeveloperControlReceipt result);
     partial void ReadDeveloperCompletion(ref ClientDeveloperControlCompletion completion, ref bool found);
     partial void QueueDeveloperAccess(DeveloperSessionAccess permission, ref bool accepted);
