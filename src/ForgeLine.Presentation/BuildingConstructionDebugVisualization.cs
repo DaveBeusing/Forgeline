@@ -18,6 +18,8 @@ public static class BuildingConstructionDebugVisualization
             : invalidColor;
 
         debugDraw.Box(preview.Bounds, color);
+        if (preview.ConveyorInput is { } input) ConveyorNetworkOverlay.DrawSocket(debugDraw, input.Position, input.Facing, true);
+        if (preview.ConveyorOutput is { } output) ConveyorNetworkOverlay.DrawSocket(debugDraw, output.Position, output.Facing, false);
         if (preview.LoadingCorridor is ForgeLine.World.AxisAlignedBounds corridor)
         {
             var outline = new ForgeLine.World.AxisAlignedBounds(
@@ -25,6 +27,12 @@ public static class BuildingConstructionDebugVisualization
                 new(corridor.Maximum.X, preview.GroundPosition.Y + 0.3f, corridor.Maximum.Z));
             debugDraw.Box(outline, color);
             debugDraw.Label(outline.Center, "LOADING LANE - KEEP CLEAR", color);
+            Vector3 facing = Vector3.Transform(Vector3.UnitZ, BuildingFootprint.GetRotation(preview.Orientation));
+            Vector3 side = Vector3.Cross(Vector3.UnitY, facing);
+            Vector3 half = (outline.Maximum - outline.Minimum) / 2;
+            Vector3 gate = outline.Center + facing * (MathF.Abs(facing.X) * half.X + MathF.Abs(facing.Z) * half.Z);
+            ConveyorNetworkOverlay.DrawSocket(debugDraw, gate - side * 1.5f, facing, true, "CARGO IN");
+            ConveyorNetworkOverlay.DrawSocket(debugDraw, gate + side * 1.5f, facing, false, "CARGO OUT");
         }
 
         if (!preview.IsValid)

@@ -115,7 +115,8 @@ public sealed class PlayerActionReadModelTests
             (ConveyorModule.OutputAdapter, 2010, "Building input adapter", 16),
             (ConveyorModule.Endcap, 2011, "End cap", 4),
             (ConveyorModule.Support, 2012, "Support", 4),
-            (ConveyorModule.RaisedSupport, 2013, "Raised support", 6)
+            (ConveyorModule.RaisedSupport, 2013, "Raised support", 6),
+            (ConveyorModule.Overpass, 2014, "Conveyor overpass", 66)
         ];
         Assert.Equal(Enum.GetValues<ConveyorModule>(), conveyors.Select(static item => item.Module));
         BuildingId[] expectedIds = scenario.Services.BuildingDefinitions.Definitions

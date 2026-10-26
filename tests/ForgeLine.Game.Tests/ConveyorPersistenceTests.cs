@@ -16,6 +16,21 @@ public sealed class ConveyorPersistenceTests
     private static readonly ulong[] ContinuationTicks = [1, 7, 24];
 
     [Fact]
+    public void PaidOverpassCrossingReconstructsAsIndependentAuthoredPartsThroughSaveAndReplay()
+    {
+        using MatchRuntime runtime = CreateRuntime(7401);
+        var center = new Vector3(160, 0, 80);
+        ExecuteConveyor(runtime, new(ConveyorEdit.Build, ConveyorModule.Standard, center, center,
+            BuildingOrientation.East, 0, true));
+        ExecuteConveyor(runtime, new(ConveyorEdit.Build, ConveyorModule.Overpass, center, center,
+            BuildingOrientation.North, 0, true));
+        var carriers = Carriers(runtime);
+        Assert.Equal(4, carriers.Length);
+        Assert.DoesNotContain(Pieces(runtime), row => row.Piece.Placement.Module == ConveyorModule.Overpass);
+        AssertRoundTripsAndContinues(runtime);
+    }
+
+    [Fact]
     public void PlayerDemolitionRemovesConveyorAndReplaysThroughTheNormalCommandBoundary()
     {
         using MatchRuntime runtime = CreateRuntime(17);

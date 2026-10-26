@@ -36,6 +36,7 @@ public sealed class ConveyorConnectionUxTests
     }
 
     [Theory]
+    [InlineData(ConveyorModule.Overpass, 0)]
     [InlineData(ConveyorModule.Standard, 0)]
     [InlineData(ConveyorModule.ShortSegment, 1)]
     [InlineData(ConveyorModule.CurveLeft, 0)]

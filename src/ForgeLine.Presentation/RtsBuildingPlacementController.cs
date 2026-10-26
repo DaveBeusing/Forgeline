@@ -65,7 +65,7 @@ public sealed class RtsBuildingPlacementController
 
         _issuer = issuer;
         _bindings = bindings ?? GameplayBindingRegistry.Default;
-        _placementHint = $"SHIFT + CLICK REPEAT AFTER ACCEPTANCE / Q LEFT / E RIGHT / {_bindings.Prompt(GameplayAction.RotatePlacement)} RIGHT / ESC CANCEL";
+        _placementHint = $"GRID 4 M / SHIFT + CLICK REPEAT AFTER ACCEPTANCE / Q LEFT / E RIGHT / {_bindings.Prompt(GameplayAction.RotatePlacement)} RIGHT / ESC CANCEL";
         _selectionKeys.Clear();
         for (int i = (int)GameplayAction.CorePlacement; i <= (int)GameplayAction.SmelterPlacement; i++)
             _selectionKeys.TryAdd(_bindings.Key((GameplayAction)i), false);
@@ -82,6 +82,8 @@ public sealed class RtsBuildingPlacementController
         PlacementPreviewFreshness.Unavailable;
 
     public bool IsActive => ActiveBuilding.IsSpecified || Conveyor.IsActive;
+    public Vector3? GridCenter => Conveyor.IsActive ? Conveyor.GridCenter :
+        IsActive && _hasPreviewRequest ? _requestedPosition : null;
 
     public void Update(
         InputState input,
@@ -276,7 +278,7 @@ public sealed class RtsBuildingPlacementController
             throw new ArgumentOutOfRangeException(nameof(buildingId));
         }
 
-        if (buildingId.Value>=ConveyorGeometry.MenuBase && buildingId.Value<ConveyorGeometry.MenuBase+14)
+        if (buildingId.Value>=ConveyorGeometry.MenuBase && buildingId.Value<ConveyorGeometry.MenuBase+ConveyorGeometry.MenuCount)
         {
             ActiveBuilding=BuildingId.None;Preview=null;
             Conveyor.Begin((ConveyorModule)(buildingId.Value-ConveyorGeometry.MenuBase));
@@ -471,16 +473,18 @@ public sealed class RtsBuildingPlacementController
                 camera.Target.Y,
                 viewportWidth,
                 viewportHeight,
-                out Vector3 horizontalTarget) ||
-            !terrain.TrySampleHeight(
-                horizontalTarget.X,
-                horizontalTarget.Z,
-                out float terrainHeight))
+                out Vector3 horizontalTarget))
         {
             worldTarget = default;
             return false;
         }
 
+        horizontalTarget = ConstructionGrid.Snap(horizontalTarget);
+        if (!terrain.TrySampleHeight(horizontalTarget.X, horizontalTarget.Z, out float terrainHeight))
+        {
+            worldTarget = default;
+            return false;
+        }
         worldTarget =
             new Vector3(
                 horizontalTarget.X,

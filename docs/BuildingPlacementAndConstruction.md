@@ -56,6 +56,24 @@ The current durability values are shared by normal construction and starting bui
 
 All thirteen current definitions leave `ArmorProfileId` unspecified and retain the existing unarmored damage resolution. A content definition can declare an armor profile without changing the construction or damage pipeline.
 
+## Placement grid and visible access
+
+Interactive building placement snaps to the same 4m grid as conveyors. A bounded
+terrain-following grid is visible around the preview. Foundation and clearance
+validation use that snapped site. Rotation keeps the same grid origin.
+
+The building ghost shows cyan **IN** and amber **OUT** direction arrows at its
+actual prospective belt sockets, using the same geometry as the completed
+building, including its orientation and foundation height. Mines expose only an
+eligible solid-resource output; Barracks and Vehicle Factory expose only input.
+Buildings without belt ports do not show belt sockets. The truck loading corridor
+also identifies **CARGO IN / CARGO OUT** access, including for liquid-processing
+buildings such as the Refinery. These arrows distinguish the loading access from
+belt connections and do not add new transport ports.
+
+Existing saves, starting layouts and scripted build commands keep their original
+positions. Conveyor terminal snapping retains exact legacy socket coordinates.
+
 ## Placement preview
 
 `BuildingPlacementService.CreatePreview` remains simulation/game-side validation and creates a non-authoritative detached read model. The presentation controller no longer receives `EntityRegistry` or `BuildingPlacementService`.
