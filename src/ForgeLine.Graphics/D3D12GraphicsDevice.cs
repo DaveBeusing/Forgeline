@@ -1834,10 +1834,14 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         while (GetCompletedFence() < fenceValue)
         {
             _ = _frameFenceEvent.WaitOne(100);
+            // Completion can occur during the wait that reaches the deadline.
+            // Observe it before classifying a timeout; no further wait is granted.
+            ulong completed = GetCompletedFence();
+            if (completed >= fenceValue) return;
             if (System.Diagnostics.Stopwatch.GetElapsedTime(started) >= TimeSpan.FromSeconds(10))
             {
                 throw new GraphicsDeviceException(
-                    $"GPU fence did not complete within ten seconds; restart the client session. target={fenceValue}; completed={GetCompletedFence()}; lastFrame={_lastSubmittedFrameFence}; software={_deviceInfo.IsSoftwareAdapter}.",
+                    $"GPU fence did not complete within ten seconds; restart the client session. target={fenceValue}; completed={completed}; lastFrame={_lastSubmittedFrameFence}; software={_deviceInfo.IsSoftwareAdapter}.",
                     "fence-timeout");
             }
         }

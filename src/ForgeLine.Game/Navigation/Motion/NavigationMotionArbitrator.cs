@@ -97,7 +97,7 @@ internal sealed class NavigationMotionArbitrator
             originals.Add(body.Identity, body);
         }
         var stationary = new NavigationCollisionFrame(collision.World, collision.Tick, collision.Coverage,
-            true, stationaryBodies, _maximumBodies);
+            true, stationaryBodies, _maximumBodies, bodyPosesAreFixed: true);
         float delta = inputs.IsEmpty ? 0 : inputs[0].DeltaSeconds;
 
         for (int position = 0; position < order.Length; position++)
@@ -121,7 +121,7 @@ internal sealed class NavigationMotionArbitrator
                     Hold(input, collision, NavigationBlockReason.Unknown);
                 continue;
             }
-            if (!MayMove(input, proposal) || !TryEnvelope(proposal, input.Vehicle.Profile, out AxisAlignedBounds envelope))
+            if (!MayMove(input, proposal) || !TryBuildSweptBounds(proposal.Start, proposal.End, input.Vehicle.Profile, out AxisAlignedBounds envelope))
             {
                 output[index] = Hold(input, collision, NavigationBlockReason.Unknown);
                 continue;
@@ -194,12 +194,7 @@ internal sealed class NavigationMotionArbitrator
             float.IsFinite(proposal.BrakingDistance) && proposal.BrakingDistance >= 0 &&
             float.IsFinite(proposal.SafeRemainingDistance) && proposal.SafeRemainingDistance >= 0 &&
             Enum.IsDefined(proposal.Reason) &&
-            (binding.DockGeneration == 0 ? vehicle.DockVisit is null :
-                vehicle.DockVisit is VehicleDockVisit visit && visit.Generation == binding.DockGeneration &&
-                vehicle.BuildingSlot is VehicleDockSlot slot && slot.Truck == vehicle.Entity &&
-                slot.Generation == binding.DockGeneration && slot.Owner == vehicle.Owner) &&
-            (binding.QueueGeneration == 0 ? vehicle.QueueEntry is null :
-                vehicle.QueueEntry is VehicleQueueEntry queue && queue.Generation == binding.QueueGeneration);
+            NavigationPrecisionOwnership.Matches(vehicle, binding);
     }
 
     private static bool MayMove(in NavigationMotionInput input, in NavigationMotionProposal proposal)
@@ -207,7 +202,7 @@ internal sealed class NavigationMotionArbitrator
         NavigationTrafficDirective traffic = input.Traffic;
         if (!input.CanMove || !float.IsFinite(input.EffectiveMaximumSpeed) || input.EffectiveMaximumSpeed < 0 ||
             traffic.Availability != NavigationModuleAvailability.Available || traffic.Binding != input.Binding ||
-            traffic.Tick != input.Tick || traffic.Action is not (NavigationTrafficAction.Proceed or NavigationTrafficAction.Recovery) ||
+            traffic.Tick != input.Tick || traffic.Action is not (NavigationTrafficAction.Proceed or NavigationTrafficAction.Recovery or NavigationTrafficAction.Brake) ||
             !float.IsFinite(traffic.MaximumSpeed) || traffic.MaximumSpeed < 0) return false;
         double maximum = Math.Min(input.Vehicle.Profile.MaximumSpeed,
             Math.Min(input.EffectiveMaximumSpeed, traffic.MaximumSpeed));
@@ -231,22 +226,62 @@ internal sealed class NavigationMotionArbitrator
         (result.Status is not (NavigationGeometryStatus.Unavailable or NavigationGeometryStatus.Blocked or
             NavigationGeometryStatus.InvalidInput or NavigationGeometryStatus.Stale) || result.AllowedFraction == 0);
 
-    private static bool TryEnvelope(in NavigationMotionProposal proposal, in NavigationVehicleProfile profile,
+    // One oriented enclosure contains the complete accepted physical motion. Unlike
+    // its broad-phase AABB, it does not fill empty corners beside a yawed vehicle.
+    internal static bool TryBuildSweptOccupancy(in NavigationPose start, in NavigationPose end,
+        in NavigationVehicleProfile profile, out NavigationPose pose, out Vector3 half, bool includeNumericalPadding = true)
+    {
+        pose = new(Vector3.Lerp(start.Position, end.Position, .5f), Quaternion.Normalize(Quaternion.Slerp(start.Rotation, end.Rotation, .5f)));
+        half = default;
+        if (!start.IsValid || !end.IsValid || !profile.IsValid || !pose.IsValid) return false;
+        double angle = RotationAngle(start.Rotation, end.Rotation);
+        double radius = Math.Sqrt((double)profile.HalfExtents.X * profile.HalfExtents.X +
+            (double)profile.HalfExtents.Y * profile.HalfExtents.Y + (double)profile.HalfExtents.Z * profile.HalfExtents.Z);
+        Vector3 translation = (end.Position - start.Position) * .5f;
+        Vector3 local = Vector3.Transform(translation, Quaternion.Conjugate(pose.Rotation));
+        float scale = MathF.Max(MathF.Max(MathF.Abs(pose.Position.X), MathF.Abs(pose.Position.Y)), MathF.Abs(pose.Position.Z));
+        float padding = (float)(2 * radius * Math.Sin(angle * .25) + (scale + radius + 1) * .000002);
+        half = profile.HalfExtents + Vector3.Abs(local) + new Vector3(padding);
+        if (!includeNumericalPadding)
+        {
+            // Collision-frame queries add their own position-scaled numerical
+            // padding. Bound the physical sweep and midpoint/axis roundoff here
+            // without charging the position-scaled padding a second time.
+            Quaternion rotation = Quaternion.Normalize(pose.Rotation);
+            Vector3 center = pose.Position;
+            Vector3 startPosition = start.Position, endPosition = end.Position;
+            Vector3 axisX = Vector3.Transform(Vector3.UnitX, rotation);
+            Vector3 axisY = Vector3.Transform(Vector3.UnitY, rotation);
+            Vector3 axisZ = Vector3.Transform(Vector3.UnitZ, rotation);
+            double rotationPadding = 2 * radius * Math.Sin(angle * .25) + (radius + 1) * .000002;
+            float Extent(float physical, Vector3 axis)
+            {
+                double Project(Vector3 point) => ((double)point.X - center.X) * axis.X +
+                    ((double)point.Y - center.Y) * axis.Y + ((double)point.Z - center.Z) * axis.Z;
+                double offset = Math.Max(Math.Abs(Project(startPosition)), Math.Abs(Project(endPosition)));
+                return MathF.BitIncrement((float)(physical + offset + rotationPadding));
+            }
+            half = new(Extent(profile.HalfExtents.X, axisX), Extent(profile.HalfExtents.Y, axisY), Extent(profile.HalfExtents.Z, axisZ));
+        }
+        return NavigationMotionCapture.Finite(half) && half.X > 0 && half.Y > 0 && half.Z > 0;
+    }
+
+    internal static bool TryBuildSweptBounds(in NavigationPose start, in NavigationPose end, in NavigationVehicleProfile profile,
         out AxisAlignedBounds bounds)
     {
         bounds = default;
-        Vector3 first = Extents(profile.HalfExtents, proposal.Start.Rotation);
-        Vector3 last = Extents(profile.HalfExtents, proposal.End.Rotation);
+        Vector3 first = Extents(profile.HalfExtents, start.Rotation);
+        Vector3 last = Extents(profile.HalfExtents, end.Rotation);
         double radius = Math.Sqrt((double)profile.HalfExtents.X * profile.HalfExtents.X +
             (double)profile.HalfExtents.Y * profile.HalfExtents.Y + (double)profile.HalfExtents.Z * profile.HalfExtents.Z);
-        double angle = RotationAngle(proposal.Start.Rotation, proposal.End.Rotation);
+        double angle = RotationAngle(start.Rotation, end.Rotation);
         // Any intermediate orientation is at most half the full arc from one endpoint.
-        Vector3 absolute = Vector3.Max(Vector3.Abs(proposal.Start.Position), Vector3.Abs(proposal.End.Position));
+        Vector3 absolute = Vector3.Max(Vector3.Abs(start.Position), Vector3.Abs(end.Position));
         float padding = (float)(2 * radius * Math.Sin(angle * 0.25) + profile.ClearanceMeters +
             0.000002 * (Math.Max(Math.Max(absolute.X, absolute.Y), absolute.Z) + radius + 1));
         Vector3 half = Vector3.Max(first, last) + new Vector3(padding);
-        Vector3 minimum = Vector3.Min(proposal.Start.Position, proposal.End.Position) - half;
-        Vector3 maximum = Vector3.Max(proposal.Start.Position, proposal.End.Position) + half;
+        Vector3 minimum = Vector3.Min(start.Position, end.Position) - half;
+        Vector3 maximum = Vector3.Max(start.Position, end.Position) + half;
         if (!NavigationMotionCapture.Finite(minimum) || !NavigationMotionCapture.Finite(maximum)) return false;
         bounds = new AxisAlignedBounds(minimum, maximum);
         return true;

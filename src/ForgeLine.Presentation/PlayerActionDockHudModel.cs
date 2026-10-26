@@ -956,6 +956,8 @@ internal static class PlayerActionDockHudModel
                 "NO POWER",
             UnitProductionStatus.Paused =>
                 "PAUSED",
+            UnitProductionStatus.OutputBlocked =>
+                "EXIT BLOCKED",
             _ =>
                 "BLOCKED"
         };
@@ -1064,6 +1066,8 @@ internal static class PlayerActionDockHudModel
                 "UNSUPPORTED",
             UnitProductionBlockReason.InvalidFacility =>
                 "INVALID FACILITY",
+            UnitProductionBlockReason.OutputBlocked =>
+                "EXIT BLOCKED",
             _ =>
                 "BLOCKED"
         };

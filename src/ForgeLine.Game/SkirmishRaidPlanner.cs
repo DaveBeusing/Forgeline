@@ -130,7 +130,7 @@ public sealed class SkirmishRaidPlanner
                     !TryWeapon(context.Entities, unit, out var weapon) || !weapon.Effectiveness.CanEngage(candidate.Class)) continue;
                 bool tank = context.Entities.GetComponent<UnitIdentity>(unit).UnitId == UnitIds.MainBattleTank;
                 if (tank && pressure <= configuration.MinimumObjectivePressureUnits) continue;
-                bool atHome = Distance(Position(context.Entities, unit), controller.HomePosition) <= 120;
+                bool atHome = Distance(Position(context.Entities, unit), controller.HomePosition) <= policy.HomeRadiusMeters;
                 if (atHome && home <= policy.HomeDefenders) continue;
                 if (!CanTravel(context.Entities, unit, candidate.Contact.LastKnownPosition, controller.HomePosition,
                         policy, roundTrip: true, out reason)) continue;
@@ -221,8 +221,10 @@ public sealed class SkirmishRaidPlanner
         Vector3 position = current!.Value.LastKnownPosition;
         if (Distance(position, state.TargetAnchor) > policy.PursuitLeashMeters)
             return Retreat(context, controller, state, members, policy, SkirmishRaidReason.TargetEscaped);
-        bool inRange = members.All(e => TryWeapon(context.Entities, e, out var weapon) &&
-            Distance(Position(context.Entities, e), position) <= weapon.RangeMeters * 0.9f);
+        // Direct attack lets each member close to its own weapon range. Waiting
+        // for every member can freeze the shared approach behind a firing member.
+        bool inRange = members.Any(e => TryWeapon(context.Entities, e, out var weapon) &&
+            Vector3.DistanceSquared(Position(context.Entities, e), position) <= weapon.RangeMeters * weapon.RangeMeters);
         if (inRange && state.Phase != SkirmishRaidPhase.Attacking)
         {
             var attack = new AttackCommand(controller.Player, members, state.Target, context.Tick, policy.PursuitLeashMeters);

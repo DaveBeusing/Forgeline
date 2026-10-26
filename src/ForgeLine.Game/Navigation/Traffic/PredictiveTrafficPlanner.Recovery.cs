@@ -1,0 +1,360 @@
+using System.Numerics;
+using ForgeLine.Core;
+using ForgeLine.Navigation;
+
+namespace ForgeLine.Game;
+
+internal sealed partial class PredictiveTrafficPlanner
+{
+    private const ulong RecoveryWaitTicks = 40;
+
+    private int FindRecoveries(NavigationTrafficFrame frame, NavigationTrafficIntent[] intents,
+        Dictionary<EntityId, NavigationVehicleObservation> vehicles, NavigationBlockReason[] waits,
+        EntityId[] waitingFor, INavigationGeometryQuery geometry, IReadOnlyDictionary<ulong, PredictiveTrafficPassageLease> leases,
+        IReadOnlyList<NavigationTrafficPassage> passages, int allowance, Vector3?[] targets, bool[] outwardReverse, bool[] capturedDepartures, ReadOnlySpan<NavigationPhysicalWait> physicalWaits,
+        Vector3?[] forwardTargets, float[] speedCaps, NavigationBlockReason[] hazards)
+    {
+        int consumed = 0;
+        var physicalCycles = new Dictionary<EntityId, EntityId>();
+        if (!physicalWaits.IsEmpty)
+        {
+            if (frame.Collision.Bodies.Count > allowance) return -1;
+            consumed += frame.Collision.Bodies.Count;
+            var bodies = frame.Collision.Bodies.ToDictionary(static body => body.Identity);
+            foreach (var observation in physicalWaits)
+            {
+                if (allowance - consumed < 4) return -1;
+                consumed += 4;
+                if (observation.Tick != frame.Tick || observation.Revision != frame.Collision.World.Revision ||
+                    observation.Owner.Entity == observation.Blocker.Entity ||
+                    !vehicles.TryGetValue(observation.Blocker.Entity, out var blocker) || blocker != observation.Blocker ||
+                    !bodies.TryGetValue(NavigationReadAdapter.GetObstacleIdentity(observation.Owner.Entity), out var ownerBody) ||
+                    !bodies.TryGetValue(NavigationReadAdapter.GetObstacleIdentity(blocker.Entity), out var blockerBody) ||
+                    ownerBody.Pose != observation.Owner.Pose || ownerBody.HalfExtents != observation.Owner.Profile.HalfExtents ||
+                    blockerBody.Pose != blocker.Pose || blockerBody.HalfExtents != blocker.Profile.HalfExtents) continue;
+                physicalCycles[observation.Owner.Entity] = blocker.Entity;
+            }
+        }
+        var indices = new Dictionary<EntityId, int>();
+        for (int i = 0; i < intents.Length; i++) indices.Add(intents[i].Binding.Requester, i);
+        var visited = new bool[intents.Length];
+        var mixedCycles = new HashSet<int>();
+        var claimedPaths = new List<(EntityId Owner, NavigationPose[] Path, NavigationVehicleProfile Profile)>();
+        for (int start = 0; start < intents.Length; start++)
+        {
+            if (visited[start]) continue;
+            var chain = new List<int>();
+            var positions = new Dictionary<int, int>();
+            var physicalBridges = new HashSet<int>();
+            int current = start;
+            while (!visited[current])
+            {
+                if (consumed == allowance) return -1;
+                consumed++;
+                if (positions.TryGetValue(current, out int cycleStart))
+                {
+                    var cycle = chain.Skip(cycleStart).OrderBy(i => intents[i].Binding.Requester).ToArray();
+                    if (cycle.Any(physicalBridges.Contains))
+                    {
+                        foreach (int index in cycle) mixedCycles.Add(index);
+                        break;
+                    }
+                    bool activeEscape = cycle.Any(i => _states.TryGetValue(intents[i].Binding.Requester, out var state) &&
+                        state.CommandGeneration == intents[i].Binding.CommandGeneration && state.RecoveryTarget is not null);
+                    if (activeEscape) break;
+                    foreach (int candidate in cycle)
+                    {
+                        if (!CanRecover(candidate)) continue;
+                        if (TryTargets(candidate)) break;
+                        if (consumed == allowance) return -1;
+                    }
+                    break;
+                }
+                positions.Add(current, chain.Count);
+                chain.Add(current);
+                EntityId nextEntity = waitingFor[current];
+                var external = new HashSet<EntityId>();
+                int next = -1;
+                while (!indices.TryGetValue(nextEntity, out next))
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (!external.Add(nextEntity) || !physicalCycles.TryGetValue(nextEntity, out nextEntity))
+                    { next = -1; break; }
+                    physicalBridges.Add(current);
+                }
+                if (next < 0) break;
+                current = next;
+            }
+            foreach (int index in chain) visited[index] = true;
+        }
+        // A verified escape remains bound to its original command until its physical endpoint.
+        for (int i = 0; i < intents.Length; i++)
+        {
+            if (targets[i] is not null || !_states.TryGetValue(intents[i].Binding.Requester, out var state) ||
+                state.CommandGeneration != intents[i].Binding.CommandGeneration || state.LastTick > frame.Tick.Value ||
+                state.RecoveryTarget is not Vector3 target || !intents[i].CanMove) continue;
+            var vehicle = vehicles[intents[i].Binding.Requester];
+            if (Vector3.DistanceSquared(vehicle.Pose.Position, target) < 0.04f) continue;
+            if (vehicle.Movement.Velocity.Length() > 1.01f || NavigationPrecisionOwnership.IsPrecise(vehicle)) continue;
+            _ = TryEscape(i, target, verifyWholeRoute: false);
+            if (consumed == allowance && targets[i] is null) return -1;
+        }
+        var continuingReverse = new HashSet<int>();
+        for (int i = 0; i < intents.Length; i++)
+        {
+            var intent = intents[i];
+            var vehicle = vehicles[intent.Binding.Requester];
+            if (targets[i] is not null || !intent.CanMove || intent.MaximumSpeed <= 0 ||
+                NavigationPrecisionOwnership.IsPrecise(vehicle) || vehicle.Movement.Velocity.LengthSquared() > 1.0001f ||
+                !_states.TryGetValue(vehicle.Entity, out var priorShunt) || priorShunt.CommandGeneration != intent.Binding.CommandGeneration ||
+                priorShunt.LastRecoveryTick >= frame.Tick.Value || frame.Tick.Value - priorShunt.LastRecoveryTick != 1 ||
+                WaitingAge(intent.Binding, frame.Tick.Value) < RecoveryWaitTicks ||
+                Vector3.Dot(vehicle.Movement.Velocity, Vector3.Transform(Vector3.UnitZ, vehicle.Pose.Rotation)) >= -.01f) continue;
+            bool currentPhysicalWait = false;
+            foreach (EntityId blocker in physicalCycles.Values)
+            {
+                if (consumed == allowance) return -1;
+                consumed++;
+                if (blocker == vehicle.Entity) { currentPhysicalWait = true; break; }
+            }
+            if (!currentPhysicalWait) continue;
+            continuingReverse.Add(i);
+            if (TryTargets(i, capturedOnly: true))
+            {
+                capturedDepartures[i] = true;
+                if (waits[i] == NavigationBlockReason.None) waits[i] = NavigationBlockReason.MovingVehicle;
+            }
+            if (consumed == allowance && targets[i] is null) return -1;
+        }
+
+        // A physical blocker outside the coarse wait graph can justify a verified
+        // reverse arc. A service reservation alone is a logical admission wait; it
+        // does not establish a physical deadlock. A copied same-tick physical veto
+        // in the opposite direction closes a mixed precise/coarse cycle. A current
+        // physically occupied owned passage can separately justify outward departure.
+        for (int i = 0; i < intents.Length; i++)
+        {
+            if (continuingReverse.Contains(i) || targets[i] is not null || !CanRecover(i, allowForwardMotion: true) || !waitingFor[i].IsValid ||
+                indices.ContainsKey(waitingFor[i]) && !mixedCycles.Contains(i)) continue;
+            bool directPhysicalCycle = physicalCycles.TryGetValue(waitingFor[i], out var opposite) &&
+                opposite == intents[i].Binding.Requester;
+            bool physicalCycle = directPhysicalCycle || mixedCycles.Contains(i);
+            NavigationTrafficPassage? occupiedPassage = null;
+            var waiter = vehicles[intents[i].Binding.Requester];
+            if (waits[i] is NavigationBlockReason.ReservedCorridor or NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle)
+                foreach (var lease in leases.Values)
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (lease.Owner != waiter.Entity || !lease.Entered || lease.LastTick != frame.Tick.Value ||
+                        !Occupies(lease.Passage, waiter.Pose, waiter.Profile.HalfExtents, waiter.Profile.ClearanceMeters)) continue;
+                    foreach (var body in frame.Collision.Bodies)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (body.Identity == NavigationReadAdapter.GetObstacleIdentity(waiter.Entity) &&
+                            body.Pose == waiter.Pose && body.HalfExtents == waiter.Profile.HalfExtents)
+                        { occupiedPassage = lease.Passage; break; }
+                    }
+                    if (occupiedPassage.HasValue) break;
+                }
+            bool unleasedOccupancy = false;
+            bool stationaryPhysicalBlocker = false;
+            if (!occupiedPassage.HasValue && waits[i] == NavigationBlockReason.ReservedCorridor)
+            {
+                // Multiple physical occupants can prevent any admission lease from being
+                // granted. A captured body may still evacuate its current region outward;
+                // it receives no lease, entry permission or reverse shortcut.
+                bool serviceWait = false;
+                foreach (var reservation in frame.Reservations)
+                {
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (reservation.Owner == waitingFor[i] && ReservationApplies(waiter, reservation))
+                    { serviceWait = true; break; }
+                }
+                foreach (var body in frame.Collision.Bodies)
+                {
+                    if (serviceWait && !mixedCycles.Contains(i)) break;
+                    if (consumed == allowance) return -1;
+                    consumed++;
+                    if (body.Identity != NavigationReadAdapter.GetObstacleIdentity(waiter.Entity) ||
+                        body.Pose != waiter.Pose || body.HalfExtents != waiter.Profile.HalfExtents) continue;
+                    foreach (var passage in passages)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (leases.ContainsKey(passage.Id) || !Occupies(passage, waiter.Pose,
+                            waiter.Profile.HalfExtents, waiter.Profile.ClearanceMeters)) continue;
+                        occupiedPassage = passage;
+                        unleasedOccupancy = true;
+                        foreach (var otherBody in frame.Collision.Bodies)
+                        {
+                            if (consumed == allowance) return -1;
+                            consumed++;
+                            if (otherBody.Identity == NavigationReadAdapter.GetObstacleIdentity(waitingFor[i]) &&
+                                otherBody.Kind == NavigationObstacleKind.Vehicle && otherBody.Velocity.LengthSquared() <= .0025f &&
+                                Occupies(passage, otherBody.Pose, otherBody.HalfExtents, 0))
+                            { stationaryPhysicalBlocker = true; break; }
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+            if (!occupiedPassage.HasValue && !CanRecover(i)) continue;
+            if (!(waits[i] is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle ||
+                  waits[i] == NavigationBlockReason.ReservedCorridor && (physicalCycle || occupiedPassage.HasValue))) continue;
+            // A physical mixed cycle, or this vehicle's currently occupied crossing,
+            // can justify a checked departure prefix. Occupied leases stay owned.
+            if (waits[i] == NavigationBlockReason.ReservedCorridor || occupiedPassage.HasValue)
+            {
+                int forwardWork = ForwardClearance(frame, waiter, intents[i], geometry, leases,
+                    allowance - consumed, out bool clear, out NavigationPose forwardPose);
+                if (forwardWork < 0) return -1;
+                consumed += forwardWork;
+                Vector3 forwardTarget = forwardPose.Position;
+                bool outward = !occupiedPassage.HasValue || IsOutwardDeparture(occupiedPassage.Value,
+                    waiter.Pose, forwardPose, waiter.Profile);
+                bool capturedCycle = clear && physicalCycle && unleasedOccupancy && stationaryPhysicalBlocker;
+                if (capturedCycle)
+                {
+                    bool noEntry = TryCheckOutwardStep(waiter.Profile, waiter.Pose, forwardPose, passages,
+                        allowance - consumed, out int departureWork, out bool departureComplete, requireOutward: false);
+                    consumed += departureWork;
+                    if (!departureComplete) return -1;
+                    capturedCycle = noEntry;
+                    if (noEntry) outward = true;
+                }
+                if (clear && mixedCycles.Contains(i) && !directPhysicalCycle && !capturedCycle) clear = false;
+                if (clear && outward && unleasedOccupancy && !capturedCycle)
+                    foreach (var passage in passages)
+                    {
+                        if (consumed == allowance) return -1;
+                        consumed++;
+                        if (Touches(passage, [waiter.Pose, waiter.Pose with { Position = forwardTarget }], waiter.Profile) &&
+                            !IsOutwardDeparture(passage, waiter.Pose, waiter.Pose with { Position = forwardTarget }, waiter.Profile))
+                        { outward = false; break; }
+                    }
+                if (clear && outward)
+                {
+                    forwardTargets[i] = forwardTarget;
+                    capturedDepartures[i] = capturedCycle;
+                    speedCaps[i] = MathF.Min(1, intents[i].MaximumSpeed);
+                    hazards[i] = NavigationBlockReason.MovingVehicle;
+                    waits[i] = NavigationBlockReason.None;
+                    continue;
+                }
+                if (unleasedOccupancy && stationaryPhysicalBlocker)
+                {
+                    // Only a physically captured, already occupied unleased region
+                    // permits this shunt. Recompute it each tick; persist no target
+                    // that could grant authority after its occupancy disappears.
+                    if (TryTargets(i, outwardOnly: true)) outwardReverse[i] = true;
+                    if (consumed == allowance && targets[i] is null) return -1;
+                    continue;
+                }
+                if (!physicalCycle) continue;
+            }
+            if (!CanRecover(i)) continue;
+            _ = TryTargets(i);
+            if (consumed == allowance && targets[i] is null) return -1;
+        }
+        return consumed;
+
+        bool TryTargets(int index, bool outwardOnly = false, bool capturedOnly = false)
+        {
+            var vehicle = vehicles[intents[index].Binding.Requester];
+            Vector3 back = Vector3.Transform(-Vector3.UnitZ, vehicle.Pose.Rotation); back.Y = 0;
+            Vector3 side = Vector3.Transform(Vector3.UnitX, vehicle.Pose.Rotation); side.Y = 0;
+            if (back.LengthSquared() < .0001f || side.LengthSquared() < .0001f) return false;
+            back = Vector3.Normalize(back); side = Vector3.Normalize(side);
+            float lateral = MathF.Max(6, vehicle.Profile.HalfExtents.Length() * 2 + 1);
+            if (TryEscape(index, vehicle.Pose.Position + back + side * lateral, outwardOnly: outwardOnly, capturedOnly: capturedOnly)) return true;
+            if (TryEscape(index, vehicle.Pose.Position + back - side * lateral, outwardOnly: outwardOnly, capturedOnly: capturedOnly)) return true;
+            return TryEscape(index, vehicle.Pose.Position + back * MathF.Min(3, MathF.Max(1, vehicle.Profile.HalfExtents.Z * 2)), outwardOnly: outwardOnly, capturedOnly: capturedOnly);
+        }
+
+        bool CanRecover(int index, bool allowForwardMotion = false)
+        {
+            var intent = intents[index];
+            var vehicle = vehicles[intent.Binding.Requester];
+            return intent.CanMove && intent.MaximumSpeed > 0 && waits[index] != NavigationBlockReason.None &&
+                !NavigationPrecisionOwnership.IsPrecise(vehicle) &&
+                vehicle.Movement.Velocity.LengthSquared() <= (allowForwardMotion ? 1.0001f : .0025f) &&
+                WaitingAge(intent.Binding, frame.Tick.Value) >= RecoveryWaitTicks;
+        }
+
+        bool TryEscape(int index, Vector3 target, bool verifyWholeRoute = true, bool outwardOnly = false, bool capturedOnly = false)
+        {
+            if (consumed == allowance) return false;
+            var vehicle = vehicles[intents[index].Binding.Requester];
+            if (!frame.Collision.World.TrySampleHeight(target.X, target.Z, out float targetHeight) ||
+                !frame.Collision.World.TrySampleHeight(vehicle.Pose.Position.X, vehicle.Pose.Position.Z, out float startHeight)) return false;
+            target.Y = targetHeight + vehicle.Pose.Position.Y - startHeight;
+            const float dt = .125f;
+            var path = new List<NavigationPose>(129) { vehicle.Pose };
+            var simulated = vehicle;
+            bool reached = false;
+            for (int step = 0; step < (verifyWholeRoute ? 128 : 1); step++)
+            {
+                if (consumed == allowance) return false;
+                consumed++;
+                if (!NavigationReverseMotion.TryStep(simulated, target, MathF.Min(1, intents[index].MaximumSpeed), dt,
+                    frame.Collision.World, out var end, out _, out float heading)) return false;
+                var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity), simulated.Pose,
+                    end, vehicle.Profile, dt);
+                var result = SweepGrounded(frame.GetVehicleCollision(vehicle.Entity), geometry, sweep, allowance - consumed);
+                if (result.WorkConsumed <= 0 || result.WorkConsumed > allowance - consumed)
+                { consumed = allowance; return false; }
+                consumed += result.WorkConsumed;
+                if (result.Status != NavigationGeometryStatus.Clear || result.AllowedFraction != 1 ||
+                    result.FrameTick != frame.Tick.Value || result.Revision != frame.Collision.World.Revision) return false;
+                if (outwardOnly || capturedOnly)
+                {
+                    bool outward = TryCheckOutwardStep(vehicle.Profile, simulated.Pose, end, passages,
+                        allowance - consumed, out int outwardWork, out bool outwardComplete, requireOutward: !capturedOnly);
+                    consumed += outwardWork;
+                    if (!outward) { if (!outwardComplete) consumed = allowance; return false; }
+                }
+                foreach (var reservation in frame.Reservations)
+                {
+                    int checkWork = ServiceReservationCheckWork(2);
+                    if (checkWork > allowance - consumed) { consumed = allowance; return false; }
+                    consumed += checkWork;
+                    if (BlocksServiceReservation(vehicle, reservation, [simulated.Pose, end])) return false;
+                }
+                foreach (var lease in leases.Values)
+                {
+                    if (consumed == allowance) return false;
+                    consumed++;
+                    if (lease.Owner != vehicle.Entity && Touches(lease.Passage, [simulated.Pose, end], vehicle.Profile)) return false;
+                }
+                foreach (var prior in claimedPaths)
+                {
+                    if (prior.Owner == vehicle.Entity) continue;
+                    for (int segment = 1; segment < prior.Path.Length; segment++)
+                    {
+                        if (consumed == allowance) return false;
+                        consumed++;
+                        if (Conflicts(simulated.Pose, end, vehicle.Profile,
+                            prior.Path[segment - 1], prior.Path[segment], prior.Profile)) return false;
+                    }
+                }
+                path.Add(end);
+                simulated = simulated with
+                {
+                    Pose = end,
+                    Movement = simulated.Movement with
+                    { Velocity = (end.Position - simulated.Pose.Position) / dt, HeadingRadians = heading }
+                };
+                if (HorizontalDistance(end.Position, target) <= .2f) { reached = true; break; }
+            }
+            if (verifyWholeRoute && !reached) return false;
+            claimedPaths.Add((vehicle.Entity, path.ToArray(), vehicle.Profile));
+            targets[index] = target;
+            return true;
+        }
+    }
+}

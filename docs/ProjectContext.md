@@ -143,32 +143,33 @@ Any protection configuration must be verified by GitHub readback after it is app
 
 ### Enforcement Status
 
-Read back on **2026-10-23**, at `master` commit
-`814b6a82af5a6f63dbb32cca2944c82a33afc6ba`:
+Configured and read back on **2026-10-25**, at `master` commit
+`65bb7e704232857c8d550be54d0e1feddaf98c19`:
 
 - [Branch metadata](https://api.github.com/repos/DaveBeusing/Forgeline/branches/master)
-  reports `protected: false`, `protection.enabled: false`,
-  `required_status_checks.enforcement_level: off`, and empty `contexts` / `checks`.
-- [Repository rulesets](https://api.github.com/repos/DaveBeusing/Forgeline/rulesets)
-  returns `[]`.
+  reports `protected: true`.
 - [Branch-protection details](https://api.github.com/repos/DaveBeusing/Forgeline/branches/master/protection)
-  returns HTTP 403, `Resource not accessible by integration`. The detailed
-  protection configuration therefore cannot be read through the current access.
-- The available GitHub interface exposes no administration write operation for
-  branch protection or rulesets. Repository content-write access does not supply
-  that capability.
+  confirms required pull requests, strict up-to-date validation, and required
+  `build-test` from GitHub Actions (App ID `15368`).
+- Administrator enforcement is enabled. Force pushes and branch deletion are
+  disabled. No bypass actor or reviewer minimum was added; the required approving
+  review count is zero.
+- Before configuration there was no branch protection and the ruleset collection
+  was empty. These controls use branch protection rather than a new ruleset;
+  an empty ruleset collection alone no longer indicates absent enforcement.
+- An isolated branch at the exact master revision received the same protection
+  request. GitHub rejected a direct fast-forward push with `GH006`, explicitly
+  citing both required pull-request integration and the cancelled `build-test`
+  check. The branch head stayed unchanged. The temporary branch and its protection
+  were then removed; master was never the target of the test.
 
-The required configuration remains PR-only integration, a successful
-`build-test` check supplied by GitHub Actions (App ID `15368`), and strict
-up-to-date validation against current `master`. Force pushes and branch deletion
-must be disabled. Preserve stronger controls and existing review requirements,
-and do not expand bypass access. No new reviewer minimum is established here.
-
-Repository protection remains **pending administrator action and readback
-verification**, tracked in [issue #307](https://github.com/DaveBeusing/Forgeline/issues/307).
-Read current branch and ruleset settings again before applying configuration,
-then verify the resulting enforcement through GitHub. A successful CI run or
-documentation update does not resolve this external requirement.
+The connected content API does not expose administration writes. The locally
+authenticated GitHub CLI supplied administrator access for the configuration and
+readback. [Issue #307](https://github.com/DaveBeusing/Forgeline/issues/307) records
+the configuration and isolated rejection-test evidence.
+Read current protection and ruleset settings before subsequent administration
+changes and preserve stronger controls. Successful CI alone does not establish
+repository protection.
 
 ## Development and Validation Source
 

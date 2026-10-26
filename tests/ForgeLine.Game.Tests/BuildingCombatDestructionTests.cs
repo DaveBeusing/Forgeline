@@ -17,6 +17,29 @@ public sealed class BuildingCombatDestructionTests
     private static readonly PlayerId Owner = new(1);
 
     [Fact]
+    public void RepeatedCombatCasualtiesReleaseSharedDriveAndCargoInventories()
+    {
+        using MatchRuntime runtime = CreateRuntime(71109);
+        runtime.Simulation.AdvanceOneTick();
+        int baseline = runtime.Inventories.CaptureSnapshot().Inventories.Count;
+        Vector3 position = runtime.Simulation.Entities.GetComponent<WorldTransform>(
+            runtime.GetBase(Owner).CommandCore).Position + Vector3.UnitX * 80;
+        for (int cycle = 0; cycle < 4; cycle++)
+        foreach (UnitId kind in new[] { UnitIds.MainBattleTank,
+            UnitIds.CargoTruck, UnitIds.SupplyTruck })
+        {
+            EntityId unit = runtime.UnitFactory.Create(runtime.Services.UnitDefinitions[kind], position, Owner);
+            InventoryId drive = runtime.Simulation.Entities.GetComponent<UnitFuelState>(unit).InventoryId;
+            Assert.Equal(drive, runtime.Simulation.Entities.GetComponent<AmmunitionState>(unit).InventoryId);
+            ApplyLethalDamage(runtime, unit);
+            Assert.False(runtime.Simulation.Entities.IsAlive(unit));
+            Assert.False(runtime.Inventories.Contains(drive));
+            runtime.Simulation.AdvanceOneTick();
+            Assert.Equal(baseline, runtime.Inventories.CaptureSnapshot().Inventories.Count);
+        }
+    }
+
+    [Fact]
     public void DestroyedStartingCoreReleasesNavigationWithoutRemovingSurvivingCore()
     {
         using MatchRuntime runtime = CreateRuntime(71101);

@@ -31,7 +31,7 @@ public readonly record struct NavigationCollisionBody(
 public sealed class NavigationCollisionFrame
 {
     public NavigationCollisionFrame(NavigationWorldSnapshot world, ulong tick, AxisAlignedBounds coverage,
-        bool isComplete, ReadOnlySpan<NavigationCollisionBody> bodies, int maximumBodies)
+        bool isComplete, ReadOnlySpan<NavigationCollisionBody> bodies, int maximumBodies, bool bodyPosesAreFixed = false)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumBodies);
@@ -44,7 +44,7 @@ public sealed class NavigationCollisionFrame
         {
             if (!body.Pose.IsValid || !Finite(body.HalfExtents) ||
                 body.HalfExtents.X <= 0 || body.HalfExtents.Y <= 0 || body.HalfExtents.Z <= 0 ||
-                !Finite(body.Velocity) || body.Identity.Generation == 0 ||
+                !Finite(body.Velocity) || bodyPosesAreFixed && body.Velocity != Vector3.Zero || body.Identity.Generation == 0 ||
                 !Enum.IsDefined(body.Identity.Source) || body.Identity.Source == NavigationObstacleSource.Unspecified ||
                 !Enum.IsDefined(body.Kind) || body.Kind == NavigationObstacleKind.Unspecified || !identities.Add(body.Identity))
                 throw new ArgumentException("Collision bodies require unique valid identities and finite physical geometry.", nameof(bodies));
@@ -53,6 +53,7 @@ public sealed class NavigationCollisionFrame
         Tick = tick;
         Coverage = coverage;
         IsComplete = isComplete;
+        BodyPosesAreFixed = bodyPosesAreFixed;
         Bodies = Array.AsReadOnly(bodies.ToArray());
     }
 
@@ -61,6 +62,8 @@ public sealed class NavigationCollisionFrame
     public AxisAlignedBounds Coverage { get; }
     public bool IsComplete { get; }
     public IReadOnlyList<NavigationCollisionBody> Bodies { get; }
+    /// <summary>Static occupancy model for a sequential owner; every actual move still requires independent arbitration.</summary>
+    public bool BodyPosesAreFixed { get; }
     private static bool Finite(Vector3 value) => float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z);
 }
 
@@ -75,7 +78,7 @@ public enum NavigationBlockReason : byte
 }
 public readonly record struct NavigationSweep(
     NavigationObstacleIdentity Mover, NavigationPose Start, NavigationPose End,
-    NavigationVehicleProfile Vehicle, float DurationSeconds);
+    NavigationVehicleProfile Vehicle, float DurationSeconds, bool PrefilterFixedBodies = false);
 public readonly record struct NavigationSweepResult(
     NavigationGeometryStatus Status, NavigationSnapshotRevision Revision, ulong FrameTick,
     float AllowedFraction, NavigationBlockReason Reason, NavigationObstacleIdentity? Blocker, int WorkConsumed);

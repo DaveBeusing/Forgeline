@@ -14,6 +14,53 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishRaidPlannerTests
 {
+    [Fact]
+    public void ConfiguredHomeRadiusProtectsDefendersBeyondTheLegacyCutoff()
+    {
+        var fixture = new Fixture();
+        for (int index = 0; index < fixture.Units.Count; index++)
+            fixture.Entities.SetComponent(fixture.Units[index], new WorldTransform(new(index < 2 ? 510 + index * 6 : 650 + index * 6, 0, 128), Quaternion.Identity, Vector3.One));
+        fixture.Step();
+        Assert.True(fixture.State.IsActive, fixture.Diagnostic.ToString());
+        Assert.False(fixture.State.Contains(fixture.Units[0]));
+        Assert.False(fixture.State.Contains(fixture.Units[1]));
+        Assert.True(fixture.State.Contains(fixture.Units[2]));
+        Assert.True(fixture.State.Contains(fixture.Units[3]));
+    }
+
+
+    [Theory]
+    [InlineData(.8f, true)]
+    [InlineData(.95f, true)]
+    [InlineData(1.05f, false)]
+    public void AnIdentifiedTargetCanBeEngagedWhileAnotherRaiderStillClosesRange(float firstRangeFraction, bool firstInRange)
+    {
+        var fixture = new Fixture(configuration: new() { Raids = new() { PursuitLeashMeters = 240 } });
+        fixture.Step();
+        var members = fixture.Raiders().ToArray();
+        var weapons = CentralDivideScenario.CreateComposition().Content.Weapons;
+        var target = fixture.Entities.GetComponent<WorldTransform>(fixture.Truck).Position;
+        var ammunitionBefore = members.Select(unit => fixture.Inventories.GetQuantity(
+            fixture.Entities.GetComponent<AmmunitionState>(unit).InventoryId, ResourceIds.Ammunition)).ToArray();
+        for (int index = 0; index < members.Length; index++)
+        {
+            float range = weapons.GetRequired(fixture.Entities.GetComponent<WeaponState>(members[index]).WeaponId).RangeMeters;
+            float distance = range * (index == 0 ? firstRangeFraction : 1.05f);
+            fixture.Entities.SetComponent(members[index], new WorldTransform(target - Vector3.UnitX * distance, Quaternion.Identity, Vector3.One));
+        }
+        fixture.Step();
+        Assert.Equal(firstInRange ? SkirmishRaidPhase.Attacking : SkirmishRaidPhase.Approaching, fixture.State.Phase);
+        for (int index = 0; index < members.Length; index++)
+        {
+            var order = fixture.Entities.GetComponent<CombatOrderState>(members[index]);
+            Assert.Equal(firstInRange ? CombatOrderKind.Attack : CombatOrderKind.AttackMove, order.Kind);
+            if (firstInRange) Assert.Equal(fixture.Truck, order.ExplicitTarget);
+            Assert.Equal(ammunitionBefore[index], fixture.Inventories.GetQuantity(
+                fixture.Entities.GetComponent<AmmunitionState>(members[index]).InventoryId, ResourceIds.Ammunition));
+        }
+    }
+
+
     [Theory]
     [InlineData(false, IntelligenceState.Identified)]
     [InlineData(true, IntelligenceState.Detected)]

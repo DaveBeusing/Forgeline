@@ -9,6 +9,29 @@ public sealed class HierarchicalPathfinderTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
+    public void ProjectedStartIsNotRepeatedWhenBothEndpointsResolveToOneCell(bool sameCell)
+    {
+        var world = NavigationWorld.Build(CreateFlatWorld(),
+            [new AxisAlignedBounds(new(28, -1, 24), new(29, 2, 25))],
+            new NavigationGridSettings { CellSizeMeters = 4 },
+            new NavigationSectorSettings { SectorSizeCells = 4 });
+        var capabilities = NavigationCapabilities.For(NavigationMovementClass.Wheeled);
+        Vector3 start = new(30, 0, 26);
+        Vector3 goal = sameCell ? new(30.5f, 0, 26.5f) : new(30, 0, 27.5f);
+        var result = new HierarchicalPathfinder(world).FindPath(start, goal, capabilities, projectBlockedEndpoints: true);
+        Assert.True(result.Succeeded);
+        var path = Assert.IsType<NavigationPath>(result.Path);
+        Assert.Equal(goal, path.RequestedDestination);
+        Assert.Equal(world.Grid.GetCellCenter(path.RefinedCells[0]), path.Waypoints[0]);
+        if (sameCell) Assert.Single(path.Waypoints);
+        else Assert.True(path.Waypoints.Count >= 2);
+        for (int index = 1; index < path.Waypoints.Count; index++)
+            Assert.NotEqual(path.Waypoints[index - 1], path.Waypoints[index]);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public void CanProjectAnEndpointOutsideABuildingButInsideItsBlockedCell(bool blockedStart)
     {
         NavigationWorld world = NavigationWorld.Build(

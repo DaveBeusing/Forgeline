@@ -7,7 +7,7 @@ namespace ForgeLine.Game;
 /// Computes ordinary corridor motion from one copied tick. Precise local, dock and
 /// queue motion stays with its existing owner. This class has no mutable history.
 /// </summary>
-public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
+public sealed partial class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
 {
     private const float DirectionEpsilon = 0.00001f;
     private readonly NavigationMotionPlannerOptions _options;
@@ -24,13 +24,14 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
     public NavigationMotionProposal Propose(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         int workAllowance, out int workConsumed) =>
-        ProposeCore(input, collision, geometry, workAllowance, out workConsumed, out _, out _, out _);
+        ProposeCore(input, collision, geometry, workAllowance, out workConsumed, out _, out _, out _, out _);
 
     /// <summary>Simulation-only trace; waypoint indices are not permission to advance route ownership.</summary>
     internal NavigationMotionProposal ProposeCore(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         int workAllowance, out int workConsumed, out Vector3 usedWaypoint,
-        out int currentWaypointIndex, out int usedWaypointIndex)
+        out int currentWaypointIndex, out int usedWaypointIndex, out NavigationCheckedHorizon? checkedHorizon,
+        bool captureDiagnostics = false)
     {
         ArgumentNullException.ThrowIfNull(collision);
         ArgumentNullException.ThrowIfNull(geometry);
@@ -39,6 +40,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         usedWaypoint = input.Vehicle.Pose.Position;
         currentWaypointIndex = -1;
         usedWaypointIndex = -1;
+        checkedHorizon = null;
 
         if (!ValidInput(input, collision))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.StaleSnapshot);
@@ -89,24 +91,62 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         if (!float.IsFinite(groundOffset))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.Terrain);
 
+        if (input.Traffic.Action == NavigationTrafficAction.Proceed && input.Traffic.SuggestedTarget is Vector3 localTarget)
+        {
+            if (input.Traffic.MaximumSpeed > 1 || HorizontalDistance(input.Vehicle.Pose.Position, localTarget) > 6 ||
+                !TryGroundedHorizon(input, collision, geometry, localTarget, groundOffset, maximumSpeed,
+                    workAllowance / 2, ref workConsumed, out var checkedTarget, out float checkedDistance,
+                    out var checkedReason, out bool clear, captureDiagnostics, out var localHorizon) || !clear)
+                return Hold(input, collision, Availability, NavigationBlockReason.ReservedCorridor, brakingDistance);
+            checkedHorizon = localHorizon;
+            usedWaypoint = checkedTarget;
+            usedWaypointIndex = -1;
+            return ProposeStep(input, collision, geometry, route, checkedTarget, checkedDistance,
+                groundOffset, currentSpeed, maximumSpeed, brakingDistance, checkedReason,
+                workAllowance, ref workConsumed, out _);
+        }
+
+        if (input.Traffic.MaximumSpeed <= 1 &&
+            input.Traffic.Reason is NavigationBlockReason.MovingVehicle or NavigationBlockReason.StaticObstacle or NavigationBlockReason.Terrain)
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, input.Traffic.Reason, brakingDistance);
+        }
+
         if (!TryLookahead(input, collision, geometry, route, currentWaypoint, groundOffset,
             lookahead, maximumSpeed, workAllowance, ref workConsumed, out Vector3 steeringTarget,
-            out float safeDistance, out NavigationBlockReason horizonReason, out int steeringIndex))
-            return Hold(input, collision, Availability, horizonReason, brakingDistance);
+            out float safeDistance, out NavigationBlockReason horizonReason, out int steeringIndex,
+            captureDiagnostics, out var queryHorizon))
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, horizonReason, brakingDistance);
+        }
         usedWaypoint = steeringTarget;
         usedWaypointIndex = steeringIndex;
 
-        return ProposeStep(input, collision, geometry, route, steeringTarget, safeDistance,
+        var proposal = ProposeStep(input, collision, geometry, route, steeringTarget, safeDistance,
             groundOffset, currentSpeed, maximumSpeed, brakingDistance, horizonReason,
-            workAllowance, ref workConsumed);
+            workAllowance, ref workConsumed, out bool forwardClearance);
+        if (forwardClearance)
+        {
+            usedWaypoint = route.Waypoints[Math.Min(currentWaypoint, route.Waypoints.Count - 1)];
+            usedWaypointIndex = currentWaypoint;
+        }
+        if (!forwardClearance) checkedHorizon = queryHorizon;
+        return proposal;
     }
 
     private NavigationMotionProposal ProposeStep(in NavigationMotionInput input,
         NavigationCollisionFrame collision, INavigationGeometryQuery geometry,
         NavigationRouteProposal route, Vector3 target, float safeDistance, float groundOffset,
         float currentSpeed, float maximumSpeed, float brakingDistance, NavigationBlockReason horizonReason,
-        int workAllowance, ref int workConsumed)
+        int workAllowance, ref int workConsumed, out bool forwardClearance)
     {
+        forwardClearance = false;
         NavigationPose start = input.Vehicle.Pose;
         NavigationVehicleProfile profile = input.Vehicle.Profile;
         float finalDistance = HorizontalDistance(start.Position, input.Binding.OriginalOrder.WorldTarget);
@@ -118,7 +158,10 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         float targetDistance = HorizontalLength(difference);
         if (!float.IsFinite(targetDistance) || targetDistance <= DirectionEpsilon)
             return Hold(input, collision, Availability, horizonReason, brakingDistance);
-        float desiredHeading = MathF.Atan2(difference.X, difference.Z);
+        bool straightClearance = input.Traffic.Action == NavigationTrafficAction.Proceed &&
+            input.Traffic.MaximumSpeed <= 1 && input.Traffic.SuggestedTarget.HasValue &&
+            NavigationMotionNumerics.IsCapturedForwardTarget(start, target);
+        float desiredHeading = straightClearance ? input.Vehicle.Movement.HeadingRadians : MathF.Atan2(difference.X, difference.Z);
         float headingChange = GroundMovementState.NormalizeAngle(desiredHeading - input.Vehicle.Movement.HeadingRadians);
         float curvature = 2 * MathF.Sin(headingChange) / targetDistance;
         float turnSpeed = MathF.Abs(curvature) > DirectionEpsilon
@@ -156,12 +199,13 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         Vector3 candidate = start.Position + forward * (speed * input.DeltaSeconds);
         candidate = GroundMovementStep.ClampArrival(start.Position, candidate,
             input.Binding.OriginalOrder.WorldTarget, tolerance);
+        candidate = NavigationMotionNumerics.ConstrainTravel(start.Position, candidate, (double)speed * input.DeltaSeconds);
         if (!Spend(workAllowance, ref workConsumed))
             return Hold(input, collision, Availability, NavigationBlockReason.SearchWork, brakingDistance);
         if (!collision.World.TrySampleHeight(candidate.X, candidate.Z, out float height) || !float.IsFinite(height))
             return Hold(input, collision, Availability, NavigationBlockReason.Terrain, brakingDistance);
         candidate.Y = height + groundOffset;
-        NavigationPose end = new(candidate, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+        NavigationPose end = new(candidate, straightClearance ? start.Rotation : Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
         if (!end.IsValid)
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.Terrain, brakingDistance);
         var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(input.Vehicle.Entity),
@@ -169,7 +213,11 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         if (!TrySweep(geometry, collision, sweep, workAllowance, ref workConsumed, out NavigationSweepResult result))
             return Hold(input, collision, NavigationModuleAvailability.Unavailable, NavigationBlockReason.MissingGeometry, brakingDistance);
         if (result.AllowedFraction <= 0)
-            return Hold(input, collision, Availability, result.Reason, brakingDistance);
+        {
+            forwardClearance = true;
+            return ProposeForwardClearance(input, collision, geometry, route, groundOffset,
+                workAllowance, ref workConsumed, result.Reason, brakingDistance);
+        }
 
         // A verified prefix belongs to this exact translation/rotation. Shorten
         // both together; never snap sideways or approve only a safe endpoint.
@@ -199,12 +247,14 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
     private bool TryLookahead(in NavigationMotionInput input, NavigationCollisionFrame collision,
         INavigationGeometryQuery geometry, NavigationRouteProposal route, int currentWaypoint,
         float groundOffset, float lookahead, float maximumSpeed, int allowance, ref int consumed,
-        out Vector3 target, out float safeDistance, out NavigationBlockReason reason, out int usedWaypoint)
+        out Vector3 target, out float safeDistance, out NavigationBlockReason reason, out int usedWaypoint,
+        bool captureDiagnostics, out NavigationCheckedHorizon? checkedHorizon)
     {
         target = input.Vehicle.Pose.Position;
         safeDistance = 0;
         reason = NavigationBlockReason.SearchWork;
         usedWaypoint = -1;
+        checkedHorizon = null;
         int pointCount = route.Waypoints.Count;
         bool finalSegment = route.ResolvedDestination != input.Binding.OriginalOrder.WorldTarget;
         if (finalSegment && pointCount == int.MaxValue) return false;
@@ -218,6 +268,20 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         {
             if (!Spend(allowance, ref consumed)) return false;
             Vector3 point = index < pointCount ? route.Waypoints[index] : input.Binding.OriginalOrder.WorldTarget;
+            if (finalSegment && index == pointCount && index > currentWaypoint)
+            {
+                Vector3 origin = index > 1 ? route.Waypoints[index - 2] : input.Vehicle.Pose.Position;
+                Vector3 approach = previous - origin, final = point - previous;
+                if ((double)approach.X * final.X + (double)approach.Z * final.Z < 0)
+                {
+                    // Blending a projected endpoint with a reversing original-target
+                    // leg can fold the lookahead back onto the current pose. Reach
+                    // the actual route endpoint before its existing local handoff.
+                    candidate = previous;
+                    last = index - 1;
+                    break;
+                }
+            }
             float length = HorizontalDistance(previous, point);
             if (!float.IsFinite(length)) { reason = NavigationBlockReason.Unknown; return false; }
             last = index;
@@ -242,13 +306,14 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         {
             if (TryGroundedHorizon(input, collision, geometry, candidate, groundOffset, maximumSpeed,
                 horizonWorkLimit, ref consumed, out Vector3 candidateTarget, out float candidateDistance,
-                out reason, out bool fullyCleared))
+                out reason, out bool fullyCleared, captureDiagnostics, out var candidateHorizon))
             {
                 if (fullyCleared)
                 {
                     target = candidateTarget;
                     safeDistance = candidateDistance;
                     usedWaypoint = index;
+                    checkedHorizon = candidateHorizon;
                     return true;
                 }
                 if (candidateDistance > safeDistance)
@@ -257,6 +322,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
                     safeDistance = candidateDistance;
                     usedWaypoint = index;
                     partialReason = reason;
+                    checkedHorizon = candidateHorizon;
                 }
             }
             if (reason == NavigationBlockReason.MissingGeometry) return false;
@@ -266,6 +332,28 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
             if (index > currentWaypoint)
                 candidate = route.Waypoints[index - 1];
         }
+        // A parked body can occupy an intermediate grid waypoint while a later
+        // corridor target remains reachable. Inspect bounded forward directions
+        // before settling for the blocked prefix. Full body/terrain clearance is
+        // mandatory; this does not consume or replace the original waypoint.
+        for (int index = last + 1, inspectedForward = 0; index < total && inspectedForward < _options.MaximumLookaheadWaypoints; index++, inspectedForward++)
+        {
+            if (!Spend(horizonWorkLimit, ref consumed)) break;
+            Vector3 point = index < pointCount ? route.Waypoints[index] : input.Binding.OriginalOrder.WorldTarget;
+            Vector3 delta = point - input.Vehicle.Pose.Position; delta.Y = 0;
+            float length = delta.Length();
+            if (!float.IsFinite(length) || length <= DirectionEpsilon) continue;
+            Vector3 alternate = length > lookahead ? input.Vehicle.Pose.Position + delta * (lookahead / length) : point;
+            if (TryGroundedHorizon(input, collision, geometry, alternate, groundOffset, maximumSpeed,
+                horizonWorkLimit, ref consumed, out var nextTarget, out float nextDistance, out var nextReason, out bool clear,
+                captureDiagnostics, out var nextHorizon) && clear)
+            {
+                target = nextTarget; safeDistance = nextDistance; usedWaypoint = index; reason = nextReason;
+                checkedHorizon = nextHorizon;
+                return true;
+            }
+            if (nextReason == NavigationBlockReason.MissingGeometry) { reason = nextReason; return false; }
+        }
         if (safeDistance <= 0) return false;
         reason = partialReason;
         return true;
@@ -274,12 +362,13 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
     private bool TryGroundedHorizon(in NavigationMotionInput input, NavigationCollisionFrame collision,
         INavigationGeometryQuery geometry, Vector3 candidate, float groundOffset, float maximumSpeed,
         int allowance, ref int consumed, out Vector3 target, out float safeDistance,
-        out NavigationBlockReason reason, out bool fullyCleared)
+        out NavigationBlockReason reason, out bool fullyCleared, bool captureDiagnostics, out NavigationCheckedHorizon? checkedHorizon)
     {
         target = input.Vehicle.Pose.Position;
         safeDistance = 0;
         reason = NavigationBlockReason.Terrain;
         fullyCleared = false;
+        checkedHorizon = null;
         NavigationBlockReason approvedReason = reason;
         int refinement = 0;
         while (true)
@@ -294,14 +383,18 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
             if (collision.World.TrySampleHeight(candidate.X, candidate.Z, out float height) && float.IsFinite(height))
             {
                 candidate.Y = height + groundOffset;
-                float desiredHeading = MathF.Atan2(candidate.X - input.Vehicle.Pose.Position.X, candidate.Z - input.Vehicle.Pose.Position.Z);
+                bool straightClearance = input.Traffic.Action == NavigationTrafficAction.Proceed &&
+                    input.Traffic.MaximumSpeed <= 1 && input.Traffic.SuggestedTarget.HasValue &&
+                    NavigationMotionNumerics.IsCapturedForwardTarget(input.Vehicle.Pose, candidate);
+                float desiredHeading = straightClearance ? input.Vehicle.Movement.HeadingRadians :
+                    MathF.Atan2(candidate.X - input.Vehicle.Pose.Position.X, candidate.Z - input.Vehicle.Pose.Position.Z);
                 float duration = MathF.Max(input.DeltaSeconds, distance / maximumSpeed);
                 float yaw = input.Vehicle.Profile.MaximumYawRate * duration;
                 if (!float.IsFinite(duration) || !float.IsFinite(yaw))
                 { reason = NavigationBlockReason.Unknown; return false; }
                 float change = GroundMovementState.NormalizeAngle(desiredHeading - input.Vehicle.Movement.HeadingRadians);
                 float heading = GroundMovementState.NormalizeAngle(input.Vehicle.Movement.HeadingRadians + Math.Clamp(change, -yaw, yaw));
-                NavigationPose end = new(candidate, Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
+                NavigationPose end = new(candidate, straightClearance ? input.Vehicle.Pose.Rotation : Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading));
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(input.Vehicle.Entity),
                     input.Vehicle.Pose, end, input.Vehicle.Profile, duration);
                 // Each retry starts at this tick's observed pose. No downstream
@@ -324,6 +417,9 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
                     target = candidate;
                     safeDistance = distance;
                     fullyCleared = true;
+                    if (captureDiagnostics) checkedHorizon = new(input.Binding,
+                        new(NavigationModuleAvailability.Available, input.Tick, collision.World.Revision),
+                        input.Vehicle.Pose, end, input.Vehicle.Profile, duration, result.AllowedFraction);
                     return true;
                 }
                 if (approved > safeDistance)
@@ -331,8 +427,11 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
                     target = candidate;
                     safeDistance = approved;
                     approvedReason = reason;
+                    if (captureDiagnostics) checkedHorizon = new(input.Binding,
+                        new(NavigationModuleAvailability.Available, input.Tick, collision.World.Revision),
+                        input.Vehicle.Pose, end, input.Vehicle.Profile, duration, result.AllowedFraction);
                 }
-                if (reason != NavigationBlockReason.Terrain)
+                if (reason is not (NavigationBlockReason.Terrain or NavigationBlockReason.OutsideWorld))
                 {
                     if (safeDistance > 0) reason = approvedReason;
                     return safeDistance > 0;
@@ -380,6 +479,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
             !vehicle.Owner.IsSpecified || order.Issuer != vehicle.Owner ||
             input.Binding.RequestId == 0 || input.Binding.CommandGeneration == 0 ||
             !vehicle.Pose.IsValid || !vehicle.Profile.IsValid || !Finite(vehicle.Movement.Velocity) ||
+            !NavigationPrecisionOwnership.Matches(vehicle, input.Binding) ||
             !float.IsFinite(vehicle.Movement.HeadingRadians) || !Enum.IsDefined(vehicle.Movement.Status) ||
             !float.IsFinite(input.DeltaSeconds) || input.DeltaSeconds <= 0 ||
             !float.IsFinite(input.EffectiveMaximumSpeed) || input.EffectiveMaximumSpeed < 0 ||
@@ -418,8 +518,7 @@ public sealed class ContinuousNavigationMotionPlanner : INavigationMotionPlanner
         input.Binding.OriginalOrder.TargetHeadingRadians.HasValue ||
         input.Vehicle.DirectOrder is MovementOrder order &&
             (order.Kind == MovementOrderKind.LocalApproach || order.TargetHeadingRadians.HasValue) ||
-        input.Vehicle.DockVisit.HasValue || input.Vehicle.QueueEntry.HasValue ||
-        input.Binding.DockGeneration != 0 || input.Binding.QueueGeneration != 0 ||
+        NavigationPrecisionOwnership.IsPrecise(input.Vehicle) ||
         input.Route?.Request.TargetSemantics == NavigationTargetSemantics.DockAccess ||
         input.Route?.Request.Goal.RequiredHeadingRadians.HasValue == true;
 

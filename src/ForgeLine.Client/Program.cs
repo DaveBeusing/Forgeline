@@ -14,6 +14,9 @@ internal static class Program
         long processEntryTimestamp = Stopwatch.GetTimestamp();
         if (args.Length == 1 && args[0] == "--validate-scenarios")
             return ValidateScenarios();
+        if (args.Length == 4 && args[0] == "--navigation-diagnostics-capture" &&
+            args[3] == "--developer-navigation-diagnostics")
+            return RunNavigationDiagnosticsCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")
@@ -42,6 +45,9 @@ internal static class Program
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunNavigationDiagnosticsCapture(string output, string runtimeRoot) => NavigationDiagnosticsCapture.Run(output, runtimeRoot);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int ValidateScenarios() => ScenarioPackageValidation.Run();
@@ -78,16 +84,33 @@ internal static class Program
         out bool smokeTest,
         out int renderInstanceCount,
         out string? visualQualificationOutput,
-        out string? settingsRoot)
+        out string? settingsRoot) =>
+        TryParseArguments(args, out smokeTest, out renderInstanceCount, out visualQualificationOutput, out settingsRoot, out _);
+
+    internal static bool TryParseArguments(
+        string[] args,
+        out bool smokeTest,
+        out int renderInstanceCount,
+        out string? visualQualificationOutput,
+        out string? settingsRoot,
+        out bool developerNavigationDiagnostics)
     {
         smokeTest = false;
         renderInstanceCount = DefaultRenderInstanceCount;
         visualQualificationOutput = null;
         settingsRoot = null;
+        developerNavigationDiagnostics = false;
+        bool requestedNavigationDiagnostics = false;
 
         for (int index = 0; index < args.Length; index++)
         {
             string argument = args[index];
+
+            if (string.Equals(argument, "--developer-navigation-diagnostics", StringComparison.OrdinalIgnoreCase))
+            {
+                requestedNavigationDiagnostics = true;
+                continue;
+            }
 
             if (string.Equals(argument, "--scenario", StringComparison.OrdinalIgnoreCase))
             {
@@ -201,6 +224,7 @@ internal static class Program
             return false;
         }
 
+        developerNavigationDiagnostics = requestedNavigationDiagnostics;
         return true;
     }
 
@@ -211,7 +235,7 @@ internal static class Program
             "[--visual-qualification-output <report.json>] " +
             "[--settings-root <directory>] [--scenario <central-divide|split-basin>] [--skip-splash] " +
             "[--startup-diagnostics-output <report.json>] [--startup-menu-smoke-test] " +
-            "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>]");
+            "[--reference-zoom <CloseTactical|NormalGameplay|Strategic>] [--developer-navigation-diagnostics]");
         writer.WriteLine("Standalone native evidence: ForgeLine.Client --reference-capture-request <request.json>");
         writer.WriteLine("Scenario integrity and recovery: ForgeLine.Client --validate-scenarios");
     }

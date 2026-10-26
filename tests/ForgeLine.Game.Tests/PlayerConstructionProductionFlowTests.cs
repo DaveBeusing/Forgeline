@@ -1380,6 +1380,7 @@ public sealed partial class PlayerConstructionProductionFlowTests
 
         if (condition()) return;
         var diagnostics = new List<string>();
+        diagnostics.Add($"navigation={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Actors)}; waits={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Traffic.Vehicles)}; preciseVetoes={string.Join(';', scenario.Services.GroundMovement.CaptureLegacyNavigationVetoes())}");
         foreach (EntityId entity in scenario.Simulation.Entities.Query<CompletedBuilding>())
             diagnostics.Add($"building {entity}:{scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity).BuildingId}" +
                 $"@{scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position}");
@@ -1405,12 +1406,16 @@ public sealed partial class PlayerConstructionProductionFlowTests
                 $" fuel={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Fuel)}" +
                 $" ammunition={scenario.Inventories.GetQuantity(facility.InputInventory, ResourceIds.Ammunition)}");
         }
+        diagnostics.Add($"leases={string.Join(';', scenario.Services.GroundMovement.CaptureNavigationState().Traffic.Leases)}");
         diagnostics.Add($"distribution={string.Join(';', scenario.AutomatedDistribution.LastDebugSnapshot.Requests)}");
         foreach (EntityId entity in scenario.Simulation.Entities.Query<CargoTransport>())
             diagnostics.Add($"{entity}: {scenario.Simulation.Entities.GetComponent<CargoTransportRuntimeState>(entity)} " +
             $"position={scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position} " +
             (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit visit) ? $"dock={visit} " : "") +
-            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move.WorldTarget} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out MovementOrder move) ? $"move={move} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleQueueEntry queue) ? $"queue={queue} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleQueueMotion queueMotion) ? $"queueMotion={queueMotion} " : "") +
+            (scenario.Simulation.Entities.TryGetComponent(entity, out VehicleDockVisit dockVisit) && scenario.Simulation.Entities.TryGetComponent(dockVisit.Building, out VehicleDockSlot slot) ? $"slot={slot} " : "") +
             $"motion={scenario.Simulation.Entities.GetComponent<GroundMovementState>(entity)}");
         Assert.True(condition(), string.Join("; ", diagnostics));
     }

@@ -109,7 +109,7 @@ public sealed class AlertLifecycleTracker
                 supply.Status is BattlefieldSupplyStatus.Critical or BattlefieldSupplyStatus.Unsupplied) targets[2] = entity;
             if (!targets[3].IsValid &&
                 (context.Entities.TryGetComponent(entity, out ProductionFacility production) && production.Status is ProductionStatus.NoInput or ProductionStatus.NoPower or ProductionStatus.OutputFull or ProductionStatus.Paused ||
-                context.Entities.TryGetComponent(entity, out UnitProductionFacility units) && units.Status is UnitProductionStatus.NoInput or UnitProductionStatus.NoPower or UnitProductionStatus.Paused)) targets[3] = entity;
+                context.Entities.TryGetComponent(entity, out UnitProductionFacility units) && units.Status is UnitProductionStatus.NoInput or UnitProductionStatus.NoPower or UnitProductionStatus.Paused or UnitProductionStatus.OutputBlocked)) targets[3] = entity;
             if (!targets[4].IsValid && context.Entities.TryGetComponent(entity, out PowerConsumer power) &&
                 power.State is PowerOperationalState.Brownout or PowerOperationalState.Offline) targets[4] = entity;
         }

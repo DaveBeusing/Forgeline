@@ -134,6 +134,30 @@ public sealed partial class VehicleDockingService
         return true;
     }
 
+    private bool ContinueBlockedQueueApproach(SimulationContext context, EntityId truck, EntityId building, PlayerId owner)
+    {
+        var entities = context.Entities;
+        if (!OwnsTruck(entities, truck, owner) || !Operational(entities, building) ||
+            !entities.TryGetComponent(building, out CompletedBuilding completed) || completed.Owner != owner ||
+            !entities.TryGetComponent(building, out BuildingLoadingDock definition) || !definition.IsValid ||
+            !entities.TryGetComponent(building, out VehicleQueueLane lane) ||
+            !entities.TryGetComponent(truck, out VehicleQueueEntry queue) || queue.Building != building || queue.Owner != owner ||
+            queue.Generation == 0 || queue.Position != 1 || queue.ArrivedAtService || !_queues.IsHead(entities, truck, building, context.Tick) ||
+            !entities.TryGetComponent(truck, out VehicleDockVisit visit) || visit.Building != building || visit.Generation != 0 || visit.LaneEntered ||
+            !entities.TryGetComponent(truck, out WorldTransform transform) ||
+            !entities.TryGetComponent(truck, out GroundMovementState motion) ||
+            !NavigationMotionCapture.Finite(queue.Target) || !float.IsFinite(queue.Heading)) return false;
+        bool settled = VehicleDockPose.HorizontalDistanceSquared(transform.Position, queue.Target) <= .11f * .11f &&
+            MathF.Abs(GroundMovementState.NormalizeAngle(motion.HeadingRadians - queue.Heading)) <= MathF.PI / 90 &&
+            motion.Velocity.LengthSquared() <= .05f * .05f;
+        if (settled) return false;
+        // Admission can fail while the head is still approaching its own safe
+        // waiting pose. It retains that approach, not permission to enter/service
+        // the occupied lane. Physical motion and FIFO gates still approve each tick.
+        QueueMove(context, truck, owner, queue.Target, queue.Heading, lane);
+        return true;
+    }
+
     private bool TryQueueLane(EntityRegistry entities, EntityId truck, EntityId building, in VehicleDockPose pose,
         in WorldTransform transform, in GroundMovement movement, out VehicleQueueLane lane)
     {
@@ -404,6 +428,10 @@ public sealed partial class VehicleDockingService
         Vector3 forward = new(MathF.Sin(motion.Heading), 0, MathF.Cos(motion.Heading));
         Vector3 side = new(forward.Z, 0, -forward.X);
         if (MathF.Abs(Vector3.Dot(current.Position - motion.Front, side)) > current.Scale.X + 2) return false;
+        // A predecessor still approaching from outside the lane has not occupied
+        // its no-passing plane. Dock admission stays FIFO and physical bodies
+        // remain vetoes; do not trap a follower at its own free waiting pose.
+        if (MathF.Abs(Vector3.Dot(predecessor.Position - motion.Front, side)) > predecessor.Scale.X + 2) return false;
         // A new arrival can already be ahead of its FIFO predecessor. Do not
         // let the no-passing gate trap it there while it moves sideways out
         // of the lane to reach its assigned tail position. Inspect the route
@@ -413,6 +441,12 @@ public sealed partial class VehicleDockingService
             entities.TryGetComponent(truck, out MovementOrder evacuation) &&
             MathF.Abs(Vector3.Dot(evacuation.WorldTarget - motion.Front, side)) >
                 MathF.Abs(Vector3.Dot(current.Position - motion.Front, side))) return false;
+        // A later arrival can already be ahead while the FIFO head is still
+        // approaching. It may advance away from that head only as far as its
+        // own assigned tail pose. This does not grant service or dock admission.
+        if (entry.Position > 1 && Vector3.Dot(current.Position - predecessor.Position, forward) > 0 &&
+            Vector3.Dot(next.Position - current.Position, forward) > 0 &&
+            Vector3.Dot(next.Position - motion.Tail, forward) <= .001f) return false;
         var ownBounds = VehicleBounds(next);
         var priorBounds = VehicleBounds(predecessor);
         float ownHalf = MathF.Abs(forward.X) * ownBounds.Extents.X + MathF.Abs(forward.Z) * ownBounds.Extents.Z;

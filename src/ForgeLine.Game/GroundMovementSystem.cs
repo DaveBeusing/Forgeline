@@ -18,6 +18,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
     private readonly SpatialQueryBuffer _neighborBuffer = new(128);
     private readonly SpatialQueryBuffer _obstacleBuffer = new(64);
     private readonly List<EntityId> _completedOrders = new();
+    private readonly List<(EntityId Entity, MovementOrder Order)> _queueApproachHandoffs = new(128);
     private readonly List<GroundMovementDebugAgent> _debugAgents = new();
     private GroundMovementDebugSnapshot _lastDebugSnapshot =
         GroundMovementDebugSnapshot.Empty;
@@ -56,6 +57,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
 
         _completedOrders.Clear();
         _debugAgents.Clear();
+        BeginOwnedQueueApproaches(context);
+        _navigationControl?.BeginTick(context);
 
         int groundUnits = 0;
         int orderedUnits = 0;
@@ -66,11 +69,14 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         int neighborAdjustments = 0;
         int obstacleAdjustments = 0;
 
+        for (int movementPass = 0; movementPass < (_navigationControl is null ? 1 : 2); movementPass++)
         foreach (EntityId entity in context.Entities.Query<
                      WorldTransform,
                      GroundMovementState>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            if (_navigationControl is not null &&
+                LogisticsNavigationCoordinator.IsLogisticsVehicle(context.Entities, entity) != (movementPass == 1)) continue;
             if (!context.Entities.TryGetComponent(
                     entity,
                     out GroundMovement movement))
@@ -110,9 +116,10 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             }
 
             orderedUnits++;
+            if (_navigationControl is not null && LogisticsNavigationCoordinator.Controls(context.Entities, entity)) continue;
 
             ProcessOrderedMovement(
-                context.Entities,
+                context,
                 entity,
                 movement,
                 order,
@@ -125,7 +132,11 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 ref terrainBlockedUnits,
                 ref neighborAdjustments,
                 ref obstacleAdjustments);
+            if (_navigationControl is not null)
+                _navigationControl.RecordLegacyMotion(context, entity, transform, context.Entities.GetComponent<WorldTransform>(entity));
         }
+
+        ExecuteNavigationMovement(context, deltaSeconds, ref movingUnits, ref stuckUnits, ref arrivedUnits, ref terrainBlockedUnits);
 
         for (int index = 0; index < _completedOrders.Count; index++)
         {
@@ -156,8 +167,30 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
                 : GroundMovementDebugSnapshot.Empty;
     }
 
+    private void BeginOwnedQueueApproaches(SimulationContext context)
+    {
+        if (_navigationControl is null) return;
+        _queueApproachHandoffs.Clear();
+        int inspected = 0;
+        foreach (EntityId entity in context.Entities.Query<VehicleQueueEntry>(QueryIterationOrder.StableByEntityIndex))
+        {
+            if (inspected++ == 128) break;
+            if (LogisticsNavigationCoordinator.IsLogisticsVehicle(context.Entities, entity) &&
+                NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, _options.ObstacleClearanceMeters, out var vehicle) &&
+                NavigationPrecisionOwnership.TryBeginOwnedQueueApproach(vehicle, out var local))
+                _queueApproachHandoffs.Add((entity, local with { AcceptedAtTick = context.Tick }));
+        }
+        // Apply structural changes only after finishing the stable query.
+        foreach (var handoff in _queueApproachHandoffs)
+        {
+            context.Entities.SetComponent(handoff.Entity, handoff.Order);
+            context.Entities.RemoveComponent<NavigationRouteState>(handoff.Entity);
+            context.Entities.RemoveComponent<NavigationPendingPath>(handoff.Entity);
+        }
+    }
+
     private void ProcessOrderedMovement(
-        EntityRegistry entities,
+        SimulationContext context,
         EntityId entity,
         in GroundMovement movement,
         in MovementOrder order,
@@ -171,6 +204,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         ref int neighborAdjustments,
         ref int obstacleAdjustments)
     {
+        var entities = context.Entities;
         float stopRadius = order.TargetHeadingRadians.HasValue ? 0.1f : movement.StopRadius;
         float arrivalRadius = stopRadius + 0.01f;
         Vector3 position = transform.Position;
@@ -280,7 +314,9 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             MathF.Abs(GroundMovementState.NormalizeAngle(state.HeadingRadians - targetHeading)) > MathF.PI / 90)
         {
             float aligned = MoveTowardsAngle(state.HeadingRadians, targetHeading, movement.TurnRateRadiansPerSecond * deltaSeconds);
-            entities.SetComponent(entity, transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, aligned) });
+            var alignedTransform = transform with { Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, aligned) };
+            if (!ApproveLegacyPose(context, entity, transform, alignedTransform, state, movement, order)) return;
+            entities.SetComponent(entity, alignedTransform);
             entities.SetComponent(entity, state with { HeadingRadians = aligned, Velocity = Vector3.Zero });
             return;
         }
@@ -289,6 +325,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             WorldTransform arrivedTransform = SnapToTerrain(
                 transform,
                 movement);
+            if (!ApproveLegacyPose(context, entity, transform, arrivedTransform, state, movement, order)) return;
             GroundMovementState arrivedState = state with
             {
                 Velocity = Vector3.Zero,
@@ -338,7 +375,14 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             vehicleTop,
             ref obstacleAdjustments);
 
-        if (order.TargetHeadingRadians.HasValue) steering = targetDirection;
+        // A queue target fixes the final alignment, not the entire remote approach.
+        // Before lane admission, retain ordinary obstacle/separation steering so the
+        // FIFO head can pass a follower already parked in its own tail bay.
+        bool freeQueueApproach = distanceToTarget > 2 &&
+            entities.TryGetComponent(entity, out VehicleQueueEntry approachQueue) && approachQueue.Generation > 0 &&
+            (!entities.TryGetComponent(entity, out VehicleDockVisit approachDock) ||
+                !approachDock.LaneEntered);
+        if (order.TargetHeadingRadians.HasValue && !freeQueueApproach) steering = targetDirection;
 
         Vector3 desiredDirection =
             steering.LengthSquared() > MinimumDirectionLengthSquared
@@ -386,7 +430,7 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
             // orbit a precise target forever. Shrink that radius with the
             // remaining approach distance while keeping normal braking/turn limits.
             float turningSpeed = remainingDistance * movement.TurnRateRadiansPerSecond * 0.5f;
-            maximumSpeed = MathF.Min(maximumSpeed, MathF.Min(1, turningSpeed));
+            maximumSpeed = MathF.Min(maximumSpeed, MathF.Min(freeQueueApproach ? 2 : 1, turningSpeed));
         }
 
         if (entities.TryGetComponent(
@@ -461,7 +505,53 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         }
 
         var candidateTransform = transform with { Position = candidate, Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, heading) };
-        if (VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform))
+        bool motionBlocked = VehicleDockingService.BlocksStagingStep(entities, entity, transform, candidateTransform) ||
+            _navigationControl is not null && !_navigationControl.TryApproveLegacyPose(context, entity, transform, candidateTransform);
+        // A close neighbor can prevent turning without blocking straight departure.
+        // Keep the owned target and try only the current heading at the same bounded
+        // speed; final heading alignment and entered service lanes retain their owner.
+        if (motionBlocked && _navigationControl is not null && speed > 0 &&
+            (order.TargetHeadingRadians is null || freeQueueApproach) &&
+            (!entities.TryGetComponent(entity, out VehicleDockVisit turnVisit) || !turnVisit.LaneEntered) &&
+            (!entities.TryGetComponent(entity, out VehicleQueueEntry turnQueue) || !turnQueue.ArrivedAtService))
+        {
+            Vector3 straight = position + new Vector3(MathF.Sin(state.HeadingRadians), 0, MathF.Cos(state.HeadingRadians)) * (speed * deltaSeconds);
+            if (TryApplyTerrain(ref straight, movement))
+            {
+                var departure = transform with { Position = straight };
+                if (!VehicleDockingService.BlocksStagingStep(entities, entity, transform, departure) &&
+                    _navigationControl.TryApproveLegacyPose(context, entity, transform, departure))
+                {
+                    candidate = straight; candidateTransform = departure; heading = state.HeadingRadians;
+                    motionBlocked = false;
+                }
+            }
+        }
+        bool physicalEscape = false;
+        if (_navigationControl is not null &&
+            _navigationControl.TryProposeLegacyLogisticsEscape(context, entity, transform, maximumSpeed, motionBlocked, out var safeEscape, out float escapeHeading) &&
+            !VehicleDockingService.BlocksStagingStep(entities, entity, transform, safeEscape) &&
+            _navigationControl.TryApproveLegacyPose(context, entity, transform, safeEscape))
+        {
+            candidate = safeEscape.Position; candidateTransform = safeEscape; heading = escapeHeading;
+            motionBlocked = false; physicalEscape = true;
+        }
+        if (!physicalEscape && _navigationControl is not null &&
+            _navigationControl.TryProposeLegacyQueueReverse(context, entity, transform, maximumSpeed, motionBlocked, out var queueDeparture, out float queueHeading))
+        {
+            Vector3 reverse = queueDeparture.Position;
+            if (TryApplyTerrain(ref reverse, movement))
+            {
+                var checkedDeparture = queueDeparture with { Position = reverse };
+                if (!VehicleDockingService.BlocksStagingStep(entities, entity, transform, checkedDeparture) &&
+                    _navigationControl.TryApproveLegacyPose(context, entity, transform, checkedDeparture))
+                {
+                    candidate = reverse; candidateTransform = checkedDeparture; heading = queueHeading;
+                    motionBlocked = false;
+                }
+            }
+        }
+        if (motionBlocked)
         {
             var waiting = state with { Velocity = Vector3.Zero, Status = GroundMovementStatus.TacticallyPaused,
                 ObservedOrderTick = order.AcceptedAtTick, StalledTicks = 0 };

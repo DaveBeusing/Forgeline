@@ -40,7 +40,7 @@ internal readonly record struct PresentationInteractionRequestSnapshot(
     StrategicOverlayMode StrategicOverlay,
     EntityId HoveredEntity,
     SimulationSessionId HoverSessionId,
-    bool OperationsOpen = false);
+    bool OperationsOpen = false, bool NavigationDiagnosticsOpen = false);
 
 public sealed class PresentationInteractionState
 {
@@ -56,6 +56,9 @@ public sealed class PresentationInteractionState
     private EntityId _hoveredEntity;
     private SimulationSessionId _hoverSessionId;
     private bool _operationsOpen;
+    private bool _navigationDiagnosticsOpen;
+    public void SetNavigationDiagnosticsOpen(bool open)
+    { lock (_gate) _navigationDiagnosticsOpen = open; }
     private ConveyorPreviewRequest? _conveyorRequest;
     public void SetConveyorRequest(ConveyorPreviewRequest? request)
     { lock (_gate) _conveyorRequest=request; }
@@ -212,7 +215,7 @@ public sealed class PresentationInteractionState
                 _strategicOverlay,
                 _hoveredEntity,
                 _hoverSessionId,
-                _operationsOpen);
+                _operationsOpen, _navigationDiagnosticsOpen);
         }
     }
 }

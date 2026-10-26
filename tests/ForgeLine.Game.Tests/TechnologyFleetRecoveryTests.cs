@@ -18,7 +18,9 @@ public sealed class TechnologyFleetRecoveryTests
         }, TestContext.Current.CancellationToken);
         var player = new PlayerId(2);
         var entities = runtime.Simulation.Entities;
-        Assert.True(runtime.RunUntil(SupplyEstablished, 12_000, TestContext.Current.CancellationToken));
+        bool established = runtime.RunUntil(SupplyEstablished, 12_000, TestContext.Current.CancellationToken);
+        Assert.True(established, CaptureFailure());
+
         Assert.False(TechnologyStateQueries.TryGetActiveResearch(entities, player, out _, out _));
         UnitId lost = supplyLost ? UnitIds.SupplyTruck : UnitIds.CargoTruck;
         var trucks = new List<EntityId>();
@@ -39,6 +41,29 @@ public sealed class TechnologyFleetRecoveryTests
                                  entities.GetComponent<CompletedBuilding>(request.Facility).Owner == player;
         }
         Assert.True(replacementQueued);
+
+        string CaptureFailure()
+        {
+            if (established) return string.Empty;
+            var lines = new List<string>();
+            foreach (var entity in entities.Query<WorldTransform, ControllableEntity>())
+            {
+                if (entities.GetComponent<ControllableEntity>(entity).Owner != player) continue;
+                string line = $"{entity}@{entities.GetComponent<WorldTransform>(entity).Position}";
+                if (entities.TryGetComponent(entity, out UnitIdentity identity)) line += $" unit={identity.UnitId}";
+                if (entities.TryGetComponent(entity, out GroundMovementState movement)) line += $" movement={movement}";
+                if (entities.TryGetComponent(entity, out MovementOrder order)) line += $" order={order}";
+                if (entities.TryGetComponent(entity, out VehicleQueueEntry queue)) line += $" queue={queue}";
+                if (entities.TryGetComponent(entity, out VehicleDockVisit dock)) line += $" dock={dock}";
+                if (entities.TryGetComponent(entity, out SupplyLoadingOrder loading)) line += $" loading={loading}";
+                if (entities.TryGetComponent(entity, out UnitProductionFacility production)) line += $" production={production.Status}";
+                lines.Add(line);
+            }
+            var checkpoint = runtime.Services.GroundMovement.CaptureNavigationState();
+            lines.Add($"navigation={string.Join(';', checkpoint.Actors)}; waits={string.Join(';', checkpoint.Traffic.Vehicles)}");
+            lines.Add($"leases={string.Join(';', checkpoint.Traffic.Leases)}; precise={string.Join(';', runtime.Services.GroundMovement.CaptureLegacyNavigationVetoes())}");
+            return string.Join(Environment.NewLine, lines);
+        }
 
         bool SupplyEstablished(MatchRuntime current)
         {

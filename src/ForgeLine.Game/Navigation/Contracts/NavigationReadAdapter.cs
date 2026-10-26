@@ -27,7 +27,7 @@ public readonly record struct NavigationVehicleObservation(
     EntityId Entity, PlayerId Owner, NavigationPose Pose, NavigationVehicleProfile Profile,
     GroundMovementState Movement, MovementOrder? DirectOrder, MovementOrder? RouteOrder,
     NavigationPendingPath? Pending, VehicleDockVisit? DockVisit, VehicleDockSlot? BuildingSlot,
-    VehicleQueueEntry? QueueEntry);
+    VehicleQueueEntry? QueueEntry, float PrecisionApproachRadius = 0);
 
 /// <summary>Simulation-thread capture only. These methods never write components or execute a search.</summary>
 public static class NavigationReadAdapter
@@ -55,7 +55,8 @@ public static class NavigationReadAdapter
             ? route.OriginalOrder : null;
         observation = new NavigationVehicleObservation(entity, control.Owner, pose, profile, state,
             Read<MovementOrder>(entities, entity), routeOrder, Read<NavigationPendingPath>(entities, entity),
-            visit, slot, Read<VehicleQueueEntry>(entities, entity));
+            visit, slot, Read<VehicleQueueEntry>(entities, entity),
+            transform.Scale.Z * 2 + movement.SeparationRadius);
         return true;
     }
 

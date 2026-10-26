@@ -10,7 +10,7 @@ namespace ForgeLine.Navigation;
 /// </summary>
 public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 {
-    public const int AlgorithmRevision = 1;
+    public const int AlgorithmRevision = 6;
 
     private readonly NavigationWorldSnapshot _snapshot;
     private readonly NavigationTerrainEnvelope _terrain;
@@ -95,6 +95,47 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         if (!double.IsFinite(intervals) || !float.IsFinite((float)radius))
             return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
 
+        IReadOnlyList<NavigationCollisionBody> candidates = frame.Bodies;
+        if (movement.PrefilterFixedBodies && frame.BodyPosesAreFixed)
+        {
+            // Union the exact interval envelopes before scanning fixed bodies. A
+            // remote body is charged once rather than once per terrain interval.
+            // Keep the original interval checks and every nearby physical veto.
+            Vector3 minimum = new(float.PositiveInfinity), maximum = new(float.NegativeInfinity);
+            float previous = 0;
+            for (int interval = 0; interval < _maximumSweepIntervals && interval < intervals; interval++)
+            {
+                if (!work.TrySpend())
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                float fraction = (float)Math.Min(1, (interval + 1.0) / intervals);
+                if (fraction <= previous)
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                var envelope = Enclose(movement, startRotation, endRotation, angle, radius, previous, fraction);
+                envelope = envelope with { HalfExtents = envelope.HalfExtents + new Vector3(movement.Vehicle.ClearanceMeters) };
+                if (!Finite(envelope.Center) || !Finite(envelope.HalfExtents) || !FiniteBounds(envelope))
+                    return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+                var bounds = envelope.Bounds;
+                minimum = Vector3.Min(minimum, bounds.Minimum);
+                maximum = Vector3.Max(maximum, bounds.Maximum);
+                previous = fraction;
+            }
+            var relevant = new List<NavigationCollisionBody>();
+            foreach (var body in frame.Bodies)
+            {
+                if (!work.TrySpend())
+                    return Result(frame, NavigationGeometryStatus.BudgetExhausted, 0, NavigationBlockReason.SearchWork, null, work);
+                if (body.Identity == movement.Mover) continue;
+                if (!TryObstacleEnvelope(body, true, movement.DurationSeconds, 0, 1, out var obstacle))
+                    return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+                var bounds = obstacle.Bounds;
+                if (bounds.Maximum.X < minimum.X || bounds.Minimum.X > maximum.X ||
+                    bounds.Maximum.Y < minimum.Y || bounds.Minimum.Y > maximum.Y ||
+                    bounds.Maximum.Z < minimum.Z || bounds.Minimum.Z > maximum.Z) continue;
+                relevant.Add(body);
+            }
+            candidates = relevant;
+        }
+
         float approved = 0;
         for (int interval = 0; interval < _maximumSweepIntervals && interval < intervals; interval++)
         {
@@ -107,7 +148,11 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
                 angle, radius, approved, endFraction);
             if (!Finite(swept.HalfExtents) || !Finite(swept.Center) || !FiniteBounds(swept))
                 return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
-            AxisAlignedBounds bounds = swept.Bounds;
+            // Terrain and coverage keep the conservative whole clearance envelope.
+            var terrainEnvelope = swept with { HalfExtents = swept.HalfExtents + new Vector3(movement.Vehicle.ClearanceMeters) };
+            if (!Finite(terrainEnvelope.HalfExtents) || !FiniteBounds(terrainEnvelope))
+                return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
+            AxisAlignedBounds bounds = terrainEnvelope.Bounds;
             if (!ContainsHorizontal(_snapshot.WorldBounds, bounds))
                 return Obstructed(frame, approved, NavigationBlockReason.OutsideWorld, null, work);
             if (!Contains(frame.Coverage, bounds))
@@ -115,14 +160,16 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
 
             NavigationObstacleIdentity? blocker = null;
             NavigationBlockReason blockReason = NavigationBlockReason.None;
-            foreach (NavigationCollisionBody body in frame.Bodies)
+            foreach (NavigationCollisionBody body in candidates)
             {
                 if (!work.TrySpend())
                     return Result(frame, NavigationGeometryStatus.BudgetExhausted, approved, NavigationBlockReason.SearchWork, null, work);
                 if (body.Identity == movement.Mover) continue;
-                if (!TryObstacleEnvelope(body, movement.DurationSeconds, approved, endFraction, out NavigationCollisionBox obstacle))
+                if (!TryObstacleEnvelope(body, frame.BodyPosesAreFixed, movement.DurationSeconds, approved, endFraction, out NavigationCollisionBox obstacle))
                     return Result(frame, NavigationGeometryStatus.InvalidInput, 0, NavigationBlockReason.Unknown, null, work);
-                if (!NavigationCollisionBox.Intersects(swept, obstacle)) continue;
+                if (!NavigationCollisionBox.Intersects(swept, obstacle, movement.Vehicle.ClearanceMeters)) continue;
+                if (frame.BodyPosesAreFixed && SeparatesTranslatedEnvelope(movement, startRotation, angle, radius,
+                    approved, endFraction, obstacle)) continue;
                 // Scan all entries before publishing a blocker so input array
                 // order cannot pick different identities under equal contacts.
                 if (blocker is null || Compare(body.Identity, blocker.Value) < 0)
@@ -136,7 +183,7 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
             }
             if (blocker.HasValue) return Obstructed(frame, approved, blockReason, blocker, work);
 
-            NavigationGeometryStatus terrainStatus = _terrain.Check(swept, movement,
+            NavigationGeometryStatus terrainStatus = _terrain.Check(terrainEnvelope, movement,
                 approved, endFraction, startOffset, _snapshot.Capabilities.MaximumSlopeDegrees, ref work);
             if (terrainStatus == NavigationGeometryStatus.BudgetExhausted)
                 return Result(frame, terrainStatus, approved, NavigationBlockReason.SearchWork, null, work);
@@ -151,6 +198,49 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
             : Result(frame, NavigationGeometryStatus.BudgetExhausted, approved, NavigationBlockReason.SearchWork, null, work);
     }
 
+    // A rounded midpoint can unnecessarily close a narrow but valid parallel gap.
+    // Bound the whole translation directly on each SAT axis in double precision.
+    // Rotation remains enclosed around the starting body, with the same numerical
+    // padding and physical clearance; an endpoint alone never authorizes motion.
+    private static bool SeparatesTranslatedEnvelope(in NavigationSweep movement, Quaternion startRotation,
+        double angle, double radius, float from, float to, in NavigationCollisionBox obstacle)
+    {
+        float numerical = MathF.Max(NavigationCollisionBox.NumericalPadding(movement.Start.Position, radius),
+            NavigationCollisionBox.NumericalPadding(movement.End.Position, radius));
+        double paddedRadius = radius + Math.Sqrt(3) * numerical;
+        float expansion = (float)(2 * paddedRadius * Math.Sin(angle * .5)) + numerical;
+        var box = NavigationCollisionBox.At(movement.Start with { Rotation = startRotation },
+            movement.Vehicle.HalfExtents + new Vector3(expansion));
+        Span<Vector3> axes = stackalloc Vector3[15]
+        {
+            box.AxisX, box.AxisY, box.AxisZ, obstacle.AxisX, obstacle.AxisY, obstacle.AxisZ,
+            Vector3.Cross(box.AxisX, obstacle.AxisX), Vector3.Cross(box.AxisX, obstacle.AxisY), Vector3.Cross(box.AxisX, obstacle.AxisZ),
+            Vector3.Cross(box.AxisY, obstacle.AxisX), Vector3.Cross(box.AxisY, obstacle.AxisY), Vector3.Cross(box.AxisY, obstacle.AxisZ),
+            Vector3.Cross(box.AxisZ, obstacle.AxisX), Vector3.Cross(box.AxisZ, obstacle.AxisY), Vector3.Cross(box.AxisZ, obstacle.AxisZ)
+        };
+        foreach (var axis in axes)
+        {
+            if (axis.LengthSquared() <= 1e-12f) continue;
+            double origin = ((double)obstacle.Center.X - movement.Start.Position.X) * axis.X +
+                ((double)obstacle.Center.Y - movement.Start.Position.Y) * axis.Y +
+                ((double)obstacle.Center.Z - movement.Start.Position.Z) * axis.Z;
+            double travel = ((double)movement.End.Position.X - movement.Start.Position.X) * axis.X +
+                ((double)movement.End.Position.Y - movement.Start.Position.Y) * axis.Y +
+                ((double)movement.End.Position.Z - movement.Start.Position.Z) * axis.Z;
+            double first = origin - travel * from, last = origin - travel * to;
+            double distance = Math.Sign(first) == Math.Sign(last) ? Math.Min(Math.Abs(first), Math.Abs(last)) : 0;
+            double extent = Projection(box, axis) + Projection(obstacle, axis) +
+                movement.Vehicle.ClearanceMeters * Math.Sqrt(NavigationCollisionBox.Dot(axis, axis));
+            if (distance > extent + (distance + extent + 1) * 2e-6) return true;
+        }
+        return false;
+
+        static double Projection(in NavigationCollisionBox body, Vector3 axis) =>
+            Math.Abs(NavigationCollisionBox.Dot(body.AxisX, axis)) * body.HalfExtents.X +
+            Math.Abs(NavigationCollisionBox.Dot(body.AxisY, axis)) * body.HalfExtents.Y +
+            Math.Abs(NavigationCollisionBox.Dot(body.AxisZ, axis)) * body.HalfExtents.Z;
+    }
+
     private static NavigationCollisionBox Enclose(in NavigationSweep movement,
         Quaternion startRotation, Quaternion endRotation, double angle, double radius, float from, float to)
     {
@@ -161,20 +251,55 @@ public sealed class NavigationVehicleGeometry : INavigationGeometryQuery
         Vector3 halfTranslation = (movement.End.Position - movement.Start.Position) * ((to - from) * 0.5f);
         // Every point's deviation from the middle rotation is bounded by the
         // chord of the enclosing sphere. Translation is projected separately.
-        float rotationExpansion = (float)(2 * radius * Math.Sin(angle * (to - from) * 0.25));
-        float padding = rotationExpansion + movement.Vehicle.ClearanceMeters +
-            NavigationCollisionBox.NumericalPadding(pose.Position, radius);
+        float numericalPadding = MathF.Max(NavigationCollisionBox.NumericalPadding(pose.Position, radius),
+            MathF.Max(NavigationCollisionBox.NumericalPadding(movement.Start.Position, radius),
+                NavigationCollisionBox.NumericalPadding(movement.End.Position, radius)));
+        double paddedRadius = radius + Math.Sqrt(3) * numericalPadding;
+        float rotationExpansion = (float)(2 * paddedRadius * Math.Sin(angle * (to - from) * 0.25));
+        float padding = rotationExpansion + numericalPadding;
+        // A rounded midpoint can shift the whole enclosure toward one endpoint.
+        // Preserve the numerical envelope of the returned poses as well as the
+        // physical body: its existing padding cannot also pay for that shift.
+        Vector3 first = Vector3.Lerp(movement.Start.Position, movement.End.Position, from);
+        Vector3 last = Vector3.Lerp(movement.Start.Position, movement.End.Position, to);
+        double exactMiddle = ((double)from + to) * .5;
+        double exactHalf = ((double)to - from) * .5;
+        double errorX = InterpolationRoundoff(movement.Start.Position.X, movement.End.Position.X,
+            pose.Position.X, halfTranslation.X, first.X, last.X, from, to, exactMiddle, exactHalf);
+        double errorY = InterpolationRoundoff(movement.Start.Position.Y, movement.End.Position.Y,
+            pose.Position.Y, halfTranslation.Y, first.Y, last.Y, from, to, exactMiddle, exactHalf);
+        double errorZ = InterpolationRoundoff(movement.Start.Position.Z, movement.End.Position.Z,
+            pose.Position.Z, halfTranslation.Z, first.Z, last.Z, from, to, exactMiddle, exactHalf);
         Vector3 extent = box.HalfExtents + new Vector3(
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisX)),
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisY)),
             (float)Math.Abs(NavigationCollisionBox.Dot(halfTranslation, box.AxisZ))) + new Vector3(padding);
+        extent = new(
+            AddRoundoff(extent.X, box.AxisX, errorX, errorY, errorZ),
+            AddRoundoff(extent.Y, box.AxisY, errorX, errorY, errorZ),
+            AddRoundoff(extent.Z, box.AxisZ, errorX, errorY, errorZ));
         return box with { HalfExtents = extent };
     }
 
-    private static bool TryObstacleEnvelope(in NavigationCollisionBody body, float duration,
+    private static double InterpolationRoundoff(float start, float end, float middle, float half,
+        float first, float last, float from, float to, double exactMiddle, double exactHalf)
+    {
+        double delta = (double)end - start;
+        return Math.Abs(middle - (start + delta * exactMiddle)) +
+            Math.Abs(half - delta * exactHalf) +
+            Math.Max(Math.Abs(first - (start + delta * from)), Math.Abs(last - (start + delta * to)));
+    }
+
+    private static float AddRoundoff(float extent, Vector3 axis, double x, double y, double z)
+    {
+        double error = Math.Abs(axis.X) * x + Math.Abs(axis.Y) * y + Math.Abs(axis.Z) * z;
+        return error > 0 ? MathF.BitIncrement((float)(extent + error)) : extent;
+    }
+
+    private static bool TryObstacleEnvelope(in NavigationCollisionBody body, bool poseFixed, float duration,
         float from, float to, out NavigationCollisionBox box)
     {
-        bool moving = body.Kind == NavigationObstacleKind.Vehicle || body.Velocity != Vector3.Zero;
+        bool moving = !poseFixed && (body.Kind == NavigationObstacleKind.Vehicle || body.Velocity != Vector3.Zero);
         if (!moving)
         {
             double staticRadius = NavigationCollisionBox.Radius(body.HalfExtents);

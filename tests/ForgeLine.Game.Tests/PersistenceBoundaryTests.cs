@@ -10,6 +10,20 @@ namespace ForgeLine.Game.Tests;
 public sealed class PersistenceBoundaryTests
 {
     [Fact]
+    public void PreCleanupAuthoritativeSchemaIsExplicitlyIncompatible()
+    {
+        using var runtime = CreateRuntime();
+        MatchSaveData save = MatchPersistenceService.CaptureSave(runtime);
+        MatchAuthoritativeSnapshot oldState = save.State with { SchemaVersion = 8 };
+        var oldSave = save with { State = oldState, StateSha256 = oldState.ComputeSha256() };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeSave(
+                MatchPersistenceSerializer.SerializeSave(oldSave))).Reason);
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(oldSave)).Reason);
+    }
+
+    [Fact]
     public void NonFiniteStartingStockIsRejectedBeforeReconstruction()
     {
         using var runtime = CreateRuntime();

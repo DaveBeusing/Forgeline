@@ -17,7 +17,7 @@ public readonly record struct GameplayProgressEvent(ulong Identity, SimulationSe
     ResourceId Resource, double Quantity, uint DefinitionId);
 
 /// <summary>Bounded completed-action observations. Never controls economy or commands.</summary>
-public sealed class GameplayProgressJournal : ISimulationTickObserver, IResourceExtractionSink
+public sealed partial class GameplayProgressJournal : ISimulationTickObserver, IResourceExtractionSink
 {
     private readonly EntityRegistry _entities;
     private readonly SimulationSessionId _session;

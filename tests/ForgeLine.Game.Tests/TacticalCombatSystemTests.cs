@@ -19,6 +19,37 @@ public sealed class TacticalCombatSystemTests
     private static readonly FactionId RedFaction = new(2);
 
     [Fact]
+    public void ReplacementOrdersAndCasualtiesRetainOnlyReferencedCombatGroups()
+    {
+        TacticalScenario scenario = CreateScenario(30, registerReadiness: true);
+        EntityId first = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.Zero);
+        EntityId second = CreateCombatUnit(scenario, BluePlayer, BlueFaction, Vector3.UnitX * 5);
+        EntityId group = EntityId.Invalid;
+        for (int order = 0; order < 64; order++)
+        {
+            var command = new HoldPositionCommand(BluePlayer, [first, second], scenario.Simulation.CurrentTick);
+            scenario.Simulation.SubmitCommand(command, scenario.Simulation.CurrentTick.Next());
+            scenario.Simulation.AdvanceOneTick();
+            group = command.CreatedCombatGroup;
+            Assert.True(scenario.Simulation.Entities.IsAlive(group));
+            Assert.Equal(1, scenario.Simulation.Entities.GetComponentCount<CombatGroupIntent>());
+            Assert.Equal(1, scenario.Readiness!.Metrics.GroupCount);
+            Assert.Equal(1, scenario.Readiness.CachedGroupCount);
+            Assert.Equal(1, scenario.Tactical.CachedGroupCount);
+        }
+        scenario.Simulation.Entities.DestroyEntity(first);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.True(scenario.Simulation.Entities.IsAlive(group));
+        Assert.Equal(1, scenario.Simulation.Entities.GetComponent<CombatGroupReadiness>(group).SurvivingMembers);
+        scenario.Simulation.Entities.DestroyEntity(second);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.False(scenario.Simulation.Entities.IsAlive(group));
+        Assert.Equal(0, scenario.Readiness!.Metrics.GroupCount);
+        Assert.Equal(0, scenario.Readiness.CachedGroupCount);
+        Assert.Equal(0, scenario.Tactical.CachedGroupCount);
+    }
+
+    [Fact]
     public void AttackPursuitCompletesNavigationAndReachesWeaponRange()
     {
         TacticalScenario scenario = CreateScenario(weaponRange: 10.0f, registerGroundMovement: true);
