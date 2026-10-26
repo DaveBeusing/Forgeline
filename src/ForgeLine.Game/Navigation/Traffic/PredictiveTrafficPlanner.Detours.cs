@@ -95,6 +95,8 @@ internal sealed partial class PredictiveTrafficPlanner
                 float duration = MathF.Max(length, turn / vehicle.Profile.MaximumYawRate);
                 var sweep = new NavigationSweep(NavigationReadAdapter.GetObstacleIdentity(vehicle.Entity),
                     node.Pose, end, vehicle.Profile, duration, PrefilterFixedBodies: true);
+                // Exhausting advisory bookkeeping cannot invalidate the captured geometry.
+                if (consumed == allowance) return false;
                 var result = SweepGrounded(collision, geometry, sweep, allowance - consumed);
                 if (result.WorkConsumed <= 0 || result.WorkConsumed > allowance - consumed ||
                     result.FrameTick != frame.Tick.Value || result.Revision != collision.World.Revision ||
