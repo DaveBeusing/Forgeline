@@ -4,6 +4,8 @@
 
 The foundation starts at master 20a6e0f6cbf4dbfadf5f2143a7a782b0db3b2c26
 (0.1.478-dev), after research, runtime assets, navigation and diagnostic integration.
+It is synchronized with master864b8977b4d9addd85d837b401188f7da89432e4,
+including the subsequent conveyor-demolition integration.
 It adds build capability and contracts, not an operational menu, spawn handler,
 parameter editor, preset importer or new persistence format. Public diagnostics
 remain available. Official binaries are the access-control boundary: someone who
@@ -208,11 +210,13 @@ Do not duplicate adapters, parsers or dispatcher authority in parallel consumers
 
 Implementation used affected-product compiler builds only, with no test files,
 test/smoke runs or benchmarks before the explicit acceptance boundary.
-Scoped acceptance of production source fedefee3 then completed:
+Scoped acceptance completed and was repeated on the synchronized source after
+correcting descriptor count units/categories:
 
 - Canonical solution restore and unchanged project-reference validation succeeded.
 - Complete Release solution build: zero warnings/errors.
-- Public selection:24/24 Game cases (19 foundation,5 existing raid-configuration)
+- Public selection:29/29 Game cases (19 foundation,5 raid-configuration,5 newly
+  integrated conveyor-demolition),1/1 newly integrated conveyor Save/Replay case
   and2/2 existing ClientBuildIdentity cases passed, no skips.
 - Developer compilation:19/19 foundation cases passed from isolated Developer
   outputs, including active permission and stale execution-time rejection.
@@ -223,6 +227,6 @@ Scoped acceptance of production source fedefee3 then completed:
   version golden or required gate was changed.
 
 Acceptance-only coverage and final documentation are committed separately from
-that production source. The PR records the published head and its required CI.
+the implementation. The PR records the exact published head and its required CI.
 Common end-to-end, full variant/package, Save/Replay and native interaction
 qualification remain separate. A foundation compiler pass is not tool/UI delivery.

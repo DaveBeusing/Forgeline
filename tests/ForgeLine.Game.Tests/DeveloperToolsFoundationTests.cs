@@ -66,6 +66,11 @@ public sealed class DeveloperToolsFoundationTests
             Assert.Same(descriptor, found);
             if (descriptor.Id != DeveloperParameterId.ConveyorThroughputMultiplier) Assert.Equal(DeveloperApplyMode.NextMatch, descriptor.ApplyMode);
         }
+        Assert.Equal("attempts", descriptors.Single(d => d.Id == DeveloperParameterId.DistributionMaximumAttempts).Unit);
+        Assert.Equal("contacts", descriptors.Single(d => d.Id == DeveloperParameterId.RaidMaximumContacts).Unit);
+        Assert.Equal("shots", descriptors.Single(d => d.Id == DeveloperParameterId.RaidMinimumShots).Unit);
+        Assert.Equal("threat", descriptors.Single(d => d.Id == DeveloperParameterId.RaidMaximumKnownThreat).Unit);
+        Assert.Equal("Raids", descriptors.Single(d => d.Id == DeveloperParameterId.RaidReadiness).Category);
         Assert.False(DeveloperParameterCatalog.TryGet((DeveloperParameterId)ushort.MaxValue, out _));
         var throughput = descriptors.Single(d => d.Id == DeveloperParameterId.ConveyorThroughputMultiplier);
         Assert.True(throughput.Accepts(DeveloperValue.FromDouble(.25), DeveloperTarget.Global));
