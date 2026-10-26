@@ -29,6 +29,15 @@ internal readonly record struct HeadlessOptions(
 {
     public string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
     public string? ScenarioRoot { get; init; }
+    public string? DeveloperPresetInput { get; init; }
+    public string? ReproductionId { get; init; }
+    public string? ReproductionOutput { get; init; }
+    public bool ScenarioWasSpecified { get; init; }
+    public bool ProfileWasSpecified { get; init; }
+    public bool SeedWasSpecified { get; init; }
+#if FORGELINE_DEVELOPER_TOOLS
+    public DeveloperPresetDocument? DeveloperPreset { get; init; }
+#endif
 
     public static HeadlessOptions Parse(string[] args)
     {
@@ -55,6 +64,10 @@ internal readonly record struct HeadlessOptions(
         bool showHelp = false;
         string? scenarioRoot = null;
         string scenarioKey = CentralDivideScenario.CompositionKey;
+        string? developerPresetInput = null;
+        string? reproductionId = null;
+        string? reproductionOutput = null;
+        bool scenarioWasSpecified = false, profileWasSpecified = false, seedWasSpecified = false;
 
         for (int index = 0; index < args.Length; index++)
         {
@@ -63,6 +76,7 @@ internal readonly record struct HeadlessOptions(
             switch (argument)
             {
                 case "--scenario":
+                    scenarioWasSpecified = true;
                     string selected = GetValue(args, ref index, argument);
                     scenario = ParseScenario(selected);
                     scenarioKey = selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
@@ -74,6 +88,7 @@ internal readonly record struct HeadlessOptions(
                     break;
 
                 case "--profile":
+                    profileWasSpecified = true;
                     profile =
                         ParseProfile(
                             GetValue(args, ref index, argument));
@@ -85,9 +100,35 @@ internal readonly record struct HeadlessOptions(
                     break;
 
                 case "--seed":
+                    seedWasSpecified = true;
                     seed =
                         ParseUInt64(args, ref index, argument);
                     break;
+
+                case "--preset-input":
+#if FORGELINE_DEVELOPER_TOOLS
+                    developerPresetInput = GetValue(args, ref index, argument);
+                    scenario = HeadlessScenarioKind.Match;
+                    break;
+#else
+                    throw new ArgumentException("--preset-input requires a Developer build.", nameof(args));
+#endif
+
+                case "--reproduction-id":
+#if FORGELINE_DEVELOPER_TOOLS
+                    reproductionId = GetValue(args, ref index, argument);
+                    break;
+#else
+                    throw new ArgumentException("--reproduction-id requires a Developer build.", nameof(args));
+#endif
+
+                case "--reproduction-output":
+#if FORGELINE_DEVELOPER_TOOLS
+                    reproductionOutput = GetValue(args, ref index, argument);
+                    break;
+#else
+                    throw new ArgumentException("--reproduction-output requires a Developer build.", nameof(args));
+#endif
 
                 case "--tick-rate":
                     tickRate =
@@ -210,7 +251,10 @@ internal readonly record struct HeadlessOptions(
                 saveOutput,
                 replayOutput,
                 loadInput,
-                replayInput);
+                replayInput,
+                developerPresetInput,
+                reproductionId,
+                reproductionOutput);
         }
 
         return new HeadlessOptions(
@@ -229,7 +273,9 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey };
+            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey,
+                DeveloperPresetInput = developerPresetInput, ReproductionId = reproductionId, ReproductionOutput = reproductionOutput,
+                ScenarioWasSpecified = scenarioWasSpecified, ProfileWasSpecified = profileWasSpecified, SeedWasSpecified = seedWasSpecified };
     }
 
     private static void ValidateCombination(
@@ -245,7 +291,10 @@ internal readonly record struct HeadlessOptions(
         string? saveOutput,
         string? replayOutput,
         string? loadInput,
-        string? replayInput)
+        string? replayInput,
+        string? developerPresetInput,
+        string? reproductionId,
+        string? reproductionOutput)
     {
         if (scenario == HeadlessScenarioKind.Match)
         {
@@ -278,6 +327,17 @@ internal readonly record struct HeadlessOptions(
                 throw new ArgumentException(
                     "--load-input and --replay-input are mutually exclusive.");
             }
+
+            if (developerPresetInput is not null && (loadInput is not null || replayInput is not null))
+                throw new ArgumentException("--preset-input cannot be combined with save or replay recovery input.");
+            if (developerPresetInput is not null && matchCount != 1)
+                throw new ArgumentException("A developer preset currently requires --matches 1.");
+            if (reproductionId is not null && developerPresetInput is null)
+                throw new ArgumentException("--reproduction-id requires --preset-input.");
+            if (reproductionOutput is not null && (developerPresetInput is null || reproductionId is null))
+                throw new ArgumentException("--reproduction-output requires --preset-input and --reproduction-id.");
+            if (reproductionId is not null && !IsReproductionId(reproductionId))
+                throw new ArgumentException("--reproduction-id must be 1-64 lowercase letters, digits or hyphens and start with a letter or digit.");
 
             bool hasRecoveryInput =
                 loadInput is not null ||
@@ -313,7 +373,7 @@ internal readonly record struct HeadlessOptions(
             saveOutput is not null ||
             replayOutput is not null ||
             loadInput is not null ||
-            replayInput is not null)
+            replayInput is not null || developerPresetInput is not null || reproductionId is not null || reproductionOutput is not null)
         {
             throw new ArgumentException(
                 "Telemetry and save/replay options are only valid for the match scenario.");
@@ -365,6 +425,9 @@ internal readonly record struct HeadlessOptions(
                 throw new ArgumentException(
                     $"Unknown match profile '{value}'.")
         };
+
+    private static bool IsReproductionId(string value) => value.Length is > 0 and <= 64 &&
+        char.IsAsciiLetterOrDigit(value[0]) && value.All(c => c is >= 'a' and <= 'z' or >= '0' and <= '9' or '-');
 
     private static ulong ParseUInt64(
         string[] args,

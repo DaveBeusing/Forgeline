@@ -185,8 +185,11 @@ only the registered Central Divide/Split Basin canonical identities and Gameplay
 Validation profiles with exactly two distinct players and canonical starts0/1.
 Seed, faction, player and computer-control fields remain typed data. No filename,
 object path, type name, script or arbitrary command is executable from metadata.
-RequiresDeveloperTools declares a requirement and grants nothing. A future preset
-provider must additionally validate against its resolved BattlefieldDefinition.
+RequiresDeveloperTools declares a requirement and grants nothing. The preset
+codec resolves the registered scenario and validates its identity and parameter
+profile against the resolved composition before building a start plan. See
+[Developer presets and reproduction](DeveloperPresets.md) for file and session
+integration boundaries.
 
 DeveloperParameterChange describes a real applied update/reset with correlation,
 ordered sequence, actual tick, before/after values and advancing parameter revision.
