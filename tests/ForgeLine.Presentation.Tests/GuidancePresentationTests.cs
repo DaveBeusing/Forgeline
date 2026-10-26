@@ -106,6 +106,54 @@ public sealed class GuidancePresentationTests
         Assert.False(bar.Contains(outside));
     }
 
+    [Theory]
+    [InlineData(1280, 720, 96)]
+    [InlineData(1920, 1080, 144)]
+    [InlineData(3840, 2160, 192)]
+    public void ConveyorReasonHasTwoLinesSeparateFromControls(int width, int height, uint dpi)
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var viewport = new RecordingContext { Width = width, Height = height };
+        var layout = GameplayHudLayout.Create(width, height, dpi);
+        var ux = default(PreAlphaUxView) with
+        {
+            Placement = new(PlacementContextState.Invalid, "CONVEYOR",
+                "SUPPORT BLOCKS LOADING LANE / MOVE ROUTE",
+                "DRAW ROUTE / TIER 0 / TAB BEND / T TIER / RMB CANCEL",
+                SessionId: snapshot.SessionId, Tick: snapshot.Tick)
+        };
+        renderer.Render(viewport, new RtsCamera(), snapshot, default,
+            RtsInformationLayerView.Empty, CombatGroupOverviewView.Empty, dpi,
+            preAlphaUx: ux, presentationTime: TimeSpan.FromSeconds(1));
+        var bounds = renderer.LastGuidanceBounds;
+        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * renderer.LastGuidanceTextSize;
+        Assert.True(bounds.Height >= line * 3);
+        Assert.False(bounds.Intersects(layout.SecondaryView));
+        Assert.True(renderer.LastGuidanceVertexCount > 0);
+    }
+
+    [Fact]
+    public void GameplayLabelsRenderThroughTheNormalHudWithoutDevelopmentMetrics()
+    {
+        using var device = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(device);
+        var snapshot = EarlyGameGuidanceTests.Snapshot(0);
+        var viewport = new RecordingContext { Width = 1600, Height = 900 };
+        var camera = SameTypeSelectionTests.Camera();
+        var draw = new DebugDraw { Enabled = true };
+        draw.Label(Vector3.Zero, "OUTPUT SNAPPED", Vector4.One);
+        draw.Label(new(10_000, 0, 10_000), "OFFSCREEN", Vector4.One);
+        renderer.Render(viewport, camera, snapshot, default, RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, 96, gameplayOverlay: draw);
+        Assert.Equal(1, renderer.LastWorldLabels);
+        renderer.Render(viewport, camera, snapshot, default, RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, 96, preAlphaUx: default(PreAlphaUxView) with { Mode = PreAlphaUxMode.Paused },
+            gameplayOverlay: draw);
+        Assert.Equal(0, renderer.LastWorldLabels);
+    }
+
     [Fact]
     public void PointerDoesNotDrawAnAdditionalMouseCursor()
     {
