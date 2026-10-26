@@ -19,7 +19,7 @@ next match starts; it does not mutate a running match.
   "schemaVersion": 1,
   "key": "conveyor-example",
   "displayName": "Conveyor example",
-  "buildRevision": "0.1.485.0",
+  "buildRevision": "0.1.486.0",
   "exportedAtUtc": "2026-10-26T00:00:00.0000000+00:00",
   "baseScenarioKey": "central-divide.directorate.v1",
   "baseScenarioIdentity": {
@@ -50,7 +50,7 @@ registered type, scope, participant, range and paired domain constraints. A
 missing or changed scenario, unsupported schema or invalid value makes the
 preset unavailable with a validation error; the source document is left intact.
 The default client store is
-`%LOCALAPPDATA%\\FORGELINE\\Developer\\Presets`, holds at most 64 files, and
+`%LOCALAPPDATA%\FORGELINE\Developer\Presets`, holds at most 64 files, and
 uses validated stable keys as filenames. Writes use a same-directory temporary
 file and atomic move/replace. Imports never overwrite an existing key. Exports
 validate the replacement before changing the existing file.
