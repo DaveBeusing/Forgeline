@@ -126,3 +126,40 @@ Developer builds. Package acceptance supplies focused host checks after the
 implementation is complete. Full menu operation on hardware, Save/Replay across
 all developer functions, and exported Public/Developer packages belong to shared
 qualification. Required PR CI remains mandatory and is reported separately.
+
+### Scoped acceptance evidence
+
+Implementation through `d9441550` was completed before the explicit package
+acceptance boundary. No tests, smokes or benchmarks were added or run during
+implementation. Affected Client product builds passed in both Public and
+Developer variants with zero warnings/errors. The branch incorporates the
+integrated menu at master `8e9282e1`; its single PR version increment is
+`0.1.482` to `0.1.483`.
+
+Acceptance source `995cfd06` adds the focused host evidence. Canonical solution
+restore passed. The unchanged project-reference validator passed for 45 projects,
+without cycles or boundary violations. The complete Public Release solution
+build passed with zero warnings/errors (64.18s). The isolated Developer Client
+test build also passed with zero warnings/errors (75.45s).
+
+The selected existing host class plus capability check passed **24/24 Public**
+cases (36.145s), and the same class with developer controls passed **41/41
+Developer** cases (37.377s), with no skips. These cover exact 1/10/100 steps,
+50-ms ticks, terminal early completion, failed-tick accounting and snapshot
+boundary, all five speeds, resume and speed-change deadlines, identical requests,
+old sessions/revisions, typed payloads, unbound access, independent pause owners,
+confirmed menu transfer, full queues, revocation, loading/window interruption,
+explicit resume cancellation and concurrent disposal. Existing catch-up,
+submission, terminal acknowledgement and owner shutdown cases are reused.
+
+A final acceptance-test cleanup makes blocked systems release even when an
+assertion fails and labels the loading blocker explicitly. The affected **5/5**
+interruption/resume cases passed again (8.590s) after rebuilding the Developer
+test project. No product correction or relaxed assertion was needed during
+acceptance. SemVer validation confirms exactly one PATCH increment.
+
+Required CI status belongs to the published PR head and is reported on the PR.
+The local build and focused cases do not qualify the complete required CI job.
+Actual menu-to-host composition, combined simulation-action dispatch, native
+operation, full Save/Replay and exported variant packages remain explicit
+integration/qualification work.
