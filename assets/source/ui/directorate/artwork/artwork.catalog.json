@@ -31050,6 +31050,12 @@
       "availability": "runtime_required"
     },
     {
+      "domain": "PauseMenuCommand",
+      "member": "DeveloperTools",
+      "role": "utility.settings",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "StrategicOverlayMode",
       "member": "Logistics",
       "role": "unit_role.logistics",

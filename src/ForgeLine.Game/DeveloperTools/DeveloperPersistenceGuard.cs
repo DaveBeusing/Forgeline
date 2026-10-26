@@ -4,15 +4,18 @@ internal static class DeveloperPersistenceGuard
 {
     internal static bool Requires(PersistedMatchConfiguration configuration, IReadOnlyList<RecordedSimulationCommand> commands,
         IReadOnlyList<DeveloperParameterAuditData>? changes = null, IReadOnlyList<AuthoritativeDomainSnapshot>? domains = null) =>
-        configuration.DeveloperInitialProfile?.Parameters is { Length: > 0 } ||
+        configuration.DeveloperInitialProfile is not null ||
         commands.Any(c => c.Kind == ReplayCommandKind.DeveloperAction || c.DeveloperPayload is not null) ||
-        changes?.Count > 0 || domains?.Any(d => d?.Name?.StartsWith("developer.", StringComparison.Ordinal) == true) == true;
+        changes is not null || domains?.Any(d => d?.Name?.StartsWith("developer.", StringComparison.Ordinal) == true) == true;
     internal static void Validate(int schema, PersistedMatchConfiguration configuration, IReadOnlyList<RecordedSimulationCommand> commands,
-        IReadOnlyList<DeveloperParameterAuditData>? changes = null, IReadOnlyList<AuthoritativeDomainSnapshot>? domains = null)
+        IReadOnlyList<DeveloperParameterAuditData>? changes = null, IReadOnlyList<AuthoritativeDomainSnapshot>? domains = null,
+        bool developerModified = false)
     {
-        bool required = Requires(configuration, commands, changes, domains);
+        bool containsDeveloperData = Requires(configuration, commands, changes, domains);
+        bool required = developerModified || containsDeveloperData;
         if (required && (schema < 8 || !DeveloperToolsCapability.Current.IsCompiled))
             throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion, "Developer payloads require schema 8 and a developer build.");
+        MatchPersistenceValidation.Require(!developerModified || containsDeveloperData, "Developer modification marker has no corresponding developer state.");
         if (configuration.DeveloperInitialProfile is { } initial)
         {
             try

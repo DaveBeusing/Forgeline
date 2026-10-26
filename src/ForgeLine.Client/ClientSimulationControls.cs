@@ -144,6 +144,9 @@ internal sealed partial class ClientSimulationHost
             changes = _pendingPauseChanges; values = _pendingPauseValues;
             _pendingPauseChanges = ClientSimulationPauseReason.None;
         }
+        // A frame may have observed the regular menu before its transfer was acknowledged.
+        // Only the explicit restore can return that owner while the developer holds its lease.
+        if (_menuPauseTransferred) changes &= ~ClientSimulationPauseReason.Menu;
         if (changes != ClientSimulationPauseReason.None) ApplyPauseReasons((_pauseReasons & ~changes) | (values & changes));
     }
 
@@ -176,6 +179,7 @@ internal sealed partial class ClientSimulationHost
 
     private void InitializeOwnerSnapshot()
     {
+        BindDeveloperRuntime();
         MatchState state = _scenario.GetMatchState();
         if (state.Lifecycle == MatchLifecyclePhase.Paused)
         { _pauseReasons = ClientSimulationPauseReason.Legacy; Volatile.Write(ref _paused, 1); }
@@ -221,6 +225,7 @@ internal sealed partial class ClientSimulationHost
     }
 
     partial void InitializeDeveloperSession(DeveloperSessionAccess? access, ref IDeveloperSessionController controller);
+    partial void BindDeveloperRuntime();
     partial void SubmitDeveloperCore(DeveloperSessionAccess permission, DeveloperRequest request, bool transfer, ref ClientDeveloperControlReceipt result);
     partial void ReadDeveloperCompletion(ref ClientDeveloperControlCompletion completion, ref bool found);
     partial void QueueDeveloperAccess(DeveloperSessionAccess permission, ref bool accepted);

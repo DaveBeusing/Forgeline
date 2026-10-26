@@ -24,6 +24,7 @@ public sealed class DeveloperMenuModel
     private readonly Dictionary<(DeveloperParameterId, DeveloperTarget), DeveloperParameterDraft> _drafts = new();
     private readonly Queue<string> _history = new();
     private DeveloperRequest? _inFlight;
+    private DeveloperRequest? _sessionInFlight;
     private Guid? _presetInFlight;
     private DeveloperSessionAccess? _access;
     private SimulationSessionId _session;
@@ -48,7 +49,8 @@ public sealed class DeveloperMenuModel
     public bool Visible { get; private set; }
     public bool Available => _snapshotReady && _access is { IsActive: true } && _access.Capability.IsCompiled && _access.Session == _session;
     public bool OwnsMenuPause => Visible && _observation?.MenuPauseTransferred == true;
-    public bool WriteBlocked => !Available || !_focused || _observation?.Loading == true || _inFlight is not null || _presetInFlight.HasValue;
+    public bool SessionWriteBlocked => !Available || !_focused || _observation?.Loading == true || _sessionInFlight is not null || _presetInFlight.HasValue;
+    public bool WriteBlocked => SessionWriteBlocked || _inFlight is not null;
     public DeveloperMenuSection Section { get; private set; }
     public string Feedback { get; private set; } = "";
     public IReadOnlyCollection<string> History => _history.ToArray();
@@ -70,7 +72,7 @@ public sealed class DeveloperMenuModel
         bool changed = _session != access.Session;
         if (changed || !access.IsActive || !access.Capability.IsCompiled || snapshot?.SessionId != access.Session)
         {
-            Close(); _drafts.Clear(); _history.Clear(); _inFlight = null; _presetInFlight = null; _target = DeveloperTarget.Global;
+            Close(); _drafts.Clear(); _history.Clear(); _inFlight = null; _sessionInFlight = null; _presetInFlight = null; _target = DeveloperTarget.Global;
             _action = null; _observation = null; _preset = 0;
         }
         _snapshotReady = snapshot?.SessionId == access.Session;
@@ -110,6 +112,7 @@ public sealed class DeveloperMenuModel
     public bool Open()
     {
         if (!Available) return false;
+        _backend?.AcquireMenuOwnership();
         Visible = true; Section = DeveloperMenuSection.Session; Feedback = "Opening preserves the current host pause state.";
         return true;
     }
@@ -124,7 +127,7 @@ public sealed class DeveloperMenuModel
     }
     public void CycleAction(int direction)
     {
-        var actions = _providers.Menu.Operations.Where(o => o.Operation is DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource &&
+        var actions = _providers.Menu.Operations.Where(o => o.Operation is DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource or DeveloperOperation.RepairEntity or DeveloperOperation.RefillUnit or DeveloperOperation.DamageEntity &&
             (o.Targets & _target.Kind) != 0).ToArray();
         if (actions.Length == 0) { _action = null; return; }
         int i = _action.HasValue ? Array.IndexOf(actions, _action.Value) : -1;
@@ -178,7 +181,7 @@ public sealed class DeveloperMenuModel
     {
         if (WriteBlocked || _providers.Presets.Status.Availability != DeveloperProviderAvailability.Available || _backend is null)
         { Feedback = "Preset I/O and session-loading adapter unavailable."; return; }
-        if (intent == DeveloperPresetIntent.RestartSameSeed && Preset is not null && PresetCompatibility != DeveloperFailureReason.None)
+        if (intent == DeveloperPresetIntent.RestartSelected && Preset is not null && PresetCompatibility != DeveloperFailureReason.None)
         { Feedback = "Select a compatible preset first."; return; }
         var correlation = Guid.NewGuid(); _presetInFlight = correlation;
         try
@@ -194,29 +197,34 @@ public sealed class DeveloperMenuModel
     private void Send(DeveloperOperation operation, DeveloperTarget target, DeveloperParameterId parameter,
         ReadOnlySpan<DeveloperValue> values, DeveloperStateRevision? revision)
     {
-        if (WriteBlocked || revision is null) { Feedback = "Waiting for current permission, revision, focus or previous result."; return; }
+        bool sessionCommand = revision?.Domain == DeveloperRevisionDomain.Session;
+        if ((sessionCommand ? SessionWriteBlocked : WriteBlocked) || revision is null) { Feedback = "Waiting for current permission, revision, focus or previous result."; return; }
         var request = new DeveloperRequest(_session, Guid.NewGuid(), revision.Value, operation, target, parameter, values);
         var context = new DeveloperExecutionContext(_session, revision.Value,
             p => _participants.Any(participant => participant.Player == p), e => e == _inspector.Entity && _inspector.Session == _session);
-        _inFlight = request;
+        if (sessionCommand) _sessionInFlight = request; else _inFlight = request;
         try
         {
             DeveloperResult result = operation is DeveloperOperation.SetParameter or DeveloperOperation.ResetParameter
                 ? _providers.Parameters.Submit(_access!, context, request)
-                : operation is DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource
+                : operation is DeveloperOperation.SpawnUnit or DeveloperOperation.GrantResource or DeveloperOperation.RepairEntity or DeveloperOperation.RefillUnit or DeveloperOperation.DamageEntity
                     ? _providers.Actions.Submit(_access!, context, request) : _providers.Sessions.Submit(_access!, context, request);
             Feedback = "Submitted; waiting for correlated authoritative result.";
             if (result.Session != request.Session || result.Correlation != request.Correlation)
-            { _inFlight = null; Feedback = "Invalid submission response; no application confirmed."; return; }
+            { if (sessionCommand) _sessionInFlight = null; else _inFlight = null; Feedback = "Invalid submission response; no application confirmed."; return; }
             if (result.Status is DeveloperRequestStatus.Applied or DeveloperRequestStatus.Rejected) Observe(result);
         }
         catch (Exception error) when (error is InvalidOperationException or ArgumentException)
-        { _inFlight = null; Feedback = "Submission failed; no application confirmed."; }
+        { if (sessionCommand) _sessionInFlight = null; else _inFlight = null; Feedback = "Submission failed; no application confirmed."; }
     }
     public void Observe(DeveloperResult result)
     {
-        if (_inFlight is not { } request || result.Session != _session || result.Correlation != request.Correlation ||
+        DeveloperRequest? request = _sessionInFlight?.Correlation == result.Correlation ? _sessionInFlight :
+            _inFlight?.Correlation == result.Correlation ? _inFlight : null;
+        if (request is null || result.Session != _session || result.Correlation != request.Correlation ||
             result.Revision.Domain != request.ExpectedRevision.Domain || result.Status == DeveloperRequestStatus.Accepted) return;
+        if (result.Status == DeveloperRequestStatus.Pending && result.Revision == request.ExpectedRevision)
+        { Feedback = "Queued; waiting for the next simulation tick."; return; }
         Feedback = result.Status switch
         {
             DeveloperRequestStatus.Applied => "Applied at tick " + result.AppliedTick!.Value.Value,
@@ -232,7 +240,8 @@ public sealed class DeveloperMenuModel
                     { draft.Observed = new(request.Parameter, request.Target, effect.Value, result.Revision); draft.Value = effect.Value; draft.Dirty = false; }
         }
         if (_history.Count == 64) _history.Dequeue();
-        _history.Enqueue(request.Operation + ": " + Feedback); _inFlight = null;
+        _history.Enqueue(request.Operation + ": " + Feedback);
+        if (request == _sessionInFlight) _sessionInFlight = null; else _inFlight = null;
     }
     public static string Failure(DeveloperFailureReason reason) => reason switch
     {

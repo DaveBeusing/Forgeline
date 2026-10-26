@@ -46,8 +46,7 @@ public static class MatchPersistenceService
 
         return new MatchReplayData(
             MatchPersistenceSerializer.CurrentSchemaVersion,
-            PersistedMatchConfiguration.Capture(
-                scenario.RuntimeSettings),
+            CaptureConfiguration(scenario),
             scenario.Simulation.CurrentTick.Value,
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),
@@ -583,7 +582,7 @@ public static class MatchPersistenceService
         }
 
         MatchPersistenceValidation.State(save.State);
-        DeveloperPersistenceGuard.Validate(save.SchemaVersion, save.Configuration, save.Commands, save.ParameterChanges, save.State.Domains);
+        DeveloperPersistenceGuard.Validate(save.SchemaVersion, save.Configuration, save.Commands, save.ParameterChanges, save.State.Domains, save.DeveloperModified);
         MatchPersistenceValidation.Require(MatchPersistenceValidation.Hash(save.StateSha256), "Invalid checkpoint checksum.");
 
         if (save.SavedTick !=
@@ -624,7 +623,7 @@ public static class MatchPersistenceService
         ValidateScenarioIdentity(replay.SchemaVersion, replay.Configuration);
         MatchPersistenceValidation.Commands(replay.Commands);
         MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
-        DeveloperPersistenceGuard.Validate(replay.SchemaVersion, replay.Configuration, replay.Commands, replay.ParameterChanges);
+        DeveloperPersistenceGuard.Validate(replay.SchemaVersion, replay.Configuration, replay.Commands, replay.ParameterChanges, developerModified: replay.DeveloperModified);
 
         ValidateCommandHistory(
             replay.Commands,

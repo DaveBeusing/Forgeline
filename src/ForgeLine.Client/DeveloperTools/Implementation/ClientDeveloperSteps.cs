@@ -86,6 +86,7 @@ internal sealed partial class ClientSimulationHost
         try { FinishDeveloperStep(faulted ? ClientDeveloperControlFailure.Faulted : ClientDeveloperControlFailure.Stopping); }
         finally
         {
+            _scenario.Services.DeveloperActions.BindAccess(DeveloperToolsCapability.Current.BindSession(SessionId, false));
             lock (_boundaryGate) { _boundAccess = null; _pendingAccess = null; }
             _developerActivated = false;
             _measurementActive = false;

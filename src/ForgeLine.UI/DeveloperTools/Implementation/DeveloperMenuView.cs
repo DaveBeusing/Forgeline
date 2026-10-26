@@ -31,7 +31,7 @@ public static class DeveloperMenuView
                 Info("HOST SPEED", model.Observation?.Speed is { } speed ? speed + "x" : "Unavailable");
                 Info("REMAINING STEPS", model.Observation?.RemainingSteps?.ToString(CultureInfo.InvariantCulture) ?? "Unavailable");
                 Info("CONTROL OBSERVATION", model.Observation is { } observation ? "Tick " + observation.Tick.Value : "Adapter observation unavailable", model.Observation is null);
-                bool sessions = writable && p.Sessions.Status.Availability == DeveloperProviderAvailability.Available && model.Observation is not null;
+                bool sessions = !model.SessionWriteBlocked && p.Sessions.Status.Availability == DeveloperProviderAvailability.Available && model.Observation is not null;
                 Control("PAUSE", "Request pause", () => model.SessionCommand(DeveloperOperation.Pause), sessions);
                 Control("RESUME", "Transfer menu pause ownership; request resume", () => model.SessionCommand(DeveloperOperation.Resume), sessions);
                 foreach (uint count in new uint[] { 1, 10, 100 })
@@ -40,7 +40,6 @@ public static class DeveloperMenuView
                     Control("SPEED " + rate + "x", "Request host speed", () => model.SessionCommand(DeveloperOperation.SetHostSpeed, DeveloperValue.FromDouble(rate)), sessions);
                 break;
             case DeveloperMenuSection.Parameters:
-                var tuning = p.Parameters is DeveloperGameplayTuningProvider provider ? provider.CaptureContribution() : null;
                 foreach (var descriptor in p.Parameters.Descriptors.Take(128))
                 {
                     var targets = descriptor.Targets == DeveloperTargetKinds.Global ? new[] { DeveloperTarget.Global } :
@@ -57,7 +56,7 @@ public static class DeveloperMenuView
                         Info("Default / confirmed", DeveloperMenuModel.Format(descriptor.Default) + " / " + (draft is null ? "Unavailable" : DeveloperMenuModel.Format(draft.Observed.Value)));
                         Info("Range / unit / apply", DeveloperMenuModel.Format(descriptor.Minimum) + ".." + DeveloperMenuModel.Format(descriptor.Maximum) +
                             " / " + descriptor.Unit + " / " + descriptor.ApplyMode);
-                        if (tuning?.Values.FirstOrDefault(v => v.Id == descriptor.Id && v.Target == target) is { Id: not DeveloperParameterId.None } value)
+                        if (model.Observation?.Parameters.FirstOrDefault(v => v.Id == descriptor.Id && v.Target == target) is { Id: not DeveloperParameterId.None } value)
                             Info("Basis / initial / pending", DeveloperMenuModel.Format(value.Basis) + " / " + DeveloperMenuModel.Format(value.Initial) +
                                 " / " + (value.Pending.HasValue ? DeveloperMenuModel.Format(value.Pending.Value) : "None"));
                         Control("APPLY " + name, "Submit this draft once", () => model.ApplyParameter(descriptor.Id, target), editable);
@@ -102,6 +101,7 @@ public static class DeveloperMenuView
                     (captured != model.Inspector.Tick ? " / older than current snapshot" : "") : "Unavailable; waiting for selected category capture", model.DebugDataTick is null);
                 break;
             case DeveloperMenuSection.Presets:
+                if (model.Observation?.PresetAvailability is { } availability) Info("PRESET STORE", availability, true);
                 Control("PRESET", model.Preset?.Label ?? "Unavailable", () => model.CyclePreset(1), model.Observation?.Presets.Count > 0, model.CyclePreset);
                 if (model.Preset is { } preset)
                 {

@@ -942,7 +942,8 @@ internal sealed partial class ClientSimulationHost : IDisposable
         AcknowledgeTerminal = 4,
         SmokeCompletion = 5,
         DeveloperControl = 6,
-        DeveloperMenuTransfer = 7
+        DeveloperMenuTransfer = 7,
+        DeveloperAction = 8
     }
 
     private readonly record struct HostMessage(

@@ -6,6 +6,30 @@ namespace ForgeLine.Client.Tests;
 
 public sealed class DeveloperPresetStoreTests
 {
+    [Fact]
+    public void IncomingFilesRequireExplicitImportAndInvalidFilesPreserveTheStore()
+    {
+        string root = Path.Combine(AppContext.BaseDirectory, "preset-tests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new DeveloperPresetStore(root: root);
+            var document = CreateDocument();
+            Assert.Empty(store.ListIncoming());
+            File.WriteAllBytes(Path.Combine(root, "Import", document.Key + ".json"), DeveloperPresetCodec.Serialize(document));
+            Assert.Empty(store.List());
+            Assert.Single(store.ListIncoming());
+            store.ImportIncoming(document.Key);
+            Assert.Single(store.List());
+            byte[] original = File.ReadAllBytes(Path.Combine(root, document.Key + ".json"));
+            File.WriteAllText(Path.Combine(root, "Import", "invalid.json"), "{}");
+            Assert.Single(store.ListIncoming());
+            Assert.NotNull(store.ImportFailure);
+            Assert.Equal(original, File.ReadAllBytes(Path.Combine(root, document.Key + ".json")));
+            Assert.Throws<IOException>(() => store.ImportIncoming(document.Key));
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
     private static DeveloperPresetDocument CreateDocument()
     {
         var settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 77);

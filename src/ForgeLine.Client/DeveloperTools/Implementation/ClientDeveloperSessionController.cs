@@ -104,6 +104,7 @@ internal sealed partial class ClientSimulationHost
             _boundAccess = access;
         }
         _developerActivated = IsAuthorized(access);
+        BindDeveloperRuntime();
         FinishDeveloperStep(ClientDeveloperControlFailure.Cancelled);
         _controlRevision = checked(_controlRevision + 1);
         if (!_developerActivated)
@@ -135,6 +136,8 @@ internal sealed partial class ClientSimulationHost
     {
         if (message.DeveloperRequest is not { } request) return;
         handled = true;
+        if (message.Kind == HostMessageKind.DeveloperAction)
+        { ProcessRuntimeDeveloper(message); return; }
         DeveloperFailureReason failure;
         lock (_boundaryGate) failure = CheckDeveloper(message.DeveloperPermission!, request, CurrentControlRevision);
         var detail = MapFailure(failure);
@@ -213,6 +216,8 @@ internal sealed partial class ClientSimulationHost
 
     partial void RejectDeveloperMessage(in HostMessage message, ClientSubmissionFailure failure)
     {
+        if (message.Kind == HostMessageKind.DeveloperAction)
+        { CompleteRuntimeDeveloper(message, DeveloperResult.Rejected(message.DeveloperRequest!, message.DeveloperRequest!.ExpectedRevision, DeveloperFailureReason.Cancelled)); return; }
         if (message.DeveloperRequest is not null) CompleteDeveloper(message,
             failure == ClientSubmissionFailure.Faulted ? ClientDeveloperControlFailure.Faulted : ClientDeveloperControlFailure.Stopping);
     }

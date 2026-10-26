@@ -57,6 +57,7 @@ public sealed class DeveloperMenuController : IDisposable
     {
         var hash = new HashCode(); hash.Add(Model.Section); hash.Add(Model.Feedback); hash.Add(Model.HostPaused);
         hash.Add(Model.Inspector); hash.Add(Model.Observation?.Tick); hash.Add(Model.Observation?.Loading); hash.Add(Model.WriteBlocked);
+        hash.Add(Model.SessionWriteBlocked); hash.Add(Model.Observation?.PresetAvailability);
         hash.Add(Model.Debug.View); hash.Add(Model.Providers.Menu.Status); hash.Add(Model.Providers.Sessions.Status);
         hash.Add(Model.Providers.Actions.Status); hash.Add(Model.Providers.Parameters.Status); hash.Add(Model.Providers.Presets.Status);
         foreach (var draft in Model.Drafts) { hash.Add(draft.Observed); hash.Add(draft.Value); hash.Add(draft.NeedsReview); }

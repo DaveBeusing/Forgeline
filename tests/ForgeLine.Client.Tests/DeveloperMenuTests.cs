@@ -159,7 +159,7 @@ public sealed class DeveloperMenuTests
         f.Backend.Presets = [new("selected", "Selected", metadata, DeveloperFailureReason.None)];
         f.Backend.Validation = DeveloperFailureReason.InvalidValue; f.Refresh();
         Assert.Equal(DeveloperFailureReason.InvalidValue, f.Model.PresetCompatibility);
-        f.Model.PresetCommand(DeveloperPresetIntent.RestartSameSeed);
+        f.Model.PresetCommand(DeveloperPresetIntent.RestartSelected);
         Assert.Equal(Guid.Empty, f.Backend.PresetCorrelation); Assert.False(f.Model.WriteBlocked);
         Assert.Contains("compatible preset", f.Model.Feedback, StringComparison.Ordinal);
     }

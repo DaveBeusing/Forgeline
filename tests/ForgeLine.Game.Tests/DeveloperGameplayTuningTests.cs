@@ -168,7 +168,7 @@ public sealed class DeveloperGameplayTuningTests
     {
         using var runtime = CentralDivideScenario.Create(Basis(), TestContext.Current.CancellationToken);
         var original = runtime.RuntimeSettings; var plan = DeveloperRestartBuilder.ForExisting(original);
-        var provider = new DeveloperGameplayTuningProvider(runtime.Simulation, plan); runtime.Services.ConveyorFlow.BindDeveloperTuning(provider);
+        var provider = Assert.IsType<DeveloperGameplayTuningProvider>(runtime.Services.DeveloperParameters);
         var request = Request(provider, DeveloperParameterId.OpponentAggression, DeveloperValue.FromDouble(.9), DeveloperTarget.ForPlayer(new(2)));
         var result = Apply(runtime.Simulation, provider, request);
         Assert.Equal(DeveloperRequestStatus.Pending, result.Result.Status); Assert.Null(result.Result.AppliedTick);

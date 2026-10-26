@@ -450,11 +450,12 @@ internal sealed class ClientApplication
             return window.IsOpen ? SessionReturnToMenuExitCode : 0;
         }
 
+        var developerAccess = DeveloperToolsCapability.Current.BindSession(scenario.Simulation.SessionId, DeveloperSessionToolsEnabled);
         using var simulationHost =
             new ClientSimulationHost(
                 scenario,
                 commandGateway,
-                snapshotBuffer, asynchronousStartup: true);
+                snapshotBuffer, asynchronousStartup: true, developerAccess: developerAccess);
         bool snapshotReady = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -548,7 +549,14 @@ internal sealed class ClientApplication
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
 #if FORGELINE_DEVELOPER_TOOLS
-        var suppliedDeveloperProviders = DeveloperProviderFactory?.Invoke(scenario) ?? DeveloperToolsComposition.Create();
+        using var defaultDeveloperBackend = new ClientDeveloperMenuBackend(scenario, simulationHost, developerAccess, settings =>
+        {
+            if (_pendingRestart.HasValue) return false;
+            settings.Validate();
+            _pendingRestart = ClientSessionRequest.Restart(settings);
+            return true;
+        });
+        var suppliedDeveloperProviders = DeveloperProviderFactory?.Invoke(scenario) ?? defaultDeveloperBackend.Providers;
         DeveloperTools = new(DeveloperToolsCapability.Current, new DeveloperMenuCatalog(suppliedDeveloperProviders.Menu), suppliedDeveloperProviders.Sessions,
             suppliedDeveloperProviders.Actions, suppliedDeveloperProviders.Parameters, suppliedDeveloperProviders.Presets);
         using var developerMenu = new DeveloperMenuController(new(DeveloperTools, debugOverlay,
@@ -558,7 +566,7 @@ internal sealed class ClientApplication
                 settings.Validate();
                 _pendingRestart = ClientSessionRequest.Restart(settings);
                 return true;
-            })));
+            }) ?? defaultDeveloperBackend));
 #endif
         bool developerSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
         var pauseMenu = new PauseMenuModel(developerSessionActive);
@@ -747,6 +755,7 @@ internal sealed class ClientApplication
             bool developerOwnedFrame = false;
 #if FORGELINE_DEVELOPER_TOOLS
             developerOwnedFrame = developerMenu.Visible;
+            defaultDeveloperBackend.SetActivated(DeveloperSessionToolsEnabled);
             developerMenu.Model.Refresh(DeveloperTools.Capability.BindSession(simulationHost.SessionId, DeveloperSessionToolsEnabled),
                 renderWorld.CurrentSnapshot, selectionController.Selection, scenario.RuntimeSettings.Participants,
                 simulationHost.IsPaused, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
@@ -1071,6 +1080,7 @@ internal sealed class ClientApplication
             }
 
             bool shouldPauseForWindow =
+                !window.IsFocused ||
                 window.IsMinimized ||
                 window.ClientSize.IsEmpty;
             bool shellBlocksGameplay =
@@ -1085,19 +1095,10 @@ internal sealed class ClientApplication
             developerOwnsPause = developerMenu.Model.OwnsMenuPause;
             if (developerOwnsPause) simulationPaused = simulationHost.IsPaused;
 #endif
-            if (!developerOwnsPause && shouldPauseSimulation !=
-                simulationPaused)
-            {
-                if (!simulationHost.TrySetPaused(
-                        shouldPauseSimulation))
-                {
-                    throw new InvalidOperationException(
-                        "Simulation control boundary is full while changing the pause state.");
-                }
-
-                simulationPaused =
-                    shouldPauseSimulation;
-            }
+            if (!simulationHost.WindowPause.TrySetPaused(!inputMatchTerminal && shouldPauseForWindow) ||
+                !developerOwnsPause && !simulationHost.MenuPause.TrySetPaused(!inputMatchTerminal && shellBlocksGameplay))
+                throw new InvalidOperationException("Simulation pause ownership could not be updated.");
+            if (!developerOwnsPause) simulationPaused = shouldPauseSimulation;
 
             if (pauseMenuCommand ==
                 PauseMenuCommand.ReturnToMenu)
