@@ -36,9 +36,7 @@ public sealed partial class PlayerConstructionProductionFlowTests
         SubmitStockPolicy(scenario,gateway,side.CommandCore,ResourceIds.Steel,retained,retained,retained);
         foreach (var input in recipe.Inputs)
             SubmitStockPolicy(scenario,gateway,smelter,input.ResourceId,input.Quantity * cycles,input.Quantity * cycles,input.Quantity * cycles);
-        var queued = DispatchAction(scenario,gateway,PlayerActionRequest.QueueProduction(smelter,RecipeIds.Steel,
-            ProductionPriority.High,ProductionRequestMode.DesiredStock,ResourceIds.Steel,steel));
-        Assert.Equal(PlayerCommandFeedbackState.Accepted,queued.State);
+        // Smelting starts automatically after the physical Ore delivery; no processing command is submitted.
         RunUntil(scenario,() => scenario.Inventories.GetQuantity(processor.OutputInventory,ResourceIds.Steel) >= steel,5_000);
         Assert.True(scenario.Simulation.Entities.GetComponent<ProductionFacility>(smelter).CompletedCycles > 0);
         foreach (var cost in scout.Costs)
@@ -640,38 +638,12 @@ public sealed partial class PlayerConstructionProductionFlowTests
             target: 200.0,
             maximum: 240.0);
 
+        // Delivered Ore is consumed as it arrives, so observe real output instead of an idle input pile.
         RunUntil(
             scenario,
-            () =>
-                scenario.Inventories.GetQuantity(
-                    steelFacility.InputInventory,
-                    ResourceIds.FerrousOre) >=
-                200.0,
-            maximumTicks: 5_000);
-
-        PlayerCommandResultReadModel steelResult =
-            DispatchAction(
-                scenario,
-                gateway,
-                PlayerActionRequest.QueueProduction(
-                    smelter,
-                    RecipeIds.Steel,
-                    ProductionPriority.High,
-                    ProductionRequestMode.DesiredStock,
-                    ResourceIds.Steel,
-                    200.0));
-        Assert.Equal(
-            PlayerCommandFeedbackState.Accepted,
-            steelResult.State);
-
-        RunUntil(
-            scenario,
-            () =>
-                scenario.Inventories.GetQuantity(
-                    steelFacility.OutputInventory,
-                    ResourceIds.Steel) >=
-                200.0,
-            maximumTicks: 2_000);
+            () => scenario.Inventories.GetQuantity(steelFacility.OutputInventory, ResourceIds.Steel) >= 200.0,
+            maximumTicks: 7_000);
+        Assert.True(scenario.Simulation.Entities.GetComponent<ProductionFacility>(smelter).CompletedCycles > 0);
 
         foreach ((ResourceId Resource, double Target) stock in
                  new[]
@@ -710,7 +682,8 @@ public sealed partial class PlayerConstructionProductionFlowTests
                 scenario.Inventories.GetQuantity(
                     vehicleProduction.InputInventory,
                     ResourceIds.Ammunition) >= 80.0,
-            maximumTicks: 8_000);
+            // Continuous processing also replenishes Ore through the shared physical loading bay.
+            maximumTicks: 12_000);
 
         QueueUnit(
             scenario,

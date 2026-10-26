@@ -34,7 +34,7 @@ internal static class PlayerActionDockInteractionLayout
             PlayerActionPanelMode.Production =>
                 actions?.Production is
                     PlayerProductionFacilityActionReadModel production
-                    ? production.Recipes.Count +
+                    ? production.QueueRecipes.Count +
                       production.Requests.Count
                     : 0,
             PlayerActionPanelMode.UnitProduction =>

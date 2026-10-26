@@ -64,6 +64,14 @@ These inventories are created only when construction completes. Construction the
 
 Transport between inventories remains a separate logistics responsibility. Production does not teleport resources from unrelated storage.
 
+## Automatic raw-material processing in matches
+
+A completed Smelter, Refinery or Electronics Plant automatically repeats its fixed recipe when local input and required power are available. Players do not open PROCESS or queue batches for these three buildings. The context menu and Process shortcut omit that step; the inspector and Operations still report work, missing inputs, power and output capacity. Operations can pause or resume the existing automatic work without offering new recipe orders or cancelling its persistent work entry.
+
+The match enables this policy in the authoritative ProductionSystem. Its existing reservations, recipe quantities, durations and capacity checks remain in force. A facility waits without creating materials when inputs or power are missing, and resumes when they return. Output-full work retains its reserved inputs until there is space. Construction must finish before a production facility exists.
+
+Existing one-shot and desired-stock orders for these processors become repeat work in place, preserving the request identity, priority, progress, input reservations and explicit paused state. Thus an old output target does not silently stop automatic processing. Work is created once per facility and persists through the existing save/replay components; no new save schema or per-frame UI command is required. Ammunition and multi-recipe facilities retain their explicit orders.
+
 ## Fixed-Tick Lifecycle
 
 Production runs in `SimulationPhase.Production`, after authoritative power allocation in `SimulationPhase.Infrastructure` and before the economy phase.

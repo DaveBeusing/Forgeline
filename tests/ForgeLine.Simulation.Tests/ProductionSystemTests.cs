@@ -779,6 +779,106 @@ public sealed class ProductionSystemTests
             simulation.Entities.GetComponent<PowerConsumer>(facility).State);
     }
 
+    [Theory]
+    [InlineData(ProductionCapability.SteelProcessing, 1u)]
+    [InlineData(ProductionCapability.FuelProcessing, 2u)]
+    [InlineData(ProductionCapability.ElectronicsProcessing, 3u)]
+    public void AutomaticProcessorsConsumeOnlyLocalInputsAndRepeatWithoutACommand(ProductionCapability capability, uint recipeId)
+    {
+        var scenario = CreateScenario(capability, automaticProcessing: true);
+        var recipe = scenario.Recipes[new RecipeId(recipeId)];
+        var input = Assert.Single(recipe.Inputs);
+        var output = Assert.Single(recipe.Outputs);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.Equal(ProductionStatus.NoInput, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+        Assert.Equal(0, scenario.System.Metrics.CompletedCycles);
+        AddInput(scenario, input.ResourceId, input.Quantity * 3);
+        scenario.Simulation.RunTicks(recipe.DurationTicks * 3, TestContext.Current.CancellationToken);
+        Assert.Equal(output.Quantity * 3, scenario.Inventories.GetQuantity(scenario.OutputInventory, output.ResourceId));
+        Assert.Equal(0, scenario.Inventories.GetQuantity(scenario.InputInventory, input.ResourceId));
+        Assert.Equal(0, scenario.Inventories.GetReservedQuantity(scenario.InputInventory, input.ResourceId));
+        Assert.Equal(3, scenario.System.Metrics.CompletedCycles);
+        var requestEntity = Assert.Single(RequestEntities(scenario));
+        Assert.Equal(ProductionRequestMode.Repeat, scenario.Simulation.Entities.GetComponent<ProductionRequest>(requestEntity).Mode);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.Equal(ProductionStatus.NoInput, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+        AddInput(scenario, input.ResourceId, input.Quantity);
+        scenario.Simulation.RunTicks(recipe.DurationTicks, TestContext.Current.CancellationToken);
+        Assert.Equal(output.Quantity * 4, scenario.Inventories.GetQuantity(scenario.OutputInventory, output.ResourceId));
+        Assert.Single(RequestEntities(scenario));
+    }
+
+    [Theory]
+    [InlineData(ProductionRequestMode.OneShot)]
+    [InlineData(ProductionRequestMode.DesiredStock)]
+    public void AutomaticProcessorsReuseLegacyOrdersWithoutStockTargetsStoppingProduction(ProductionRequestMode legacyMode)
+    {
+        var scenario = CreateScenario(ProductionCapability.SteelProcessing, automaticProcessing: true);
+        AddInput(scenario, ResourceIds.FerrousOre, 30);
+        Queue(scenario, RecipeIds.Steel, legacyMode,
+            legacyMode == ProductionRequestMode.DesiredStock ? ResourceIds.Steel : default,
+            legacyMode == ProductionRequestMode.DesiredStock ? 10 : 0);
+        scenario.Simulation.AdvanceOneTick();
+        EntityId request = Assert.Single(RequestEntities(scenario));
+        scenario.Simulation.RunTicks(scenario.Recipes[RecipeIds.Steel].DurationTicks * 3 - 1, TestContext.Current.CancellationToken);
+        Assert.Equal(30, scenario.Inventories.GetQuantity(scenario.OutputInventory, ResourceIds.Steel));
+        Assert.Equal(request, Assert.Single(RequestEntities(scenario)));
+    }
+
+    [Fact]
+    public void AutomaticProcessingWaitsForPowerAndOutputSpaceAndPreservesExplicitPause()
+    {
+        var scenario = CreateScenario(ProductionCapability.SteelProcessing, addGenerator: false,
+            outputCapacity: 10, automaticProcessing: true);
+        AddInput(scenario, ResourceIds.FerrousOre, 30);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.Equal(ProductionStatus.NoPower, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+        Assert.Equal(0, scenario.Inventories.GetReservedQuantity(scenario.InputInventory, ResourceIds.FerrousOre));
+        var generator = scenario.Simulation.Entities.CreateEntity();
+        scenario.Simulation.Entities.AddComponent(generator, new PowerNetworkMembership(ProductionNetwork));
+        scenario.Simulation.Entities.AddComponent(generator, new PowerGenerator(10_000));
+        scenario.Simulation.RunTicks(scenario.Recipes[RecipeIds.Steel].DurationTicks * 2, TestContext.Current.CancellationToken);
+        Assert.Equal(ProductionStatus.OutputFull, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+        Assert.Equal(10, scenario.Inventories.GetQuantity(scenario.OutputInventory, ResourceIds.Steel));
+        Assert.Equal(10, scenario.Inventories.GetReservedQuantity(scenario.InputInventory, ResourceIds.FerrousOre));
+        Assert.True(scenario.Inventories.Remove(scenario.OutputInventory, ResourceIds.Steel, 10).Succeeded);
+        scenario.Simulation.AdvanceOneTick();
+        Assert.Equal(2, scenario.System.Metrics.CompletedCycles);
+        var request = Assert.Single(RequestEntities(scenario));
+        scenario.Simulation.SubmitCommand(new SetProductionRequestPausedCommand(request, true, scenario.Simulation.CurrentTick),
+            scenario.Simulation.CurrentTick.Next());
+        scenario.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
+        Assert.Equal(ProductionStatus.Paused, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+        Assert.Equal(2, scenario.System.Metrics.CompletedCycles);
+        scenario.Simulation.SubmitCommand(new SetProductionRequestPausedCommand(request, false, scenario.Simulation.CurrentTick),
+            scenario.Simulation.CurrentTick.Next());
+        Assert.True(scenario.Inventories.Remove(scenario.OutputInventory, ResourceIds.Steel, 10).Succeeded);
+        scenario.Simulation.RunTicks(scenario.Recipes[RecipeIds.Steel].DurationTicks, TestContext.Current.CancellationToken);
+        Assert.Equal(3, scenario.System.Metrics.CompletedCycles);
+    }
+
+    [Theory]
+    [InlineData(ProductionCapability.AmmunitionProcessing)]
+    [InlineData(ProductionCapability.SteelProcessing | ProductionCapability.FuelProcessing)]
+    public void AutomaticProcessingDoesNotChooseOrdersForOtherProductionCapabilities(ProductionCapability capability)
+    {
+        var scenario = CreateScenario(capability, automaticProcessing: true);
+        AddInput(scenario, ResourceIds.Steel, 100);
+        AddInput(scenario, ResourceIds.Electronics, 100);
+        AddInput(scenario, ResourceIds.FerrousOre, 100);
+        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
+        Assert.Empty(RequestEntities(scenario));
+        Assert.Equal(0, scenario.System.Metrics.CompletedCycles);
+        Assert.Equal(ProductionStatus.Idle, scenario.Simulation.Entities.GetComponent<ProductionFacility>(scenario.Facility).Status);
+    }
+
+    private static List<EntityId> RequestEntities(ProductionScenario scenario)
+    {
+        var result = new List<EntityId>();
+        foreach (var entity in scenario.Simulation.Entities.Query<ProductionRequest>()) result.Add(entity);
+        return result;
+    }
+
     private static ProductionResult RunDeterministicScenario(ulong seed)
     {
         ProductionScenario scenario = CreateScenario(
@@ -836,7 +936,8 @@ public sealed class ProductionSystemTests
         ProductionCapability capabilities,
         bool addGenerator = true,
         double outputCapacity = 1_000.0,
-        ulong seed = 1)
+        ulong seed = 1,
+        bool automaticProcessing = false)
     {
         var inventories = new InventoryStore();
         ProductionRecipeCatalog recipes =
@@ -844,7 +945,8 @@ public sealed class ProductionSystemTests
         var power = new PowerNetworkSystem();
         var production = new ProductionSystem(
             recipes,
-            inventories);
+            inventories,
+            automaticProcessing);
         var simulation = new SimulationCoordinator(seed: seed);
 
         simulation.RegisterSystem(power);

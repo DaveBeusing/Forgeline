@@ -233,7 +233,8 @@ public sealed partial class PlayerActionPanelController
                 PlayerActionPanelMode.Construction);
         }
 
-        if (Pressed(input, _bindings.Key(GameplayAction.Process)) && !globalShortcutsBlocked)
+        if (Pressed(input, _bindings.Key(GameplayAction.Process)) && !globalShortcutsBlocked &&
+            actions?.Production is { IsAutomatic: false })
         {
             ToggleMode(
                 PlayerActionPanelMode.Production);
@@ -610,10 +611,10 @@ public sealed partial class PlayerActionPanelController
         }
 
         if (SelectedIndex <
-            facility.Recipes.Count)
+            facility.QueueRecipes.Count)
         {
             PlayerProductionRecipeActionReadModel recipe =
-                facility.Recipes[
+                facility.QueueRecipes[
                     SelectedIndex];
 
             ResourceId desiredResource =
@@ -648,7 +649,7 @@ public sealed partial class PlayerActionPanelController
 
         int requestIndex =
             SelectedIndex -
-            facility.Recipes.Count;
+            facility.QueueRecipes.Count;
 
         if (requestIndex < 0 ||
             requestIndex >= facility.Requests.Count)
@@ -882,7 +883,7 @@ public sealed partial class PlayerActionPanelController
         {
             int requestIndex =
                 SelectedIndex -
-                production.Recipes.Count;
+                production.QueueRecipes.Count;
 
             if (requestIndex >= 0 &&
                 requestIndex <
@@ -1034,13 +1035,13 @@ public sealed partial class PlayerActionPanelController
             actions?.Production is not
                 PlayerProductionFacilityActionReadModel facility ||
             SelectedIndex < 0 ||
-            SelectedIndex >= facility.Recipes.Count)
+            SelectedIndex >= facility.QueueRecipes.Count)
         {
             return 0.0;
         }
 
         return ResolveDesiredStockQuantity(
-            facility.Recipes[
+            facility.QueueRecipes[
                 SelectedIndex]);
     }
 
@@ -1334,13 +1335,13 @@ public sealed partial class PlayerActionPanelController
             actions?.Production is not
                 PlayerProductionFacilityActionReadModel facility ||
             SelectedIndex < 0 ||
-            SelectedIndex >= facility.Recipes.Count)
+            SelectedIndex >= facility.QueueRecipes.Count)
         {
             return;
         }
 
         PlayerProductionRecipeActionReadModel recipe =
-            facility.Recipes[
+            facility.QueueRecipes[
                 SelectedIndex];
 
         if (recipe.Outputs.Count == 0)

@@ -1,6 +1,7 @@
 using System.Numerics;
 using ForgeLine.Combat;
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Input;
 using ForgeLine.Platform;
@@ -100,10 +101,32 @@ public sealed class ContextualCommandTests
         Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ProcessingContextOmitsProcessForAutomaticWorkEvenWithAnActiveOrder(bool automatic)
+    {
+        var production = new PlayerProductionFacilityActionReadModel(new(10, 1), new(11, 1), RecipeIds.Steel,
+            ProductionStatus.Running, ProductionBlockReason.None, .5,
+            [new PlayerProductionRecipeActionReadModel(RecipeIds.Steel, "Steel", [], [])],
+            [new PlayerProductionRequestReadModel(new(11, 1), RecipeIds.Steel, "Steel", ProductionPriority.Normal,
+                ProductionRequestMode.Repeat, false, true)], isAutomatic: automatic);
+        var snapshot = Snapshot(kind: PlayerSelectionKind.Building, eligible: 0, production: production);
+        Assert.Equal(automatic ? 0 : 1, ContextualCommandModel.Count(snapshot));
+        Assert.Equal(automatic ? 1 : 2,
+            PlayerActionDockInteractionLayout.GetItemCount(PlayerActionPanelMode.Production, snapshot.PlayerActions));
+        if (!automatic)
+        {
+            Assert.True(ContextualCommandModel.TryGet(snapshot, 0, out var command));
+            Assert.Equal(PlayerActionPanelMode.Production, command.Mode);
+        }
+    }
+
     private static PresentationSnapshot Snapshot(PlayerSelectionKind kind = PlayerSelectionKind.Unit,
         int count = 1, int eligible = 1, ulong actionTick = 4, ulong actionSession = 1,
         bool terminal = false, int pending = 0, bool core = false,
-        ulong sessionValue = 1, ulong experienceTick = 4)
+        ulong sessionValue = 1, ulong experienceTick = 4,
+        PlayerProductionFacilityActionReadModel? production = null)
     {
         var tick = new SimulationTick(4);
         var session = new SimulationSessionId(sessionValue);
@@ -115,7 +138,7 @@ public sealed class ContextualCommandTests
             0, 0, false, false, default(CombatOrderKind), default, [], []);
         var actions = new PlayerActionSnapshot(new SimulationSessionId(actionSession), new SimulationTick(actionTick),
             core ? [new PlayerConstructionActionReadModel(BuildingIds.PowerPlant, "Power Plant", [], false)] : [],
-            pending, null, null, tactical: tactical);
+            pending, production, null, tactical: tactical);
         return new PresentationSnapshot(tick, TimeSpan.Zero, 1, [], sessionId: session,
             playerExperience: experience, playerActions: actions);
     }

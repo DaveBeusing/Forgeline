@@ -261,7 +261,8 @@ public sealed class MatchRuntime : IDisposable
         var production =
             new ProductionSystem(
                 recipes,
-                inventories);
+                inventories,
+                automaticProcessing: true);
         var progress = new GameplayProgressJournal(simulation.Entities, simulation.SessionId);
         simulation.RegisterTickObserver(progress);
         var extraction =

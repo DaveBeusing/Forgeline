@@ -113,11 +113,13 @@ public sealed class PlayerProductionFacilityActionReadModel
         ProductionBlockReason blockReason,
         double progress,
         IReadOnlyList<PlayerProductionRecipeActionReadModel> recipes,
-        IReadOnlyList<PlayerProductionRequestReadModel> requests)
+        IReadOnlyList<PlayerProductionRequestReadModel> requests,
+        bool isAutomatic = false)
     {
         Entity = entity;
         ActiveRequest = activeRequest;
         ActiveRecipe = activeRecipe;
+        IsAutomatic = isAutomatic;
         Status = status;
         BlockReason = blockReason;
         Progress = progress;
@@ -137,6 +139,8 @@ public sealed class PlayerProductionFacilityActionReadModel
 
     public RecipeId ActiveRecipe { get; }
 
+    public bool IsAutomatic { get; }
+
     public ProductionStatus Status { get; }
 
     public ProductionBlockReason BlockReason { get; }
@@ -145,6 +149,9 @@ public sealed class PlayerProductionFacilityActionReadModel
 
     public IReadOnlyList<PlayerProductionRecipeActionReadModel> Recipes =>
         _recipes;
+
+    public IReadOnlyList<PlayerProductionRecipeActionReadModel> QueueRecipes =>
+        IsAutomatic ? Array.Empty<PlayerProductionRecipeActionReadModel>() : _recipes;
 
     public IReadOnlyList<PlayerProductionRequestReadModel> Requests =>
         _requests;
@@ -859,7 +866,8 @@ internal static class PlayerActionSnapshotFactory
             facility.BlockReason,
             progress,
             recipes,
-            requests);
+            requests,
+            isAutomatic: AutomaticProcessing.RecipeFor(facility.Capabilities).IsSpecified);
     }
 
     private static PlayerUnitProductionFacilityActionReadModel
