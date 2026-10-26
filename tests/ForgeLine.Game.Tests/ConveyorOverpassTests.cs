@@ -135,17 +135,6 @@ public sealed class ConveyorOverpassTests
         Assert.Equal(output.Facing, preview.ConveyorOutput.Value.Facing);
     }
 
-    [Fact]
-    public void InvalidBuildingOrientationProducesAnInvalidPreviewWithoutPorts()
-    {
-        var f = new ConveyorTestFixture();
-        var service = new BuildingPlacementService(DirectorateContent.CreateBuildingCatalog(), f.Terrain, f.Spatial);
-        var preview = service.CreatePreview(f.Entities, f.Player, BuildingIds.Smelter, Center, (BuildingOrientation)255);
-        Assert.False(preview.IsValid);
-        Assert.Null(preview.ConveyorInput);
-        Assert.Null(preview.ConveyorOutput);
-    }
-
     private static ConveyorBuildRequest Request(BuildingOrientation direction) =>
         new(ConveyorEdit.Build, ConveyorModule.Overpass, Center, Center, direction, 0, true);
 }

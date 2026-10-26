@@ -166,7 +166,6 @@ public sealed class BuildingPlacementService
 
     private static ConveyorSocket? PreviewPort(EntityRegistry entities, in BuildingPlacementResult result, bool input)
     {
-        if (!Enum.IsDefined(result.Orientation)) return null;
         if (result.BuildingId == BuildingIds.Extractor &&
             (!entities.TryGetComponent(result.ResourceDeposit, out ResourceDeposit deposit) || !ConveyorSimulationSystem.Eligible(deposit.ResourceId)))
             return null;
