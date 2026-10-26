@@ -28,6 +28,12 @@ internal static class ClientBuildIdentity
             .FirstOrDefault(attribute => attribute.Key == "BuildId")?
             .Value ?? "local";
 
+    internal static string BuildVariant =>
+        typeof(ClientBuildIdentity).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+            .Single(attribute => attribute.Key == "BuildVariant").Value ?? "unknown";
+
+    internal static bool DeveloperToolsEnabled => ForgeLine.Game.DeveloperToolsCapability.Current.IsCompiled;
+
     internal static string DisplayVersion =>
-        $"{ProductVersion}+{SourceRevision[..Math.Min(12, SourceRevision.Length)]}";
+        $"{ProductVersion}+{SourceRevision[..Math.Min(12, SourceRevision.Length)]} [{BuildVariant}]";
 }

@@ -1,0 +1,10 @@
+<Project>
+  <ItemGroup Condition="'$(ForgeLineEnableDeveloperTools)' != 'true'">
+    <Compile Remove="DeveloperTools/Implementation/**/*.cs" />
+  </ItemGroup>
+  <Target Name="ValidateDeveloperToolsBuild" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(ForgeLineEnableDeveloperTools)' != 'true' and '$(ForgeLineEnableDeveloperTools)' != 'false'" Text="ForgeLineEnableDeveloperTools must be true or false." />
+    <Error Condition="('$(ForgeLineEnableDeveloperTools)' == 'true' and '$(ForgeLineBuildVariant)' != 'Developer') or ('$(ForgeLineEnableDeveloperTools)' == 'false' and '$(ForgeLineBuildVariant)' != 'Public')" Text="Developer-tools capability and build variant disagree." />
+    <Error Condition="'$(ForgeLineEnableDeveloperTools)' != 'true' and $([System.String]::Copy('$(DefineConstants)').Contains('FORGELINE_DEVELOPER_TOOLS'))" Text="The developer-tools compilation symbol requires the developer build property." />
+  </Target>
+</Project>
