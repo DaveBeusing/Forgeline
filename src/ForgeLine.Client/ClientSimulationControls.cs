@@ -199,7 +199,8 @@ internal sealed partial class ClientSimulationHost
         _measurementActive = !IsPaused && !IsTerminalFrozen;
     }
 
-    private long PacingIntervalTicks() => Math.Max(1, ToHostTicks(_simulation.Clock.TickDuration));
+    private long PacingIntervalTicks() => Math.Max(1, checked((long)Math.Ceiling(
+        _simulation.Clock.TickDuration.TotalSeconds * _time.TimestampFrequency / _requestedSpeed)));
 
     private void PublishControlStatus()
     {

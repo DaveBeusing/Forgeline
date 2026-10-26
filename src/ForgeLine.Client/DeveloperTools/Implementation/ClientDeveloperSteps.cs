@@ -80,6 +80,14 @@ internal sealed partial class ClientSimulationHost
         }
     }
 
-    partial void StopDeveloperControls(bool faulted) => FinishDeveloperStep(
-        faulted ? ClientDeveloperControlFailure.Faulted : ClientDeveloperControlFailure.Stopping);
+    partial void StopDeveloperControls(bool faulted)
+    {
+        try { FinishDeveloperStep(faulted ? ClientDeveloperControlFailure.Faulted : ClientDeveloperControlFailure.Stopping); }
+        finally
+        {
+            lock (_boundaryGate) { _boundAccess = null; _pendingAccess = null; }
+            _developerActivated = false;
+            _measurementActive = false;
+        }
+    }
 }

@@ -8,7 +8,7 @@ namespace ForgeLine.Client;
 internal sealed partial class ClientSimulationHost
 {
     private static readonly HashSet<DeveloperOperation> SessionOperations =
-        [DeveloperOperation.Pause, DeveloperOperation.Resume, DeveloperOperation.SingleStep];
+        [DeveloperOperation.Pause, DeveloperOperation.Resume, DeveloperOperation.SingleStep, DeveloperOperation.SetHostSpeed];
     private readonly ConcurrentQueue<ClientDeveloperControlCompletion> _developerCompletions = new();
     private readonly HashSet<Guid> _pendingCorrelations = [];
     private DeveloperSessionAccess? _boundAccess, _pendingAccess;
@@ -39,9 +39,12 @@ internal sealed partial class ClientSimulationHost
         if (failure != DeveloperFailureReason.None) return failure;
         if (!ReferenceEquals(permission, _boundAccess) || !IsAuthorized(permission)) return DeveloperFailureReason.SessionNotActivated;
         if (request.Target != DeveloperTarget.Global) return DeveloperFailureReason.InvalidTarget;
-        bool valid = request.Operation == DeveloperOperation.SingleStep
-            ? request.Values.Count == 1 && request.Values[0].Kind == DeveloperValueKind.UnsignedNumber && request.Values[0].AsUInt32() is 1 or 10 or 100
-            : request.Values.Count == 0;
+        bool valid = request.Operation switch
+        {
+            DeveloperOperation.SingleStep => request.Values.Count == 1 && request.Values[0].Kind == DeveloperValueKind.UnsignedNumber && request.Values[0].AsUInt32() is 1 or 10 or 100,
+            DeveloperOperation.SetHostSpeed => request.Values.Count == 1 && request.Values[0].Kind == DeveloperValueKind.RealNumber && request.Values[0].AsDouble() is 0.25 or 0.5 or 1 or 2 or 4,
+            _ => request.Values.Count == 0
+        };
         if (!valid) return DeveloperFailureReason.InvalidValue;
         return DeveloperFailureReason.None;
     }
@@ -143,6 +146,20 @@ internal sealed partial class ClientSimulationHost
         { StartDeveloperStep(message); return; }
         try
         {
+            if (request.Operation == DeveloperOperation.SetHostSpeed)
+            {
+                double speed = request.Values[0].AsDouble();
+                if (_requestedSpeed != speed)
+                {
+                    _requestedSpeed = speed;
+                    _controlRevision = checked(_controlRevision + 1);
+                    RestartPacingInterval();
+                    if (_activeStep.HasValue) _measurementActive = false;
+                    PublishControlStatus();
+                }
+                CompleteDeveloper(message, ClientDeveloperControlFailure.None);
+                return;
+            }
             bool pause = request.Operation == DeveloperOperation.Pause;
             if (!pause) FinishDeveloperStep(ClientDeveloperControlFailure.Cancelled);
             var reasons = _pauseReasons;
@@ -174,8 +191,11 @@ internal sealed partial class ClientSimulationHost
         DeveloperFailureReason failure = DeveloperFailureReason.None, uint requested = 0, uint completed = 0)
     {
         var request = message.DeveloperRequest!;
+        if (requested == 0 && request.Operation == DeveloperOperation.SingleStep) requested = request.Values[0].AsUInt32();
         bool applied = detail == ClientDeveloperControlFailure.None || detail == ClientDeveloperControlFailure.Terminal && completed > 0;
-        DeveloperAppliedValue[] values = completed > 0
+        DeveloperAppliedValue[] values = request.Operation == DeveloperOperation.SetHostSpeed
+            ? [DeveloperAppliedValue.ForSession(DeveloperEffectKind.HostSpeed, DeveloperValue.FromDouble(_requestedSpeed))]
+            : completed > 0
             ? [DeveloperAppliedValue.ForSession(DeveloperEffectKind.AdvancedTicks, DeveloperValue.FromUInt32(completed)),
                DeveloperAppliedValue.ForSession(DeveloperEffectKind.Paused, DeveloperValue.FromBoolean(IsPaused))]
             : [DeveloperAppliedValue.ForSession(DeveloperEffectKind.Paused, DeveloperValue.FromBoolean(IsPaused))];

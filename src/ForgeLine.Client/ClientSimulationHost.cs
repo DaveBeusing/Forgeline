@@ -142,7 +142,6 @@ internal sealed partial class ClientSimulationHost : IDisposable
         _simulation.AdvanceOneTick();
         Interlocked.Increment(ref _completedTicks);
         _lastCompletedTick = _simulation.CurrentTick;
-        PublishControlStatus();
     }
 
     public bool IsTerminalFrozen =>
@@ -495,11 +494,6 @@ internal sealed partial class ClientSimulationHost : IDisposable
             NotifyProgress();
             UpdateTerminalState();
 
-            _nextTickAt =
-                _time.GetTimestamp() +
-                ToHostTicks(
-                    _simulation.Clock.TickDuration);
-
             _started.Set();
             NotifyProgress();
 
@@ -569,9 +563,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
                     PublishControlStatus();
 
                     catchUpTicks++;
-                    _nextTickAt +=
-                        ToHostTicks(
-                            _simulation.Clock.TickDuration);
+                    _nextTickAt = checked(_nextTickAt + PacingIntervalTicks());
                     now =
                         _time.GetTimestamp();
                 }
@@ -580,10 +572,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
                         MaximumCatchUpTicks &&
                     now >= _nextTickAt)
                 {
-                    _nextTickAt =
-                        now +
-                        ToHostTicks(
-                            _simulation.Clock.TickDuration);
+                    _nextTickAt = checked(now + PacingIntervalTicks());
                 }
             }
         }
@@ -769,6 +758,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
         AdvanceOneTick();
         NotifyProgress();
         UpdateTerminalState();
+        PublishControlStatus();
     }
 
     private void UpdateTerminalState()
@@ -929,13 +919,6 @@ internal sealed partial class ClientSimulationHost : IDisposable
 
     private static TimeSpan StopwatchElapsed(long start, long end) =>
         TimeSpan.FromSeconds((end - start) / (double)Stopwatch.Frequency);
-
-    private long ToHostTicks(
-        TimeSpan duration) =>
-        checked(
-            (long)Math.Ceiling(
-                duration.TotalSeconds *
-                _time.TimestampFrequency));
 
     private TimeSpan HostElapsed(
         long start,
