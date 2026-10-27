@@ -655,7 +655,8 @@ public sealed class AutomatedDistributionSystem
                     request.ResourceId);
             double retainedTarget =
                 GetRetainedSourceTarget(
-                    node.Entity,
+                    entities,
+                    sourceInventory,
                     request.ResourceId,
                     request.Priority);
             double surplus = Math.Max(
@@ -971,7 +972,8 @@ public sealed class AutomatedDistributionSystem
     }
 
     private double GetRetainedSourceTarget(
-        EntityId sourceEntity,
+        EntityRegistry entities,
+        InventoryId sourceInventory,
         ResourceId resourceId,
         LogisticsStockPriority requestPriority)
     {
@@ -981,9 +983,12 @@ public sealed class AutomatedDistributionSystem
         {
             LogisticsStockPolicy policy = _policies[index].Policy;
             if (policy.Enabled &&
-                policy.TargetEntity == sourceEntity &&
                 policy.ResourceId == resourceId &&
-                policy.Priority <= requestPriority)
+                policy.Priority <= requestPriority &&
+                _network.TryGetNodeForEntity(policy.TargetEntity, out var targetNode) &&
+                _network.TryGetNode(targetNode, out var node) &&
+                TryResolveDestinationInventory(entities, node, out var policyInventory) &&
+                policyInventory == sourceInventory)
             {
                 retainedTarget = Math.Max(
                     retainedTarget,
