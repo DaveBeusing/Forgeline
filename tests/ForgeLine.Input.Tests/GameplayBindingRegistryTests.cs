@@ -55,6 +55,31 @@ public sealed class GameplayBindingRegistryTests
         Assert.Equal("TAB NEXT  ENTER ACT  C CANCEL  G PRIMARY  I SECONDARY  J/N ADJUST", registry.DockNavigationPrompt);
     }
     [Fact]
+    public void TacticalOverridesUseExistingConflictRulesAndPreserveUnboundDefaults()
+    {
+        var bindings = new GameplayBindings().With(GameplayAction.Stop, PlatformKey.J);
+        Assert.Equal(PlatformKey.J, new GameplayBindingRegistry(bindings).Key(GameplayAction.Stop));
+        Assert.Throws<InvalidDataException>(() => new GameplayBindingRegistry(bindings.With(GameplayAction.Hold, PlatformKey.J)));
+        Assert.Throws<InvalidDataException>(() => new GameplayBindingRegistry(bindings.With(GameplayAction.Hold, PlatformKey.A), new RtsCameraBindings()));
+        for (int i = 0; i < 8; i++)
+        {
+            var action = GameplayBindingRegistry.TacticalAction(i);
+            Assert.Equal(PlatformKey.Unknown, GameplayBindingRegistry.Default.Key(action));
+            Assert.Equal(GameplayBindingRegistry.Default.TacticalPrompt, GameplayBindingRegistry.Default.TacticalShortcut(i));
+        }
+    }
+
+    [Fact]
+    public void ResetRemovesOnlyChosenOverrideAndCanRestoreUnboundTacticalDefault()
+    {
+        var settings = new GameplayBindings().With(GameplayAction.Stop, PlatformKey.J).With(GameplayAction.Hold, PlatformKey.G);
+        var reset = new GameplayBindingRegistry(settings.Reset(GameplayAction.Stop));
+        Assert.Equal(PlatformKey.Unknown, reset.Key(GameplayAction.Stop));
+        Assert.Equal(PlatformKey.G, reset.Key(GameplayAction.Hold));
+        Assert.Equal(2, settings.Overrides.Count);
+    }
+
+    [Fact]
     public void WarmLookupDoesNotAllocate()
     {
         var registry = GameplayBindingRegistry.Default;
