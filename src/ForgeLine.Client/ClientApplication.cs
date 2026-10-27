@@ -1666,14 +1666,14 @@ internal sealed class ClientApplication
                     }
                 }
 
-                if (buildingPlacementController.Conveyor.TryTakeRequest(out ConveyorBuildRequest conveyorRequest))
+                if (buildingPlacementController.TryTakeConveyorRequest(out ConveyorBuildRequest conveyorRequest))
                 {
                     SimulationSessionId conveyorSession=currentSnapshot?.SessionId??default;
                     if (!conveyorSession.IsSpecified || !simulationHost.TrySubmit(conveyorSession,
                         gateway=>gateway.SubmitConveyor(scenario.Services.Conveyors, LocalPlayer,
                             conveyorRequest, constructionInventory, currentSnapshot?.Tick??SimulationTick.Zero),
                         out pendingPlacementHostSequence))
-                        buildingPlacementController.Conveyor.ObserveSubmission(null,presentationInteraction);
+                        buildingPlacementController.ObserveSubmission(null,presentationInteraction);
                 }
 
                 if (buildingPlacementController.TryTakePlacementRequest(
@@ -2088,6 +2088,7 @@ internal sealed class ClientApplication
 
             case PlayerActionRequestKind.BeginBuildingPlacement:
                 tacticalTargetingController.Cancel();
+                if (buildingPlacementController.IsActive) buildingPlacementController.Cancel(presentationInteraction);
                 buildingPlacementController.SelectBuilding(
                     request.BuildingId);
                 return;
@@ -2380,6 +2381,7 @@ internal sealed class ClientApplication
                 placementInvalidColor);
         }
 
+        buildingPlacementController.Templates.Draw(gameplayDraw);
         buildingPlacementController.Conveyor.Draw(gameplayDraw);
         ConveyorNetworkOverlay.Draw(gameplayDraw,renderWorld.CurrentSnapshot,selectionController.Selection.Entities,
             selectionController.HoveredEntity,showAllPorts:buildingPlacementController.Conveyor.IsActive,

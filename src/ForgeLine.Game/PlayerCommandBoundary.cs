@@ -70,7 +70,8 @@ public readonly record struct PlayerCommandResultReadModel(
     OperationsRuleResult OperationsResult = OperationsRuleResult.None,
     ConveyorFailure ConveyorResult = ConveyorFailure.None,
     ConveyorRoutingFailure RoutingResult = ConveyorRoutingFailure.None,
-    BridgeRepairFailure BridgeResult = BridgeRepairFailure.None);
+    BridgeRepairFailure BridgeResult = BridgeRepairFailure.None,
+    EntityId CreatedSite = default);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -1392,7 +1393,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                         : 1,
                     buildResult.RejectionReason,
                     buildResult.PlacementFailure,
-                    buildResult.ResolvedAtTick);
+                    buildResult.ResolvedAtTick, CreatedSite: buildResult.CreatedSite);
             }
 
             case PlayerCommandKind.Demolition:

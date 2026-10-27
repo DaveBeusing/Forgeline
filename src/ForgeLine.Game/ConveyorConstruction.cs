@@ -309,6 +309,23 @@ public sealed class ConveyorConstructionService
         return ports.AsReadOnly();
     }
 
+    /// <summary>Read-only proposal for future authored endpoints. Execution still requires real completed ports.</summary>
+    public ConveyorPlan PreviewDesignRoute(EntityRegistry entities, PlayerId owner,
+        ConveyorSocket output, ConveyorSocket input, EntityId payer)
+    {
+        if (!owner.IsSpecified || output.Input || !input.Input ||
+            !entities.TryGetComponent(payer, out InventoryStorage storage) || !_stock.Contains(storage.InventoryId) ||
+            !entities.TryGetComponent(payer, out ControllableEntity sourceOwner) || sourceOwner.Owner != owner ||
+            !entities.HasComponent<CompletedBuilding>(payer))
+            return new(ConveyorFailure.InvalidSource, Array.Empty<ConveyorPlacement>(), 0);
+        var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
+            output.Position - Vector3.UnitY * 5.8f, input.Position - Vector3.UnitY * 5.8f,
+            BuildingOrientation.North, 0, true, AutomaticRouting: true, AutomaticHeight: true);
+        ConveyorBuildingPort[] ports = [new(default, owner, output.Position, output.Facing, false),
+            new(default, owner, input.Position, input.Facing, true)];
+        return PreviewAutomatic(entities, owner, request, storage, ports);
+    }
+
     public ConveyorPlan Preview(EntityRegistry entities,PlayerId owner,ConveyorBuildRequest request,EntityId payer)
     {
         var pieces=new List<ConveyorPlacement>();
@@ -478,18 +495,22 @@ public sealed class ConveyorConstructionService
     }
 
     private ConveyorPlan PreviewAutomatic(EntityRegistry entities, PlayerId owner,
-        ConveyorBuildRequest request, InventoryStorage storage)
+        ConveyorBuildRequest request, InventoryStorage storage, IReadOnlyList<ConveyorBuildingPort>? designPorts = null)
     {
         ConveyorPlan Fail(ConveyorFailure failure) => new(failure, Array.Empty<ConveyorPlacement>(), 0);
         if (request.Target.IsValid) return Fail(ConveyorFailure.InvalidRequest);
-        IReadOnlyList<ConveyorBuildingPort> ports = CapturePorts(entities, owner);
+        IReadOnlyList<ConveyorBuildingPort> ports = designPorts ?? CapturePorts(entities, owner);
         IReadOnlyList<ConveyorOwnedPiece> existing = Capture(entities, owner);
         Vector3 start = request.Start, end = request.End;
         Vector3? departure = null, arrival = null;
         ConveyorBuildingPort? sourcePort = null, destinationPort = null;
         bool startSocket = false, endSocket = false;
 
-        if (request.SourcePortBuilding.IsValid)
+        if (designPorts is not null)
+        {
+            sourcePort = ports[0]; departure = Cardinal(ports[0].Facing);
+        }
+        else if (request.SourcePortBuilding.IsValid)
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
                 port.Building == request.SourcePortBuilding && !port.Input);
@@ -502,7 +523,11 @@ public sealed class ConveyorConstructionService
         else if (!ResolveSocket(start, false, out startSocket, out departure))
             return Fail(ConveyorFailure.PortMismatch);
 
-        if (request.DestinationPortBuilding.IsValid)
+        if (designPorts is not null)
+        {
+            destinationPort = ports[1]; arrival = Cardinal(-ports[1].Facing);
+        }
+        else if (request.DestinationPortBuilding.IsValid)
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
                 port.Building == request.DestinationPortBuilding && port.Input);
@@ -564,7 +589,7 @@ public sealed class ConveyorConstructionService
             }
             if (pieces.Count == 0 || !ConveyorAutomaticRouter.IsConnected(pieces) ||
                 ConveyorAutomaticRouter.HasSelfIntersection(pieces)) continue;
-            ConveyorPlan plan = CompletePlan(entities, owner, request, storage, pieces, ground, default, existing);
+            ConveyorPlan plan = CompletePlan(entities, owner, request, storage, pieces, ground, default, existing, designPorts);
             if (plan.IsValid) return plan;
             firstFailure ??= plan;
             if (plan.Failure == ConveyorFailure.InsufficientStock) affordableFailure ??= plan;
@@ -597,7 +622,8 @@ public sealed class ConveyorConstructionService
 
     private ConveyorPlan CompletePlan(EntityRegistry entities, PlayerId owner,
         ConveyorBuildRequest request, InventoryStorage storage, List<ConveyorPlacement> pieces,
-        float ground, ConveyorPiece old, IReadOnlyList<ConveyorOwnedPiece> existingPieces)
+        float ground, ConveyorPiece old, IReadOnlyList<ConveyorOwnedPiece> existingPieces,
+        IReadOnlyList<ConveyorBuildingPort>? designPorts = null)
     {
         Vector3? failurePosition = null;
         ConveyorObstruction obstruction = ConveyorObstruction.None;
@@ -614,7 +640,7 @@ public sealed class ConveyorConstructionService
             (piece.Module != ConveyorModule.ShortSegment ||
              piece.SpanMeters < ConveyorAutomaticRouter.MinimumSpanMeters || piece.SpanMeters > 4)))
             return Fail(ConveyorFailure.InvalidRequest);
-        IReadOnlyList<ConveyorBuildingPort> ports = CapturePorts(entities, owner);
+        IReadOnlyList<ConveyorBuildingPort> ports = designPorts ?? CapturePorts(entities, owner);
         bool localSupports=request.AutomaticHeight || old.Placement.RiseMeters!=0 ||
             old.Placement.SupportHeightMeters>0;
         // Each footing reaches the local ground, including independently elevated building foundations.

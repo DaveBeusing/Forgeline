@@ -49,11 +49,13 @@ public sealed class RtsBuildingPlacementController
     private int _height;
     private float _displayScale;
 
+    public RtsConstructionTemplateController Templates { get; } = new();
+
     public RtsConveyorConstructionController Conveyor { get; } = new();
 
     public GameplayBindingRegistry Bindings => _bindings;
-    public bool AwaitingResult => _awaitingResult;
-    public string InteractionHint => Conveyor.IsActive ? Conveyor.Hint : _awaitingResult ? "BUILD REQUEST PENDING" :
+    public bool AwaitingResult => _awaitingResult || Templates.AwaitingResult;
+    public string InteractionHint => Templates.IsActive ? Templates.Hint : Conveyor.IsActive ? Conveyor.Hint : _awaitingResult ? "BUILD REQUEST PENDING" :
         IsActive ? _placementHint : string.Empty;
 
     public RtsBuildingPlacementController(PlayerId issuer, GameplayBindingRegistry? bindings = null)
@@ -81,8 +83,8 @@ public sealed class RtsBuildingPlacementController
     public PlacementPreviewFreshness PreviewFreshness { get; private set; } =
         PlacementPreviewFreshness.Unavailable;
 
-    public bool IsActive => ActiveBuilding.IsSpecified || Conveyor.IsActive;
-    public Vector3? GridCenter => Conveyor.IsActive ? Conveyor.GridCenter :
+    public bool IsActive => ActiveBuilding.IsSpecified || Conveyor.IsActive || Templates.IsActive;
+    public Vector3? GridCenter => Templates.IsActive ? Templates.GridCenter : Conveyor.IsActive ? Conveyor.GridCenter :
         IsActive && _hasPreviewRequest ? _requestedPosition : null;
 
     public void Update(
@@ -100,6 +102,20 @@ public sealed class RtsBuildingPlacementController
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(terrain);
         ArgumentNullException.ThrowIfNull(interaction);
+        bool control = input.IsKeyDown(PlatformKey.LeftControl) || input.IsKeyDown(PlatformKey.RightControl);
+        int template = control && input.WasKeyPressed(_bindings.Key(GameplayAction.StoragePlacement)) ? 1 :
+            control && input.WasKeyPressed(_bindings.Key(GameplayAction.SmelterPlacement)) ? 2 : 0;
+        if (template != 0 && !AwaitingResult && !pointerCaptured)
+        {
+            Cancel(interaction);
+            Templates.Begin(template);
+            foreach (var key in _selectionKeys.Keys) _selectionKeys[key] = input.IsKeyDown(key);
+        }
+        if (Templates.IsActive)
+        {
+            Templates.Update(input, camera, terrain, snapshot, interaction, _issuer, viewportWidth, viewportHeight, pointerCaptured, displayScale);
+            return;
+        }
         if (Conveyor.IsActive)
         {
             Conveyor.Update(input,camera,terrain,snapshot,interaction,_issuer,viewportWidth,viewportHeight,pointerCaptured,displayScale);
@@ -257,6 +273,7 @@ public sealed class RtsBuildingPlacementController
     {
         ArgumentNullException.ThrowIfNull(interaction);
 
+        Templates.Cancel(interaction);
         Conveyor.Cancel(interaction);
         ActiveBuilding = BuildingId.None;
         Preview = null;
@@ -273,11 +290,19 @@ public sealed class RtsBuildingPlacementController
     public void SelectBuilding(
         BuildingId buildingId)
     {
+        if (Templates.IsActive) return;
         if (!buildingId.IsSpecified)
         {
             throw new ArgumentOutOfRangeException(nameof(buildingId));
         }
 
+        if (buildingId.Value > PaidConstructionTemplates.MenuBase &&
+            buildingId.Value <= PaidConstructionTemplates.MenuBase + 2)
+        {
+            ActiveBuilding = BuildingId.None; Preview = null;
+            Templates.Begin((int)(buildingId.Value - PaidConstructionTemplates.MenuBase));
+            return;
+        }
         if (buildingId.Value>=ConveyorGeometry.MenuBase && buildingId.Value<ConveyorGeometry.MenuBase+ConveyorGeometry.MenuCount)
         {
             ActiveBuilding=BuildingId.None;Preview=null;
@@ -301,6 +326,7 @@ public sealed class RtsBuildingPlacementController
 
     public void ObserveSubmission(PlayerCommandSubmissionReceipt? receipt, PresentationInteractionState interaction)
     {
+        Templates.ObserveSubmission(receipt);
         Conveyor.ObserveSubmission(receipt,interaction);
         if (!_awaitingResult || _correlation.IsSpecified) return;
         if (receipt is not { Accepted: true, Kind: PlayerCommandKind.Construction } accepted || accepted.SessionId != _session)
@@ -310,6 +336,7 @@ public sealed class RtsBuildingPlacementController
 
     public void ObserveResult(in PlayerCommandResultReadModel result, PresentationInteractionState interaction)
     {
+        Templates.ObserveResult(result);
         Conveyor.ObserveResult(result,interaction);
         if (!_awaitingResult || !_correlation.IsSpecified || result.SessionId != _session ||
             result.Kind != PlayerCommandKind.Construction || result.CorrelationId != _correlation) return;
@@ -326,6 +353,7 @@ public sealed class RtsBuildingPlacementController
     public bool TryTakePlacementRequest(
         out BuildingPlacementRequest request)
     {
+        if (Templates.TryTakeBuilding(out request)) return true;
         if (_pendingRequest is null)
         {
             request = default;
@@ -337,6 +365,9 @@ public sealed class RtsBuildingPlacementController
         _pendingRequest = null;
         return true;
     }
+
+    public bool TryTakeConveyorRequest(out ConveyorBuildRequest request) =>
+        Templates.TryTakeConveyor(out request) || Conveyor.TryTakeRequest(out request);
 
     private void EnsurePreviewRequest(
         PresentationInteractionState interaction,

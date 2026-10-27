@@ -334,3 +334,65 @@ Presentation changes do not modify `BuildingFootprint`, `SpatialPresence`, place
 ## Rotation during active placement
 
 With a valid active building placement, Q rotates 90 degrees counterclockwise and E 90 degrees clockwise. F9 (or the configured `RotatePlacement` key) remains a clockwise shortcut. Each accepted edge changes the existing four-state `BuildingOrientation`, invalidates the prior preview request and requires a fresh matching snapshot before an authoritative build request can be submitted. Awaiting an already issued build result does not accept a late rotation. Simultaneous Q/E edges cancel one another; key repeats do not produce extra turns. The placement HUD prompt now displays the actual contextual controls.
+
+## Paid construction templates
+
+Open Build and select **Template / STORAGE LINK** or **Template / SMELTER OUTPUT**.
+The corresponding shortcuts are Ctrl plus the configured Storage or Smelter
+placement key (default Ctrl+F7 / Ctrl+F8). Move the complete draft on the shared
+4m grid; Q/E rotates it by 90 degrees. One left click starts the explicit
+three-step application. Escape, right click, focus/modal/pause/display changes or
+session replacement cancel unsent steps. Submitted commands remain authoritative.
+
+The initial bounded catalog stores two layouts: two Storage Depots, or a Smelter
+followed by a Storage Depot. Both keep their building orientation and a 48m
+relative displacement. Their explicit connection is building 1 OUT to building 2
+IN. These are fixed authored designs, not a capture/editor/import format. No
+production recipe, power generation, stock policy, external port or resource
+deposit is inferred. Further industrial configuration remains deliberate.
+
+The whole draft shows both footprints, loading corridors, directed ports and
+the prospective conveyor parts. Each building label quotes its individual
+material requirements; the connection quotes Steel including required supports.
+The context panel lists combined requirements and available unreserved Command
+Core stock. Invalid building locations and the failed connection location are
+marked separately. If no priced route can be proposed, its cost is explicitly\nunavailable and no complete total quote is displayed. A design must have valid geometry and affordable combined
+requirements before the initial click. This observation is not a reservation,
+guaranteed route, paid order or completed building.
+
+**Acceptance is sequential and partial, not atomic.** At most one ordinary command
+is outstanding. Buildings use SubmitBuild/BuildCommand and their usual per-building
+reservation, site progression, cancellation and consumption behavior. The next
+building is checked again against a fresh completed-tick observation. The full
+created-site identity is returned in correlated construction feedback. A rejected
+or unsent step stops the remaining work; nothing retries or grants resources.
+Already accepted sites stay accepted and use normal cancellation/demolition rules.
+
+The connection waits for both exact owned site identities to become completed,
+living buildings. It then uses the normal automatic directed ConveyorConstruction
+command with those explicit endpoints and pays the actual route's Steel. Changed
+terrain, stock, occupation, ownership, identity, road/support, dock or port state
+can change the plan or reject it. Missing endpoints stop the link. Each complete
+conveyor route retains its own existing all-or-nothing payment semantics; the
+larger template has no rollback or up-front shared reservation.
+
+Blue footprints identify accepted sites/completed buildings; green/red draft
+geometry identifies observed validity. Per-step UNSENT, REQUEST PENDING, SITE
+ACCEPTED, WAITING FOR COMPLETED BUILDINGS, LINK ACCEPTED, REJECTED, SKIPPED and
+CANCELLED UNSENT remain distinct. Acceptance does not claim completed production
+or transported materials. Closing placement never retracts submitted commands.
+
+The template controller and pending continuation exist only in the current client
+session. New Game, Restart and Load discard them. Accepted ordinary Build and
+Conveyor inputs already use existing replay codecs and authoritative site/inventory
+state. There is no new authoritative component, command kind, saved template,
+registered content identity or schema: envelope 1, payload 11 and authoritative
+schema 16 remain current. A save between steps retains paid work but does not
+resume the unsent template continuation on load. Historical hashes stay intact.
+
+Status: implemented; manual user review outstanding. Product compilation does
+not qualify real pointer input, native label legibility, physical construction,
+stock consumption or Save/Replay. Review both templates and all rotations,
+terrain/build-area/road/loading-lane/occupied-port rejection, changed stock and
+ownership, destroyed/cancelled sites, partial acceptance, cancellation before
+and after submission, session replacement and save/replay during each paid step.
