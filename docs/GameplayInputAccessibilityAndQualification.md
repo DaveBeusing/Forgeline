@@ -8,7 +8,7 @@ Gameplay shortcuts share `GameplayBindingRegistry` in the input boundary. The re
 
 Open Settings from the main menu or Pause → Settings. Up/Down moves focus, Left/Right selects GAMEPLAY ACTION or changes GAMEPLAY KEY, and Enter/APPLY saves. The key row scrolls into the existing seven-row viewport. Pointer adjustment uses those same visible row identities. The editor shows each candidate, including a rejected candidate and its reason; rejection leaves the valid draft unchanged and disables APPLY. Move to another candidate or action to resolve it. A gameplay binding change uses the existing settings restart path before starting a match. ESC/BACK discards unsaved edits. During a paused match, binding changes are saved for the next match; the active controllers retain their current mapping.
 
-Twenty-five actions are configurable: seven action modes, next item, two setting cycles, decrease/increase, activate/cancel job, base focus, formation, strategic layer, minimap, pause, five building shortcuts and placement rotation. Defaults remain B/P/U/L/Y/K/H, Tab/T/M/Left/Right/Enter/C, Home/F3/F10/F11/Space and F4–F9. Unknown/numeric undefined keys, duplicate actions, duplicate command keys, modifier keys, control-group digits and reserved help/developer/cancel keys are rejected. Assignment to a conflicting camera key is rejected for global actions. Menu-only keys intentionally replace camera navigation while a ring owns keyboard focus; global mode keys stay distinct from menu editing keys.
+The original action categories and menu controls remain configurable: seven action modes, next item, two setting cycles, decrease/increase, activate/cancel job, base focus, formation, strategic layer, minimap, pause, five building shortcuts and placement rotation. Current defaults are B/P/U/L/Y/K/H, Tab/T/M/Left/Right/Enter/C, Home/F10/F11/Space and Delete for demolition. Formation and direct building/rotation shortcuts are unbound by default; F3–F9 are retired. Unknown/numeric undefined keys, duplicate actions, duplicate command keys, modifier keys, control-group digits and reserved help/developer/cancel keys are rejected. Assignment to a conflicting camera key is rejected for global actions. Menu-only keys intentionally replace camera navigation while a ring owns keyboard focus; global mode keys stay distinct from menu editing keys.
 
 Escape cancellation/pause, mouse selection/targeting, Shift selection/repeat placement, Ctrl/digit group actions, modified developer/guide shortcuts and terminal R restart are fixed entries in the registry. They remain discoverable but are not arbitrary chord/mouse rebinding features. Camera drag and movement continue to use their existing settings.
 
@@ -86,3 +86,51 @@ Earlier dock/inspector measurements on this page remain historical.
 Global action categories use the active `GameplayBindingRegistry`: B / P / U / L / Y / K / H (or saved valid remaps) open the corresponding copied action-ring category at the last currently valid client pointer position. No valid pointer inside the HUD safe area means no menu opens and a guidance message is issued; no synthetic world entity or viewport-center anchor is created. Without an authorized selected owner, selection-dependent controls render a disabled `No target` sector with the reason to select a building or unit. Global construction/technology items still use existing authorized action snapshots and request dispatch.
 
 Context arbitration is modal/help/settings/pause suppression first, then active building placement, then a genuinely paginated radial item/group level, and then camera. While placing, Q is a 90-degree counterclockwise turn and E a clockwise turn; the existing remapped F9 compatibility key remains clockwise. Placement orientation and authoritative preview-revision checks use the same four `BuildingOrientation` states. While a paginated radial page is open, Q moves backward and E forward by one real four-item page, clamped at the first and last page; an unpaged root does not own Q/E. On dismissal, camera rotation again uses the unchanged stored camera bindings. A keydown/key-up gesture cannot dispatch to both the ring/placement and camera. Release suppression, modal ownership and target validity remain unchanged.
+
+## Direct tactical shortcuts and command acknowledgement
+
+Settings → Bindings includes ATTACK, ATTACK MOVE, STOP, HOLD POSITION, RETREAT,
+FIRE MISSION, CANCEL FIRE MISSION and RETREAT TO RECOVERY. These additional actions
+start unbound so existing saved command and camera assignments remain valid.
+Assign a free key through the existing GAMEPLAY ACTION / GAMEPLAY KEY rows. Existing
+conflict checks, persistence and next-match application apply. The key list's DEFAULT
+entry removes only the selected override; APPLY saves the reset, and BACK discards it.
+A reset that collides with another assignment is rejected without changing the draft.
+
+Direct tactical keys use the same copied selection, eligibility and pending checks
+and the same request factories as the tactical ring. They do not add a command bus
+or change stance, queue, navigation or simulation behavior. Modified direct shortcuts
+are ignored, including modifiers released before the next input frame. One frame can
+produce at most one panel request; held/retained keys and simultaneous clicks cannot
+produce a second activation. Bound direct keys appear on tactical ring items; unbound
+items retain the K / Tab / Enter workflow using the current category/navigation bindings.
+
+Move remains right click. Shift + right click appends; Ctrl + right click patrols;
+Ctrl + Shift + right click extends an existing patrol. Attack and Attack Move can be
+appended by holding Shift at the resolving world click. The existing LOGISTICS repair
+cards submit paid bridge repair through the authoritative command boundary; there is
+no new generic repair or rally command. Construction continues through BUILD and the
+existing location/material preview, repeat, rotation, cancellation and result owner.
+
+Targeting consumes the original world-press position and captured Shift exactly once.
+The click that opens a targeting mode, a press over captured UI, missing/outdated action
+snapshots and focus/session changes cannot become deferred world commands. Escape and
+right click cancel local targeting without submitting a simulation request. The existing
+short-lived feedback surface acknowledges cancellation; F1 developer ownership is unchanged.
+
+Move, minimap movement and resolved tactical target markers display PENDING while the
+host/gateway processes the request. The marker becomes ACCEPTED, PARTIAL or REJECTED only
+for its matching simulation session and correlation ID. Full/stopping host boundaries and
+gateway rejections resolve to REJECTED; an earlier command's delayed response cannot recolor
+a newer marker. A bounded 128-result scratch handles a result drained before its receipt,
+matching the existing gateway outstanding limit. A final marker lasts 0.8 seconds; pending
+markers remain until the outcome or an existing lifecycle cancellation. Labels and pending/
+warning/invalid shapes supplement color. Acceptance means the order was admitted, not that
+movement, damage or a queued leg has completed. Exact rejection reasons/counts remain in
+the existing authoritative notification/status surface.
+
+Regression coverage includes remapped/menu parity, reset isolation, blocked and brief
+modifier gestures, retained click origin, captured UI transitions, stale action data,
+session/correlation mismatch, early results, partial acceptance and admission rejection.
+Native Windows interaction/terrain/DPI acceptance remains a separate gate; no screenshot
+or performance baseline is implicitly approved by these source-level cases.
