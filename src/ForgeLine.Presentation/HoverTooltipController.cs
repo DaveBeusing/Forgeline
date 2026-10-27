@@ -22,11 +22,22 @@ public readonly record struct HoverTooltipView(
     bool Contextual = false,
     bool SelectionStatus = false,
     ulong SelectionRevision = 0,
-    ulong MenuRevision = 0);
+    ulong MenuRevision = 0,
+    float TextScale = 1);
 
 public sealed class HoverTooltipController
 {
     public static TimeSpan DefaultDelay => TimeSpan.FromMilliseconds(175);
+    private HoverTooltipSettings _settings = HoverTooltipSettings.Default;
+    public void Configure(HoverTooltipSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        settings.Validate();
+        if (_settings == settings) return;
+        _settings = settings;
+        Reset();
+    }
+
     private HoverTooltipView _candidate;
     private Vector2 _anchor;
     private TimeSpan _stable;
@@ -51,7 +62,7 @@ public sealed class HoverTooltipController
             return Reset();
 
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
-            false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale);
+            false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale, TextScale: _settings.TextScale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
         // The selected-object inspector is persistent while its ring is open;
         // hovering an action sector must not replace the authorized object facts.
@@ -115,7 +126,7 @@ public sealed class HoverTooltipController
         }
         else if (elapsed > TimeSpan.Zero && elapsed <= TimeSpan.FromMilliseconds(250)) _stable += elapsed;
         else if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMilliseconds(250)) _stable = TimeSpan.Zero;
-        _candidate = next with { Ready = next.SelectionStatus || _stable >= DefaultDelay };
+        _candidate = next with { Ready = next.SelectionStatus || _stable >= TimeSpan.FromMilliseconds(_settings.DelayMilliseconds) };
         return _candidate;
     }
 

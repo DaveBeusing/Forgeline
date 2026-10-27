@@ -12,7 +12,7 @@ namespace ForgeLine.Client;
 
 internal sealed record ClientUserSettings
 {
-    internal const int CurrentSchemaVersion = 3;
+    internal const int CurrentSchemaVersion = 4;
     private const int MinimumWindowWidth = 1_024;
     private const int MinimumWindowHeight = 720;
     private const int MaximumWindowWidth = 7_680;
@@ -44,6 +44,8 @@ internal sealed record ClientUserSettings
     public UiFeedbackSettings CreateUiFeedbackSettings() => new(ReducedUiMotion, UiSoundEnabled, UiSoundVolume);
 
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
+
+    public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
 
     public bool EdgeScrollEnabled { get; init; } = true;
 
@@ -102,6 +104,8 @@ internal sealed record ClientUserSettings
 
         CreateUiFeedbackSettings().Validate();
         WorldAudio.Validate();
+        ArgumentNullException.ThrowIfNull(Tooltips);
+        Tooltips.Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
         Particles.Validate();
@@ -274,6 +278,9 @@ internal sealed class ClientSettingsStore
             string? graphicsProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "renderQuality", StringComparison.OrdinalIgnoreCase));
             JsonNode? graphics = graphicsProperty is null ? null : document[graphicsProperty];
             if (graphicsProperty is not null) document.Remove(graphicsProperty);
+            string? tooltipProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "tooltips", StringComparison.OrdinalIgnoreCase));
+            JsonNode? tooltip = tooltipProperty is null ? null : document[tooltipProperty];
+            if (tooltipProperty is not null) document.Remove(tooltipProperty);
             ClientUserSettings settings =
                 JsonSerializer.Deserialize<ClientUserSettings>(
                     document.ToJsonString(),
@@ -281,7 +288,8 @@ internal sealed class ClientSettingsStore
                 throw new InvalidDataException(
                     "Settings file did not contain a settings object.");
 
-            bool migrated = settings.SchemaVersion is 1 or 2;
+            bool legacyGraphics = settings.SchemaVersion is 1 or 2;
+            bool migrated = settings.SchemaVersion is 1 or 2 or 3;
             if (migrated) settings = settings with { SchemaVersion = ClientUserSettings.CurrentSchemaVersion };
             settings.Validate();
             string? graphicsRecovery = null;
@@ -300,7 +308,7 @@ internal sealed class ClientSettingsStore
                     settings = settings with { SceneAtmosphere = SceneAtmosphereSettings.Default, Particles = ParticleSettings.Default };
                 }
             }
-            if (migrated && graphicsRecovery is null)
+            if (legacyGraphics && graphicsRecovery is null)
             {
                 var converted = settings.CreateRenderQualitySettings();
                 settings = settings with
@@ -309,6 +317,21 @@ internal sealed class ClientSettingsStore
                     SceneAtmosphere = settings.SceneAtmosphere with { Quality = AtmosphereQuality.Disabled },
                     Particles = ParticleSettings.Default
                 };
+            }
+            string? tooltipRecovery = null;
+            if (tooltipProperty is not null)
+            {
+                try
+                {
+                    var parsed = tooltip?.Deserialize<HoverTooltipSettings>(JsonOptions) ?? throw new InvalidDataException("Tooltip settings are missing.");
+                    parsed.Validate();
+                    settings = settings with { Tooltips = parsed };
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidDataException or ArgumentException)
+                {
+                    tooltipRecovery = $"Tooltip settings reset: {exception.Message} Other settings were preserved.";
+                    _ = TryQuarantineInvalidSettings();
+                }
             }
             string? bindingRecovery = null;
             if (gameplayProperty is not null)
@@ -326,14 +349,14 @@ internal sealed class ClientSettingsStore
                 }
             }
             cancellationToken.ThrowIfCancellationRequested();
-            if (migrated || bindingRecovery is not null || graphicsRecovery is not null) Save(settings);
+            if (migrated || bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null) Save(settings);
 
             return new ClientSettingsLoadResult(
                 settings,
                 _path,
                 CreatedDefaults: false,
-                RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null,
-                RecoveryMessage: graphicsRecovery is null ? bindingRecovery : bindingRecovery is null ? graphicsRecovery : graphicsRecovery + " " + bindingRecovery);
+                RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null,
+                RecoveryMessage: string.Join(" ", new[] { graphicsRecovery, bindingRecovery, tooltipRecovery }.Where(message => message is not null)));
         }
         catch (Exception exception)
             when (exception is JsonException or

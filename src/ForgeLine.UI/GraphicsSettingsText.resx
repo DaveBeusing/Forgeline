@@ -54,4 +54,11 @@
   <data name="AlertSoundVolumeHelp" xml:space="preserve"><value>Supply warnings, unit readiness and match results.</value></data>
   <data name="AmbienceSoundVolume" xml:space="preserve"><value>AMBIENCE VOLUME</value></data>
   <data name="AmbienceSoundVolumeHelp" xml:space="preserve"><value>Wind and distant industrial or battlefield atmosphere.</value></data>
+  <data name="TooltipDelay" xml:space="preserve"><value>TOOLTIP DELAY</value></data>
+  <data name="TooltipDelayHelp" xml:space="preserve"><value>0-1000 MS IN 25 MS STEPS. APPLIES TO HOVER AND FOCUSED ACTION DETAILS; OBJECT STATUS STAYS VISIBLE.</value></data>
+  <data name="TooltipTextSize" xml:space="preserve"><value>TOOLTIP TEXT SIZE</value></data>
+  <data name="TooltipTextSizeHelp" xml:space="preserve"><value>STANDARD / LARGE / EXTRA LARGE. FITS AVAILABLE HUD SPACE; DOES NOT CHANGE WORLD CLICK REGIONS.</value></data>
+  <data name="StandardTooltipText" xml:space="preserve"><value>STANDARD</value></data>
+  <data name="LargeTooltipText" xml:space="preserve"><value>LARGE</value></data>
+  <data name="ExtraLargeTooltipText" xml:space="preserve"><value>EXTRA LARGE</value></data>
 </root>

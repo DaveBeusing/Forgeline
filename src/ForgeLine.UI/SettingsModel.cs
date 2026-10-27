@@ -19,6 +19,7 @@ public readonly record struct FrontendSettingsSnapshot(
     FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null, UiFeedbackSettings FeedbackSettings = default)
 {
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
+    public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
 }
 
 public sealed class SettingsModel
@@ -38,6 +39,12 @@ public sealed class SettingsModel
     {
         settings.Validate();
         Settings = Settings with { FeedbackSettings = settings };
+    }
+
+    public void SetTooltips(HoverTooltipSettings settings)
+    {
+        settings.Validate();
+        Settings = Settings with { Tooltips = settings };
     }
 
     public void SetWorldAudio(WorldAudioSettings settings)

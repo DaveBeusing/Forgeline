@@ -58,7 +58,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (content is not { } resolved) return;
         _width = context.Graphics.Width;
         _height = context.Graphics.Height;
-        _scale = view.SelectionStatus ? Math.Clamp(context.Layout.Scale, 1, 1.25f) : context.Layout.Scale;
+        _scale = (view.SelectionStatus ? Math.Clamp(context.Layout.Scale, 1, 1.25f) : context.Layout.Scale) * view.TextScale;
         if (_width <= 0 || _height <= 0) return;
         _count = 0;
         _line = 0;
@@ -72,7 +72,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         _measuring = false;
         float fitted = MathF.Min(_scale, MathF.Min(context.Layout.SafeArea.Width / 350,
             context.Layout.SafeArea.Height / (16 + lines * 14)));
-        _scale = view.SelectionStatus ? MathF.Max(1, fitted) : fitted;
+        _scale = fitted;
+        if (!float.IsFinite(_scale) || _scale <= 0) return;
         if (_wrapDetails && !view.SelectionStatus)
         {
             var safe = context.Layout.SafeArea;
@@ -90,8 +91,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             RadialActionLayout.ResolveObstacles(occupied,context.Layout,context.PreAlphaUx.Onboarding,context.Operations,
                 context.CombatGroups,notifications);
             float preferred=_scale;
-            for(int attempt=0;attempt<5;attempt++) {
-                _scale=MathF.Max(1,preferred-attempt*.125f);
+            for(int attempt=0;attempt<9;attempt++) {
+                _scale=MathF.Min(preferred,MathF.Max(.5f,preferred-attempt*.125f));
                 _bounds=HoverTooltipPlacement.BesideRing(context.ActionPanel.Ring,context.Layout,occupied,
                     330*_scale,(16+lines*14)*_scale);
                 if(!_bounds.IsEmpty) break;
