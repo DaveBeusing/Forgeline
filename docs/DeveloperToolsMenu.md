@@ -7,7 +7,21 @@ The live provider integration is included in master through PR #379
 ClientDeveloperMenuBackend for the current runtime, host and session access.
 The factory hooks below remain optional composition overrides.
 
-In an enabled developer build, pause the match and choose DEVELOPER TOOLS.
+From the repository root, run:
+
+~~~powershell
+pwsh ./build/Start-DevelopmentClient.ps1
+~~~
+
+The launcher builds and runs Release with
+`-p:ForgeLineEnableDeveloperTools=true` on both commands. This selects the
+isolated Developer output and its compiled menu/providers, including when an
+older Public build exists. Runtime assets retain their normal build path.
+Session activation is supplied by the existing client composition; no saved
+preference or extra runtime permission flag is needed.
+
+In the launched client, start or load a match, press Escape and choose
+DEVELOPER TOOLS.
 No new keyboard chord replaces Help, metrics, gameplay bindings or the guide.
 The existing frontend renderer, geometry, fonts, detail controls and focus visuals
 render the bounded scrollable surface. Use the SECTION choice to switch Session,
