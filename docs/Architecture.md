@@ -390,4 +390,10 @@ and obj/Developer roots. Use the same property for restore and dependent builds.
 The public publisher forces false and verifies assembly variant metadata.
 See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
 request/result, parameter, preset and provider contracts and ownership handoffs.
-No menu or mutating tool is implied by these contracts.
+The Developer client composes the live menu, session controller, action/parameter
+transport and preset adapter through ClientDeveloperMenuBackend. Requests enter
+the existing bounded ClientSimulationHost queue and execute on the sole simulation
+owner; preset restarts use the transactional session loader. See
+[Developer tools menu](DeveloperToolsMenu.md) for operation and
+[Developer tools qualification](DeveloperToolsQualification.md) for evidence and
+remaining acceptance limits.

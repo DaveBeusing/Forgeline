@@ -79,25 +79,42 @@ does not copy absolute input/output paths or machine-specific locations. Save an
 replay output continue through the existing codecs. Existing public recovery
 paths remain responsible for rejecting Developer-only payloads in Public builds.
 
-## Client integration handoff
+## Client integration and operation
 
-`ClientDeveloperPresetSessionAdapter` owns the client-side store and produces
-normal `ClientSessionRequest` values for preset restart and baseline restart. The
-`ClientApplication` menu backend factory remains owned by the Menu and Diagnostics
-integration. The concrete hook is `ClientApplication.DeveloperProviderFactory`
-for registering the adapter as `IDeveloperPresetService`, paired with
-`ClientApplication.DeveloperMenuBackendFactory` for menu intents. That owner must
-compose the adapter with its session/action backend, surface store and validation
-errors to the menu, and submit returned requests via the existing restart callback.
-The combined qualification integration supplies that composition through
-`ClientDeveloperMenuBackend`: explicit local import, original export, saving
-current values and each restart enter the real provider/loader paths. Native
-and packaged acceptance results are recorded in
-[Developer tools qualification](DeveloperToolsQualification.md).
+ClientApplication creates ClientDeveloperMenuBackend with a
+ClientDeveloperPresetSessionAdapter by default. DeveloperProviderFactory and
+DeveloperMenuBackendFactory remain optional override hooks. The backend routes
+explicit import/export/save/restart intents to the real adapter and publishes
+bounded compatibility or I/O feedback.
+
+To import, place a schema-1 document in
+`%LOCALAPPDATA%\FORGELINE\Developer\Presets\Import\<key>.json`.
+The filename must equal the document's stable key. Open the Developer menu and
+choose Presets, select the `Import: <display name>` entry, then activate Import.
+Import validates the source again and creates a managed preset without replacing
+an existing key. Incoming entries whose keys already exist are hidden; invalid
+or incompatible incoming documents remain untouched and produce availability
+feedback. Each directory is limited to 64 JSON files and each document to 64 KiB;
+linked files/directories are rejected.
+
+Export writes the original start profile as `original-profile.json` in the
+managed preset directory, atomically replacing that key only after validation.
+Save Current Values writes a new `preset-<guid>.json` containing effective values
+and pending next-match edits. Neither operation changes the running match.
+Select a stored compatible preset before Restart Selected. Restart Same
+Configuration uses the original initial profile; Return to Baseline removes its
+overrides while retaining the registered scenario identity, profile, seed and
+participants. All restart intents return normal session requests whose settings
+ClientApplication queues as ClientSessionRequest.Restart through the existing
+transactional loader. Admission leaves the backend loading; it does not report a
+completed new session before the loader constructs it.
 
 ## Acceptance boundary
 
-This package has targeted product builds and focused preset acceptance coverage.
-The full public/Developer package matrix, native menu interaction, full Save/Replay
-compatibility matrix and combined scenario/content qualification remain open for
-the combined qualification effort.
+The live client composition and store are integrated through PR #379. Historical
+builds, native/package observations, Save/Replay evidence and remaining failures
+are recorded in [Developer tools qualification](DeveloperToolsQualification.md).
+Those results retain their original source identity; this documentation update
+runs no tests and claims no new functional acceptance. Manual user approval
+remains outstanding. No preset, save, replay or authoritative hash schema changes
+are introduced here.

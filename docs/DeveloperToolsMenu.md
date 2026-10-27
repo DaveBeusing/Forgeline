@@ -2,10 +2,10 @@
 
 ## Entry and scope
 
-The menu starts from master 0747a72205abd19505ecdeec6279ec5714acd4f6,
-version 0.1.481-dev, with the foundation and gameplay tuning integrated. The PR
-increments PATCH once to 0.1.482-dev. Existing client asset integration from
-PR353 is already merged; no alternate client composition is copied from a branch.
+The live provider integration is included in master through PR #379
+(merge 89086e68cc72798544b8b75d81c7d36d6bd13811). ClientApplication creates
+ClientDeveloperMenuBackend for the current runtime, host and session access.
+The factory hooks below remain optional composition overrides.
 
 In an enabled developer build, pause the match and choose DEVELOPER TOOLS.
 No new keyboard chord replaces Help, metrics, gameplay bindings or the guide.
@@ -32,11 +32,11 @@ Player preferences never activate this permission.
 
 All five provider statuses are shown, including precise Unavailable reasons.
 The menu catalog is a real local provider and preserves supplied action entries.
-On this master, SessionControls, central SimulationActions and preset I/O remain
-missing. GameplayTuning code is integrated but has no central dispatcher binding.
-The default client therefore displays these missing services and disables their
-controls. Visualization is genuinely connected to the existing DebugOverlayController;
-no unavailable service reports successful simulation application.
+The default Developer client connects session controls to ClientSimulationHost,
+simulation actions and gameplay tuning to the Game dispatcher through the bounded
+host queue, and presets to ClientDeveloperPresetSessionAdapter. Visualization
+uses the existing DebugOverlayController. Unavailable providers disable their
+controls and expose their reason; admission never reports simulation application.
 
 Parameter descriptors supply names, units, defaults, bounds, steps, target kinds
 and apply modes. Actual observations supply confirmed values and revisions;
@@ -89,9 +89,10 @@ DeveloperMenuBackendFactory : Func<MatchRuntime, DeveloperToolsProviders,
     Func<MatchRuntimeSettings, bool>, IDeveloperMenuBackend?>
 ~~~
 
-Register actual already integrated domain providers with DeveloperProviderFactory.
-The menu preserves these session/action/parameter/preset providers and merges their
-catalog operations. A backend is an observation/preset client bridge, not another
+Without overrides, ClientDeveloperMenuBackend supplies the registered
+session/action/parameter/preset providers. DeveloperProviderFactory can replace
+that composition; the menu preserves supplied providers and merges their catalog
+operations. A backend is an observation/preset client bridge, not another
 simulation dispatcher. Its Capture returns a bounded immutable
 DeveloperMenuBackendSnapshot for the actual current session: domain revisions,
 correlated results, captured tick, actual host speed/remaining steps, preset entries,
@@ -122,9 +123,10 @@ submission alone remains Submitted and blocks another write. The restart callbac
 passed to the backend validates proposed settings, queues ClientSessionRequest.Restart
 and returns through the normal session-loading loop. It creates no ad hoc runtime.
 The service owns preserving the requested seed/identity and installing initial
-profiles; its normal loader owns construction and failure handling. No preset
-storage, parser, runtime swap, persistence format or replay adapter is implemented
-inside this menu package.
+profiles; its normal loader owns construction and failure handling.
+The default backend delegates storage and validation to the preset adapter
+and DeveloperPresetStore. It queues settings through ClientApplication as a
+ClientSessionRequest.Restart; ClientSessionFactory owns the new runtime.
 
 ## Input lifetime and remaining qualification
 
@@ -142,7 +144,16 @@ Public/Developer package exclusion, Save/Replay and native/DPI qualification rem
 with the combined developer-tools qualification. A rendered menu with missing
 providers does not qualify their functionality.
 
-## Scoped acceptance evidence
+## Current integration and acceptance
+
+The product paths above are integrated. Historical results below describe the
+earlier menu package; the later combined source, native/package observations and
+remaining failures are recorded in [Developer tools qualification](DeveloperToolsQualification.md).
+They do not establish complete product acceptance. Manual user approval remains
+outstanding. Documentation reconciliation introduces no new runtime state or
+Save/Replay format.
+
+## Historical menu-package acceptance evidence
 
 Implementation commits ba34443, 99276432 and 58a9222b precede the explicit scoped
 acceptance boundary. No tests, smokes or benchmarks ran during implementation.
