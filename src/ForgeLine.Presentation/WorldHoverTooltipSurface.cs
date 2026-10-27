@@ -195,7 +195,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (input.MoreMaterials) Line("ADDITIONAL INPUTS: SEE LOGISTICS REQUIREMENTS");
         Line("LOGISTICS: STOCK POLICY / OPERATIONS: INPUT DIAGNOSIS");
         if (input.Automatic) Line("AUTOMATIC PROCESSING: CONTROL INPUT DELIVERY");
-        else Line("PRODUCTION: REQUEST PRIORITY / PAUSE / CANCEL");
+        else if (input.UnitProduction) Line("UNIT PRODUCTION: QUEUE / CANCEL");
+        else Line("PRODUCTION: REQUESTS / PAUSE / CANCEL");
     }
 
     private void EmitSelectionStatus(in PlayerSelectionSummary selection, SelectedCombatGroup? group, FormationTemplate formation)

@@ -9,7 +9,8 @@ namespace ForgeLine.Presentation;
 /// <summary>Owned, copied input facts from the same tick as the surrounding snapshot.</summary>
 public sealed record ProductionInputInformation(EntityId Entity, InventoryId Inventory,
     Vector3? Position, bool MissingInput, bool Automatic,
-    IReadOnlyList<PlayerActionResourceAmount> MissingMaterials, bool MoreMaterials);
+    IReadOnlyList<PlayerActionResourceAmount> MissingMaterials, bool MoreMaterials,
+    bool UnitProduction = false);
 
 internal static class ProductionInputInformationCapture
 {
@@ -22,7 +23,7 @@ internal static class ProductionInputInformationCapture
             control.Owner != extraction.Player) return null;
         var scenario = extraction.Scenario;
         InventoryId inventory;
-        bool missing, automatic = false;
+        bool missing, automatic = false, unitProduction = false;
         var amounts = new List<PlayerActionResourceAmount>(7);
         bool more = false;
         if (entities.TryGetComponent(entity, out ProductionFacility processing))
@@ -38,6 +39,7 @@ internal static class ProductionInputInformationCapture
         }
         else if (entities.TryGetComponent(entity, out UnitProductionFacility factory))
         {
+            unitProduction = true;
             inventory = factory.InputInventory;
             missing = factory.BlockReason == UnitProductionBlockReason.NoInput;
             if (missing && scenario.Services.UnitDefinitions.TryGet(factory.ActiveUnit, out var definition))
@@ -47,7 +49,7 @@ internal static class ProductionInputInformationCapture
 
         return new(entity, inventory,
             entities.TryGetComponent(entity, out WorldTransform transform) ? transform.Position : null,
-            missing, automatic, Array.AsReadOnly(amounts.ToArray()), more);
+            missing, automatic, Array.AsReadOnly(amounts.ToArray()), more, unitProduction);
 
         void Add(ResourceId resource, double required)
         {
