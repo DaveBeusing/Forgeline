@@ -10,7 +10,7 @@ using ForgeLine.World;
 namespace ForgeLine.Simulation.Benchmarks;
 
 [MemoryDiagnoser]
-public class CargoTransportBenchmarks
+public class CargoTransportBenchmarks : IDisposable
 {
     private SimulationCoordinator _simulation = null!;
     private CargoTransportSystem _transportSystem = null!;
@@ -23,6 +23,32 @@ public class CargoTransportBenchmarks
 
     [IterationSetup]
     public void Setup()
+    {
+        Cleanup();
+        try { SetupScenario(); }
+        catch { Cleanup(); throw; }
+    }
+
+    [IterationCleanup]
+    public void Cleanup()
+    {
+        var navigation = _navigation;
+        _navigation = null!;
+        navigation?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing) Cleanup();
+    }
+
+    private void SetupScenario()
     {
         TerrainWorld terrain = CreateFlatWorld();
         NavigationWorld navigationWorld =
