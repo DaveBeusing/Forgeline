@@ -114,12 +114,12 @@ internal sealed partial class LogisticsNavigationCoordinator
             if (!_actors.TryGetValue(entity, out var actor))
             {
                 if (_actors.Count == MaximumHistory) { _overflow = true; continue; }
-                actor = new(entity, route.OriginalOrder, 1, request, true, _tick, _tick, 0, 0,
+                actor = new(entity, route.OriginalOrder, route.BoundSearch?.Binding.CommandGeneration ?? 1, request, true, _tick, _tick, 0, 0,
                     NavigationTrafficAction.Hold, NavigationBlockReason.Unknown);
             }
             else if (!previouslyActive.Contains(entity) || actor.OriginalOrder != route.OriginalOrder || actor.RequestId != request)
             {
-                actor = actor with { OriginalOrder = route.OriginalOrder, Generation = checked(actor.Generation + 1),
+                actor = actor with { OriginalOrder = route.OriginalOrder, Generation = route.BoundSearch?.Binding.CommandGeneration ?? checked(actor.Generation + 1),
                     RequestId = request, LastProgressTick = _tick, LastAction = NavigationTrafficAction.Hold };
                 _routes.Remove(entity);
             }

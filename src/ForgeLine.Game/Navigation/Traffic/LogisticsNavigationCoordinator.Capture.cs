@@ -184,6 +184,20 @@ internal sealed partial class LogisticsNavigationCoordinator
         int copyWork = checked(source.Path.Waypoints.Count * 2);
         if (copyWork > Limits.WorkPerTick - consumed) { consumed = Limits.WorkPerTick; return false; }
         consumed += copyWork;
+        if (source.Path.Proposal is { } connected)
+        {
+            if (connected.Request.Capabilities != snapshot.Capabilities || connected.Request.Vehicle != profile ||
+                connected.Request.Revision.Geometry != snapshot.Revision.Geometry) return false;
+            // This is a motion-only view of the physical frame, whose costs are
+            // NotConnected. It is not a cost reassessment or a new route choice.
+            // Path.Proposal retains the original search scope, costs and corridor.
+            var physical = connected.Request with { Revision = snapshot.Revision,
+                KnowledgeScope = snapshot.KnowledgeScope, TargetSemantics = NavigationTargetSemantics.Transit };
+            proposal = new(physical, connected.ResolvedDestination, connected.Waypoints.ToArray(),
+                connected.Regions.ToArray(), connected.Diagnostics, MaximumWaypoints);
+            _routes[entity] = new(source.Path, snapshot, profile, request.RequestId, proposal);
+            return true;
+        }
         // The legacy endpoint kernel visits a five-by-five cell square. This adapter does not
         // claim that the old search evaluated a vehicle footprint; current sweeps supply that veto.
         var goal = new NavigationGoalConstraints(snapshot.Grid.Settings.CellSizeMeters * 2.5f * MathF.Sqrt(2),

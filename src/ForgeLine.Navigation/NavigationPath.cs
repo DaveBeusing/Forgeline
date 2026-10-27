@@ -50,6 +50,25 @@ public sealed class NavigationPath
         Diagnostics = diagnostics;
     }
 
+    /// <summary>Present only for the connected bounded vehicle search.</summary>
+    public NavigationRouteProposal? Proposal { get; private init; }
+
+    public static NavigationPath FromProposal(NavigationRouteProposal proposal, NavigationGrid grid)
+    {
+        ArgumentNullException.ThrowIfNull(proposal);
+        ArgumentNullException.ThrowIfNull(grid);
+        var cells = new List<NavigationCellCoordinate>(proposal.Waypoints.Count);
+        foreach (var point in proposal.Waypoints)
+        {
+            if (!grid.TryWorldToCell(point, out var cell))
+                throw new ArgumentException("A route point is outside its pinned grid.", nameof(proposal));
+            if (cells.Count == 0 || cells[^1] != cell) cells.Add(cell);
+        }
+        return new(proposal.Request.Revision.Geometry, proposal.Request.Capabilities.MovementClass,
+            proposal.Request.OriginalDestination, proposal.Regions.Select(r => r.Region).ToArray(), [],
+            cells.ToArray(), proposal.Waypoints.ToArray(), proposal.Diagnostics) { Proposal = proposal };
+    }
+
     public NavigationVersion Version { get; }
 
     public NavigationMovementClass MovementClass { get; }
