@@ -111,6 +111,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     public bool DebugCaptureEnabled { get; set; }
 
+    public SkirmishResearchReadModel CaptureResearch(EntityId controller) =>
+        _research?.Capture(controller) ?? default;
+
     public IReadOnlyList<SkirmishOpponentDebugReadModel> DebugSnapshot =>
         _debug;
 
@@ -1413,7 +1416,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
     private static bool CanPlanExpansion(OwnedState owned, in SkirmishEconomyAssessment economy,
         int totalUnits, SkirmishOpponentConfiguration configuration) =>
-        IsBootstrapComplete(owned) &&
+        IsBootstrapComplete(owned) && HasLiveCoreAssaultForce(owned, configuration) &&
         (economy.HealthScore >= configuration.ExpansionReadinessThreshold || economy.RawResourceConstrained) &&
         totalUnits >= 4 && !HasPendingBuilding(owned, BuildingIds.LogisticsHub) &&
         !HasPendingBuilding(owned, BuildingIds.SupplyDepot);
@@ -3479,7 +3482,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 80.0,
                 240.0,
                 420.0,
-                productionPriority);
+                productionPriority,
+                cargoFleetRecovery);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -3489,7 +3493,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 30.0,
                 80.0,
                 160.0,
-                productionPriority);
+                productionPriority,
+                cargoFleetRecovery);
             LogisticsStockPriority fuelPriority =
                 plannedUnit ==
                     UnitIds.MainBattleTank ||
@@ -3512,7 +3517,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 cargoFleetRecovery
                     ? 480.0
                     : 280.0,
-                fuelPriority);
+                fuelPriority,
+                cargoFleetRecovery);
             SetUnitProductionStockPolicy(
                 context,
                 entity,
@@ -3522,7 +3528,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 50.0,
                 120.0,
                 240.0,
-                productionPriority);
+                productionPriority,
+                cargoFleetRecovery);
         }
 
         for (int index = 0;
@@ -3562,7 +3569,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         double minimum,
         double target,
         double maximum,
-        LogisticsStockPriority priority)
+        LogisticsStockPriority priority,
+        bool reserveCargo)
     {
         bool idleInfantry = !facility.ActiveUnit.IsSpecified && !plannedUnit.IsSpecified &&
             facility.Supports(UnitProductionCapability.Infantry) &&
@@ -3591,11 +3599,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             plannedUnit,
             resource,
             ref minimum);
-        ApplyLogisticsReplacementReserve(
-            facility,
-            plannedUnit,
-            resource,
-            ref minimum);
+        if (reserveCargo)
+            ApplyLogisticsReplacementReserve(
+                facility,
+                plannedUnit,
+                resource,
+                ref minimum);
 
         double needed = Math.Max(UnitCost(plannedUnit, resource), UnitCost(facility.ActiveUnit, resource));
         UnitId successor = ResolveQueuedSuccessor(context.Entities, entity, facility);
@@ -3774,7 +3783,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         OwnedState owned,
         SkirmishOpponentConfiguration configuration)
     {
-        int cargoTarget = ResolveCargoFleetTarget(owned, configuration);
+        int cargoTarget = ResolveEssentialCargoFleetTarget(owned, configuration);
 
         // Queued vehicles cannot haul their own missing production inputs.
         return GetUnitCount(
@@ -4068,7 +4077,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 continue;
             }
 
-            if (EnsureReconnaissanceRecoveryProduction(
+            if (EnsureCoreForceRecoveryProduction(
                     context,
                     owned,
                     facilityEntity,
@@ -4237,7 +4246,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 activeRequest,
                 out active) &&
             (active.Priority.CompareTo(ProductionPriority.High) > 0 ||
-             (candidate == UnitIds.CargoTruck && active.Priority == ProductionPriority.High)) &&
+             (active.Priority == ProductionPriority.High &&
+              (candidate == UnitIds.CargoTruck ||
+               candidate == UnitIds.SupplyTruck && active.UnitId == UnitIds.CargoTruck))) &&
             !context.Entities.HasComponent<
                 UnitProductionCancellationRequest>(
                     activeRequest);
@@ -4300,7 +4311,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return true;
     }
 
-    private bool EnsureReconnaissanceRecoveryProduction(
+    private bool EnsureCoreForceRecoveryProduction(
         SimulationContext context,
         OwnedState owned,
         EntityId facilityEntity,
@@ -4317,23 +4328,28 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return false;
         }
 
-        int scoutCount =
-            GetUnitCount(
-                owned,
-                UnitIds.ScoutVehicle);
-        int pendingScouts = GetPendingUnitCount(owned, UnitIds.ScoutVehicle);
-        // Preserve initial mobilization; a lost scout in an established force
-        // still needs ownership of the production slot even when queued.
-        if (scoutCount >= 1 ||
-            (pendingScouts >= 1 &&
-             GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits))
+        // Restore live core roles before optional force or fleet growth. A
+        // queued but unpaid request cannot make a lost role available.
+        UnitId candidate;
+        if (GetUnitCount(owned, UnitIds.ScoutVehicle) < 1)
         {
-            return false;
+            // Preserve the first combined mobilization pipeline.
+            if (GetPendingUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
+                GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits)
+                return false;
+            candidate = UnitIds.ScoutVehicle;
         }
+        else if (GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits)
+            candidate = UnitIds.MainBattleTank;
+        else if (GetUnitCount(owned, UnitIds.MobileArtillery) < 1 &&
+            TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner,
+                TechnologyCapabilityIds.MechanizedSystems))
+            candidate = UnitIds.MobileArtillery;
+        else return false;
 
         EntityId activeRequest =
             facility.ActiveRequest;
-        bool scoutQueued = false;
+        bool candidateQueued = false;
         int liveRequests = 0;
         EntityId replaceablePending =
             EntityId.Invalid;
@@ -4360,9 +4376,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             liveRequests++;
 
             if (request.UnitId ==
-                UnitIds.ScoutVehicle)
+                candidate)
             {
-                scoutQueued = true;
+                candidateQueued = true;
 
                 if (request.Priority.CompareTo(
                         ProductionPriority.High) > 0)
@@ -4404,22 +4420,26 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
 
         UnitProductionRequest active =
             default;
-        bool activeBlocksScout =
+        bool activeBlocksCore =
             activeRequest.IsValid &&
             facility.ActiveUnit !=
-                UnitIds.ScoutVehicle &&
+                candidate &&
             facility.Status ==
                 UnitProductionStatus.NoInput &&
             context.Entities.TryGetComponent(
                 activeRequest,
                 out active) &&
-            active.Priority.CompareTo(
-                ProductionPriority.High) > 0 &&
+            (active.Priority.CompareTo(ProductionPriority.High) > 0 ||
+             active.Priority == ProductionPriority.High &&
+             (active.UnitId == UnitIds.ScoutVehicle && GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 ||
+              active.UnitId == UnitIds.MainBattleTank &&
+                  GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits ||
+              active.UnitId == UnitIds.MobileArtillery && GetUnitCount(owned, UnitIds.MobileArtillery) >= 1)) &&
             !context.Entities.HasComponent<
                 UnitProductionCancellationRequest>(
                     activeRequest);
 
-        if (activeBlocksScout &&
+        if (activeBlocksCore &&
             CancelUnitProduction(
                 context,
                 owned,
@@ -4434,7 +4454,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     liveRequests - 1);
         }
 
-        if (!scoutQueued &&
+        if (!candidateQueued &&
             liveRequests >=
                 configuration.MaximumQueuedUnitsPerFacility &&
             replaceablePending.IsValid &&
@@ -4452,18 +4472,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     liveRequests - 1);
         }
 
-        if (!scoutQueued &&
+        if (!candidateQueued &&
             liveRequests <
                 configuration.MaximumQueuedUnitsPerFacility &&
             (!RequiresCargoReplacementReserve(owned, configuration) ||
-             HasLogisticsReplacementReserve(facility, UnitIds.ScoutVehicle)))
+             HasLogisticsReplacementReserve(facility, candidate)))
         {
             QueueUnitProduction(
                 context,
                 owned,
                 facilityEntity,
                 facility.Owner,
-                UnitIds.ScoutVehicle,
+                candidate,
                 ProductionPriority.High,
                 liveRequests);
         }
@@ -4482,7 +4502,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             return UnitId.None;
         }
 
-        int cargoTarget = ResolveCargoFleetTarget(owned, configuration);
+        int cargoTarget = ResolveEssentialCargoFleetTarget(owned, configuration);
         int cargoCount =
             GetUnitCount(
                 owned,
@@ -4709,7 +4729,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                     : ResolveInitialInfantryTarget(configuration),
                 [UnitIds.CombatEngineer] = 1,
                 [UnitIds.ScoutVehicle] = HasLiveCoreAssaultForce(owned, configuration) ? 2 : 1,
-                [UnitIds.CargoTruck] = ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true),
+                [UnitIds.CargoTruck] = HasLiveCoreAssaultForce(owned, configuration)
+                    ? ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true)
+                    : ResolveEssentialCargoFleetTarget(owned, configuration),
                 [UnitIds.SupplyTruck] = HasLiveCoreAssaultForce(owned, configuration)
                     ? configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count)
                     : configuration.MinimumSupplyTrucks,
