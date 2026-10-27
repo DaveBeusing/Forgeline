@@ -117,3 +117,17 @@ Road shoulders use a distinct mineral material to transition toward surrounding 
 These visual entities do not participate in logistics routing, capacity, navigation blocking, restoration progress, or crossing availability. Those facts continue to come exclusively from the existing logistics and strategic-infrastructure systems.
 
 Final high-detail environment art, richer bridge repair/destruction effects, and production map-editor authoring remain future work. The gameplay topology and authoritative state are not placeholders.
+
+## Bridge combat and paid repair
+
+In normal matches the North Bridge is a shared neutral Structure combat target with 1,200 health. Identify it, select a unit whose weapon can engage structures, choose Attack and click the bridge. Existing weapon range, ammunition, faction intelligence, damage and lifecycle rules apply. Units do not automatically acquire bridges as enemies. Destroying the bridge retains its crossing entity and disables the actual GroundRoad edge and navigation passage in the ordinary infrastructure system.
+
+To repair, select one owned Combat Engineer and open Logistics in its action ring. The copied list shows up to eight currently identified bridges, ordered by distance, with health, lifecycle, progress, costs and authoritative rejection reasons. The engineer must be alive and within 32 m horizontally of the crossing passage. A new kit costs 120 Steel and 20 Electronics from an owned, living, completed building inventory within 64 m of the engineer; reserved stock is unavailable. The menu considers up to 32 owned storage candidates in stable entity order and prefers an affordable nearby candidate. Its tooltip names the selected source entity and available amounts.
+
+Payment occurs once when the simulation accepts Repair. The engineer stops at the site. A damaged operational bridge also closes for the full existing map restoration duration. A destroyed bridge receives one paid work health point; restoration health and fixed-tick progress then advance together. Neither logistics nor navigation reopens until completion. Leaving the area or losing the engineer pauses the paid job. The paying player can select another own engineer and use Repair / Resume to take over without another kit. Another player cannot take over that paid work. Further damage interrupts the job, disables the bridge and spends the kit without refund. A later repair requires new payment.
+
+The South Ford keeps its existing generic host disable/restore lifecycle and is not a weapon target or paid bridge-repair action. The raw RestoreStrategicInfrastructureCommand cannot restore combat bridges for free. Raw host disable and noncombat restore remain outside the player replay codec; normal bridge weapon orders and RepairBridgeCommand are recorded.
+
+No cargo order, reservation or loaded inventory is replaced by this feature. Existing versioned route invalidation, alternate routing, waiting and retry behavior remains responsible for in-flight cargo. A bridge repair does not teleport trucks or refund their loads. See [Bridge combat lifecycle](adr/BridgeCombatAndPaidRepair.md) and [save compatibility](SaveLoadReplayAndRecovery.md#bridge-combat-and-repair-compatibility).
+
+Implementation status: manual acceptance is outstanding. No new automated qualification, test or smoke run is claimed.

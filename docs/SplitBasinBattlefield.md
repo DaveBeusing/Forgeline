@@ -16,7 +16,7 @@ Richer paired contested reserves sit outside the yards: 12,000 Ore, 8,000 Volati
 
 The central Basin Bridge at (1024, 1024) is the short exposed route. The Outer Ford at (1024, 1664) creates a longer southern approach around the divide. Terrain rises around the northern overlooks and between the two passages; real static blockers close the divide outside the authored gaps. The lower central basin and elevated flanks are simulation terrain, using normal slope rules. Current visual sensing uses range and faction intelligence; terrain/vegetation occlusion and an elevation sight bonus are not implemented. Route geometry changes proximity to observers. A production-sensor probe uses the existing Scout Vehicle's 320 m visual range at the northern bridge approach: the bridge target is identified, while the outer-ford target loses current identification. This is one observer placement, not a claim that the complete outer route is concealed. No terrain cover or safety advantage is promised for the outer route. Trees and decorative props have no extra gameplay effects.
 
-Both crossings use the normal disable/restore commands and fixed-tick infrastructure system (80 bridge ticks, 120 ford ticks). Each disables its actual road edge and navigation passage. Either single loss retains a real alternative; losing both disconnects the two halves. Road capacities remain explicit (bridge 160/s, ford 90/s) and use the existing routing implementation. No teleport or route override exists. Crossings currently expose host disable/restore commands, not weapon-damage targets or a player repair action. Those existing host commands are outside the player replay codec; persistence correctly rejects their unrecorded history. The paid active-logistics save/replay proof runs before that separate infrastructure lifecycle check. Combat destruction/repair and recovery after host-triggered crossing loss remain an explicit existing integration limitation.
+Both crossings retain the fixed-tick infrastructure lifecycle (80 bridge ticks, 120 ford ticks), their actual road edges and navigation passages. Either single loss retains a real alternative; losing both disconnects the two halves. Road capacities remain bridge 160/s and ford 90/s. The bridge now supports normal weapon damage and paid player repair as described below.
 
 ## Identity and compatibility
 
@@ -26,7 +26,7 @@ Map JSON SHA-256: `f82b732e563b611a9106279e260564ba91a77eb3a61e19dd1e439caf28d8c
 
 Terrain SHA-256 over every little-endian height sample in chunk/Z/X order: `ee7f0c7e872c2e32528729eca98171ebbcbd9d0d4d846a007fb4d5eb0d9562cd`.
 
-The registry pins those bytes plus the mandatory digest sidecar. Save/replay payload 7 stores the exact scenario identity; envelope 1 is retained and authoritative schema 8 follows the integrated technology-progression master. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
+The registry pins those bytes plus the mandatory digest sidecar. The original map integration used payload 7 and authoritative schema 8. Current captures use payload 10 and authoritative schema 13 with envelope 1; the exact compiled scenario identity is retained. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
 
 ## Reproduction
 
@@ -102,3 +102,15 @@ Local evidence is under `artifacts/`: `split-basin-final-build.log`, `split-basi
 The change remains a draft candidate with existing [texture-budget #344](https://github.com/DaveBeusing/Forgeline/issues/344) and [resource-field fixture #345](https://github.com/DaveBeusing/Forgeline/issues/345) blockers. Required gates, assertions and budgets are retained. No merge, release or tag is part of this task.
 
 Current terrain/vegetation sensing has no occlusion or elevation sight bonus. Host-only crossing disruption/restoration and its unrecorded-history rejection remain the separate infrastructure limits described above. Automated native/WARP execution, sustained reference-performance qualification and human visual/gameplay acceptance are separate evidence classes. Existing required gates remain unchanged.
+
+## Bridge operation
+
+The Basin Bridge is a neutral, explicitly targeted Structure with 1,200 health in the normal match runtime. Weapon damage uses the normal ammunition, target-class, intelligence and lifecycle rules. Its destruction closes the existing real road edge and navigation passage. Automatic hostile target acquisition excludes shared bridges.
+
+Select an owned Combat Engineer and use its Logistics ring to inspect or start Repair / Resume for a currently identified bridge. A new kit costs 120 Steel plus 20 Electronics from an own living completed storage within 64 m of the engineer. The engineer must stand within 32 m horizontally of the crossing passage. The copied row and tooltip report lifecycle, health, progress, material source, available unreserved stock and policy rejection reasons. Up to eight identified bridges and 32 own storage candidates are considered.
+
+Accepted repair closes even a damaged operational bridge. It uses the map's existing 80 fixed simulation ticks; the route remains closed through the final tick. A missing or out-of-range engineer pauses work; the paying player can resume or hand over to another own engineer without paying twice. Further damage discards the paid kit and disables the bridge. Other players cannot take over a paid job. The Outer Ford retains its original host-only 120-tick restore lifecycle and is not a combat bridge.
+
+In-flight cargo retains ordinary orders, reservations and loaded stock. Real topology changes invoke the existing alternate-route / blocked-route behavior; repair creates no bypass or cargo replacement. Normal weapon/player-repair command history supports deterministic recovery. Raw host crossing commands remain unsupported by the external player replay codec.
+
+Manual acceptance of weapon destruction, paid completion, cargo continuity and Save/Replay is outstanding; earlier map qualification is historical evidence only.
