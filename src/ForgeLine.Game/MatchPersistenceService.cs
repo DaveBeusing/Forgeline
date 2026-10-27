@@ -566,7 +566,7 @@ public static class MatchPersistenceService
             save.SchemaVersion);
         MatchPersistenceValidation.Configuration(save.Configuration);
         ValidateScenarioIdentity(save.SchemaVersion, save.Configuration);
-        MatchPersistenceValidation.Commands(save.Commands);
+        MatchPersistenceValidation.Commands(save.Commands, save.SchemaVersion);
         MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
 
         ValidateCommandHistory(
@@ -621,7 +621,7 @@ public static class MatchPersistenceService
                 $"Replay state schema {replay.AuthoritativeSchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         MatchPersistenceValidation.Configuration(replay.Configuration);
         ValidateScenarioIdentity(replay.SchemaVersion, replay.Configuration);
-        MatchPersistenceValidation.Commands(replay.Commands);
+        MatchPersistenceValidation.Commands(replay.Commands, replay.SchemaVersion);
         MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
         DeveloperPersistenceGuard.Validate(replay.SchemaVersion, replay.Configuration, replay.Commands, replay.ParameterChanges, developerModified: replay.DeveloperModified);
 

@@ -101,6 +101,7 @@ public sealed class MoveEntitiesCommand : ISimulationCommand
 
             if (!_preserveCombatIntent)
             {
+                TacticalCommandUtilities.RemoveIfPresent<QueuedUnitOrders>(context, entity);
                 ClearCombatIntent(
                     context,
                     entity);
@@ -310,6 +311,7 @@ public sealed class StopMovementCommand : ISimulationCommand
                 continue;
             }
 
+            TacticalCommandUtilities.RemoveIfPresent<QueuedUnitOrders>(context, entity);
             TacticalCommandUtilities.ClearMovementIntent(
                 context,
                 entity);

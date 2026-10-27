@@ -38,7 +38,8 @@ internal static class MatchPersistenceValidation
         }
     }
 
-    internal static void Commands(IReadOnlyList<RecordedSimulationCommand>? commands)
+    internal static void Commands(IReadOnlyList<RecordedSimulationCommand>? commands,
+        int payloadSchema = MatchPersistenceSerializer.CurrentSchemaVersion)
     {
         Require(commands is not null, "Missing command history.");
         foreach (var command in commands!)
@@ -47,6 +48,11 @@ internal static class MatchPersistenceValidation
             Require(Enum.IsDefined(command!.Kind) && command.Entities is not null,
                 "Invalid command kind or entity collection.");
             Require(command.Entities!.All(entity => entity.IsValid), "Invalid command entity identity.");
+            if (command.Kind == ReplayCommandKind.QueuedOrders)
+                Require(payloadSchema >= 11 && command.Issuer.IsSpecified && command.Entities.Length is > 0 and <= QueuedUnitOrders.MaximumUnits &&
+                    Enum.IsDefined(command.QueueEdit) && Enum.IsDefined(command.QueueKind) && Enum.IsDefined(command.Formation) &&
+                    (!command.Patrol || command.QueueKind == QueuedOrderKind.Move) &&
+                    (command.QueueKind != QueuedOrderKind.Attack || command.TargetEntity.IsValid), "Invalid queued order command.");
             if (command.Kind == ReplayCommandKind.BridgeRepair)
                 Require(command.Issuer.IsSpecified && command.Entities.Length == 1,
                     "Invalid bridge repair command.");
