@@ -98,7 +98,11 @@ public readonly record struct PlayerProductionRequestReadModel(
     ProductionPriority Priority,
     ProductionRequestMode Mode,
     bool Paused,
-    bool IsActive);
+    bool IsActive)
+{
+    public ResourceId DesiredStockResource { get; init; }
+    public double DesiredStockQuantity { get; init; }
+}
 
 public sealed class PlayerProductionFacilityActionReadModel
 {
@@ -618,6 +622,7 @@ public sealed class PlayerActionSnapshot
     public PlayerProductionFacilityActionReadModel? Production { get; }
 
     public OperationsRuleSelectionSnapshot? OperationsRules { get; }
+    public PolicyTemplateSelectionSnapshot? PolicyTemplates { get; init; }
     public ConveyorRoutingActionReadModel? ConveyorRouting { get; init; }
 
     public PlayerUnitProductionFacilityActionReadModel? UnitProduction { get; }
@@ -720,7 +725,9 @@ internal static class PlayerActionSnapshotFactory
             tactical,
             technology,
             interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null)
-        { ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility) };
+        { ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility),
+            PolicyTemplates = interaction.OperationsOpen
+                ? PolicyTemplateSelectionCapture.Capture(context, extraction, interaction.SelectedEntities) : null };
     }
 
     private static ConveyorRoutingActionReadModel? CaptureRouting(SimulationContext context, PlayerId player, EntityId entity)
@@ -868,7 +875,8 @@ internal static class PlayerActionSnapshotFactory
                     request.Priority,
                     request.Mode,
                     request.Paused,
-                    requestEntity == facility.ActiveRequest));
+                    requestEntity == facility.ActiveRequest)
+                { DesiredStockResource = request.DesiredStockResourceId, DesiredStockQuantity = request.DesiredStockQuantity });
         }
 
         double progress = 0.0;
