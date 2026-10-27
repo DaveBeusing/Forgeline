@@ -16,7 +16,7 @@ These controls reuse the normal command gateway and finite production/distributi
 ## First production chain
 
 1. Use BUILD to construct power, a Smelter and a Vehicle Factory at valid sites. Suitable buildings connect automatically to nearby road nodes. There is no manual CONNECT ROUTE step.
-2. Select the Smelter, open LOGISTICS and select the INPUTS card for its Steel recipe. USE INPUTS prepares editor values from the current recipe. Apply the required resource with APPLY POLICY. Choose enough additional steps for the downstream requirement, using the recipe output; PROCESS selects the recipe, its production mode and QUEUE after local inputs arrive.
+2. Select the Smelter, open LOGISTICS and select the INPUTS card for its Steel recipe. USE INPUTS prepares editor values from the current recipe. Apply the required resource with APPLY POLICY. Choose enough additional steps for the downstream requirement. The completed Smelter processes automatically when local inputs and power are available; no PROCESS/QUEUE step is required.
 3. Select the Vehicle Factory and open LOGISTICS. Page to INPUTS: Scout Vehicle, choose the number of additional steps with the existing decrease/increase controls, then USE INPUTS. The default is one additional unit, with no extra buffer. An active reserved unit is separate from these additional steps.
 4. Select each required resource and use APPLY POLICY. Preparation creates no policy or order. Saved manual rules remain unchanged until that resource is submitted. Each command reports its own pending/accepted/rejected outcome; accepting one resource does not mean every resource was applied. Reapplying updates the same target/resource policy.
 5. Watch local/free/reserved stock, requested demand and assigned incoming loads separately. Cargo Trucks choose their real source and assignment automatically. A request is not a delivery; incoming stock is not local factory input.
@@ -25,7 +25,44 @@ These controls reuse the normal command gateway and finite production/distributi
 
 All requirements and explanatory cost lists come from the active recipe/unit catalog. A changed catalog updates the preview; there is no fixed Scout cost table in help. Additional steps range from 1 to 100. A preview includes current reservations (still physically stored until consumption) and outstanding demand, without adding assigned loads twice. It rejects a proposal whose combined projected occupancy exceeds shared storage. Free space is not allocated independently to every material. Existing stock unrelated to the recipe also occupies storage; consume or move it before retrying a rejected proposal.
 
-## Manual quantity editing
+## Command Core automatic refill
+
+Select an owned completed Command Core, open LOGISTICS and choose the material.
+A material click (or the configured Activate key on an item page) opens the
+existing ring's dedicated stock editor. It does not save a default rule.
+
+The editor has MIN - / MIN + and MAX - / MAX + controls, plus APPLY STOCK and
+REMOVE RULE. Next item changes resource; Back returns to the material list.
+The existing Secondary Setting key switches MIN/MAX for keyboard decrease/increase.
+Quantities use the same 50-unit editing grid and shared inventory capacity bounds.
+The editor shows both draft values; item/status text shows real local stock and
+the saved rule or current transport failure separately.
+
+APPLY STOCK sends the existing stock-policy command with Minimum = MIN and
+Target = Maximum = MAX, enabled. Only accepted execution installs that rule.
+Once local stock plus assigned/in-transit incoming quantities falls **below MIN**,
+the existing distributor assigns a free, empty, owned Cargo Truck to collect
+available source surplus. It uses additional physical shipments as needed until
+the live target reaches MAX. For example MIN 100 / MAX 500 requests a refill
+when effective stock falls below 100, aiming for 500 rather than the old separate
+default target of 100. Ordinary stock increases, reservations, capacity and
+policy edits are reevaluated by the existing scheduler.
+
+No source stock, free truck, drive Fuel, valid graph route or physical bay means
+waiting/retry with the recorded reason. Supply Trucks are separate. Policy
+acceptance, requested quantities and assigned incoming loads do not prove arrival.
+MAX is the refill goal for this editor, not a hard cap on conveyors or already
+committed cargo. Shared capacity still limits actual unloading. REMOVE RULE stops
+future unassigned demand; existing cargo keeps its transport lifecycle.
+
+New drafts retain the normal 50 / 150 MIN/MAX defaults (or capacity-fitted
+equivalents). Existing policy values are loaded without rewriting their stored
+target. Applying a Core draft deliberately changes its target to its displayed
+MAX and enables it. Existing zero minimum values retain their legacy meaning:
+a nonnegative stock cannot fall below zero; choose a positive MIN for automatic
+refill. No new default policies are silently installed.
+
+## Manual quantity editing for other facilities
 
 Opening LOGISTICS for a resource without a saved stock policy prepares a local
 MIN 50 / TARGET 100 / MAX 150 draft. The draft is not saved and does not place
@@ -55,7 +92,7 @@ multiples of 50. No editor change itself guarantees a delivery.
 
 - MIN triggers replenishment when stock plus outstanding requests falls below it.
 - TARGET is the refill goal.
-- MAX is validated and saved policy metadata. The current dispatcher does not enforce it as a hard inventory ceiling.
+- MAX is validated and saved policy metadata. The current dispatcher does not enforce it as a hard inventory ceiling. The Command Core editor deliberately submits TARGET equal to MAX to make MAX its refill goal.
 - Shared inventory capacity is a separate physical storage contract. It still limits unloading.
 
 INPUTS cards prepare drafts only. A draft target includes materials for the selected additional steps and the inputs still reserved by active work. The current stored rule and its command outcome remain separate from the editor. Closing, losing the selection or changing the session discards the draft. Opening another building cannot inherit its values.

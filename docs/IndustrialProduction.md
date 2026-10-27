@@ -72,6 +72,20 @@ The match enables this policy in the authoritative ProductionSystem. Its existin
 
 Existing one-shot and desired-stock orders for these processors become repeat work in place, preserving the request identity, priority, progress, input reservations and explicit paused state. Thus an old output target does not silently stop automatic processing. Work is created once per facility and persists through the existing save/replay components; no new save schema or per-frame UI command is required. Ammunition and multi-recipe facilities retain their explicit orders.
 
+## Visible finished-material stock
+
+Selected owned processors and permitted world hover show PRODUCED MATERIALS IN
+OUTPUT STOCK. Each supported recipe output has its actual local on-hand quantity,
+reserved amount and free amount. For a Smelter this is the Steel remaining in its
+output inventory, including a visible zero after collection. It is not a lifetime
+production counter, a recipe batch size or the Command Core's stock.
+
+Extraction copies at most seven distinct output-resource rows for the current
+facility, session and completed tick, with an overflow notice. Rendering reads
+that snapshot only. Owned selection and authorized hover have the same facts;
+foreign contacts receive no inventory disclosure. Normal cargo/conveyor
+collection updates the count at the next published snapshot.
+
 ## Fixed-Tick Lifecycle
 
 Production runs in `SimulationPhase.Production`, after authoritative power allocation in `SimulationPhase.Infrastructure` and before the economy phase.
