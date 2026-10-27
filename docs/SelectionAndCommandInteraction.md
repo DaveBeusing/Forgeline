@@ -31,7 +31,7 @@ Two left clicks within 350 ms and the latched 6-pixel DPI/UI-scaled movement thr
 
 Click completion reuses the nearest current hover hit, so a foreign object in front does not expose an owned selectable behind it through a second ownership-only raycast. Same-type selection scans only the current render world; no map-wide or live ECS query is used. Selection remains stably ordered and duplicate-free; retained list capacity avoids allocating one tree node per unit on each repeated same-type selection.
 
-Context cursors use existing compiled cursor identities. UI ownership wins over world cursors. Move requires current owned visible copied movement capability; selecting only an immobile building keeps the default cursor. Attack/AttackMove/FireMission/Retreat cursors occur only in the existing validated targeting mode. A Supply panel alone is not a supply-targeting gesture. Repair and Patrol affordances are not inferred. Build requires a matching valid preview without a known copied material shortage; pending command results use the default cursor. Preview/cursor validity never authorizes the eventual command.
+Context cursors use existing compiled cursor identities. UI ownership wins over world cursors. Move requires current owned visible copied movement capability; selecting only an immobile building keeps the default cursor. Attack/AttackMove/FireMission/Retreat cursors occur only in the existing validated targeting mode. A Supply panel alone is not a supply-targeting gesture. Repair affordances are not inferred. Patrol is an explicit Ctrl + right-click action on eligible selected units; it does not infer a new cursor or hidden target. Build requires a matching valid preview without a known copied material shortage; pending command results use the default cursor. Preview/cursor validity never authorizes the eventual command.
 
 The first RTS interaction layer connects visible controllable presentation entities to the authoritative fixed-tick simulation command pipeline without allowing input or rendering code to mutate live simulation state.
 
@@ -343,3 +343,13 @@ transforms without reading ECS state on the render thread.
 This is a presentation-only feature. It does not modify pathfinding, movement,
 production, logistics, combat execution, saving or replay state. Native animation,
 terrain/zoom contrast and DPI/UI-scale checks remain required for visual acceptance.
+
+## Queued viewport orders and patrol
+
+Shift + right click appends Move. Hold Shift when resolving an existing Attack or Attack Move targeting gesture to append the tactical entry. Ctrl + right click starts a recurring patrol from each eligible unit's current position to the chosen point; Ctrl + Shift + right click extends an existing patrol. Normal right click and accepted manual replacement/Stop/Hold/Retreat commands clear older queue intentions. These modifiers are captured in the immutable request and pass through the ordinary simulation-owner gateway, session/tick validation and result flow.
+
+Queues admit 16 retained entries per unit and at most 1,024 units globally. They are military movement/tactical intent only; physical Cargo/Supply trucks keep their logistics owners. Current formations finish before appended entries; subsequent legs advance independently per unit. Resupply suspends progression and resumes the same active entry after actual service. A blocked or rejected entry does not silently skip ahead. Extending a nonexistent patrol, mixing finite appends into a patrol, or exceeding capacity is rejected without replacing the existing sequence.
+
+Selected-order status shows the current and next kind, queue count, loop and waiting/supply/block/rejection state. Next coordinate segments are pale amber and share the existing total 1,024-segment/8,192-line budget with current paths. Unidentified queued attack targets have no invented world marker. Modal, focus, terminal, selection and session cancellation continue to use the existing input lifecycle. Minimap commands retain their existing replacement semantics; these queue modifiers apply to viewport commands.
+
+See [combat orders and sequences](CombatOrdersAndReadiness.md#bounded-unit-order-sequences-and-patrol) for completion, priorities, capacity, and manual acceptance. Payload 11 / authoritative schema 14 make the new intent explicit in Save/Replay; envelope 1 and old hashes remain unchanged.

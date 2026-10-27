@@ -184,7 +184,7 @@ The canonical Vertical Slice composes `TerrainLineOfFirePolicy` into automatic a
 
 Headless or focused compositions may still use the unobstructed default when terrain is intentionally absent.
 
-The V1 rule is deliberately gameplay-oriented. It does not simulate material penetration, destructible cover, vegetation occlusion, or detailed ballistic collision against structures.
+The V1 rule is deliberately gameplay-oriented. It does not simulate material penetration, destructible cover, or detailed ballistic collision against structures. Explicit map cover and ground visual screens are separate rules described below; decorative vegetation still has no implicit effects.
 
 ## Projectile Target Validity
 
@@ -280,3 +280,13 @@ Those systems must extend these armor, targeting, weapon, Health, and lifecycle 
 
 
 See [Battlefield Intelligence](BattlefieldIntelligence.md) for the faction visibility store, sensor semantics, Detected/Identified lifecycle, last-known contacts, presentation filtering, and the concrete intelligence target-availability policy.
+
+## Authored infantry cover
+
+The normal damage owner now consumes the map's immutable TacticalAreaSet. Infantry occupying an authored cover rectangle receives the strongest overlapping multiplier after directional armor and before ordinary Health and suppression resolution. Current maps use 0.65 (35% less direct damage). Multipliers do not stack. The rule is omnidirectional and also applies when attacker and target occupy the same area.
+
+Only known direct weapon hits receive this infantry modifier. Artillery area damage, vehicles, structures, neutral bridges and developer damage do not. Existing ammunition, target-class, facing, hit, retaliation, destruction and paid bridge-repair behavior remain in their existing owners. No cover wall is added to navigation or projectile geometry.
+
+Visual screens separately affect exact intelligence authorization, including radar identification; detection can remain a coarse contact. TerrainLineOfFirePolicy retains its existing weapon rule. An area granting cover need not conceal a target, and decorative trees are not gameplay evidence. Move through the ordinary command path; single owned unit hover/selection status reports copied cover and screen state. The Sensors overlay locates the explicit regions.
+
+See [Cover and visual occlusion](CoverAndVisualOcclusion.md) for boundaries, map locations and manual scenarios. New semantics use authoritative schema 15 and map revision 2/format 4, retaining envelope 1/payload 11. Existing tests and historical measurements remain unchanged; new product compilation and manual acceptance are outstanding.

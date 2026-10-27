@@ -57,7 +57,7 @@ public sealed class SelectedUnitOrderOverlay
         {
             // 1,024 connections plus seven strokes per target fit the existing 8,192-line renderer.
             if (LastConnectionCount == MaximumTargets) break;
-            if (!order.HasTarget || !Finite(order.Target))
+            if ((!order.HasTarget || !Finite(order.Target)) && (!order.HasNextTarget || !Finite(order.NextTarget)))
                 continue;
             if (!world.TryGetInterpolatedInstance(order.Entity, interpolation, out RenderInstance instance))
                 continue;
@@ -66,11 +66,17 @@ public sealed class SelectedUnitOrderOverlay
             if (!Finite(start))
                 continue;
 
-            draw.Line(start, order.Target, stroke);
-            LastConnectionCount++;
+            if (order.HasTarget && Finite(order.Target))
+            { draw.Line(start, order.Target, stroke); LastConnectionCount++; }
+            if (order.HasNextTarget && Finite(order.NextTarget) && LastConnectionCount < MaximumTargets)
+            {
+                draw.Line(order.HasTarget && Finite(order.Target) ? order.Target : start,
+                    order.NextTarget, new Vector4(1, .75f, .2f, LineAlpha));
+                LastConnectionCount++;
+            }
             // Several formation members may share one destination. Blend a
             // given pulse once, not once per member.
-            if (_targets.Count < MaximumTargets && _targets.Add(order.Target))
+            if (order.HasTarget && Finite(order.Target) && _targets.Count < MaximumTargets && _targets.Add(order.Target))
             {
                 _orderedTargets.Add(order.Target);
                 LastUniqueTargetCount++;

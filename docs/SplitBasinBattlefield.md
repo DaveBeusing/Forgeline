@@ -14,19 +14,19 @@ Both sides receive the unchanged normal stock: 2,200 Ore, 900 Volatiles, 900 Sil
 
 Richer paired contested reserves sit outside the yards: 12,000 Ore, 8,000 Volatiles and 10,000 Silicates per side. Six explicit shared sites provide northern overlooks, mining outposts and southern staging areas. Rare Elements are absent and introduce no new bootstrap gate. The existing placement validator still rejects slopes, collisions and invalid dock/footprint positions.
 
-The central Basin Bridge at (1024, 1024) is the short exposed route. The Outer Ford at (1024, 1664) creates a longer southern approach around the divide. Terrain rises around the northern overlooks and between the two passages; real static blockers close the divide outside the authored gaps. The lower central basin and elevated flanks are simulation terrain, using normal slope rules. Current visual sensing uses range and faction intelligence; terrain/vegetation occlusion and an elevation sight bonus are not implemented. Route geometry changes proximity to observers. A production-sensor probe uses the existing Scout Vehicle's 320 m visual range at the northern bridge approach: the bridge target is identified, while the outer-ford target loses current identification. This is one observer placement, not a claim that the complete outer route is concealed. No terrain cover or safety advantage is promised for the outer route. Trees and decorative props have no extra gameplay effects.
+The central Basin Bridge at (1024, 1024) is the short exposed route. The Outer Ford at (1024, 1664) creates a longer southern approach around the divide. Terrain rises around the northern overlooks and between the two passages; real static blockers close the divide outside the authored gaps. The lower central basin and elevated flanks are simulation terrain, using normal slope rules. Current visual sensing uses range, faction intelligence, bounded sampled-terrain sight and explicit visual screens. Decorative vegetation has no automatic occlusion and there is no elevation range bonus. Route geometry changes proximity to observers. A production-sensor probe uses the existing Scout Vehicle's 320 m visual range at the northern bridge approach: the bridge target is identified, while the outer-ford target loses current identification. This is one observer placement, not a claim that the complete outer route is concealed. Only the explicitly authored cover rectangles below grant infantry protection; the outer route has no general safety guarantee. Trees and decorative props have no extra gameplay effects.
 
 Both crossings retain the fixed-tick infrastructure lifecycle (80 bridge ticks, 120 ford ticks), their actual road edges and navigation passages. Either single loss retains a real alternative; losing both disconnects the two halves. Road capacities remain bridge 160/s and ford 90/s. The bridge now supports normal weapon damage and paid player repair as described below.
 
 ## Identity and compatibility
 
-Map revision 1, artifact format 3 and terrain recipe version 1 reuse the existing Directorate content revision `directorate.v1`. The current content hash is `205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63`.
+Map revision 2, artifact format 4 and terrain recipe version 1 reuse the existing Directorate content revision `directorate.v1`. The current content hash is `205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63`.
 
-Map JSON SHA-256: `f82b732e563b611a9106279e260564ba91a77eb3a61e19dd1e439caf28d8c8b8`.
+Map JSON SHA-256: `635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a36e`.
 
 Terrain SHA-256 over every little-endian height sample in chunk/Z/X order: `ee7f0c7e872c2e32528729eca98171ebbcbd9d0d4d846a007fb4d5eb0d9562cd`.
 
-The registry pins those bytes plus the mandatory digest sidecar. The original map integration used payload 7 and authoritative schema 8. Current captures use payload 10 and authoritative schema 13 with envelope 1; the exact compiled scenario identity is retained. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
+The registry pins those bytes plus the mandatory digest sidecar. The original map integration used payload 7 and authoritative schema 8. Current captures use payload 11 and authoritative schema 15 with envelope 1; the exact compiled scenario identity is retained. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
 
 ## Reproduction
 
@@ -101,7 +101,7 @@ Local evidence is under `artifacts/`: `split-basin-final-build.log`, `split-basi
 
 The change remains a draft candidate with existing [texture-budget #344](https://github.com/DaveBeusing/Forgeline/issues/344) and [resource-field fixture #345](https://github.com/DaveBeusing/Forgeline/issues/345) blockers. Required gates, assertions and budgets are retained. No merge, release or tag is part of this task.
 
-Current terrain/vegetation sensing has no occlusion or elevation sight bonus. Host-only crossing disruption/restoration and its unrecorded-history rejection remain the separate infrastructure limits described above. Automated native/WARP execution, sustained reference-performance qualification and human visual/gameplay acceptance are separate evidence classes. Existing required gates remain unchanged.
+The preceding qualification predates explicit tactical areas and bridge combat integration. Current ground sensing and crossing behavior are specified below; decorative trees still provide no automatic bonus. Automated native/WARP execution, sustained reference-performance qualification and human visual/gameplay acceptance are separate evidence classes. Existing required gates remain unchanged.
 
 ## Bridge operation
 
@@ -114,3 +114,11 @@ Accepted repair closes even a damaged operational bridge. It uses the map's exis
 In-flight cargo retains ordinary orders, reservations and loaded stock. Real topology changes invoke the existing alternate-route / blocked-route behavior; repair creates no bypass or cargo replacement. Normal weapon/player-repair command history supports deterministic recovery. Raw host crossing commands remain unsupported by the external player replay codec.
 
 Manual acceptance of weapon destruction, paid completion, cargo continuity and Save/Replay is outstanding; earlier map qualification is historical evidence only.
+
+## Explicit tactical geography
+
+Revision 2 authors four infantry-cover rectangles near basin/outer approaches and two deliberate grove visual screens. Open Sensors to view green cover and amber screens, then use normal movement commands; single owned unit hover/selection status reports its own current state. Only these gameplay entries provide the rules, regardless of decorative object density.
+
+Cover reduces direct infantry damage by 35%, without stacking or artillery/vehicle/structure protection. Screens restrict ground visual/radar identification outside the 32 m close exception; terrain can still block the close ray. Radar detection remains possible as a coarse cell-centered contact. See [locations, budgets and acceptance limits](CoverAndVisualOcclusion.md).
+
+The new map digest above, matching sidecar and registered descriptor replace revision 1 only for new compatible matches. Existing terrain fingerprints and historical measurements are retained without becoming proof of the new sensing or combat behavior. Product compilation and manual acceptance, including Save/Replay at authoritative schema 15, remain outstanding.

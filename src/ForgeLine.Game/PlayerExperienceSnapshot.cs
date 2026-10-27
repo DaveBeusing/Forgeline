@@ -31,7 +31,8 @@ public enum PlayerCommandFeedbackKind : byte
     Tactical = 7,
     Artillery = 8,
     Surrender = 9,
-    Technology = 10
+    Technology = 10,
+    QueuedOrders = 11
 }
 
 public enum PlayerCommandFeedbackState : byte

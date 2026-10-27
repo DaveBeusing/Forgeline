@@ -196,6 +196,9 @@ public sealed class RtsTacticalTargetingController
                 viewportWidth,
                 viewportHeight,
                 formation);
+            if (_pendingRequest is { Kind: PlayerActionRequestKind.SubmitAttack or PlayerActionRequestKind.SubmitAttackMove } queued &&
+                (input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)))
+                _pendingRequest = queued with { AppendOrders = true };
         }
 
         _leftWasDown = leftDown;

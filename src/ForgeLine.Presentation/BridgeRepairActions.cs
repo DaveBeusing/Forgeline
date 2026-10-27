@@ -25,7 +25,7 @@ internal static partial class PlayerActionSnapshotFactory
     {
         var entities = context.Entities;
         if (!entities.TryGetComponent(engineer, out UnitIdentity unit) || unit.UnitId != UnitIds.CombatEngineer ||
-            !entities.TryGetComponent(engineer, out WorldTransform pose)) return Array.AsReadOnly(Array.Empty<BridgeRepairActionReadModel>());
+            !entities.TryGetComponent(engineer, out WorldTransform pose)) return Array.AsReadOnly<BridgeRepairActionReadModel>([]);
         var scenario = extraction.Scenario;
         float Distance(EntityId entity)
         {

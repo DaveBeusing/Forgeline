@@ -159,7 +159,7 @@ Qualification fails with actionable diagnostics when a critical location is unre
 
 ## Compiled Map Artifact and Registration
 
-BattlefieldMapArtifact format **3** carries map revision, copied placement/topology data, TerrainVisual, authoritative terrain recipe version **1**, Directorate catalog digest and explicit starting-base/objective rule IDs. Formats 1 and 2 omit authoritative geometry and are rejected. ToDefinition copies every collection and material array; edits to the source artifact cannot mutate the reconstructed definition.
+BattlefieldMapArtifact format **4** carries map revision, copied placement/topology data, TerrainVisual, authoritative terrain recipe version **1**, Directorate catalog digest explicit starting-base/objective rule IDs and up to 32 explicit TacticalAreaDefinition entries. Formats 1 through 3 are rejected rather than implicitly acquiring new tactical rules. ToDefinition copies every collection and material array; edits to the source artifact cannot mutate the reconstructed definition.
 
 ScenarioRegistry registers Central Divide and [Split Basin](SplitBasinBattlefield.md). The composition key remains `central-divide.directorate.v1`, the map key remains `prototype.vertical_slice`, and the default remains Central Divide. The descriptor binds the map key/revision, SHA-256 of the complete deterministic JSON, terrain version, Directorate content key/digest and rule IDs. The content digest serializes the eight actual catalogs in stable ID order, including technology definitions, costs, weapons and armor. Changing content requires a newly qualified map revision and explicit compatibility handling.
 
@@ -236,3 +236,11 @@ The strategic map does not change the fundamental ownership model:
 Headless execution remains fully supported.
 
 `ForgeLine.Editor` remains a bootstrap host in this stage. Interactive map-editor authoring is not introduced by this change; the compiled artifact and qualification contract are the stable boundary that a later editor can target.
+
+## Revision-2 tactical areas
+
+Both registered battlefields now carry an immutable, bounded World TacticalAreaSet through capture, validation, reconstruction and authoring comparison. Map definitions expose their revision explicitly. Region bounds must fit the map, keys are unique, numbers finite and cover multipliers between 0.5 and 1. No scenery classification creates an area.
+
+Runtime map JSON and mandatory sidecars are registered together at revision 2. Central Divide digest: `0f64c67943ddd0e399f7cc7579f65c43feded449e6bb43182de3bdd9ff4d0682`; Split Basin digest: `635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a36e`. Terrain recipes/catalogs are unchanged. These prepared content bytes are not a claimed MapCompiler qualification; earlier maps and terrain fingerprints retain their historical revisions.
+
+Sensors/All overlays copy public outlines and labels; occupancy and hidden entity metrics are absent. [Cover and visual occlusion](CoverAndVisualOcclusion.md) specifies combat/sensing consumers, budget boundaries, schema-15 recovery and outstanding manual acceptance.
