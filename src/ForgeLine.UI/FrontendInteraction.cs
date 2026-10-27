@@ -18,7 +18,7 @@ public enum FrontendSettingsField : byte
     RenderQuality = 8,
     ResolutionScale = 9, Antialiasing = 10, Shadows = 11, Textures = 12, ObjectDetail = 13,
     SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20,
-    WorldSoundEnabled = 21, MasterSoundVolume = 22, WorldSoundVolume = 23, AlertSoundVolume = 24, AmbienceSoundVolume = 25
+    WorldSoundEnabled = 21, MasterSoundVolume = 22, WorldSoundVolume = 23, AlertSoundVolume = 24, AmbienceSoundVolume = 25, TooltipDelay = 26, TooltipTextSize = 27
 }
 
 public enum FrontendSettingsSection : byte { General, Graphics, Audio, Bindings }
@@ -28,7 +28,8 @@ public sealed class SettingsInteractionModel
     private static readonly FrontendSettingsField[][] s_sections =
     [
         [FrontendSettingsField.OutputResolution, FrontendSettingsField.BorderlessFullscreen, FrontendSettingsField.UiScale,
-         FrontendSettingsField.EdgeScroll, FrontendSettingsField.CameraSpeed, FrontendSettingsField.Onboarding, FrontendSettingsField.ReducedUiMotion],
+         FrontendSettingsField.EdgeScroll, FrontendSettingsField.CameraSpeed, FrontendSettingsField.Onboarding, FrontendSettingsField.ReducedUiMotion,
+         FrontendSettingsField.TooltipDelay, FrontendSettingsField.TooltipTextSize],
         [FrontendSettingsField.RenderQuality, FrontendSettingsField.ResolutionScale, FrontendSettingsField.Antialiasing,
          FrontendSettingsField.Shadows, FrontendSettingsField.Textures, FrontendSettingsField.ObjectDetail,
          FrontendSettingsField.SurfaceDetail, FrontendSettingsField.VegetationMotion, FrontendSettingsField.Atmosphere, FrontendSettingsField.Particles],
@@ -229,6 +230,10 @@ public sealed class SettingsInteractionModel
                 model.SetWorldAudio(settings.WorldAudio with { Alerts = Math.Clamp(settings.WorldAudio.Alerts + Math.Sign(direction) * .05f, 0, 1) }); break;
             case FrontendSettingsField.AmbienceSoundVolume:
                 model.SetWorldAudio(settings.WorldAudio with { Ambience = Math.Clamp(settings.WorldAudio.Ambience + Math.Sign(direction) * .05f, 0, 1) }); break;
+            case FrontendSettingsField.TooltipDelay:
+                model.SetTooltips(settings.Tooltips with { DelayMilliseconds = Math.Clamp(settings.Tooltips.DelayMilliseconds + Math.Sign(direction) * 25, 0, 1000) }); break;
+            case FrontendSettingsField.TooltipTextSize:
+                model.SetTooltips(settings.Tooltips with { TextSize = (HoverTooltipTextSize)(((int)settings.Tooltips.TextSize + Math.Sign(direction) + 3) % 3) }); break;
             case FrontendSettingsField.Onboarding:
                 model.SetOnboarding(
                     !settings.ShowOnboarding);

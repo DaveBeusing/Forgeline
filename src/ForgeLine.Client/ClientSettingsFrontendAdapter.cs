@@ -61,7 +61,8 @@ internal sealed class ClientSettingsFrontendAdapter
                 ReducedUiMotion = snapshot.FeedbackSettings.ReducedMotion,
                 UiSoundEnabled = snapshot.FeedbackSettings.SoundEnabled,
                 UiSoundVolume = snapshot.FeedbackSettings.SoundVolume,
-                WorldAudio = snapshot.WorldAudio
+                WorldAudio = snapshot.WorldAudio,
+                Tooltips = snapshot.Tooltips
             };
 
         settings.Validate();
@@ -81,6 +82,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality, settings.CreateRenderQualitySettings(), settings.CreateUiFeedbackSettings()) { WorldAudio = settings.WorldAudio };
+            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality, settings.CreateRenderQualitySettings(), settings.CreateUiFeedbackSettings()) { WorldAudio = settings.WorldAudio, Tooltips = settings.Tooltips };
     }
 }

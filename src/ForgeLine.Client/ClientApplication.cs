@@ -1834,6 +1834,7 @@ internal sealed class ClientApplication
                     TacticalFeedback = tacticalTargetingController.CommandFeedback.View
                 };
 
+            hoverTooltip.Configure(_settings.Tooltips);
             HoverTooltipView tooltipView = hoverTooltip.Update(inputState, currentSnapshot,
                 selectionController.HoveredEntity, camera, interactionLayout, actionPanelView,
                 selectionController.IsDragSelecting || buildingPlacementController.IsActive ||

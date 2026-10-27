@@ -302,7 +302,14 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
             service.Preview(context.Entities,_extraction.Player,r.Request,_extraction.Side.CommandCore):null;
         double available=context.Entities.TryGetComponent(_extraction.Side.CommandCore,out InventoryStorage storage)?
             _extraction.Scenario.Inventories.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel):0;
-        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player,_extraction.Scenario.Inventories),ConveyorConstructionService.CapturePorts(context.Entities,_extraction.Player));
+        var scenario = _extraction.Scenario;
+        var ports = ConveyorConstructionService.CapturePorts(context.Entities, _extraction.Player);
+        // The marker/description budget is independent of the authoritative port set.
+        var information = ports.Take(128).Select(port => new ConveyorPortInformation(port.Building, port.Input,
+            ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port)))).ToArray();
+        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player,scenario.Inventories),ports)
+        { PortInformation = Array.AsReadOnly(information),
+            BeltMaterials = ConveyorPortInformationCapture.Materials(scenario, (1 << ConveyorSimulationSystem.EligibleResources.Count) - 1) };
     }
 
     private RenderInstance[] CaptureRenderInstances(
@@ -992,6 +999,19 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 request.RequestedPosition,
                 request.Orientation);
 
+        if (_extraction.Scenario.Services.BuildingDefinitions.TryGet(preview.BuildingId, out var building))
+        {
+            var scenario = _extraction.Scenario;
+            var deposit = context.Entities.TryGetComponent(preview.ResourceDeposit, out ResourceDeposit resource)
+                ? resource.ResourceId : default;
+            preview = preview with
+            {
+                ConveyorInputMaterials = preview.ConveyorInput.HasValue
+                    ? ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.PreviewAllowedResources(building, true, deposit)) : string.Empty,
+                ConveyorOutputMaterials = preview.ConveyorOutput.HasValue
+                    ? ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.PreviewAllowedResources(building, false, deposit)) : string.Empty
+            };
+        }
         return new BuildingPlacementPreviewReadModel(
             request.RequestId,
             context.Tick,

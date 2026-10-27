@@ -222,7 +222,9 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("MasterSoundVolume"), $"{settings.WorldAudio.Master * 100:0}%", IsFocused: focused == FrontendSettingsField.MasterSoundVolume, CanDecrease: settings.WorldAudio.Master > 0, CanIncrease: settings.WorldAudio.Master < 1),
                 new(GraphicsSettingsText.Get("WorldSoundVolume"), $"{settings.WorldAudio.World * 100:0}%", IsFocused: focused == FrontendSettingsField.WorldSoundVolume, CanDecrease: settings.WorldAudio.World > 0, CanIncrease: settings.WorldAudio.World < 1),
                 new(GraphicsSettingsText.Get("AlertSoundVolume"), $"{settings.WorldAudio.Alerts * 100:0}%", IsFocused: focused == FrontendSettingsField.AlertSoundVolume, CanDecrease: settings.WorldAudio.Alerts > 0, CanIncrease: settings.WorldAudio.Alerts < 1),
-                new(GraphicsSettingsText.Get("AmbienceSoundVolume"), $"{settings.WorldAudio.Ambience * 100:0}%", IsFocused: focused == FrontendSettingsField.AmbienceSoundVolume, CanDecrease: settings.WorldAudio.Ambience > 0, CanIncrease: settings.WorldAudio.Ambience < 1)
+                new(GraphicsSettingsText.Get("AmbienceSoundVolume"), $"{settings.WorldAudio.Ambience * 100:0}%", IsFocused: focused == FrontendSettingsField.AmbienceSoundVolume, CanDecrease: settings.WorldAudio.Ambience > 0, CanIncrease: settings.WorldAudio.Ambience < 1),
+                new(GraphicsSettingsText.Get("TooltipDelay"), $"{settings.Tooltips.DelayMilliseconds} MS", IsFocused: focused == FrontendSettingsField.TooltipDelay, CanDecrease: settings.Tooltips.DelayMilliseconds > 0, CanIncrease: settings.Tooltips.DelayMilliseconds < 1000),
+                new(GraphicsSettingsText.Get("TooltipTextSize"), GraphicsSettingsText.Get(settings.Tooltips.TextSize.ToString() + "TooltipText"), IsFocused: focused == FrontendSettingsField.TooltipTextSize, CanDecrease: true, CanIncrease: true)
             };
         interaction ??= new SettingsInteractionModel();
         foreach (var settingField in Enum.GetValues<FrontendSettingsField>())
@@ -232,7 +234,7 @@ internal static class FrontendPresentationAdapter
                 FrontendSettingsField.BorderlessFullscreen or FrontendSettingsField.EdgeScroll or FrontendSettingsField.Onboarding or
                 FrontendSettingsField.WorldSoundEnabled or FrontendSettingsField.ReducedUiMotion or FrontendSettingsField.UiSoundEnabled or FrontendSettingsField.SurfaceDetail or
                 FrontendSettingsField.VegetationMotion => FrontendValueKind.Toggle,
-                FrontendSettingsField.UiScale or FrontendSettingsField.CameraSpeed or FrontendSettingsField.UiSoundVolume or
+                FrontendSettingsField.TooltipDelay or FrontendSettingsField.UiScale or FrontendSettingsField.CameraSpeed or FrontendSettingsField.UiSoundVolume or
                 FrontendSettingsField.MasterSoundVolume or FrontendSettingsField.WorldSoundVolume or FrontendSettingsField.AlertSoundVolume or FrontendSettingsField.AmbienceSoundVolume or FrontendSettingsField.ResolutionScale => FrontendValueKind.Slider,
                 FrontendSettingsField.BindingKey => FrontendValueKind.Binding,
                 _ => FrontendValueKind.Choice
@@ -251,6 +253,7 @@ internal static class FrontendPresentationAdapter
             };
             float normalized = settingField switch
             {
+                FrontendSettingsField.TooltipDelay => settings.Tooltips.DelayMilliseconds / 1000f,
                 FrontendSettingsField.UiScale => (settings.UiScale - FrontendDesign.MinimumScale) / (FrontendDesign.MaximumScale - FrontendDesign.MinimumScale),
                 FrontendSettingsField.CameraSpeed => (settings.CameraPanSpeedMultiplier - .5f) / 2,
                 FrontendSettingsField.UiSoundVolume => settings.FeedbackSettings.SoundVolume,

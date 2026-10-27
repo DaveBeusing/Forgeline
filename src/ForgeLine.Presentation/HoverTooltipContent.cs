@@ -16,7 +16,9 @@ internal readonly record struct HoverTooltipContent(
     string WorkStatus = "", string Explanation = "", UiSkinState VisualState = UiSkinState.Normal, bool WrapDetails = false,
     PlayerSelectionSummary? Selection = null, SelectedCombatGroup? Group = null,
     FormationTemplate Formation = default, PlayerCommandFeedback? Feedback = null,
-    PlayerActionSnapshot? OwnedActions = null);
+    PlayerActionSnapshot? OwnedActions = null,
+    string ActionTitle = "", string ActionStatus = "",
+    ProductionInputInformation? ProductionInput = null);
 
 internal static class HoverTooltipResolver
 {
@@ -36,7 +38,7 @@ internal static class HoverTooltipResolver
                 (ring.Global && experience.Selection.Count != 0) ||
                 (ring.Group is not null && (experience.Selection.Count != ring.Group.SelectedCount ||
                     !ring.Group.MatchesSelection(snapshot.PlayerActions?.Tactical?.SelectedEntities)))) return null;
-            return new(experience.Selection.Count == 0 ? "COMMANDS" : experience.Selection.DisplayName,
+            var content = new HoverTooltipContent(experience.Selection.Count == 0 ? "COMMANDS" : experience.Selection.DisplayName,
                 SelectionInspectorHudModel.ResolveKindLabel(experience.Selection.Kind), "", "READ-ONLY STATUS",
                 WrapDetails: true, Selection: experience.Selection,
                 Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
@@ -48,7 +50,17 @@ internal static class HoverTooltipResolver
                      actions.Supply?.Entity == experience.Selection.PrimaryEntity ||
                      actions.Production?.Entity == experience.Selection.PrimaryEntity ||
                      actions.UnitProduction?.Entity == experience.Selection.PrimaryEntity)
-                    ? actions : null);
+                    ? actions : null,
+                ProductionInput: snapshot.PlayerActions is { } inputActions &&
+                    inputActions.SessionId == snapshot.SessionId && inputActions.Tick == snapshot.Tick &&
+                    inputActions.ProductionInput?.Entity == experience.Selection.PrimaryEntity
+                        ? inputActions.ProductionInput : null);
+            if (view.ActionReady && ResolveDock(snapshot, view, panel) is { } action)
+                content = content with { ActionTitle = action.Title, ActionStatus = action.Status,
+                    Costs = action.Costs, Outputs = action.Outputs, ProductionTicks = action.ProductionTicks,
+                    Requirement = action.Requirement, Prerequisites = action.Prerequisites,
+                    WorkStatus = action.WorkStatus, Explanation = action.Explanation, Hint = action.Hint };
+            return content;
         }
         if (view.DockControl != 0) return ResolveDock(snapshot, view, panel);
         if (view.Contact.IsSpecified)
@@ -88,8 +100,7 @@ internal static class HoverTooltipResolver
         }
         if(world.Category==PlayerHoverCategory.Conveyor) explanation=world.Requirement;
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
-            WrapDetails: world.Category == PlayerHoverCategory.Bridge || world.OwnedDetails.TacticalProtection.HasValue || world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
-                (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));
+            WrapDetails: true, ProductionInput: world.ProductionInput);
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
