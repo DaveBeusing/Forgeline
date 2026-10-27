@@ -675,7 +675,7 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 presentationInteraction,
                 ref pendingPlacementHostSequence,
-                operationsController);
+                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -840,6 +840,7 @@ internal sealed class ClientApplication
             {
                 buildingPlacementController.Cancel(presentationInteraction);
                 tacticalTargetingController.Cancel();
+                actionPanel.ShowDemolitionFeedback("CANCELLED - TARGETING / PLACEMENT");
                 inputState.SuppressKeyUntilRelease(PlatformKey.Escape);
                 returnPressed = false;
             }
@@ -1333,7 +1334,7 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         inputSnapshot?.Tick ??
-                            SimulationTick.Zero);
+                            SimulationTick.Zero, inputState);
                 }
             }
 
@@ -1472,6 +1473,7 @@ internal sealed class ClientApplication
                     inputSnapshot?.Tick ??
                     SimulationTick.Zero;
 
+                selectionController.CommandFeedback.Show(minimapMovement.WorldTarget, valid: true);
                 RequireSubmission(
                     simulationHost,
                     gateway =>
@@ -1480,13 +1482,13 @@ internal sealed class ClientApplication
                             movementEntities,
                             minimapMovement.WorldTarget,
                             observedTick,
-                            activeFormation));
-                selectionController.CommandFeedback.Show(minimapMovement.WorldTarget, valid: true);
+                            activeFormation), selectionController.CommandFeedback);
             }
 
             if (minimapInteraction.TryTakeActionRequest(
                     out PlayerActionRequest minimapAction))
             {
+                tacticalTargetingController.Cancel();
                 DispatchPlayerActionRequest(
                     minimapAction,
                     simulationHost,
@@ -1494,8 +1496,7 @@ internal sealed class ClientApplication
                     tacticalTargetingController,
                     presentationInteraction,
                     inputSnapshot?.Tick ??
-                        SimulationTick.Zero);
-                tacticalTargetingController.Cancel();
+                        SimulationTick.Zero, inputState);
             }
 
             if (minimapInteraction.TryTakeOverlaySelection(
@@ -1591,8 +1592,12 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         currentSnapshot?.Tick ??
-                            SimulationTick.Zero);
+                            SimulationTick.Zero, inputState);
                 }
+
+                if (targetingWasActive && !tacticalTargetingController.IsActive &&
+                    !tacticalTargetingController.CommandFeedback.IsVisible)
+                    actionPanel.ShowDemolitionFeedback("CANCELLED - TARGETING");
 
                 bool placementWasActive = buildingPlacementController.IsActive;
                 if (!tacticalTargetingController.IsActive)
@@ -1648,7 +1653,7 @@ internal sealed class ClientApplication
                                     movementRequest.Append ? QueuedOrderEdit.Append : QueuedOrderEdit.Replace,
                                     movementRequest.Patrol, observedTick, requestedFormation)
                                 : gateway.SubmitMovement(LocalPlayer, movementEntities,
-                                    movementRequest.WorldTarget, observedTick, requestedFormation));
+                                    movementRequest.WorldTarget, observedTick, requestedFormation), selectionController.CommandFeedback);
                     }
                 }
 
@@ -1721,7 +1726,7 @@ internal sealed class ClientApplication
                 presentationInteraction,
                 actionPanel,
                 scenario.Services.Resources,
-                operationsController);
+                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -2078,7 +2083,8 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController buildingPlacementController,
         RtsTacticalTargetingController tacticalTargetingController,
         PresentationInteractionState presentationInteraction,
-        SimulationTick observedTick)
+        SimulationTick observedTick,
+        InputState? initiatingInput = null)
     {
         switch (request.Kind)
         {
@@ -2108,7 +2114,7 @@ internal sealed class ClientApplication
 
                 tacticalTargetingController.Begin(
                     request,
-                    simulationHost.SessionId);
+                    simulationHost.SessionId, initiatingInput);
                 return;
         }
 
@@ -2119,6 +2125,15 @@ internal sealed class ClientApplication
                     request.TacticalEntities?.ToArray()
             };
 
+        RtsCommandFeedback? marker = request.Kind is PlayerActionRequestKind.SubmitAttack or
+            PlayerActionRequestKind.SubmitAttackMove or PlayerActionRequestKind.SubmitRetreat or
+            PlayerActionRequestKind.SubmitFireMissionCoordinate or PlayerActionRequestKind.SubmitFireMissionContact
+            ? tacticalTargetingController.CommandFeedback : null;
+        if (request.Kind is PlayerActionRequestKind.SubmitAttackMove or PlayerActionRequestKind.SubmitRetreat or
+            PlayerActionRequestKind.SubmitFireMissionCoordinate)
+            marker!.Show(request.TacticalWorldTarget, true,
+                request.Kind != PlayerActionRequestKind.SubmitRetreat,
+                request.Kind == PlayerActionRequestKind.SubmitAttackMove);
         RequireSubmission(
             simulationHost,
             gateway =>
@@ -2135,20 +2150,22 @@ internal sealed class ClientApplication
                 }
 
                 return receipt;
-            });
+            }, marker);
     }
 
     private static void RequireSubmission(
         ClientSimulationHost simulationHost,
-        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
+        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission,
+        RtsCommandFeedback? marker = null)
     {
-        if (!simulationHost.TrySubmit(
-                simulationHost.SessionId,
-                submission))
+        bool submitted = simulationHost.TrySubmit(simulationHost.SessionId, submission, out ulong sequence);
+        if (marker is not null)
         {
-            throw new InvalidOperationException(
-                "Simulation command boundary is full or stopping.");
+            marker.TrackSubmission(sequence, simulationHost.SessionId);
+            if (!submitted) marker.ObserveSubmission(sequence, null);
         }
+        else if (!submitted)
+            throw new InvalidOperationException("Simulation command boundary is full or stopping.");
     }
 
     private static void DrainSubmissionCompletions(
@@ -2157,12 +2174,15 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController placement,
         PresentationInteractionState interaction,
         ref ulong placementHostSequence,
-        OperationsController operations)
+        OperationsController operations,
+        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback)
     {
         while (simulationHost.TryReadSubmissionCompletion(
                    out ClientSubmissionCompletion completion))
         {
             operations.ObserveRuleSubmission(completion.HostSequence, completion.Receipt);
+            movementFeedback.ObserveSubmission(completion.HostSequence, completion.Receipt);
+            tacticalFeedback.ObserveSubmission(completion.HostSequence, completion.Receipt);
             if (completion.HostSequence == placementHostSequence)
             {
                 placement.ObserveSubmission(completion.Receipt, interaction);
@@ -3742,12 +3762,15 @@ internal sealed class ClientApplication
         PresentationInteractionState interaction,
         PlayerActionPanelController actionPanel,
         ResourceCatalog resources,
-        OperationsController operations)
+        OperationsController operations,
+        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
             operations.ObserveRuleResult(result);
+            movementFeedback.ObserveResult(result);
+            tacticalFeedback.ObserveResult(result);
             placement.ObserveResult(result, interaction);
             if(result.Kind==PlayerCommandKind.ConveyorConstruction)
                 actionPanel.ShowDemolitionFeedback(result.State==PlayerCommandFeedbackState.Accepted?

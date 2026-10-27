@@ -311,7 +311,17 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         if (!marker.Visible) return;
         var point = camera.WorldToScreen(marker.Position,width,height);
-        if (point.IsVisible) _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        if (!point.IsVisible) return;
+        _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        string label = marker.State switch
+        {
+            RtsCommandMarkerState.Pending => "PENDING",
+            RtsCommandMarkerState.Partial => "PARTIAL",
+            RtsCommandMarkerState.Rejected => "REJECTED",
+            _ => "ACCEPTED"
+        };
+        _text.AddCentered(label, new(point.Position.X-60*scale, point.Position.Y+14*scale,120*scale,18*scale),
+            12*scale, Vector4.One, width, height);
     }
 
     private void EmitMinimap(
