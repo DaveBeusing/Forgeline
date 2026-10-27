@@ -20,12 +20,12 @@ public readonly record struct BridgeRepairActionReadModel(
 
 internal static partial class PlayerActionSnapshotFactory
 {
-    private static IReadOnlyList<BridgeRepairActionReadModel> CaptureBridgeRepairs(
+    private static System.Collections.ObjectModel.ReadOnlyCollection<BridgeRepairActionReadModel> CaptureBridgeRepairs(
         SimulationContext context, PresentationExtractionContext extraction, EntityId engineer)
     {
         var entities = context.Entities;
         if (!entities.TryGetComponent(engineer, out UnitIdentity unit) || unit.UnitId != UnitIds.CombatEngineer ||
-            !entities.TryGetComponent(engineer, out WorldTransform pose)) return [];
+            !entities.TryGetComponent(engineer, out WorldTransform pose)) return Array.AsReadOnly(Array.Empty<BridgeRepairActionReadModel>());
         var scenario = extraction.Scenario;
         float Distance(EntityId entity)
         {
