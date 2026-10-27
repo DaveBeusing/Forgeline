@@ -67,7 +67,7 @@ public sealed class NavigationDiagnosticSnapshot
 {
     internal NavigationDiagnosticSnapshot(SimulationSessionId session, PlayerId viewer, SimulationTick tick,
         NavigationSnapshotRevision revision, NavigationModuleConnections modules, NavigationIntegrationLimits limits,
-        ReadOnlySpan<NavigationDiagnosticVehicle> vehicles, NavigationDeliveryWindow? deliveries, NavigationFleetDiagnostics? fleet = null)
+        ReadOnlySpan<NavigationDiagnosticVehicle> vehicles, NavigationDeliveryWindow? deliveries, NavigationFleetDiagnostics? fleet = null, bool vehicleCoverageComplete = true)
     {
         if (!session.IsSpecified || !viewer.IsSpecified || vehicles.Length > 128)
             throw new ArgumentException("Invalid diagnostic session or bound.");
@@ -81,7 +81,9 @@ public sealed class NavigationDiagnosticSnapshot
         Vehicles = Array.AsReadOnly(vehicles.ToArray());
         CompletedDeliveries = deliveries;
         Fleet = fleet;
+        VehicleCoverageComplete = vehicleCoverageComplete;
     }
+    public bool VehicleCoverageComplete { get; }
     public NavigationFleetDiagnostics? Fleet { get; }
     public NavigationDeliveryWindow? CompletedDeliveries { get; }
     public SimulationSessionId Session { get; }

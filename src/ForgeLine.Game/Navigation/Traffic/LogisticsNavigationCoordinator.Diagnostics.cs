@@ -24,13 +24,14 @@ internal sealed partial class LogisticsNavigationCoordinator
         var revision = _snapshot is { } currentSnapshot && currentSnapshot.Revision.Geometry == _navigation.World.Version
             ? currentSnapshot.Revision : new NavigationSnapshotRevision(_navigation.World.Version, 0);
         var observations = new List<NavigationDiagnosticVehicle>();
+        bool coverageComplete = true;
         var traffic = _traffic.CaptureState();
         foreach (var entity in authorized.Order())
         {
             if (!entities.TryGetComponent(entity, out UnitIdentity unit) ||
                 unit.UnitId != UnitIds.CargoTruck && unit.UnitId != UnitIds.SupplyTruck ||
                 !NavigationMotionCapture.TryCaptureVehicle(entities, entity, _movementOptions, out var vehicle)) continue;
-            if (observations.Count == 128) return null;
+            if (observations.Count == 128) { coverageComplete = false; continue; }
             bool hasActor = _actors.TryGetValue(entity, out var actor) && actor.Active && actor.LastTick == _tick &&
                 actor.OriginalOrder == vehicle.RouteOrder && actor.OriginalOrder.Issuer == viewer;
             PredictiveTrafficVehicleState? wait = null;
@@ -127,6 +128,6 @@ internal sealed partial class LogisticsNavigationCoordinator
                 _navigation.VehicleRoutingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
                 _navigation.VehicleSchedulingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
                 NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
-            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick), _navigation.CaptureFleetDiagnostics(viewer, context.Tick));
+            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick), _navigation.CaptureFleetDiagnostics(viewer, context.Tick), coverageComplete);
     }
 }

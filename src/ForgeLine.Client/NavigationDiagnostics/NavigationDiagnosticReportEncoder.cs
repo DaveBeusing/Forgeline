@@ -150,9 +150,10 @@ internal static partial class NavigationDiagnosticReportEncoder
             }
             writer.WriteStartObject("fleet");
             var fleetSource = snapshot.NavigationDiagnosis;
-            if (connected && fleetSource is { Fleet: { } fleet } && fleet.Tick == fleetSource.Tick && fleet.Viewer == fleetSource.Viewer)
+            if (fleetSource is { Fleet: { } fleet } && snapshot.PlayerExperience is { } fleetExperience && fleetExperience.Player == fleet.Viewer && fleetExperience.Tick == snapshot.Tick && fleetSource.Session == snapshot.SessionId && fleet.Tick == snapshot.Tick && fleet.Tick == fleetSource.Tick && fleet.Viewer == fleetSource.Viewer)
             {
                 WriteCurrent(writer, "fleetScheduler", fleet, fleetSource);
+                WriteCurrent(writer, "vehicleCoverageComplete", fleetSource.VehicleCoverageComplete, fleetSource);
                 WriteCurrent(writer, "waitingSearches", fleet.WaitingSearches, fleetSource);
                 WriteCurrent(writer, "activeSearches", fleet.ActiveSearches, fleetSource);
                 WriteCurrent(writer, "searchWork", fleet.WorkConsumedThisTick, fleetSource);
