@@ -2,13 +2,13 @@
 
 ## Revision and current state
 
-Contract revision **3** is `NavigationIntegrationContract.Revision`. The namespace roots remain `ForgeLine.Navigation` and `ForgeLine.Game`. Folders express ownership; no project or dependency is added.
+Contract revision **4** is `NavigationIntegrationContract.Revision`. The namespace roots remain `ForgeLine.Navigation` and `ForgeLine.Game`. Folders express ownership; no project or dependency is added.
 
 Historical foundation base: `cdb60b1a926e770f25eb1ec350548bb00349ff49`, 0.1.472-dev. Navigation recovery PR #354 and adjacent technology/rescue PR #350 are already integrated. This foundation retains them unchanged and prepares exactly one PATCH increment to 0.1.473-dev.
 
 The normal MatchRuntime connects Traffic, continuous Motion, Routing and copied
-Diagnostics for the defined Cargo/Supply logistics scope. Scheduling/cache and
-RegionalUpdates remain NotConnected. Standalone legacy navigation instances do
+Diagnostics for the defined Cargo/Supply logistics scope. Scheduling and its bounded workspace/cache path are now connected through the
+prepared scheduler. RegionalUpdates remains NotConnected. Standalone legacy navigation instances do
 not acquire routing availability merely by constructing a kernel.
 
 VehicleRoutingKernel supplies bounded resumable hierarchy/refinement/fallback,
@@ -17,10 +17,11 @@ and retains root generations, advances the existing pending requests in bounded
 slices and checks full binding/profile/world freshness before movement admission.
 Owned congestion costs are finite, scoped, delayed and expiring. Existing Fuel,
 GroundMovement and precise Dock/Queue authorities remain in place. No regional
-storage or prepared fleet scheduler is activated. See
+storage is activated. Coordinator cache phases and the host JobScheduler share
+the existing fleet grant ledger. See
 [Connected vehicle routing](CongestionAwareRouting.md) for exact scope, bounds,
 current implementation calls, conservative clearance and pending manual approval.
-Authoritative schema 12 records the new routing state; envelope 1/payload 9 remain
+Authoritative schema 14 records the new routing state; envelope 1/payload 10 remain
 unchanged. [The routing ADR](../adr/BoundedVehicleRoutingIntegration.md) records
 the compatibility decision.
 
@@ -163,7 +164,7 @@ The following declarations are the authored integration surface; compiler-genera
 [Source](../../src/ForgeLine.Navigation/Contracts/NavigationIntegrationLimits.cs)
 
 ```csharp
-public static class NavigationIntegrationContract // public const int Revision = 3
+public static class NavigationIntegrationContract // public const int Revision = 4
 public enum NavigationModuleAvailability : byte { NotConnected = 0, Available = 1, Unavailable = 2 }
 public sealed record NavigationIntegrationLimits(
     int WorkPerTick, int WorkPerSearch, int MaximumActiveSearches,
@@ -436,3 +437,15 @@ public interface INavigationDiagnosticsSink
     bool TryPublish(NavigationDiagnosticFrame frame);
 }
 ```
+
+## Connected fleet phases and state
+
+INavigationCoordinatorSearchSession.Prepare and Complete run on the coordinator
+before dispatch and after the worker barrier. Advance receives only the grant
+remainder. Combined work is settled once against the original disjoint grant.
+The concrete pool/cache owner is VehicleFleetKernel; the Game owner composes the
+prepared NavigationSearchScheduler and borrows existing Jobs. Exact current
+scope, limits, data-only checkpoint projection and owned diagnostics are in
+[Connected fleet scheduling](NavigationSearchScheduling.md). Schema 14 and
+scheduler checkpoint revision 2 retain the execution-relevant state. No regional
+cache dependency completeness is inferred from a list of route sectors.
