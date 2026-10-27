@@ -288,7 +288,7 @@ Manual acceptance remains outstanding, including recovery during disabled, activ
 
 ## Queued unit orders and patrol compatibility
 
-Current captures use authoritative schema **14**, payload schema **11**, envelope **1**. The new QueuedOrders command (kind 18) records the issuer, full unit identities, edit operation, Move/AttackMove/Attack kind, coordinate or target, formation and submitted tick. Replay reconstructs normal fixed-tick sequence progression. Patrol legs call existing commands directly on the simulation owner and do not grow the external command journal per cycle.
+Queued-order integration introduced authoritative schema **14**, payload schema **11**, envelope **1**. The QueuedOrders command (kind 18) records the issuer, full unit identities, edit operation, Move/AttackMove/Attack kind, coordinate or target, formation and submitted tick. Replay reconstructs normal fixed-tick sequence progression. Patrol legs call existing commands directly on the simulation owner and do not grow the external command journal per cycle.
 
 The ECS checkpoint includes the bounded per-unit queue's immutable entries, cursor, owner, repeating/active/wait/resume flags, status and issued tick. Limits are 16 retained entries per unit and 1,024 units globally. Current/next UI projections are observations, not additional persisted authorities. Queue attacks are revalidated through current faction intelligence on activation; historical knowledge cannot grant a hidden target.
 
