@@ -88,7 +88,7 @@ internal static class HoverTooltipResolver
         }
         if(world.Category==PlayerHoverCategory.Conveyor) explanation=world.Requirement;
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
-            WrapDetails: world.Category == PlayerHoverCategory.Bridge || world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
+            WrapDetails: world.Category == PlayerHoverCategory.Bridge || world.OwnedDetails.TacticalProtection.HasValue || world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
                 (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));
     }
 

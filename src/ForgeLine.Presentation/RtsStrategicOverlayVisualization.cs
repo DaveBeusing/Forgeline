@@ -52,6 +52,7 @@ public static class RtsStrategicOverlayVisualization
             mode ==
                 StrategicOverlayMode.Sensors)
         {
+            DrawTacticalAreas(draw, snapshot, all);
             DrawSensors(
                 draw,
                 snapshot,
@@ -434,6 +435,19 @@ public static class RtsStrategicOverlayVisualization
                     statusColor);
                 labels++;
             }
+        }
+    }
+
+    private static void DrawTacticalAreas(DebugDraw draw, StrategicOverlaySnapshot snapshot, bool compact)
+    {
+        int labels = 0;
+        for (int index = 0; index < Math.Min(snapshot.TacticalAreas.Count, TacticalAreaSet.MaximumAreas); index++)
+        {
+            var area = snapshot.TacticalAreas[index];
+            var color = area.BlocksVisual ? new Vector4(1, .65f, .15f, .8f) : new Vector4(.25f, .9f, .35f, .8f);
+            draw.Line(area.A, area.B, color); draw.Line(area.B, area.C, color);
+            draw.Line(area.C, area.D, color); draw.Line(area.D, area.A, color);
+            if (labels++ < (compact ? 8 : 16)) draw.Label((area.A + area.C) * .5f + Vector3.UnitY, area.Label, color);
         }
     }
 

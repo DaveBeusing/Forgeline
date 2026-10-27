@@ -83,6 +83,7 @@ internal static class PlayerHoverSummaryFactory
                 new[] { entity }, scenario.Inventories, scenario.Production, scenario.UnitProduction,
                 scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions);
             if (details.Count != 1) return null;
+            details = PlayerTacticalProtection.Attach(entities, extraction.Player, details, scenario.Battlefield.TacticalAreas);
             var category = details.Kind switch
             {
                 PlayerSelectionKind.Unit => PlayerHoverCategory.Unit,
