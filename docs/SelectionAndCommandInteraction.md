@@ -146,7 +146,7 @@ Initial interaction conventions are:
 | Box selection | Left-drag |
 | Toggle entities in box | Shift + left-drag |
 | Movement order | Right click with a non-empty selection |
-| Cycle development formation | F3 (Compact → Line → Column → Wedge) |
+| Cycle formation | Initially unbound; optional permitted binding (Compact → Line → Column → Wedge) |
 
 A drag becomes box selection after six logical pixels, scaled by the active DPI/UI layout at press time. Crossing the threshold latches box mode until release, even if the pointer returns near its starting point. Mouse press/release edges retain clicks completed between frame updates.
 
@@ -175,7 +175,7 @@ The client creates `MoveEntitiesCommand` with:
 - submission tick;
 - currently selected formation template.
 
-The development client starts with `Compact` and cycles the formation template with F3. This is a minimal command-surface control until the dedicated RTS command UI owns formation selection.
+The client starts with `Compact`. The optional Formation action retains its stable binding ID but has no default key; F3-F9 are retired and cannot be assigned. Building and template selection stays in the Build menu, with Q/E placement rotation.
 
 It submits the command through `SimulationCoordinator.SubmitCommand` for the next simulation tick and uses the matching `SimulationCommandSource`.
 
@@ -226,7 +226,7 @@ continues to supply authorized labels/icons without a rendering owner.
 
 Hover, selection, placement-preview, tactical-target, and strategic-overlay feedback use a dedicated player-facing world-overlay path around immutable presentation data. They no longer share the engineering debug buffer. Player-facing line markers render after depth-tested developer diagnostics and without depth testing so selection and command feedback remain readable over terrain and world geometry. None of these visuals mutates simulation state. Normal player selection no longer paints elliptical rings. Each selected unit, building and group member receives four oriented L-shaped corner markers from `TacticalFootprint`; permitted hover uses four diagonal corner notches and foreign hover adds outward ticks and its distinct tint. Corners sample terrain height with the existing visual ground-plane fallback. Primary selection/permitted hover retain authored corner artwork while all selected group members remain legible via procedural corners. Hidden, offscreen or invalid instances never gain unauthorized markers. Construction/collision footprints and F2 developer sensor/range/navigation circles retain their independent renderers.
 
-Engineering diagnostics use an independent category model. F2 toggles the developer master switch; Shift+F2 toggles Rendering, while Shift+F4 through Shift+F9 toggle Navigation, World, Logistics, Sensors, Combat, and Entities. Unshifted F4–F8 building shortcuts and F9 placement rotation remain unchanged. Disabled developer categories do not request their associated simulation debug-capture paths.
+Engineering diagnostics use an independent category model. With active compiled developer tools, F1 opens Visualization checkboxes for the debug master, Rendering, Navigation, World, Logistics, Sensors, Combat and Entities. Unmodified F2 remains the master shortcut. Former Shift+F diagnostic chords and F3-F9 building/rotation shortcuts are removed from the live input path. Disabled categories do not request simulation debug capture.
 
 The Windows client periodically reports:
 
@@ -237,7 +237,7 @@ The Windows client periodically reports:
 - rejected target count;
 - command execution tick.
 
-Shift + F1 toggles the development metrics overlay and now also reports player-overlay lines, developer-debug lines, dropped debug lines, and developer-overlay CPU submission cost.
+The F1 developer menu's Performance metrics checkbox enables the overlay containing player-overlay lines, developer-debug lines, dropped debug lines and developer-overlay CPU submission cost. Shift+F12 remains exclusively the optional guide; navigation export uses its menu button.
 
 ## Validation
 

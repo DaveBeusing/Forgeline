@@ -6,7 +6,7 @@ Hold Shift when clicking a current valid placement to continue placing that buil
 
 Continuation requires a new preview request identity, matching building/orientation/location and completed tick at or after the result. The previous valid preview is discarded immediately on submission. Construction resource, footprint and same-tick conflicts remain revalidated by the existing command pipeline. Host submission sequence and command correlation identity connect results to the correct intent; unrelated/late results cannot revive canceled placement.
 
-F9 rotation is remembered for the last stable building type during the session, including after successful single placement and reselection. Switching building type starts at North. Escape, focus loss, help/pause, incompatible panel mode, display change and session replacement clear repeat/pending state and rotation memory. No orientation or placement authority is persisted to saves or settings.
+Placement rotation is remembered for the last stable building type during the session, including after successful single placement and reselection. Switching building type starts at North. Escape, focus loss, help/pause, incompatible panel mode, display change and session replacement clear repeat/pending state and rotation memory. No orientation or placement authority is persisted to saves or settings.
 
 FORGELINE uses an authoritative, command-driven construction lifecycle. The interactive client may preview a building footprint and explain whether the current location appears valid, but only simulation command execution decides whether construction starts.
 
@@ -99,17 +99,12 @@ The Windows development client exposes the complete current building catalog thr
 - `Enter` or left click on a palette row — begin placement for the selected building;
 - the palette displays copied construction costs and current Command Core inventory availability.
 
-The legacy direct development bindings remain available for fast testing:
-
-- `F4` — Command Core;
-- `F5` — Power Plant;
-- `F6` — Mine / Extractor;
-- `F7` — Storage Depot;
-- `F8` — Smelter;
-- `F9` — rotate clockwise;
-- left click — submit the valid preview as a build command;
-- `Escape` — leave building-placement mode;
-- `F2` — toggle world diagnostics, including resource-deposit bounds.
+F3-F9 direct development shortcuts are retired. Use the construction palette
+for Command Core, Power Plant, Extractor, Storage, Smelter and the rest of the
+catalog. Q/E rotates an active preview; left click requests the current valid
+location and Escape cancels. Optional gameplay actions can be assigned other
+permitted keys in Settings. Developer diagnostics are configured through F1;
+unmodified F2 remains the activated Developer world's master switch.
 
 The placement ghost is green when the matching preview is currently valid and red when it is currently invalid. Preview freshness is explicit:
 
@@ -123,7 +118,7 @@ A click can produce a build request only from a `Current` valid preview. Stale/u
 
 The compact context card distinguishes **placement check pending**, **stale preview**, **current invalid reason**, **location valid at captured tick**, and **missing core materials**. Invalid text uses the existing allowed failure labels (bounds, slope, terrain, buildable area, obstruction or required deposit); it never names an obstructing entity or exposes a deposit reference. Freshness takes precedence over old validity and costs. For a current valid location, material text uses only the coherent Action Dock construction model's captured Command Core quantities; missing/stale action models omit amounts. Only as many bounded cost rows as fit are shown.
 
-This text cannot authorize placement. Left click requests construction from the existing current-valid preview path; execution still revalidates location, ownership and inventory. A shortage hint does not grant resources or fabricate a deficit from absent data. F9 rotates and Escape cancels. The context card captures world clicks to prevent requests through its text, and old-session/tick views are discarded at render time.
+This text cannot authorize placement. Left click requests construction from the existing current-valid preview path; execution still revalidates location, ownership and inventory. A shortage hint does not grant resources or fabricate a deficit from absent data. Q/E rotates and Escape cancels. The context card captures world clicks to prevent requests through its text, and old-session/tick views are discarded at render time.
 
 `BuildingCommandProcessingSystem` runs during `SimulationPhase.OrderProcessing`. It re-evaluates placement from simulation-owned state when the command executes.
 
@@ -333,13 +328,13 @@ Presentation changes do not modify `BuildingFootprint`, `SpatialPresence`, place
 
 ## Rotation during active placement
 
-With a valid active building placement, Q rotates 90 degrees counterclockwise and E 90 degrees clockwise. F9 (or the configured `RotatePlacement` key) remains a clockwise shortcut. Each accepted edge changes the existing four-state `BuildingOrientation`, invalidates the prior preview request and requires a fresh matching snapshot before an authoritative build request can be submitted. Awaiting an already issued build result does not accept a late rotation. Simultaneous Q/E edges cancel one another; key repeats do not produce extra turns. The placement HUD prompt now displays the actual contextual controls.
+With a valid active building placement, Q rotates 90 degrees counterclockwise and E 90 degrees clockwise. The optional `RotatePlacement` action starts unbound; F3-F9 are retired. Each accepted edge changes the existing four-state `BuildingOrientation`, invalidates the prior preview request and requires a fresh matching snapshot before an authoritative build request can be submitted. Awaiting an already issued build result does not accept a late rotation. Simultaneous Q/E edges cancel one another; key repeats do not produce extra turns. The placement HUD prompt now displays the actual contextual controls.
 
 ## Paid construction templates
 
 Open Build and select **Template / STORAGE LINK** or **Template / SMELTER OUTPUT**.
-The corresponding shortcuts are Ctrl plus the configured Storage or Smelter
-placement key (default Ctrl+F7 / Ctrl+F8). Move the complete draft on the shared
+If Storage or Smelter placement is deliberately assigned another permitted key,
+Ctrl plus that key selects the corresponding template. Both actions start unbound. Move the complete draft on the shared
 4m grid; Q/E rotates it by 90 degrees. One left click starts the explicit
 three-step application. Escape, right click, focus/modal/pause/display changes or
 session replacement cancel unsent steps. Submitted commands remain authoritative.

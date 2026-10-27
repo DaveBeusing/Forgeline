@@ -20,9 +20,13 @@ older Public build exists. Runtime assets retain their normal build path.
 Session activation is supplied by the existing client composition; no saved
 preference or extra runtime permission flag is needed.
 
-In the launched client, start or load a match, press Escape and choose
-DEVELOPER TOOLS.
-No new keyboard chord replaces Help, metrics, gameplay bindings or the guide.
+In an activated Developer client, start or load a match and press unmodified
+**F1** to open Visualization directly. Escape → DEVELOPER TOOLS remains an
+alternative entry. F1 or Escape closes the developer surface back to Pause;
+Escape from Pause resumes through the existing host pause boundary.
+F1/F12 no longer have legacy help assignments. Shift+F12 belongs only to the
+optional match guide. F3-F9 have no default gameplay/developer assignments and
+cannot be reassigned.
 The existing frontend renderer, geometry, fonts, detail controls and focus visuals
 render the bounded scrollable surface. Use the SECTION choice to switch Session,
 Parameters, Actions, Visualization and Presets. Up/Down or wheel move the focus;
@@ -34,11 +38,15 @@ the ordinary pause menu before a subsequent Escape can resume gameplay.
 DeveloperToolsCapability.Current and ephemeral session activation gate entry.
 Public builds compile neither menu implementation nor inspector implementation;
 PauseMenuModel also refuses its developer entry without compiled capability.
-ClientApplication applies the same session capability to F2, Shift+F2 and
-Shift+F4-F9 world diagnostics and the opt-in logistics navigation controller.
-Public Controls and FixedBindings omit those entries. Public Shift+F1 metrics,
-player strategic overlays, minimap and standalone qualification entries retain
-their existing scope; they cannot grant developer permission. A session activation
+ClientApplication applies the same session capability to the F1 menu, its
+diagnostic checkboxes and unmodified F2 world-debug master. Visualization now
+owns the former developer Shift+F functions: performance metrics, Rendering,
+Navigation, World, Logistics, Sensors, Combat and Entities, plus the navigation
+diagnostic panel and each of its six layers. The old live Shift+F1/F2/F4-F11
+handlers are disconnected; report export is an explicit menu button.
+Public builds have no F1 developer entry or metrics shortcut. F10/F11 retain
+their normal player overlay/minimap behavior even when navigation diagnostics
+are enabled. These changes grant no simulation action capability. A session activation
 loss closes the menu, clears drafts/results/targets and disables development views.
 Player preferences never activate this permission.
 
@@ -191,3 +199,33 @@ Controls as well as compiled capability; both affected client test builds passed
 with zero warnings/errors, and the capability case passed1/1 in each variant. No original assertion, price, golden, deadline or gate was
 relaxed. The PR identifies the exact published source and required CI result.
 No full native, package, save/replay or real-provider integration campaign is claimed.
+
+## Visualization checkboxes and retired shortcuts
+
+Visualization uses the existing frontend Toggle control, with a visible checkmark
+and a single activation by pointer, Enter or Space. Debug master gates its checked
+categories. Performance metrics and the navigation panel have separate checkboxes.
+Navigation layer controls are available while that panel is enabled; turning the
+panel off clears its layers. Its details up/down and report export are explicit
+menu actions. Export validates the latest copied publication, current full
+selected-vehicle identity, own visibility and session before writing a report;
+missing/stale data produces a rejection message. No key chord exports a report.
+
+The menu acquires the existing pause/input ownership before world controllers
+can consume the opening press. Opening, closing, focus, layout and session
+transitions suppress held input. Deactivation closes the menu and disables the
+diagnostic views and metrics. Choices belong to the current match session and
+are not stored in saves or a new settings authority.
+
+Formation and direct building/rotation actions retain stable GameplayAction IDs
+but start unbound. Buildings and paid templates remain in Build; Q/E still rotates
+placement. The binding editor permits other valid keys, while F3-F9 are retired.
+Loading older settings removes only gameplay overrides using those keys.
+Retired camera slots are replaced with available ordinary default camera keys,
+preserving other camera bindings and all unrelated display/audio/game settings.
+The settings layout/schema is unchanged; the normalized configuration is saved.
+
+Product compilation and manual review are distinct. Review Public/Developer and
+activation loss, checkbox pointer/Enter/Space edges, held keys, focus/resize,
+pause/resume and session replacement, navigation data/export rejection, all
+retired keys/modifiers, old saved bindings, Build/Q/E and the sole guide shortcut.
