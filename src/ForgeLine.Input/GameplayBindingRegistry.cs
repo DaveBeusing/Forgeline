@@ -16,6 +16,10 @@ public sealed record GameplayBindings
         var retained = Overrides.Where(x => !GameplayBindingRegistry.IsRetiredFunctionKey(x.Key)).ToArray();
         return retained.Length == Overrides.Count ? this : this with { Overrides = retained };
     }
+    public GameplayBindings Reset(GameplayAction action) => this with
+    {
+        Overrides = Overrides.Where(x => x.Action != action).ToArray()
+    };
     public GameplayBindings With(GameplayAction action, PlatformKey key) => new()
     {
         Overrides = Overrides.Where(x => x.Action != action).Append(new(action, key)).ToArray()
