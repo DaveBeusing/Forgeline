@@ -10,6 +10,8 @@ internal readonly record struct BattlefieldStatusMarker(Vector2 Position, HudRec
 internal sealed class BattlefieldStatusOverlay
 {
     internal const int MaximumMarkers = 64;
+    private readonly int[] _next = new int[4096];
+    private readonly HashSet<ForgeLine.Core.EntityId> _selected = new(4096);
     private readonly BattlefieldStatusMarker[] _markers = new BattlefieldStatusMarker[MaximumMarkers];
     public ReadOnlySpan<BattlefieldStatusMarker> Markers => _markers.AsSpan(0, Count);
     public int Count { get; private set; }
@@ -26,21 +28,43 @@ internal sealed class BattlefieldStatusOverlay
         int limit = strategic ? 32 : MaximumMarkers;
         int labels = strategic ? 4 : 8;
         bool showSupply = view.OverlayMode is StrategicOverlayMode.Supply or StrategicOverlayMode.All;
+        if (!showSupply && (view.SelectedEntities is null || view.SelectedEntities.Length == 0)) return;
+        _selected.Clear();
+        if (view.SelectedEntities is { } selectedEntities)
+            for (int i = 0; i < Math.Min(selectedEntities.Length, 4096); i++) _selected.Add(selectedEntities[i]);
+        Span<int> heads = stackalloc int[6], tails = stackalloc int[6];
+        heads.Fill(-1); tails.Fill(-1);
         int inspected = Math.Min(snapshot.Instances.Length, 4096);
-        // Selection first, then pinned and empty/critical supply; ordinary details cannot starve warnings.
-        for (int priority = 0; priority < 6 && Count < limit; priority++)
-        for (int i = 0; i < inspected && Count < limit; i++)
+        // Stable priority buckets inspect membership once; no selection-by-unit Cartesian scan.
+        for (int i = 0; i < inspected; i++)
         {
             ref readonly var instance = ref snapshot.Instances[i];
             if (instance.Selectable.Owner != player.Player || (instance.Visibility & RenderVisibilityMask.World) == 0 ||
                 !units.TryGet(instance.Entity, out var unit)) continue;
-            bool selected = view.SelectedEntities?.Contains(instance.Entity) == true;
-            if ((!selected && !showSupply) || Priority(unit, selected) != priority) continue;
-            var point = camera.WorldToScreen(instance.Transform.Position + Vector3.UnitY *
-                (PresentationBounds.ResolveLocalHalfExtents(instance).Y + 2), width, height);
-            if (!point.IsVisible) continue;
+            bool selected = _selected.Contains(instance.Entity);
+            if (!selected && !showSupply) continue;
+            int priority = Priority(unit, selected);
+            if (priority < 0) continue;
+            _next[i] = -1;
+            if (tails[priority] < 0) heads[priority] = i;
+            else _next[tails[priority]] = i;
+            tails[priority] = i;
+        }
+        var matrix = camera.GetMatrices(width, height).ViewProjection;
+        for (int priority = 0; priority < 6 && Count < limit; priority++)
+        for (int i = heads[priority]; i >= 0 && Count < limit; i = _next[i])
+        {
+            ref readonly var instance = ref snapshot.Instances[i];
+            if (!units.TryGet(instance.Entity, out var unit)) continue;
+            var world = instance.Transform.Position + Vector3.UnitY *
+                (PresentationBounds.ResolveLocalHalfExtents(instance).Y + 2);
+            var projected = Vector4.Transform(new Vector4(world, 1), matrix);
+            if (!float.IsFinite(projected.W) || projected.W <= 0) continue;
+            var ndc = new Vector3(projected.X, projected.Y, projected.Z) / projected.W;
+            if (!(ndc.X >= -1 && ndc.X <= 1 && ndc.Y >= -1 && ndc.Y <= 1 && ndc.Z >= 0 && ndc.Z <= 1)) continue;
+            var position = new Vector2((ndc.X + 1) * .5f * width, (1 - ndc.Y) * .5f * height);
             float size = (strategic ? 7 : 9) * scale;
-            var bounds = new HudRect(point.Position.X - size, point.Position.Y - size, size * 2, size * 2);
+            var bounds = new HudRect(position.X - size, position.Y - size, size * 2, size * 2);
             if (bounds.X < clip.X || bounds.Right > clip.Right || bounds.Y < clip.Y || bounds.Bottom > clip.Bottom) continue;
             string label = labels > 0 ? Label(unit) : string.Empty;
             var occupied = label.Length > 0
@@ -61,7 +85,7 @@ internal sealed class BattlefieldStatusOverlay
             string symbol = unit.BattlefieldStatus.Suppression == SuppressionLevel.Pinned ? "P" :
                 critical ? "!" : unit.BattlefieldStatus.Suppression == SuppressionLevel.Suppressed ? "S" :
                 unit.HasSupply && unit.SupplyStatus == BattlefieldSupplyStatus.LowSupply ? "L" : ">";
-            _markers[Count++] = new(point.Position, occupied, label, symbol, critical);
+            _markers[Count++] = new(position, occupied, label, symbol, critical);
         }
     }
 
