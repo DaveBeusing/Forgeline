@@ -75,6 +75,7 @@ public readonly record struct PlayerActionRequest(
     EntityId[]? ConvoyEscorts = null,
     EntityId ConvoyGroup = default)
 {
+    public bool AppendOrders { get; init; }
     public uint ExpectedInfrastructureRevision { get; init; }
     public static PlayerActionRequest RepairBridge(EntityId engineer, EntityId bridge, EntityId source, uint revision) =>
         new(PlayerActionRequestKind.RepairBridge, BuildingId.None, source, RecipeId.None,

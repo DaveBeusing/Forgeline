@@ -256,7 +256,9 @@ public sealed class RtsSelectionController
             }
             if (PointerMovementTargetValid)
             {
-                _pendingMovementRequest = new MovementOrderRequest(Selection.ToArray(), worldTarget);
+                _pendingMovementRequest = new MovementOrderRequest(Selection.ToArray(), worldTarget,
+                    input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift),
+                    input.IsKeyDown(PlatformKey.LeftControl) || input.IsKeyDown(PlatformKey.RightControl));
             }
         }
 

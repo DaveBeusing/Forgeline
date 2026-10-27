@@ -25,7 +25,8 @@ public enum ReplayCommandKind : byte
     ConveyorConstruction = 14,
     DeveloperAction = 15,
     ConveyorRouting = 16,
-    BridgeRepair = 17
+    BridgeRepair = 17,
+    QueuedOrders = 18
 }
 
 public sealed record RecordedSimulationCommand
@@ -105,6 +106,12 @@ public sealed record RecordedSimulationCommand
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public ConveyorBuildRequest ConveyorRequest { get; init; }
 
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public QueuedOrderEdit QueueEdit { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public QueuedOrderKind QueueKind { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Patrol { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public uint InfrastructureRevision { get; init; }
 
@@ -284,6 +291,15 @@ public static class ReplayCommandCodec
                 recorded = Base(ReplayCommandKind.DeveloperAction) with { DeveloperPayload = command.CapturePayload() };
                 return true;
 #endif
+            case QueuedOrdersCommand command:
+                recorded = Base(ReplayCommandKind.QueuedOrders) with
+                {
+                    Issuer = command.Issuer, Entities = command.Units.ToArray(),
+                    SubmittedAtTick = command.SubmittedAtTick.Value, Position = command.Order.Destination,
+                    TargetEntity = command.Order.Target, Formation = command.Order.Formation,
+                    QueueKind = command.Order.Kind, QueueEdit = command.Edit, Patrol = command.Patrol
+                };
+                return true;
             case MoveEntitiesCommand command:
                 recorded =
                     Base(
@@ -595,6 +611,10 @@ public static class ReplayCommandCodec
         return command.Kind switch
         {
             ReplayCommandKind.DeveloperAction => DecodeDeveloper(command, scenario),
+            ReplayCommandKind.QueuedOrders =>
+                new QueuedOrdersCommand(command.Issuer, command.Entities,
+                    new(command.QueueKind, command.Position, command.TargetEntity, command.Formation, submittedAtTick),
+                    command.QueueEdit, command.Patrol, submittedAtTick, scenario.Intelligence),
             ReplayCommandKind.Movement =>
                 new MoveEntitiesCommand(
                     command.Issuer,

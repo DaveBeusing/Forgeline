@@ -9,7 +9,7 @@ namespace ForgeLine.Presentation;
 
 public enum SelectedUnitOrderKind : byte
 {
-    Idle, Move, Attack, AttackMove, Retreat, Hold, Cargo, Resupply
+    Idle, Move, Attack, AttackMove, Retreat, Hold, Cargo, Resupply, Patrol
 }
 
 public readonly record struct SelectedUnitOrderView(
@@ -19,7 +19,15 @@ public readonly record struct SelectedUnitOrderView(
     string Status,
     Vector3 Target,
     bool HasTarget,
-    EntityId TargetEntity = default);
+    EntityId TargetEntity = default)
+{
+    public SelectedUnitOrderKind NextKind { get; init; }
+    public Vector3 NextTarget { get; init; }
+    public bool HasNextTarget { get; init; }
+    public bool HasNextOrder { get; init; }
+    public int PendingOrders { get; init; }
+    public bool Repeating { get; init; }
+}
 
 /// <summary>Immutable copied selection and authoritative orders from one session/tick.</summary>
 public sealed class SelectedUnitOrderSnapshot
@@ -95,12 +103,41 @@ internal static class SelectedUnitOrderSnapshotFactory
                 (control.Category & (ControllableEntityCategory.Unit | ControllableEntityCategory.Logistics)) == 0 ||
                 !entities.TryGetComponent(id, out WorldTransform world))
                 continue;
-            views.Add(Resolve(context, extraction, id, world.Position));
+            views.Add(WithQueue(Resolve(context, extraction, id, world.Position), context, extraction));
         }
 
         return new SelectedUnitOrderSnapshot(
             extraction.Scenario.Simulation.SessionId, context.Tick,
             selected.ToArray(), views.ToArray(), Summary(views));
+    }
+
+    private static SelectedUnitOrderView WithQueue(SelectedUnitOrderView view, SimulationContext context,
+        PresentationExtractionContext extraction)
+    {
+        if (!context.Entities.TryGetComponent(view.Entity, out QueuedUnitOrders queue) || queue.Owner != extraction.Player)
+            return view;
+        int next = queue.Cursor + (queue.Active ? 1 : 0);
+        bool hasNext = next < queue.Entries.Count || queue.Repeating;
+        var entry = queue.Entries[hasNext ? next % queue.Entries.Count : queue.Cursor];
+        bool hasPosition = hasNext && entry.Kind != QueuedOrderKind.Attack;
+        Vector3 target = entry.Destination;
+        if (hasNext && entry.Kind == QueuedOrderKind.Attack &&
+            extraction.Scenario.Intelligence.TryGetContact(new FactionId(checked((uint)extraction.Player.Value)),
+                IntelligenceContactKey.FromEntity(entry.Target), out var contact) &&
+            contact.IsCurrent && contact.State == IntelligenceState.Identified)
+        { target = contact.LastKnownPosition; hasPosition = true; }
+        var kind = queue.Repeating && queue.Active && view.Kind is SelectedUnitOrderKind.Move or SelectedUnitOrderKind.Idle
+            ? SelectedUnitOrderKind.Patrol : view.Kind;
+        string nextLabel = entry.Kind switch { QueuedOrderKind.AttackMove => "ATTACK MOVE",
+            QueuedOrderKind.Attack => "ATTACK", _ => queue.Repeating ? "PATROL" : "MOVE" };
+        return view with { Kind = kind, HasNextOrder = hasNext, HasNextTarget = hasPosition && Finite(target),
+            NextKind = entry.Kind switch { QueuedOrderKind.AttackMove => SelectedUnitOrderKind.AttackMove,
+                QueuedOrderKind.Attack => SelectedUnitOrderKind.Attack, _ => queue.Repeating ? SelectedUnitOrderKind.Patrol : SelectedUnitOrderKind.Move },
+            NextTarget = target, PendingOrders = queue.PendingCount, Repeating = queue.Repeating,
+            Status = (kind == SelectedUnitOrderKind.Patrol ? "PATROL — " + queue.Status : view.Status) +
+                (queue.Status != QueuedOrderStatus.Running ? " / QUEUE " + queue.Status.ToString().ToUpperInvariant() : "") +
+                (hasNext ? " / NEXT " + nextLabel : "") + " / Q " + queue.PendingCount.ToString(System.Globalization.CultureInfo.InvariantCulture) +
+                (queue.Repeating ? " LOOP" : "") };
     }
 
     private static SelectedUnitOrderView Resolve(
@@ -264,6 +301,8 @@ internal static class SelectedUnitOrderSnapshotFactory
             };
             labels.Add(name + " " + count.ToString(System.Globalization.CultureInfo.InvariantCulture));
         }
+        int queued = orders.Count(order => order.HasNextOrder);
+        if (queued > 0) labels.Add("NEXT ORDERS " + queued.ToString(System.Globalization.CultureInfo.InvariantCulture));
         return string.Join(" / ", labels);
     }
 

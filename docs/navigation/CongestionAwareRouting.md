@@ -7,9 +7,8 @@ HierarchicalNavigationSystem.ConnectVehicleRouting after initial navigation worl
 construction. Normal strategic Cargo Truck and Supply Truck orders with Wheeled
 capabilities use this kernel. The existing NavigationRequests owner advances it;
 GroundMovementSystem remains the only transform writer. Military/formation paths
-retain the existing HierarchicalPathfinder path. No second movement system or regional storage is enabled here. Fleet admission,
-arena ownership and exact bounded caching now use the connected prepared services;
-see [Fleet scheduling](NavigationSearchScheduling.md).
+retain the existing HierarchicalPathfinder path. No second movement system,
+regional storage, fleet scheduler or route cache is enabled here.
 
 Precise queue/dock ownership is unchanged. NavigationPrecisionOwnership excludes
 heading-constrained and already precise service motion from coarse admission.
@@ -115,21 +114,21 @@ scope and actual corridor.
 | Reserved peak workspace per request / active aggregate | 8 MiB / 64 MiB |
 | Start candidates / endpoint candidates | 16 / 16 |
 
-NavigationRequests now delegates admission and active work to the prepared
-NavigationSearchScheduler and policy ledger. The existing pending ECS component
-retains unadmitted requests; the bounded arena pool and exact cache are connected
-through coordinator phases around existing JobScheduler work. Routing and
-Scheduling availability are advertised only after actual MatchRuntime composition.
-Regional availability remains NotConnected. See
-[Connected fleet scheduling](NavigationSearchScheduling.md) for the current
-submission, work, memory and checkpoint bounds.
+NavigationRequests services active continuations in stable rotating request order.
+Additional requests remain in the existing per-entity NavigationPendingPath
+component until a slot opens. There is no second global input queue. Allocation
+accounting is monotonic across discarded refinement/candidate storage and reserves
+checkpoint/publication copies conservatively. This integration is not the
+prepared NavigationSearchScheduler; scheduling/cache and regional availability
+remain NotConnected. Routing availability is reported only by the connected
+MatchRuntime path. Standalone legacy navigation instances remain unconnected.
 
-Authoritative schema **14** records root/request counters, rotation fairness,
+Authoritative schema **12** records root/request counters, rotation fairness,
 cost publication history and complete detached continuations with their pinned
 penalties in navigation.routing.v1. Pending/accepted bindings also travel in ECS
 snapshots. The existing save/replay reconstruction replays the same commands and
 fixed work slices, then compares the complete authoritative checkpoint. Envelope
-1 and payload 10 remain unchanged; older authoritative checkpoints are explicitly
+1 and payload 9 remain unchanged; older authoritative checkpoints are explicitly
 incompatible. Historical hashes are not rewritten and no old frontier is guessed.
 The existing total document-size limit still applies; an oversized save fails
 without replacing the previous file. See
@@ -151,9 +150,8 @@ continuation. Check that narrow-corridor conservatism does not strand the normal
 map's service routes. Natural match completion remains unverified.
 
 Status: implemented in the defined logistics scope; manual user approval pending.
-Current fleet/cache and schema-14 acceptance is tracked in NavigationSearchScheduling.Handoff.md.
 
-Historical routing-package source compilation: Release Game and its Navigation/product dependencies
+Final source compilation: Release Game and its Navigation/product dependencies
 compiled in both Public and Developer variants with SDK 10.0.402, zero warnings
 and zero errors. Product source: d509c793931e32e4db2e6b0e665de634328152c6. Commands:
 

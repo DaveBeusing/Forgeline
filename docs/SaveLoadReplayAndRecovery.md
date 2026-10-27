@@ -54,10 +54,10 @@ The three version boundaries have separate responsibilities:
 | Boundary | Current version | Contract |
 | --- | ---: | --- |
 | Document envelope | 1 | Header, document kind, serialized payload, and payload checksum |
-| Save/replay payload | 10 | Configuration, recorded command history, and checkpoint/replay metadata |
+| Save/replay payload | 11 | Configuration, recorded command history, and checkpoint/replay metadata |
 | Authoritative simulation state | 14 | Deterministic reconstruction and checkpoint comparison |
 
-New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 10, but discovery, loading and replaying now require authoritative schema 14. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 11, but discovery, loading and replaying now require authoritative schema 14. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
 Payload schema 8 adds typed developer simulation commands, an optional initial developer parameter profile and the ordered parameter audit. Developer action payload schema 1 records the operation, complete target identity, correlation, expected revision, typed finite values and whether execution was activated at its recorded tick. Commands remain in their original full sequence even when their later result is Rejected; replay therefore preserves rejected and pending command ordering. Developer initial parameters are separate from later command-driven changes, and recovery verifies the ordered audit and authoritative `developer.state.v1` contribution. Developer Save/Replay requires a compiled Developer host and explicit `RestoreDeveloper` or `PlayDeveloperReplay` capability. Public recovery rejects these payloads before handler execution; diagnostic flags and persisted markers do not create access. Developer persistence originally retained authoritative schema 9; later compatibility changes are listed below. See [Developer simulation actions](DeveloperSimulationActions.md) for the operation and host-binding contract.
 
@@ -278,7 +278,7 @@ and operation approval remain pending; no new test execution is claimed.
 
 ## Bridge combat and repair compatibility
 
-Current captures use envelope **1**, payload **10** and authoritative schema **14**. Payload 10 adds BridgeRepair (command kind 17), preserving issuer, submitted/target ticks, queue sequence and source, complete engineer/bridge/material-source identities and expected infrastructure revision. Rejected and pending repair commands retain their original ordering. Execution validates the match-bound infrastructure service again; the UI cannot directly modify health, progress or stock.
+Bridge combat introduced envelope **1**, payload **10** and authoritative schema **13**. Payload 10 adds BridgeRepair (command kind 17), preserving issuer, submitted/target ticks, queue sequence and source, complete engineer/bridge/material-source identities and expected infrastructure revision. Rejected and pending repair commands retain their original ordering. Execution validates the match-bound infrastructure service again; the UI cannot directly modify health, progress or stock.
 
 The checkpoint includes the ordinary health, target and intelligence contracts plus BridgeCombat, any BridgeRepairWork and bridge-targeted projectiles' BridgeProjectileTarget. The projectile intent retains the full launch-target identity even after the firing unit changes orders or dies. The latter stores payer, engineer, paid material-source provenance, starting/expected health and pause reason; StrategicInfrastructureState owns the existing fixed-tick progress. Reconstruction creates the same neutral faction and bounded bridge contracts, replays weapon/repair inputs and compares the complete state/hash. Loaded cargo, orders, reservations and topology are reconstructed through their existing owners.
 
@@ -286,19 +286,12 @@ These contracts change tick-zero components and subsequent target/sensor/lifecyc
 
 Manual acceptance remains outstanding, including recovery during disabled, actively restoring, engineer-paused and re-damaged states with cargo already travelling. No new test, smoke, benchmark or automated qualification was run for this integration.
 
-## Fleet scheduling compatibility
+## Queued unit orders and patrol compatibility
 
-Authoritative schema 14 supersedes the schema-13 routing semantics with the
-connected fleet policy/admission ledger, exact suspended continuations and pinned
-input publications. Arena initialization and total work remain correlated with
-scheduler state. Derived route payloads retain exact cache order/expiry/access
-state because lookup work can affect completion ticks. Pool warmth is not a
-simulation decision. Authoritative JSON uses explicit data projections instead
-of helpers whose constructors accept ReadOnlySpan, correcting the baseline
-congestion-checkpoint metadata failure.
+Current captures use authoritative schema **14**, payload schema **11**, envelope **1**. The new QueuedOrders command (kind 18) records the issuer, full unit identities, edit operation, Move/AttackMove/Attack kind, coordinate or target, formation and submitted tick. Replay reconstructs normal fixed-tick sequence progression. Patrol legs call existing commands directly on the simulation owner and do not grow the external command journal per cycle.
 
-Normal recovery reconstructs these services through the original command/tick
-path and compares the complete checkpoint. Earlier authoritative checkpoints are
-explicitly incompatible. Envelope 1/payload 10, the 128-MiB document bound and
-atomic replacement remain unchanged; no historical hash is rewritten.
-See [the fleet scheduling ADR](adr/BoundedFleetNavigationScheduling.md).
+The ECS checkpoint includes the bounded per-unit queue's immutable entries, cursor, owner, repeating/active/wait/resume flags, status and issued tick. Limits are 16 retained entries per unit and 1,024 units globally. Current/next UI projections are observations, not additional persisted authorities. Queue attacks are revalidated through current faction intelligence on activation; historical knowledge cannot grant a hidden target.
+
+Schema-13 and earlier authoritative saves/replays are explicitly incompatible. Existing payload layout reading does not waive that simulation check. QueuedOrders in payloads older than 11 fail validation before reconstruction. No migration invents pre-existing queues or patrol waypoints, changes old checkpoints or rewrites historical hashes. The preceding routing, inventory, reservation, dock, supply, ownership and lifecycle rules remain authoritative. See [queued orders and patrol](adr/BoundedQueuedOrdersAndPatrol.md).
+
+No queue save/load/replay qualification is claimed from compilation. Manual review must include an active finite sequence, a multi-cycle patrol, an active resupply interruption, blocked routing, replacement/Retreat and subsequent continuation under the current formats.

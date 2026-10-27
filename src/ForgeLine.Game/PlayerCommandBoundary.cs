@@ -31,7 +31,8 @@ public enum PlayerCommandKind : byte
     OperationsRule = 13,
     ConveyorConstruction = 14,
     ConveyorRouting = 15,
-    BridgeRepair = 16
+    BridgeRepair = 16,
+    QueuedOrders = 17
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -252,6 +253,25 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             source,
             observedTick,
             envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitQueuedOrders(PlayerId issuer, ReadOnlySpan<EntityId> targets,
+        Vector3 destination, EntityId target, QueuedOrderKind kind, QueuedOrderEdit edit,
+        bool patrol, SimulationTick observedTick, FormationTemplate formation = FormationTemplate.Compact)
+    {
+        if (targets.Length is < 1 or > QueuedUnitOrders.MaximumUnits)
+            return new(SessionId, PlayerCommandCorrelationId.None, PlayerCommandKind.QueuedOrders,
+                SimulationCommandSource.None, observedTick, observedTick, 0, false,
+                PlayerCommandSubmissionFailure.BoundaryFull);
+        if (!TryBeginSubmission(PlayerCommandKind.QueuedOrders, issuer, observedTick,
+            out var correlation, out var targetTick, out var source, out var rejected)) return rejected;
+        var command = new QueuedOrdersCommand(issuer, targets,
+            new(kind, destination, target, formation, observedTick), edit, patrol, observedTick,
+            _intelligence ?? throw new InvalidOperationException("Tactical intelligence is unavailable."));
+        var envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(new(correlation, PlayerCommandKind.QueuedOrders, envelope,
+            null, null, null, null, null, null, null, QueuedCommand: command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.QueuedOrders, source, observedTick, envelope);
     }
 
     public PlayerCommandSubmissionReceipt SubmitBuild(
@@ -1310,6 +1330,15 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     {
         switch (pending.Kind)
         {
+            case PlayerCommandKind.QueuedOrders:
+            {
+                var command = pending.QueuedCommand!;
+                if (command.ExecutedAtTick == SimulationTick.Zero) return null;
+                return new(SessionId, pending.CorrelationId, pending.Kind,
+                    ResolveState(command.AcceptedTargetCount, command.RejectedTargetCount),
+                    command.AcceptedTargetCount, command.RejectedTargetCount,
+                    BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None, command.ExecutedAtTick);
+            }
             case PlayerCommandKind.Movement:
             {
                 MoveEntitiesCommand command =
@@ -1694,6 +1723,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             {
                 PlayerCommandKind.Movement =>
                     PlayerCommandFeedbackKind.Movement,
+                PlayerCommandKind.QueuedOrders =>
+                    PlayerCommandFeedbackKind.QueuedOrders,
                 PlayerCommandKind.Construction or PlayerCommandKind.Demolition or PlayerCommandKind.ConveyorConstruction =>
                     PlayerCommandFeedbackKind.Construction,
                 PlayerCommandKind.Production =>
@@ -1743,6 +1774,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         OperationsRuleCommand? OperationsCommand = null,
         ConveyorConstructionCommand? ConveyorCommand = null,
         ConveyorRoutingCommand? RoutingCommand = null,
+        QueuedOrdersCommand? QueuedCommand = null,
         RepairBridgeCommand? BridgeCommand = null)
     {
         public static PendingCommand ForOperationsRule(

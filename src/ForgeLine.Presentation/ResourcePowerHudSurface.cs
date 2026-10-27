@@ -632,7 +632,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         PlayerCommandFeedbackKind kind) =>
         kind switch
         {
-            PlayerCommandFeedbackKind.Movement =>
+            PlayerCommandFeedbackKind.Movement or PlayerCommandFeedbackKind.QueuedOrders =>
                 RtsUiIcon.CommandMove,
             PlayerCommandFeedbackKind.Construction =>
                 RtsUiIcon.CommandBuild,
@@ -658,6 +658,8 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
         {
             PlayerCommandFeedbackKind.Movement =>
                 "MOVE",
+            PlayerCommandFeedbackKind.QueuedOrders =>
+                "ORDER QUEUE",
             PlayerCommandFeedbackKind.Construction =>
                 "BUILD",
             PlayerCommandFeedbackKind.Production =>

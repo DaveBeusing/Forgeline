@@ -586,6 +586,7 @@ internal static class TacticalCommandUtilities
         EntityId entity,
         in CombatOrderState order)
     {
+        RemoveIfPresent<QueuedUnitOrders>(context, entity);
         ClearCombatGroupMembership(
             context,
             entity);
