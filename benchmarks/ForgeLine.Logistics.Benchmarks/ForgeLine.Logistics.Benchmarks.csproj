@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../ScalabilityMeasurement.cs" Link="ScalabilityMeasurement.cs" />
+    <ProjectReference Include="../../src/ForgeLine.Game/ForgeLine.Game.csproj" />
+    <ProjectReference Include="../../src/ForgeLine.Presentation/ForgeLine.Presentation.csproj" />
+  </ItemGroup>
+</Project>

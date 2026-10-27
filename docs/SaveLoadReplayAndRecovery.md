@@ -324,3 +324,13 @@ These are changed combat and perception semantics. Saves/replays declaring autho
 See [cover rules and manual acceptance](CoverAndVisualOcclusion.md). Product compilation could not run against the exact source tree in this environment, and no tests or qualification runs were performed for this integration. Manual Save/Replay acceptance remains outstanding.
 
 The integrated fleet scheduler retains its explicit congestion, scheduler, cache and pinned-snapshot projections. Cover adds the world.tactical_areas domain without replacing those navigation authorities or changing their checkpoint fields.
+
+## Committed inbound storage compatibility
+
+Current authoritative captures use schema **17**, envelope **1** and payload
+**11**. Accepted cargo across all resources now reduces shared destination
+headroom for subsequent truck and conveyor admission. This changes dispatch
+decisions, so schema-16 and earlier saves/replays are explicitly incompatible.
+No historical checkpoint, map identity or hash is rewritten. Phase-local incoming
+capacity is derived from live orders and actual remaining cargo, never persisted.
+See [committed inbound admission](adr/CommittedInboundStorageAdmission.md).

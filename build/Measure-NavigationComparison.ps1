@@ -63,6 +63,42 @@ try {
                 MeasuredSha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
             }
         }
+        # Normalize only JSON constructor metadata in the historical cohort. The route search
+        # and measured workload remain unchanged; retain hashes alongside the existing guards.
+        $routeRelative = 'src/ForgeLine.Navigation/Contracts/NavigationSearchContracts.cs'
+        $routePath = Join-Path $baseline $routeRelative
+        if (Test-Path -LiteralPath $routePath) {
+            $source = [System.IO.File]::ReadAllText($routePath)
+            $marker = '    public NavigationSearchSpecification Request { get; }'
+            if ($source.Contains('public sealed class NavigationRouteProposal') -and
+                !$source.Contains('[System.Text.Json.Serialization.JsonConstructor]')) {
+                if (!$source.Contains($marker)) { throw 'Cannot normalize historical route JSON metadata.' }
+                $beforeHash = (Get-FileHash -LiteralPath $routePath -Algorithm SHA256).Hash
+                $constructor = @'
+    // JSON metadata must not bind a ref-struct constructor parameter.
+    [System.Text.Json.Serialization.JsonConstructor]
+    public NavigationRouteProposal(NavigationSearchSpecification request, Vector3 resolvedDestination,
+        IReadOnlyList<Vector3> waypoints, IReadOnlyList<NavigationRegionRevision> regions,
+        NavigationPathDiagnostics diagnostics)
+        : this(request, resolvedDestination,
+            (waypoints ?? throw new ArgumentNullException(nameof(waypoints))).ToArray(),
+            (regions ?? throw new ArgumentNullException(nameof(regions))).ToArray(),
+            diagnostics, Math.Max(1, waypoints.Count))
+    {
+    }
+
+'@
+                $normalized = $source.Insert($source.IndexOf($marker, [System.StringComparison]::Ordinal), $constructor + [Environment]::NewLine)
+                [System.IO.File]::WriteAllText($routePath, $normalized, [System.Text.UTF8Encoding]::new($false))
+                $baselineCompatibility += [ordered]@{
+                    Path = $routeRelative
+                    Rule = 'JSON collection constructor metadata; route search unchanged'
+                    Replacements = 1
+                    OriginalSha256 = $beforeHash
+                    MeasuredSha256 = (Get-FileHash -LiteralPath $routePath -Algorithm SHA256).Hash
+                }
+            }
+        }
         Invoke-Checked dotnet @('restore', $project)
         Invoke-Checked dotnet @('build', $project, '--configuration', 'Release', '--no-restore')
     }

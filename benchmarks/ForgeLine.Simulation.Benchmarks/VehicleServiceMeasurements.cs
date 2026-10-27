@@ -32,7 +32,7 @@ internal static class VehicleServiceMeasurements
         {
             foreach (int count in new[] { 100, 500 })
             {
-                var original = new CargoTransportBenchmarks { TransportCount = count };
+                using var original = new CargoTransportBenchmarks { TransportCount = count };
                 original.Setup();
                 Record(Measure("original-cargo", count, sample, () =>
                 {
@@ -40,7 +40,7 @@ internal static class VehicleServiceMeasurements
                     var navigation = original.NavigationDiagnostics;
                     return new(original.MeasuredTicks, navigation.QueuedPathCount, navigation.ActiveRouteCount + navigation.PendingPathCount, completed);
                 }));
-                var fleet = new Fleet(count);
+                using var fleet = new Fleet(count);
                 Record(Measure("shared-building-service", count, sample, fleet.Run));
             }
             var movement = new GroundMovementBenchmarks();
@@ -71,7 +71,7 @@ internal static class VehicleServiceMeasurements
             GC.GetTotalAllocatedBytes(precise: true) - allocation, counters.PathSearches, counters.ActivePaths, counters.CompletedDeliveries);
     }
 
-    private sealed class Fleet
+    private sealed class Fleet : IDisposable
     {
         private readonly SimulationCoordinator _simulation = new(ticksPerSecond: 20);
         private readonly CargoTransportSystem _cargo;
@@ -89,24 +89,33 @@ internal static class VehicleServiceMeasurements
             var destination = Building(new(1600, 0, 1024));
             _navigation = new(new HierarchicalPathfinder(NavigationWorld.Build(terrain, obstacles,
                 new NavigationGridSettings { CellSizeMeters = 16 }, new NavigationSectorSettings { SectorSizeCells = 8 })));
-            _cargo = new(network, inventories, _navigation, new VehicleDockingService(terrain, spatial, _navigation));
-            _simulation.RegisterSystem(new SpatialIndexSystem(new SpatialIndexSynchronizer(spatial)));
-            _simulation.RegisterSystem(_navigation);
-            _simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
-            _simulation.RegisterSystem(_cargo);
-            if (!inventories.Add(source.Inventory, ResourceIds.Steel, count * 20).Succeeded)
-                throw new InvalidOperationException("Unable to seed finite fleet inventory.");
-            var origin = network.AddNode(source.Entity, new(1200, 0, 1024), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
-            var target = network.AddNode(destination.Entity, new(1600, 0, 1024), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
-            network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 400, 400, count * 20);
-            var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck];
-            var profile = new CargoTruckDefinition(definition.Key, definition.CargoCapacity, definition.Movement, definition.VisualScale, definition.VisualId);
-            for (int index = 0; index < count; index++)
+            try
             {
-                var truck = CargoTruckFactory.Create(_simulation.Entities, inventories,
-                    new(1100 - index % 20 * 14, definition.Movement.HeightOffset, 1038.5f + index / 20 * 14), new(1), _cargo, profile);
-                if (!_cargo.TryAssignOrder(_simulation.Entities, truck, new(origin, target, ResourceIds.Steel, 20, SimulationTick.Zero), SimulationTick.Zero))
-                    throw new InvalidOperationException("Unable to assign finite fleet delivery.");
+                _cargo = new(network, inventories, _navigation, new VehicleDockingService(terrain, spatial, _navigation));
+                _simulation.RegisterSystem(new SpatialIndexSystem(new SpatialIndexSynchronizer(spatial)));
+                _simulation.RegisterSystem(_navigation);
+                _simulation.RegisterSystem(new GroundMovementSystem(terrain, spatial));
+                _simulation.RegisterSystem(_cargo);
+                if (!inventories.Add(source.Inventory, ResourceIds.Steel, count * 20).Succeeded)
+                    throw new InvalidOperationException("Unable to seed finite fleet inventory.");
+                var origin = network.AddNode(source.Entity, new(1200, 0, 1024), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoSource);
+                var target = network.AddNode(destination.Entity, new(1600, 0, 1024), LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination);
+                network.AddEdge(origin, target, LogisticsTransportMode.GroundRoad, 400, 400, count * 20);
+                var definition = DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck];
+                var profile = new CargoTruckDefinition(definition.Key, definition.CargoCapacity, definition.Movement, definition.VisualScale, definition.VisualId);
+                for (int index = 0; index < count; index++)
+                {
+                    var truck = CargoTruckFactory.Create(_simulation.Entities, inventories,
+                        new(1100 - index % 20 * 14, definition.Movement.HeightOffset, 1038.5f + index / 20 * 14), new(1), _cargo, profile);
+                    if (!_cargo.TryAssignOrder(_simulation.Entities, truck, new(origin, target, ResourceIds.Steel, 20, SimulationTick.Zero), SimulationTick.Zero))
+                        throw new InvalidOperationException("Unable to assign finite fleet delivery.");
+                }
+
+            }
+            catch
+            {
+                _navigation.Dispose();
+                throw;
             }
 
             (EntityId Entity, InventoryId Inventory) Building(Vector3 point)
@@ -124,6 +133,12 @@ internal static class VehicleServiceMeasurements
                 obstacles.Add(presence.CreateEntry(entity, transform).Bounds);
                 return (entity, inventory);
             }
+        }
+
+        public void Dispose()
+        {
+            _navigation.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public Counters Run()

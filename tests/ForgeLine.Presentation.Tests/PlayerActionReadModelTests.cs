@@ -122,6 +122,7 @@ public sealed class PlayerActionReadModelTests
         BuildingId[] expectedIds = scenario.Services.BuildingDefinitions.Definitions
             .Select(static definition => definition.Id)
             .Concat(conveyors.Select(static item => new BuildingId(item.ActionId)))
+            .Concat(new[] { new BuildingId(3001), new BuildingId(3002) })
             .Order()
             .ToArray();
         Assert.Equal(expectedIds.Length, expectedIds.Distinct().Count());
@@ -169,6 +170,15 @@ public sealed class PlayerActionReadModelTests
             Assert.Equal(expected.Steel, cost.RequiredQuantity);
             Assert.Equal(capturedSteel, cost.AvailableQuantity);
             Assert.True(action.HasRequiredResources);
+        }
+
+        foreach (int template in new[] { 1, 2 })
+        {
+            var action = Assert.Single(actions.Construction,
+                row => row.BuildingId == new BuildingId(PaidConstructionTemplates.MenuBase + (uint)template));
+            Assert.Equal("Template / " + PaidConstructionTemplates.Name(template), action.DisplayName);
+            Assert.Empty(action.Costs); // The later placement preview prices every actual building/link.
+            Assert.False(action.RequiresResourceDeposit);
         }
 
         PlayerConstructionActionReadModel powerPlant =

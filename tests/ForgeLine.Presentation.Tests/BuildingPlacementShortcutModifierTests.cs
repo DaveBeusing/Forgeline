@@ -10,14 +10,14 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class BuildingPlacementShortcutModifierTests
 {
     [Fact]
-    public void ShiftModifiedDevelopmentShortcutDoesNotSelectBuilding()
+    public void ShiftModifiedCustomPlacementShortcutDoesNotSelectBuilding()
     {
         var input =
             new InputState();
         var controller =
             new RtsBuildingPlacementController(
                 new PlayerId(
-                    1));
+                    1), new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.CorePlacement, PlatformKey.O)));
         var interaction =
             new PresentationInteractionState();
         var camera =
@@ -36,7 +36,7 @@ public sealed class BuildingPlacementShortcutModifierTests
         input.Apply(
             PlatformInputEvent.KeyChanged(
                 PlatformInputEventKind.KeyDown,
-                PlatformKey.F4));
+                PlatformKey.O));
 
         controller.Update(
             input,
@@ -62,7 +62,7 @@ public sealed class BuildingPlacementShortcutModifierTests
         var controller =
             new RtsBuildingPlacementController(
                 new PlayerId(
-                    1));
+                    1), new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.CorePlacement, PlatformKey.O)));
         var interaction =
             new PresentationInteractionState();
         var camera =
@@ -77,7 +77,7 @@ public sealed class BuildingPlacementShortcutModifierTests
         input.Apply(
             PlatformInputEvent.KeyChanged(
                 PlatformInputEventKind.KeyDown,
-                PlatformKey.F4));
+                PlatformKey.O));
 
         controller.Update(
             input,

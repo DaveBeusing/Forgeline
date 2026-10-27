@@ -426,6 +426,14 @@ public sealed class AutomatedDistributionSystem
             }
         }
 
+        if (_dispatchCandidates.Count == 0) return;
+        var incoming = CaptureInboundCapacity(context.Entities);
+        var nodes = _network.GetNodes();
+        var trucks = new List<EntityId>();
+        foreach (var truck in context.Entities.Query<CargoTransport>(QueryIterationOrder.StableByEntityIndex))
+            trucks.Add(truck);
+        var phase = new DispatchPhase(incoming, nodes, trucks, CaptureRetainedSourceTargets(context.Entities, nodes));
+
         _dispatchCandidates.Sort(
             (left, right) =>
             {
@@ -458,13 +466,15 @@ public sealed class AutomatedDistributionSystem
         {
             TryDispatch(
                 context,
-                _dispatchCandidates[index]);
+                _dispatchCandidates[index],
+                phase);
         }
     }
 
     private void TryDispatch(
         SimulationContext context,
-        RequestState request)
+        RequestState request,
+        in DispatchPhase phase)
     {
         // One feasibility attempt per eligible pending request per tick.
         // RetryPending requests retain their place without reserving anything.
@@ -486,7 +496,8 @@ public sealed class AutomatedDistributionSystem
         }
 
         double destinationCapacity =
-            _inventories.GetAddableQuantity(
+            phase.Incoming.GetAddable(
+                _inventories,
                 destinationInventory,
                 request.ResourceId,
                 request.RequestedQuantity);
@@ -505,7 +516,8 @@ public sealed class AutomatedDistributionSystem
                 context.Entities,
                 request,
                 destination,
-                destinationCapacity);
+                destinationCapacity,
+                phase);
 
         if (!selection.Succeeded)
         {
@@ -587,6 +599,7 @@ public sealed class AutomatedDistributionSystem
             return;
         }
 
+        phase.Incoming.Add(destinationInventory, request.ResourceId, selection.Quantity);
         request.Origin = selection.SourceNode.Id;
         request.AssignedTruck = selection.TruckEntity;
         request.ReservedSourceInventory = selection.SourceInventory;
@@ -603,9 +616,10 @@ public sealed class AutomatedDistributionSystem
         EntityRegistry entities,
         RequestState request,
         in LogisticsNode destination,
-        double destinationCapacity)
+        double destinationCapacity,
+        in DispatchPhase phase)
     {
-        IReadOnlyList<LogisticsNode> nodes = _network.GetNodes();
+        IReadOnlyList<LogisticsNode> nodes = phase.Nodes;
         DispatchSelection best = default;
         bool destinationHasOwner =
             TryResolveOwner(
@@ -649,10 +663,7 @@ public sealed class AutomatedDistributionSystem
                     sourceInventory,
                     request.ResourceId);
             double retainedTarget =
-                GetRetainedSourceTarget(
-                    node.Entity,
-                    request.ResourceId,
-                    request.Priority);
+                phase.RetainedTargets.GetValueOrDefault((sourceInventory, request.ResourceId, request.Priority));
             double surplus = Math.Max(
                 0.0,
                 available - retainedTarget);
@@ -684,6 +695,7 @@ public sealed class AutomatedDistributionSystem
                     node,
                     structuralRoute.Route,
                     request.ResourceId,
+                    phase.Trucks,
                     out EntityId truckEntity,
                     out CargoTransport truck,
                     out bool fuelBlocked))
@@ -820,6 +832,7 @@ public sealed class AutomatedDistributionSystem
         in LogisticsNode source,
         LogisticsRoute route,
         ResourceId resource,
+        IReadOnlyList<EntityId> trucks,
         out EntityId selectedEntity,
         out CargoTransport selectedTransport,
         out bool fuelBlocked)
@@ -837,9 +850,7 @@ public sealed class AutomatedDistributionSystem
 
         double bestDistanceSquared = double.PositiveInfinity;
 
-        foreach (EntityId entity in
-                 entities.Query<CargoTransport>(
-                     QueryIterationOrder.StableByEntityIndex))
+        foreach (EntityId entity in trucks)
         {
             CargoTransport transport =
                 entities.GetComponent<CargoTransport>(entity);
@@ -965,28 +976,55 @@ public sealed class AutomatedDistributionSystem
             requiredFuel + reserveFuel;
     }
 
-    private double GetRetainedSourceTarget(
-        EntityId sourceEntity,
-        ResourceId resourceId,
-        LogisticsStockPriority requestPriority)
+    // Phase-local and proportional to current policies; no high-water cache survives a phase.
+    private Dictionary<(InventoryId, ResourceId, LogisticsStockPriority), double> CaptureRetainedSourceTargets(
+        EntityRegistry entities, IReadOnlyList<LogisticsNode> nodes)
     {
-        double retainedTarget = 0.0;
-
-        for (int index = 0; index < _policies.Count; index++)
+        var sourceInventories = new HashSet<InventoryId>();
+        foreach (var node in nodes)
+            if (node.Enabled && node.Capabilities.HasFlag(LogisticsNodeCapabilities.CargoSource) &&
+                TryResolveSourceInventory(entities, node, out var inventory))
+                sourceInventories.Add(inventory);
+        var targets = new Dictionary<(InventoryId, ResourceId, LogisticsStockPriority), double>();
+        foreach (var row in _policies)
         {
-            LogisticsStockPolicy policy = _policies[index].Policy;
-            if (policy.Enabled &&
-                policy.TargetEntity == sourceEntity &&
-                policy.ResourceId == resourceId &&
-                policy.Priority <= requestPriority)
+            var policy = row.Policy;
+            if (!policy.Enabled ||
+                !_network.TryGetNodeForEntity(policy.TargetEntity, out var targetNode) ||
+                !_network.TryGetNode(targetNode, out var node) ||
+                !TryResolveDestinationInventory(entities, node, out var inventory) ||
+                !sourceInventories.Contains(inventory)) continue;
+            for (var priority = policy.Priority; priority <= LogisticsStockPriority.Low; priority++)
             {
-                retainedTarget = Math.Max(
-                    retainedTarget,
-                    policy.DesiredTarget);
+                var key = (inventory, policy.ResourceId, priority);
+                targets[key] = Math.Max(targets.GetValueOrDefault(key), policy.DesiredTarget);
             }
         }
+        return targets;
+    }
 
-        return retainedTarget;
+    /// <summary>Rebuilt at each owner phase; full live order identities determine committed storage.</summary>
+    internal CargoInboundCapacity CaptureInboundCapacity(EntityRegistry entities)
+    {
+        var incoming = new CargoInboundCapacity();
+        foreach (var entity in entities.Query<CargoTransportOrder>(QueryIterationOrder.StableByEntityIndex))
+        {
+            if (!entities.TryGetComponent(entity, out CargoTransport transport) ||
+                !entities.TryGetComponent(entity, out CargoTransportRuntimeState state) ||
+                state.Lifecycle is CargoTransportLifecycleState.Idle or CargoTransportLifecycleState.Failed)
+                continue;
+            var order = entities.GetComponent<CargoTransportOrder>(entity);
+            if (!_network.TryGetNode(order.Destination, out var destination) ||
+                !TryResolveDestinationInventory(entities, destination, out var inventory)) continue;
+            bool carrying = state.LoadedQuantity > QuantityEpsilon ||
+                state.Lifecycle is CargoTransportLifecycleState.ToDestination or CargoTransportLifecycleState.Unloading;
+            double quantity = carrying
+                ? _inventories.Contains(transport.CargoInventory)
+                    ? _inventories.GetQuantity(transport.CargoInventory, order.ResourceId) : 0
+                : Math.Min(order.RequestedQuantity, transport.Capacity);
+            incoming.Add(inventory, order.ResourceId, quantity);
+        }
+        return incoming;
     }
 
     /// <summary>Only physically committed trucks reserve destination demand against local conveyor delivery.</summary>
@@ -1799,6 +1837,12 @@ public sealed class AutomatedDistributionSystem
             set;
         }
     }
+
+    private readonly record struct DispatchPhase(
+        CargoInboundCapacity Incoming,
+        IReadOnlyList<LogisticsNode> Nodes,
+        IReadOnlyList<EntityId> Trucks,
+        IReadOnlyDictionary<(InventoryId, ResourceId, LogisticsStockPriority), double> RetainedTargets);
 
     private readonly record struct PolicyState(
         EntityId PolicyEntity,

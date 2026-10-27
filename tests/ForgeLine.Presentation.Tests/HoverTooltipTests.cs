@@ -16,6 +16,29 @@ public sealed class HoverTooltipTests
     private static readonly SimulationSessionId Session = new(1);
     private static readonly GameplayHudLayout Layout = GameplayHudLayout.Create(1600, 900, 96);
 
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    public void CoreTooltipUsesDraftOnlyForTheSelectedMaterial(int hovered, bool showsDraft)
+    {
+        var steel = new PlayerStockPolicyActionReadModel(new(70, 1), ResourceIds.Steel, "Steel",
+            40, 50, 100, 150, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var fuel = steel with { ResourceId = ResourceIds.Fuel, DisplayName = "Fuel",
+            CurrentQuantity = 5, DesiredMinimum = 10, DesiredTarget = 20, DesiredMaximum = 30 };
+        var logistics = new PlayerLogisticsActionReadModel(Entity, [steel, fuel], null, 500) { IsCommandCore = true };
+        var actions = new PlayerActionSnapshot(Session, new(1), [], 0, null, null, logistics);
+        var snapshot = Snapshot(actions: actions);
+        var panel = default(PlayerActionPanelView) with { Mode = PlayerActionPanelMode.Logistics,
+            SelectedIndex = 0, StockMinimum = 75, StockMaximum = 175, StockPreview = "STEEL DRAFT" };
+        var view = new HoverTooltipView(Session, default, default, new(800, 450), true, 1600, 900, 1,
+            panel.Mode, (int)PlayerActionDockControlKind.Item, hovered);
+        var content = Assert.IsType<HoverTooltipContent>(HoverTooltipResolver.Resolve(snapshot, view, panel));
+        Assert.Equal(showsDraft, content.Requirement.Contains("DRAFT MIN 75 / MAX 175", StringComparison.Ordinal));
+        Assert.Equal(showsDraft, content.Requirement.Contains("STEEL DRAFT", StringComparison.Ordinal));
+        Assert.Contains(showsDraft ? "CORE STOCK 40" : "CORE STOCK 5", content.Requirement);
+        Assert.Contains(showsDraft ? "SAVED MIN 50" : "SAVED MIN 10", content.Requirement);
+    }
+
     [Fact]
     public void DelayUsesElapsedPresentationTimeAndResetsForMotionIdentityAndSession()
     {

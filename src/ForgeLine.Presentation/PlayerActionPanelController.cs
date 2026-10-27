@@ -55,6 +55,7 @@ public readonly record struct PlayerActionPanelView(
     public UiMotionView? Motion { get; init; }
     public int LogisticsSteps { get; init; } = 1;
     public string StockPreview { get; init; } = string.Empty;
+    public bool StockConflict { get; init; }
     public ObjectActionRingView Ring { get; init; }
     public bool DockExpanded => IsOpen && !Ring.UsesRing;
     public bool IsOpen =>
@@ -76,6 +77,14 @@ public sealed partial class PlayerActionPanelController
     private ProductionStockProposal? _stockProposal;
     private string _stockPreviewLabel = string.Empty;
     private bool _stockResourceFromProposal;
+    private StockPolicyBaseline? _stockBaseline;
+    private bool _stockDraftStale;
+    private readonly record struct StockPolicyBaseline(EntityId Policy, double Minimum, double Target,
+        double Maximum, LogisticsStockPriority Priority, bool Enabled)
+    {
+        internal static StockPolicyBaseline From(in PlayerStockPolicyActionReadModel policy) =>
+            new(policy.PolicyEntity, policy.DesiredMinimum, policy.DesiredTarget, policy.DesiredMaximum, policy.Priority, policy.Enabled);
+    }
     private int _logisticsSteps = 1;
     private double _stockMinimum;
     private double _stockTarget;
@@ -465,7 +474,9 @@ public sealed partial class PlayerActionPanelController
             _sessionId,
             !PlayerActionDockHudModel.MatchesSelection(actions, _currentSelection), _bindings, _contextualHoveredIndex, _contextualPressed)
         { Ring = BuildRing(actions), LogisticsSteps = _logisticsSteps,
-            StockPreview = _stockProposal is not null && _stockResourceFromProposal ? _stockPreviewLabel : string.Empty };
+            StockConflict = _stockDraftStale,
+            StockPreview = _stockDraftStale ? "POLICY CHANGED / CURRENT VALUES LOADED / REVIEW BEFORE APPLY" :
+                _stockProposal is not null && _stockResourceFromProposal ? _stockPreviewLabel : string.Empty };
     }
 
     public bool TryTakeRequest(
@@ -746,6 +757,13 @@ public sealed partial class PlayerActionPanelController
             _feedbackRemaining = TimeSpan.FromSeconds(4);
             return;
         }
+        if (_stockDraftStale)
+        {
+            _stockDraftStale = false;
+            Feedback = "CURRENT POLICY REVIEWED / APPLY AGAIN TO SAVE";
+            _feedbackRemaining = TimeSpan.FromSeconds(8);
+            return;
+        }
         _pendingRequest =
             PlayerActionRequest.SetStockPolicy(
                 logistics.Entity,
@@ -1005,12 +1023,33 @@ public sealed partial class PlayerActionPanelController
             logistics.Policies[SelectedIndex];
 
         if (_stockEntity != logistics.Entity)
-        { _stockEntity = logistics.Entity; _stockProposal = null; _stockResourceId = ResourceId.None; }
-        if (_stockResourceId == policy.ResourceId)
         {
-            return;
+            _stockEntity = logistics.Entity; _stockProposal = null;
+            _stockResourceId = ResourceId.None; _stockBaseline = null; _stockDraftStale = false;
         }
-
+        var baseline = StockPolicyBaseline.From(policy);
+        bool sameResource = _stockResourceId == policy.ResourceId;
+        if (sameResource && _stockBaseline == baseline) return;
+        if (sameResource && _stockBaseline is { } previous)
+        {
+            bool dirty = _stockMinimum != previous.Minimum ||
+                _stockTarget != (logistics.IsCommandCore ? previous.Maximum : previous.Target) ||
+                _stockMaximum != previous.Maximum || LogisticsPriority != previous.Priority ||
+                _stockResourceFromProposal;
+            bool acceptedDraft = policy.HasPolicy && policy.Enabled == (logistics.IsCommandCore || previous.Enabled) &&
+                _stockMinimum == policy.DesiredMinimum &&
+                _stockTarget == policy.DesiredTarget &&
+                _stockMaximum == policy.DesiredMaximum && LogisticsPriority == policy.Priority;
+            if (dirty && !acceptedDraft)
+            {
+                _stockDraftStale = true;
+                _stockProposal = null;
+                Feedback = "POLICY CHANGED / CURRENT VALUES LOADED / REVIEW BEFORE APPLY";
+                _feedbackRemaining = TimeSpan.FromSeconds(8);
+            }
+        }
+        else _stockDraftStale = false;
+        _stockBaseline = baseline;
         _stockResourceId = policy.ResourceId;
         _stockResourceFromProposal = false;
         _stockMinimum = policy.DesiredMinimum;

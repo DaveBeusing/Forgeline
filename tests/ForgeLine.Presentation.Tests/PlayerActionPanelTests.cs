@@ -12,6 +12,91 @@ namespace ForgeLine.Presentation.Tests;
 
 public sealed class PlayerActionPanelTests
 {
+    [Theory]
+    [InlineData("threshold")]
+    [InlineData("enabled")]
+    [InlineData("priority")]
+    [InlineData("removed")]
+    [InlineData("recreated")]
+    public void DirtyStockDraftReloadsChangedPolicyAndRequiresReviewBeforeApply(string change)
+    {
+        var policy = new PlayerStockPolicyActionReadModel(new(80, 1), ResourceIds.Steel, "Steel",
+            0, 50, 100, 200, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var snapshot = Snapshot(policy);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1600, 900);
+        Key(PlatformKey.L); Key(PlatformKey.Right);
+        Assert.Equal(100, View().StockMinimum);
+        var current = change switch
+        {
+            "threshold" => policy with { DesiredMinimum = 25, DesiredTarget = 150, DesiredMaximum = 250 },
+            "enabled" => policy with { Enabled = false },
+            "priority" => policy with { Priority = LogisticsStockPriority.High },
+            "removed" => policy with { PolicyEntity = EntityId.Invalid },
+            _ => policy with { PolicyEntity = new(80, 2) }
+        };
+        snapshot = Snapshot(current);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(View().StockConflict);
+        Assert.Equal(current.DesiredMinimum, View().StockMinimum);
+        Assert.Equal(current.DesiredMaximum, View().StockMaximum);
+        Assert.Contains("POLICY CHANGED", View().StockPreview);
+        Assert.False(controller.TryTakeRequest(out _));
+        Key(PlatformKey.Enter);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.False(View().StockConflict);
+        Key(PlatformKey.Enter);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(current.DesiredMinimum, request.StockMinimum);
+        Assert.Equal(current.DesiredMaximum, request.StockMaximum);
+        Assert.Equal(current.Priority, request.StockPriority);
+        Assert.True(request.Enabled);
+
+        PresentationSnapshot Snapshot(PlayerStockPolicyActionReadModel row) =>
+            CreateSnapshot(logistics: new PlayerLogisticsActionReadModel(new(73, 1), [row], null, 500) { IsCommandCore = true });
+        PlayerActionPanelView View() => controller.CreateView(1600, 900, snapshot.PlayerActions);
+        void Key(PlatformKey key)
+        {
+            Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
+    [Fact]
+    public void CleanStockDraftRefreshesAndOwnAppliedValuesDoNotBecomeAConflict()
+    {
+        var policy = new PlayerStockPolicyActionReadModel(new(80, 1), ResourceIds.Steel, "Steel",
+            0, 50, 100, 200, LogisticsStockPriority.Normal, true, default, default, default, default);
+        var snapshot = Snapshot(policy);
+        var input = new InputState();
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1600, 900);
+        Key(PlatformKey.L);
+        policy = policy with { DesiredMinimum = 100, DesiredTarget = 200, DesiredMaximum = 250 };
+        snapshot = Snapshot(policy);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.Equal(100, View().StockMinimum);
+        Assert.Equal(250, View().StockMaximum);
+        Assert.False(View().StockConflict);
+        Key(PlatformKey.Right); Key(PlatformKey.Enter);
+        Assert.True(controller.TryTakeRequest(out var request));
+        snapshot = Snapshot(policy with { DesiredMinimum = request.StockMinimum,
+            DesiredTarget = request.StockTarget, DesiredMaximum = request.StockMaximum });
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.False(View().StockConflict);
+        Assert.Equal(request.StockMinimum, View().StockMinimum);
+
+        PresentationSnapshot Snapshot(PlayerStockPolicyActionReadModel row) =>
+            CreateSnapshot(logistics: new PlayerLogisticsActionReadModel(new(73, 1), [row], null, 500) { IsCommandCore = true });
+        PlayerActionPanelView View() => controller.CreateView(1600, 900, snapshot.PlayerActions);
+        void Key(PlatformKey key)
+        {
+            Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
     [Fact]
     public void LockedUnitActivationOpensItsTechnologyWithoutSubmittingProduction()
     {

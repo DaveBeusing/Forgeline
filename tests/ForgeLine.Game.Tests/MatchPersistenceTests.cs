@@ -378,6 +378,20 @@ public sealed class MatchPersistenceTests
     }
 
     [Fact]
+    public void PreInboundCapacityCheckpointsAreRejectedBeforeReconstruction()
+    {
+        using MatchRuntime runtime = CreateScenario(seed: 831);
+        MatchSaveData save = MatchPersistenceService.CaptureSave(runtime);
+        MatchAuthoritativeSnapshot oldState = save.State with { SchemaVersion = 16 };
+        MatchSaveData oldSave = save with { State = oldState, StateSha256 = oldState.ComputeSha256() };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(oldSave)).Reason);
+        MatchReplayData oldReplay = MatchPersistenceService.CaptureReplay(runtime) with { AuthoritativeSchemaVersion = 16 };
+        Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(oldReplay)).Reason);
+    }
+
+    [Fact]
     public void PreIndustrialCombatCheckpointsAreRejectedBeforeReconstruction()
     {
         using MatchRuntime runtime = CreateScenario(seed: 831);

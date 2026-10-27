@@ -123,10 +123,11 @@ public sealed class RepeatPlacementTests
     {
         var f = new Fixture();
         f.Prime();
-        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.F9));
+        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
         f.Update(f.Snapshot());
         Assert.Equal(BuildingOrientation.East, f.Controller.Orientation);
-        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.F9));
+        f.Input.BeginFrame();
+        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.E));
         f.Update(f.Snapshot());
         f.Click(true);
         Assert.True(f.Controller.TryTakePlacementRequest(out _));
@@ -147,9 +148,10 @@ public sealed class RepeatPlacementTests
     {
         var f = new Fixture();
         f.Prime();
-        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.F9));
+        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
         f.Update(f.Snapshot());
-        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.F9));
+        f.Input.BeginFrame();
+        f.Input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.E));
         f.Update(f.Snapshot());
         f.Click(false);
         Assert.True(f.Controller.TryTakePlacementRequest(out _));
@@ -185,7 +187,7 @@ public sealed class RepeatPlacementTests
     }
 
     [Fact]
-    public void ContextualQAndERotationIsReversibleAndF9StaysClockwise()
+    public void ContextualQAndERotationIsReversibleAndRetiredF9IsIgnored()
     {
         var fixture = new Fixture();
         fixture.Prime();
@@ -212,12 +214,12 @@ public sealed class RepeatPlacementTests
         Press(PlatformKey.E);
         Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
         Press(PlatformKey.F9);
-        Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
+        Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
         Press(PlatformKey.E);
         Press(PlatformKey.E);
         Press(PlatformKey.E);
         Press(PlatformKey.E);
-        Assert.Equal(BuildingOrientation.East, fixture.Controller.Orientation);
+        Assert.Equal(BuildingOrientation.North, fixture.Controller.Orientation);
         Assert.Contains("Q LEFT / E RIGHT", fixture.Controller.InteractionHint);
     }
 

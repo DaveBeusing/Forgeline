@@ -198,11 +198,13 @@ internal static class HoverTooltipResolver
                     else
                     {
                         var stock = logistics.Policies[index];
-                        requirement = (panel.StockPreview.Length > 0 ? panel.StockPreview + "; " : string.Empty) + LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
+                        requirement = (index == panel.SelectedIndex && panel.StockPreview.Length > 0 ? panel.StockPreview + "; " : string.Empty) + LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
                             (logistics.HasEnabledGraphNode ? "; NETWORK NODE ACTIVE; LOCAL ACCESS OBSERVED SEPARATELY" : "; NO ACTIVE NETWORK NODE");
                         if (logistics.IsCommandCore)
                         {
-                            requirement = $"CORE STOCK {stock.CurrentQuantity:0.##}; DRAFT MIN {panel.StockMinimum:0.##} / MAX {panel.StockMaximum:0.##}; " +
+                            string draft = index == panel.SelectedIndex
+                                ? $"DRAFT MIN {panel.StockMinimum:0.##} / MAX {panel.StockMaximum:0.##}; " : string.Empty;
+                            requirement = $"CORE STOCK {stock.CurrentQuantity:0.##}; " + draft +
                                 $"SAVED MIN {stock.DesiredMinimum:0.##} / REFILL TO {stock.DesiredTarget:0.##}. " + requirement;
                         }
                         status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {(string.IsNullOrEmpty(stock.SourceName) ? "NOT ASSIGNED" : stock.SourceName)} / {(stock.AssignedTruck.IsValid ? "CARGO TRUCK ASSIGNED" : "NO CARGO TRUCK ASSIGNED")}";

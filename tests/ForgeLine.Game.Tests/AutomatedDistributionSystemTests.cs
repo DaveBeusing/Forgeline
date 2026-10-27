@@ -1183,6 +1183,67 @@ public sealed class AutomatedDistributionSystemTests
         Assert.Equal(40, fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre));
     }
 
+    [Fact]
+    public void DifferentResourcesCannotOvercommitTheSameDestinationInventory()
+    {
+        var fixture = CreateFixture(sourceQuantity: 100);
+        var destination = CreateStorageEntity(fixture.Simulation, fixture.Inventories,
+            new Vector3(52, 0, 4), 100, out var inventory);
+        var target = fixture.Network.AddNode(destination, new Vector3(52, 0, 4),
+            LogisticsNodeKind.StorageDepot, LogisticsNodeCapabilities.CargoDestination | LogisticsNodeCapabilities.Storage);
+        fixture.Connect(fixture.SourceNode, target, capacityPerSecond: 1000);
+        Assert.True(fixture.Inventories.Add(fixture.SourceInventory, ResourceIds.Steel, 100).Succeeded);
+        fixture.AddPolicy(destination, 50, 100, 100, LogisticsStockPriority.Normal);
+        var steelPolicy = fixture.Simulation.Entities.CreateEntity();
+        fixture.Simulation.Entities.AddComponent(steelPolicy,
+            new LogisticsStockPolicy(destination, ResourceIds.Steel, 50, 100, 100));
+        var first = fixture.CreateTruck(fixture.SourcePosition);
+        var second = fixture.CreateTruck(fixture.SourcePosition);
+        fixture.Simulation.AdvanceOneTick();
+
+        var requests = fixture.Distribution.LastDebugSnapshot.Requests;
+        Assert.Single(requests, row => row.State == LogisticsTransportRequestState.Assigned);
+        Assert.Single(requests, row => row.FailureReason == LogisticsTransportRequestFailureReason.DestinationFull);
+        RunUntil(fixture, () => fixture.Distribution.Metrics.CompletedRequestCount == 1, 1000);
+        Assert.Equal(100, fixture.Inventories.GetTotalQuantity(inventory));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(first));
+        Assert.False(fixture.Simulation.Entities.HasComponent<CargoTransportOrder>(second));
+        Assert.Equal(200, fixture.Inventories.GetTotalQuantity(fixture.SourceInventory) +
+            fixture.Inventories.GetTotalQuantity(inventory));
+    }
+
+    [Theory]
+    [InlineData(false, LogisticsStockPriority.Normal, 20)]
+    [InlineData(false, LogisticsStockPriority.Low, 40)]
+    [InlineData(true, LogisticsStockPriority.Normal, 40)]
+    public void SourceRetentionAppliesOnlyToTheInventoryOwnedByThePolicy(
+        bool separateOutput, LogisticsStockPriority sourcePriority, double expectedLoad)
+    {
+        var fixture = CreateFixture(sourceQuantity: 80);
+        var exported = fixture.SourceInventory;
+        if (separateOutput)
+        {
+            exported = fixture.Inventories.CreateInventory(new InventorySpecification(1000));
+            Assert.True(fixture.Inventories.Add(exported, ResourceIds.FerrousOre, 80).Succeeded);
+            fixture.Simulation.Entities.AddComponent(fixture.SourceEntity,
+                new ProductionFacility(fixture.SourceInventory, exported,
+                    ProductionCapability.SteelProcessing, SimulationTick.Zero));
+        }
+        fixture.Connect(fixture.SourceNode, fixture.DestinationNode, capacityPerSecond: 1000);
+        fixture.AddPolicy(fixture.SourceEntity, 10, 60, 100, sourcePriority);
+        fixture.AddPolicy(fixture.DestinationEntity, 10, 40, 100, LogisticsStockPriority.Normal);
+        var truck = fixture.CreateTruck(fixture.SourcePosition);
+        fixture.Simulation.AdvanceOneTick();
+
+        var order = fixture.Simulation.Entities.GetComponent<CargoTransportOrder>(truck);
+        Assert.Equal(expectedLoad, order.RequestedQuantity);
+        Assert.Equal(expectedLoad, fixture.Inventories.GetReservedQuantity(exported, ResourceIds.FerrousOre));
+        if (separateOutput)
+            Assert.Equal(0, fixture.Inventories.GetReservedQuantity(fixture.SourceInventory, ResourceIds.FerrousOre));
+        RunUntil(fixture, () => fixture.Cargo.Metrics.CompletedOrderCount > 0, 1000);
+        Assert.Equal(expectedLoad, fixture.Inventories.GetQuantity(fixture.DestinationInventory, ResourceIds.FerrousOre));
+    }
+
     private static DistributionFixture CreateFixture(
         double sourceQuantity,
         Vector3? sourcePosition = null,

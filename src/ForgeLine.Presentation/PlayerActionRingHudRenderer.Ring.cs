@@ -41,6 +41,10 @@ internal sealed partial class PlayerActionRingHudRenderer
                 actions?.Logistics is { IsCommandCore: true } core && panel.SelectedIndex >= 0 && panel.SelectedIndex < core.Policies.Count;
             bool bandControl = target.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum or
                 PlayerActionDockControlKind.DecreaseMaximum or PlayerActionDockControlKind.IncreaseMaximum;
+            bool activeStockField = coreStock && bandControl &&
+                (target.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum
+                    ? panel.StockThresholdField == PlayerStockThresholdField.Minimum
+                    : panel.StockThresholdField == PlayerStockThresholdField.Maximum);
             bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
                 panel.Mode, target.ItemIndex, panel, actions));
             if (orderItem || orderDetail) enabled = true;
@@ -48,6 +52,9 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool pending = panel.ContextualPending && item && panel.SelectedIndex == target.ItemIndex;
             Vector4 fill = RadialActionVisuals.Background(enabled, hovered, ring.Pressed && hovered, pending, opacity);
             RingSegment(geometry, i, fill, width, height);
+            if (activeStockField && !hovered)
+                RingHoverArc(geometry, i, new Vector4(.3f, .8f, 1, opacity),
+                    RadialActionVisuals.HoverArcWidth(scale), width, height);
             if (hovered)
                 RingHoverArc(geometry, i, RadialActionVisuals.HoverArc(enabled, ring.Pressed, pending, opacity),
                     RadialActionVisuals.HoverArcWidth(scale), width, height);
@@ -115,13 +122,14 @@ internal sealed partial class PlayerActionRingHudRenderer
             }
             else if (coreStock && bandControl && actions?.Logistics is { } bandStock)
             {
+                if (activeStockField) value.Append("EDIT ");
                 if (!enabled) value.Append(PlayerActionDockHudModel.DecideBandAdjustment(panel, bandStock, target.Kind).Reason);
                 else value.Append(target.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum
                     ? panel.StockMinimum : panel.StockMaximum, "F0");
             }
             else if (coreStock && target.Kind == PlayerActionDockControlKind.Activate)
             {
-                value.Append("MIN "); value.Append(panel.StockMinimum, "F0");
+                value.Append(panel.StockConflict ? "REVIEW / MIN " : "MIN "); value.Append(panel.StockMinimum, "F0");
                 value.Append(" / MAX "); value.Append(panel.StockMaximum, "F0");
             }
             else if (coreStock && target.Kind == PlayerActionDockControlKind.Cancel)
