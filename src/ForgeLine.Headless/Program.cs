@@ -245,7 +245,8 @@ internal static class Program
                     scenario.Services.UnitDefinitions,
                     settings.OpponentConfigurations.ToDictionary(
                         pair => new PlayerId(pair.Key), pair => pair.Value),
-                    scenario.Intelligence);
+                    scenario.Intelligence,
+                    scenario.Opponents);
                 scenario.Simulation.RegisterSystem(progression);
             }
 

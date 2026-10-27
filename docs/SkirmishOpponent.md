@@ -72,7 +72,7 @@ The opening plan establishes the minimum industrial chain with real construction
 
 Economy evaluation observes real inventory quantities, power generation/demand, offline consumers, active construction, and production capability. A power shortage raises power construction priority. Recovery is based on actual generating capacity rather than treating four completed plants as a permanent ceiling: when demand still exceeds generation or consumers remain offline, the controller may add bounded reserve capacity up to six plants through normal construction. Raw-resource shortages prioritize missing extractors before discretionary expansion.
 
-Production facilities receive desired-stock programs through the existing production system. Logistics stock targets are applied through the existing stock-policy command so physical distribution remains responsible for moving material. Unit-production refill minima account for the active unit's material costs; stock above a generic minimum is not necessarily sufficient to start that unit. When a logistics-capable factory is below its configured Cargo Truck fleet target, its Fuel policy reserves two Cargo Truck fuel costs while transports still exist. This prevents the physical logistics fleet from consuming its last recovery path without granting material or bypassing Cargo Truck delivery. The Command Core keeps a protected Steel minimum for construction, but its desired retained target remains below the full strategic reserve so Critical Vehicle Factory demand can draw real surplus when an objective-pressure unit is blocked on Steel.
+Production facilities receive desired-stock programs through the existing production system. Logistics stock targets are applied through the existing stock-policy command so physical distribution remains responsible for moving material. Unit-production refill minima account for the active unit's material costs; stock above a generic minimum is not necessarily sufficient to start that unit. When a logistics-capable factory is below its essential live Cargo Truck fleet target, its Fuel policy reserves two Cargo Truck fuel costs while transports still exist. This prevents the physical logistics fleet from consuming its last recovery path without granting material or bypassing Cargo Truck delivery. The Command Core keeps a protected Steel minimum for construction, but its desired retained target remains below the full strategic reserve so Critical Vehicle Factory demand can draw real surplus when an objective-pressure unit is blocked on Steel.
 
 Faction-wide inventory totals are an assessment, not a substitute for the consuming facility's inputs. Diagnosing NoInput requires comparing each recipe or unit cost with available stock in that facility. A full extractor output and nonempty deposit alongside an empty refinery input indicate a material-flow problem, not proof of deposit exhaustion. Power state is independently authoritative: recorded input shortages do not supersede an active NoPower block reason.
 
@@ -80,7 +80,7 @@ Faction-wide inventory totals are an assessment, not a substitute for the consum
 
 Expansion is considered after bootstrap when the configured economy readiness threshold is met or the economy is raw-resource constrained, provided the force and pending-construction checks permit it.
 
-The controller evaluates known static expansion sites, requests normal Logistics Hub construction, and can add a nearby contested-resource extractor when construction and placement rules allow it. Unsupported remote hubs are candidates for a nearby Supply Depot. Placement is validated by the same building-placement service used for player construction.
+After the live core assault force is established, the controller evaluates known static expansion sites, requests normal Logistics Hub construction, and can add a nearby contested-resource extractor when construction and placement rules allow it. Unsupported remote hubs are candidates for a nearby Supply Depot. Placement is validated by the same building-placement service used for player construction.
 
 Economic buildings are connected to the canonical prototype road corridor through the shared road-access and logistics-registration systems. No remote resource transfer is introduced by the opponent.
 
@@ -88,7 +88,7 @@ Economic buildings are connected to the canonical prototype road corridor throug
 
 Unit production uses the existing Directorate unit catalog and normal unit-production queues. The current vertical-slice composition can request infantry, Combat Engineers, Scout Vehicles, Main Battle Tanks, Mobile Artillery, Cargo Trucks, and Supply Trucks.
 
-Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan. Critical logistics recovery owns the next vehicle-production slot only until the configured minimum Cargo Truck and Supply Truck fleet is restored. Once that floor is satisfied, the vehicle plan first establishes one reconnaissance Scout, then the configured minimum objective-pressure Main Battle Tanks, then one Mobile Artillery unit before optional roster growth. Mature mobile Supply Truck capacity follows physical Supply Depot growth up to three providers after the reconnaissance Scout, configured objective-pressure Main Battle Tanks, and first Mobile Artillery requirement are satisfied. This mobile-support growth is selected before optional Cargo Truck expansion so a mature frontline can recover multiple stranded combat units without changing the critical early Cargo/Supply fleet floors. If later network growth or vehicle loss leaves that mature support target unmet, recovery may reclaim a material-blocked Normal-priority optional vehicle slot through the same unit-production cancellation, priority, and queue commands; the core assault prerequisites and critical Cargo Truck floor still remain ahead of this recovery. Optional Cargo Truck capacity still scales from the physical Supply Depot count afterward. Logistics-capable vehicle factories also retain enough ordinary input stock for one Cargo Truck replacement before routine non-logistics production is admitted, preventing loss of the final transport fleet from stranding replacement production without granting materials or bypassing transport. Both rules add real produced vehicles only; they do not create transport capacity or Fuel implicitly. If the last reconnaissance Scout is destroyed, reconnaissance reconstitution may cancel a material-blocked Normal-priority vehicle request and enqueue the replacement Scout at High priority through the normal unit-production command path; an already critical logistics recovery still outranks that replacement. Once the configured objective-pressure Main Battle Tank floor is already present, the replacement Scout's physical factory-material stock policies are promoted to Critical until the reconnaissance unit can be produced, preventing a mature force from remaining blind behind routine material demand. When a Main Battle Tank is the active or planned vehicle, its unit-production material policies use Critical logistics priority; routine unit-production refill remains High. This preserves both reconnaissance continuity and the structure-capable assault path under cargo contention without granting resources or bypassing normal production.
+Desired counts are intentionally simple. Configuration limits queue depth so the controller cannot monopolize a production facility with an unbounded plan. Critical logistics recovery owns the next vehicle-production slot only until the configured minimum Cargo Truck and Supply Truck fleet is restored. Once that floor is satisfied, the vehicle plan first establishes one reconnaissance Scout, then the configured minimum objective-pressure Main Battle Tanks, then one Mobile Artillery unit before optional roster growth. Mature mobile Supply Truck capacity follows physical Supply Depot growth up to three providers after the reconnaissance Scout, configured objective-pressure Main Battle Tanks, and first Mobile Artillery requirement are satisfied. This mobile-support growth is selected before optional Cargo Truck expansion so a mature frontline can recover multiple stranded combat units without changing the critical early Cargo/Supply fleet floors. If later network growth or vehicle loss leaves that mature support target unmet, recovery may reclaim a material-blocked Normal-priority optional vehicle slot through the same unit-production cancellation, priority, and queue commands; the core assault prerequisites and critical Cargo Truck floor still remain ahead of this recovery. Optional Cargo Truck capacity still scales from the physical Supply Depot count afterward. Only factories serving an essential live Cargo deficit retain the additional ordinary input stock for one Cargo Truck replacement before routine non-logistics production is admitted, preventing loss of the final transport fleet from stranding replacement production without granting materials or bypassing transport. Both rules add real produced vehicles only; they do not create transport capacity or Fuel implicitly. If the last reconnaissance Scout is destroyed, reconnaissance reconstitution may cancel a material-blocked Normal-priority vehicle request and enqueue the replacement Scout at High priority through the normal unit-production command path; an already critical logistics recovery still outranks that replacement. Once the configured objective-pressure Main Battle Tank floor is already present, the replacement Scout's physical factory-material stock policies are promoted to Critical until the reconnaissance unit can be produced, preventing a mature force from remaining blind behind routine material demand. When a Main Battle Tank is the active or planned vehicle, its unit-production material policies use Critical logistics priority; routine unit-production refill remains High. This preserves both reconnaissance continuity and the structure-capable assault path under cargo contention without granting resources or bypassing normal production.
 
 Before the core assault roster is live, optional growth is deferred: one Scout,
 the configured minimum objective-pressure Tanks and one Artillery are established
@@ -293,3 +293,86 @@ counterplay still require human Windows/D3D12 acceptance. Physical conveyor
 qualification remains tracked in #310; the unchanged gameplay texture-budget
 blocker is #344. WARP, physical GPU performance and human inspection are separate
 evidence classes; the headless scene does not replace them.
+
+## Core progression and production recovery
+
+The progression correction starts from master `89086e68` (0.1.487) after
+the earlier research, logistics and full-match work was integrated. It preserves
+the existing controller, physical production, movement and supply systems.
+
+Critical Cargo recovery uses `ResolveEssentialCargoFleetTarget`, the existing
+configured/depot hauling floor. Processing-industry growth and expansion
+headroom are optional fleet goals after the live Scout, configured tank minimum
+and first artillery exist. A healthy essential fleet no longer adds an imaginary
+Cargo replacement to every factory refill minimum. Actual Cargo losses restore
+the reserve and use the normal High-priority recovery path. A missing Supply
+Truck may release an unpaid High Cargo request once the essential live hauling
+floor is healthy. Running/paid work continues.
+
+The former Scout recovery path also restores missing core tanks and the first
+unlocked artillery. An existing matching request is promoted, not duplicated.
+An unpaid Normal request may be cancelled through the existing owner-validated
+command to free the active slot; an obsolete High core-role request may yield
+only after its live role is satisfied. The ordinary goal calculation retries
+cancelled optional work when the core force has recovered. Optional Combat
+Engineer production also waits for that core force. Supply deficits and
+losses keep the existing critical recovery precedence.
+
+Optional hub/depot expansion waits for that same live core assault force, so
+its construction cannot repeatedly spend partial deliveries before necessary
+research and units exist. Power, missing raw extraction and bootstrap industry
+remain on the existing higher-priority paths. Attack admission, retreat/recovery,
+reconnaissance escort handoff and deep-offensive commitment are unchanged;
+restored units re-enter those existing planners on the next normal decision.
+
+Research and construction share the definition of active unpaid factory inputs.
+InventoryStore availability already excludes paid reservations. Such reservations
+are not charged again by the budget calculation. New research retains its normal
+Cargo/Supply replacement reserve and must be payable from one real owned source.
+Needed Mechanized Systems precedes optional Sensor Fusion.
+
+### Reading a blocked decision
+
+The copied research diagnostic records source, resource, research cost, available
+quantity, paid reserved quantity, active unpaid unit input, replacement reserve
+and aggregate available budget after unpaid inputs. `ProductionInputs` means
+the selected source would consume a live unit's unpaid inputs; `ProductionReserve`
+means the remaining player budget is insufficient after those commitments.
+`Requirements/MissingMaterials` remains an actual source shortage. Active research
+continues to report its real research-system block even during other priorities.
+
+The existing `--diagnostics-output` progression sidecar includes `Research`
+alongside bounded production, industry, provider and transport details.
+Research reason/technology/block transitions participate in its existing
+128-entry bounded history; source details retain scalar values rather than
+unbounded per-tick arrays. Debug observations never become inventory authority.
+
+### Delivery and remaining manual work
+
+Authoritative schema **10** explicitly rejects older deterministic ordering.
+Envelope 1 and payload 8 are retained. No authoritative component or command
+codec is added; research diagnostics and progression histories are derived.
+See [Technology progression](TechnologyProgression.md) and
+[recovery compatibility](SaveLoadReplayAndRecovery.md#opponent-progression-compatibility).
+
+No tests were created, modified or executed, and no smoke, benchmark, headless,
+native qualification, CI dispatch or rerun was started for this correction.
+Product compilation is still outstanding: the connected content interface has no
+compiler and the available local checkout lacks the current master object.
+No build or behavioral success is claimed.
+
+Manual review must follow the normal-profile research payment into Mechanized
+Systems and physical artillery, then destroy core/logistics units and inspect
+real reconstitution, restored supply and renewed attack commands. Separately
+inspect an unmodified seed-2026 validation-profile match through the existing
+80,000-tick terminal bound. Costs, initial resources, deadlines and victory rules
+have not changed.
+
+Baseline CI run 40407552138 fails the existing normal-research assertion at
+TechnologyNormalMatchTests line 49. Its reported stock/force totals stop changing
+around tick 30,000. That establishes stagnation, not the truck's physical cause.
+If it persists, the concrete follow-up is to identify the first stationary paid
+cargo job in the transport history and distinguish drive Fuel, docking/queue
+ownership, navigation failure, source shortage and destination capacity. No
+cargo-motion change or guaranteed natural victory is claimed by this scheduling
+correction. User acceptance remains pending.
