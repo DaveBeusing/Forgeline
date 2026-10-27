@@ -1476,6 +1476,14 @@ internal static partial class PlayerActionSnapshotFactory
             entities, target, scenario.Production, scenario.UnitProduction,
             scenario.Services.UnitDefinitions, scenario.Services.BuildingDefinitions);
         var policies = new List<PlayerStockPolicyActionReadModel>();
+        // Only selected-facility rows survive this capture. Stable first-policy precedence is unchanged.
+        var selectedPolicies = new Dictionary<ResourceId, (EntityId Entity, LogisticsStockPolicy Policy)>();
+        foreach (var candidate in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
+        {
+            var current = entities.GetComponent<LogisticsStockPolicy>(candidate);
+            if (current.TargetEntity == entity)
+                selectedPolicies.TryAdd(current.ResourceId, (candidate, current));
+        }
 
         foreach (ResourceDefinition resource in
                  scenario.Services.Resources.Definitions)
@@ -1486,22 +1494,11 @@ internal static partial class PlayerActionSnapshotFactory
                 default;
             bool hasPolicy = false;
 
-            foreach (EntityId candidate in
-                     entities.Query<LogisticsStockPolicy>(
-                         QueryIterationOrder.StableByEntityIndex))
+            if (selectedPolicies.TryGetValue(resource.Id, out var selectedPolicy))
             {
-                LogisticsStockPolicy current =
-                    entities.GetComponent<LogisticsStockPolicy>(
-                        candidate);
-
-                if (current.TargetEntity == entity &&
-                    current.ResourceId == resource.Id)
-                {
-                    policyEntity = candidate;
-                    policy = current;
-                    hasPolicy = true;
-                    break;
-                }
+                policyEntity = selectedPolicy.Entity;
+                policy = selectedPolicy.Policy;
+                hasPolicy = true;
             }
 
             double currentQuantity =
@@ -1639,9 +1636,13 @@ internal static partial class PlayerActionSnapshotFactory
         {
             if (!policyId.IsValid ||
                 scenario.AutomatedDistribution.LastDebugSnapshot.Tick != tick) return EntityId.Invalid;
-            foreach (var request in scenario.AutomatedDistribution.LastDebugSnapshot.Requests.Reverse())
+            var requests = scenario.AutomatedDistribution.LastDebugSnapshot.Requests;
+            for (int index = requests.Count - 1; index >= 0; index--)
+            {
+                var request = requests[index];
                 if (request.PolicyEntity == policyId && request.State is (LogisticsTransportRequestState.Assigned or LogisticsTransportRequestState.InTransit) &&
                     scenario.Logistics.TryGetNode(request.Origin, out var source) && Owned(source.Entity)) return source.Entity;
+            }
             return EntityId.Invalid;
         }
     }
