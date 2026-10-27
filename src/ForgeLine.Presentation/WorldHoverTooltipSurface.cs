@@ -276,6 +276,11 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
 
     private void EmitWorld(in PlayerHoverSummary world, bool includeWorkState = false)
     {
+        if (world.Category == PlayerHoverCategory.Bridge)
+        {
+            Line(world.Requirement);
+            return;
+        }
         var details = world.OwnedDetails;
         Span<char> text = stackalloc char[160];
         if (details.HasHealth) Percent("HEALTH", details.HealthFraction);

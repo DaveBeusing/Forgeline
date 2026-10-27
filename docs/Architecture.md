@@ -315,6 +315,10 @@ The canonical `Central Divide` battlefield is game content, not a presentation s
 
 Strategic crossings use the generic `StrategicInfrastructure` / `StrategicInfrastructureState` lifecycle. `StrategicInfrastructureSystem` is simulation-authoritative: disabling a crossing disables its real logistics edge and publishes a new `NavigationWorld` with that crossing blocked. The new navigation version invalidates cached/stale paths through the existing navigation boundary. Restoration remains unavailable while its fixed-tick progress advances and only re-enables logistics and navigation on completion.
 
+Normal match initialization adds bounded combat contracts only to RoadBridge crossing entities. They remain shared infrastructure: explicit attack uses normal intelligence/weapon rules, while automatic hostile acquisition excludes bridges. Ordinary lethal damage retains the crossing entity and delegates closure to StrategicInfrastructureSystem. Bridge geometry is queried by combat and sensors separately from the movement spatial index, so an operational bridge does not become a physical obstacle.
+
+Paid repair is owned by that same infrastructure system and restoration loop. RepairBridgeCommand binds to the match, validates current intelligence, full identities, bridge revision, own engineer proximity and own unreserved material stock, then consumes one kit. BridgeRepairWork is authoritative ECS state for payer, engineer, material-source provenance, expected health and pause reason. Only paid completion opens the route; damage spends the kit and disables it. Presentation copies facts and emits a normal command. See [Bridge combat and paid repair](adr/BridgeCombatAndPaidRepair.md).
+
 `MatchObjectiveSystem` owns match completion state. Command Core objective registration adds the normal combat-target components required by the existing targeting, damage, and entity-lifecycle systems rather than introducing objective-specific damage. Presentation may visualize map landmarks and infrastructure state, but it never decides reachability, restoration, or victory.
 
 See `docs/CentralDivideBattlefield.md`.

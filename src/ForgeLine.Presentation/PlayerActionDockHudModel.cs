@@ -289,6 +289,8 @@ internal static class PlayerActionDockHudModel
                     : string.Empty;
 
             case PlayerActionPanelMode.Logistics:
+                if (actions.BridgeRepairs.Count > 0)
+                    return index >= 0 && index < actions.BridgeRepairs.Count ? actions.BridgeRepairs[index].Title : string.Empty;
                 if (actions.ConveyorRouting is { } routing)
                     return ConveyorRoutingActionReadModel.Title(index) +
                         ((int)routing.Preference == index ? " (SET)" : "");
@@ -435,6 +437,12 @@ internal static class PlayerActionDockHudModel
                         "UNAVAILABLE");
 
             case PlayerActionPanelMode.Logistics:
+                if (actions.BridgeRepairs.Count > 0)
+                    return index >= 0 && index < actions.BridgeRepairs.Count &&
+                        actions.BridgeRepairs[index].Failure == BridgeRepairFailure.None
+                        ? PlayerActionDockItemState.Enabled
+                        : PlayerActionDockItemState.Disabled(index >= 0 && index < actions.BridgeRepairs.Count
+                            ? BridgeRepairText.Describe(actions.BridgeRepairs[index].Failure) : "SELECT BRIDGE");
                 if (actions.ConveyorRouting is { } routing)
                     return routing.Failure(index) == ConveyorRoutingFailure.None
                         ? PlayerActionDockItemState.Enabled
@@ -505,7 +513,7 @@ internal static class PlayerActionDockHudModel
         actions is not null && actions.PendingCommandCount == 0 &&
         !(panel.ContextualPending && panel.ContextualActivationTick == actions.Tick &&
           panel.ContextualSessionId == actions.SessionId) &&
-        !(mode == PlayerActionPanelMode.Logistics && actions.ConveyorRouting is not null &&
+        !(mode == PlayerActionPanelMode.Logistics && (actions.ConveyorRouting is not null || actions.BridgeRepairs.Count > 0) &&
           control != PlayerActionDockControlKind.Activate) &&
         !(mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } orders &&
           index >= orders.OrderStartIndex) &&
@@ -551,6 +559,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.OrderStartIndex => "VIEW ORDER",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
+            PlayerActionPanelMode.Logistics when actions?.BridgeRepairs.Count > 0 => "REPAIR / RESUME",
             PlayerActionPanelMode.Logistics when actions?.ConveyorRouting is not null => "APPLY ROUTING",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
@@ -846,6 +855,8 @@ internal static class PlayerActionDockHudModel
     public static string ResolveCommandFeedbackReason(
         in PlayerCommandFeedback feedback)
     {
+        if (feedback.BridgeFailure != BridgeRepairFailure.None)
+            return BridgeRepairText.Describe(feedback.BridgeFailure);
         if (feedback.RoutingFailure != ConveyorRoutingFailure.None)
             return ConveyorRoutingPolicy.Describe(feedback.RoutingFailure);
         if (feedback.PlacementFailure !=

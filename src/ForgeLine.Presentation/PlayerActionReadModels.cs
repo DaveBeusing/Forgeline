@@ -623,6 +623,7 @@ public sealed class PlayerActionSnapshot
 
     public OperationsRuleSelectionSnapshot? OperationsRules { get; }
     public PolicyTemplateSelectionSnapshot? PolicyTemplates { get; init; }
+    public IReadOnlyList<BridgeRepairActionReadModel> BridgeRepairs { get; init; } = [];
     public ConveyorRoutingActionReadModel? ConveyorRouting { get; init; }
 
     public PlayerUnitProductionFacilityActionReadModel? UnitProduction { get; }
@@ -637,7 +638,7 @@ public sealed class PlayerActionSnapshot
         _technology;
 }
 
-internal static class PlayerActionSnapshotFactory
+internal static partial class PlayerActionSnapshotFactory
 {
     public static PlayerActionSnapshot Capture(
         SimulationContext context,
@@ -725,7 +726,8 @@ internal static class PlayerActionSnapshotFactory
             tactical,
             technology,
             interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null)
-        { ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility),
+        { BridgeRepairs = CaptureBridgeRepairs(context, extraction, selectedFacility),
+            ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility),
             PolicyTemplates = interaction.OperationsOpen
                 ? PolicyTemplateSelectionCapture.Capture(context, extraction, interaction.SelectedEntities) : null };
     }

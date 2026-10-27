@@ -44,7 +44,7 @@ internal static class PlayerActionDockInteractionLayout
                       units.Requests.Count
                     : 0,
             PlayerActionPanelMode.Logistics =>
-                actions?.ConveyorRouting is not null ? 3 : actions?.Logistics?.ItemCount ??
+                actions?.BridgeRepairs.Count > 0 ? actions.BridgeRepairs.Count : actions?.ConveyorRouting is not null ? 3 : actions?.Logistics?.ItemCount ??
                 0,
             PlayerActionPanelMode.Supply =>
                 actions?.Supply is null

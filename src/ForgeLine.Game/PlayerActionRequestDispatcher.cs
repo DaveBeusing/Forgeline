@@ -16,6 +16,12 @@ public static class PlayerActionRequestDispatcher
 
         switch (request.Kind)
         {
+            case PlayerActionRequestKind.RepairBridge:
+                receipt = gateway.SubmitBridgeRepair(player,
+                    request.TacticalEntities is { Length: 1 } ? request.TacticalEntities[0] : EntityId.Invalid,
+                    request.TacticalTarget, request.Facility, request.ExpectedInfrastructureRevision, observedTick);
+                return true;
+
             case PlayerActionRequestKind.SetConveyorRouting:
                 receipt = gateway.SubmitConveyorRouting(player, request.Facility,
                     request.RoutingPreference, request.ExpectedRoutingRevision, observedTick);

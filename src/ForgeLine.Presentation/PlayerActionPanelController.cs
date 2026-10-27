@@ -690,6 +690,13 @@ public sealed partial class PlayerActionPanelController
 
     private void ActivateLogistics(PlayerActionSnapshot actions)
     {
+        if (actions.BridgeRepairs.Count > 0)
+        {
+            if (SelectedIndex >= 0 && SelectedIndex < actions.BridgeRepairs.Count &&
+                actions.BridgeRepairs[SelectedIndex] is var repair && repair.Failure == BridgeRepairFailure.None)
+                _pendingRequest = PlayerActionRequest.RepairBridge(repair.Engineer, repair.Bridge, repair.Source, repair.Revision);
+            return;
+        }
         if (actions.ConveyorRouting is { } routing)
         {
             if (SelectedIndex is >= 0 and < 3 && routing.Failure(SelectedIndex) == ConveyorRoutingFailure.None)

@@ -373,6 +373,10 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                         entities.HasComponent<GroundMovement>(entity))
                     : SelectablePresentationMetadata.None;
 
+            if (entities.TryGetComponent(entity, out BridgeCombat bridgeCombat))
+                selectable = new SelectablePresentationMetadata(new PlayerId(bridgeCombat.Faction.Value),
+                    ControllableEntityCategory.Building, false);
+
             WorldFeaturePresentationMetadata worldFeature =
                 entities.TryGetComponent(
                     entity,
