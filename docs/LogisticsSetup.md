@@ -97,3 +97,45 @@ For an owned selected facility or Cargo Truck, the focused [Operations Diagnosis
 ## Optional operations rules
 
 The opt-in [Operations Rules and Recovery](OperationsAutomation.md) automation can install one missing explicitly configured input stock policy or temporarily pause and resume an output-blocked production request. It uses the existing validated commands, does not bypass physical transport, and yields to manual overrides. Normal production and distribution systems already stop and retry their own work; enabling a rule is not required for normal operation.
+
+## Reusing settings with policy templates
+
+Use Operations → TEMPLATES for deliberate repeated setup:
+
+- Select one owned source, choose STOCK POLICY or PRODUCTION, then COPY / NEXT
+  SOURCE to choose the resource or recipe. Field changes are a local draft.
+- SAVE SLOT stores one of four local match-session slots. Nothing is applied yet.
+- Select the destination facilities, PREVIEW their before/after settings, and use
+  DETAILS / NEXT to read all target reasons, capacities and recipe input costs.
+- APPLY PREVIEW sends at most one normal command per ready target (32 targets
+  maximum), sequentially. Inspect every result; omitted, skipped, rejected or
+  cancelled targets have not been changed by the batch.
+
+Stock templates carry MIN/TARGET/MAX, priority and the enabled flag. Production
+templates carry the normal recipe mode/priority and DesiredStock output target.
+They queue work only on suitable idle manual processors. Existing queues and
+automatic processors are preserved. A missing input is displayed as a real cost
+shortage; queue admission never means the unit of material has been produced.
+
+Manually disabled stock policies remain untouched. Active matching Operations
+rules, duplicate policies, unsupported resources, destroyed/foreign facilities and
+capacity violations are shown as reasons to use individual controls. Combined
+policy targets are checked against actual configured storage, while unloading,
+reservations, distribution and physical cargo remain authoritative. MAX is still
+saved policy metadata, not a hard unloading ceiling.
+
+Focus loss, modal/resize interruption, closing or changing selection stops unsent
+work. Already submitted commands retain their ordinary result. There is no
+automatic retry and no automatic resumption on reopening; preview and apply again
+deliberately. Four slots live only in the current client match session: New Game,
+Restart and Load clear them. Confirmed commands are already in the normal
+Save/Replay history, even though the local templates themselves are not saved.
+
+The 50-unit editor and existing fields are reused; template quantities are bounded
+at 1,000,000. The preview is copied observation and the sequence is not atomic
+across facilities. No new resources, priorities or transport authority are added.
+Conveyor A/B routing stays in the selected Splitter's existing Logistics ring and
+does not become a stock or production template.
+
+This source has no newly executed tests or native acceptance. Compilation and
+manual review remain outstanding; see [Operations templates](OperationsAutomation.md#session-local-stock-and-production-templates).
