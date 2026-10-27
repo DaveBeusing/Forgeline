@@ -71,18 +71,39 @@ internal sealed class VehicleSearchState
 /// </summary>
 public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutingCheckpoint>
 {
-    public const int AlgorithmRevision = 1;
+    public const int AlgorithmRevision = 2;
+    private readonly long _reservedWorkspaceBytes;
+    public VehicleRoutingKernel(long reservedWorkspaceBytes = 0)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(reservedWorkspaceBytes);
+        _reservedWorkspaceBytes = reservedWorkspaceBytes;
+    }
+    internal static VehicleRoutingCheckpoint DecodeCheckpoint(NavigationSearchSpecification request, string json)
+    {
+        if (json.Length > 3 * 1024 * 1024) throw new ArgumentException("Routing checkpoint exceeds its cap.", nameof(json));
+        var state = JsonSerializer.Deserialize<VehicleSearchState>(json, JsonOptions) ??
+            throw new ArgumentException("Routing checkpoint is empty.", nameof(json));
+        long retained = (long)state.Nodes.Count + state.Frontier.Length + state.HighRoute.Count +
+            state.Corridor.Count + state.Reversed.Count + state.Points.Count + state.Regions.Count;
+        if (!Enum.IsDefined(state.Stage) || !Enum.IsDefined(state.Status) || !Enum.IsDefined(state.Failure) ||
+            state.Work < 0 || state.Work > request.MaximumWork || state.AllocatedEntries < retained ||
+            state.AllocatedEntries > request.MaximumWorkspaceBytes / 1024 ||
+            state.Nodes.Values.Any(n => !float.IsFinite(n.Cost) || n.Cost < 0) ||
+            state.Frontier.Any(n => !float.IsFinite(n.Cost) || n.Cost < 0 || !float.IsFinite(n.Remaining) || n.Remaining < 0))
+            throw new ArgumentException("Routing continuation exceeds its data and work bounds.", nameof(json));
+        return new(request, state);
+    }
     internal static JsonSerializerOptions JsonOptions { get; } = new() { IncludeFields = true };
     public NavigationModuleAvailability Availability => NavigationModuleAvailability.Available;
 
     public INavigationSearchSession<VehicleRoutingCheckpoint> CreateSession(
-        NavigationWorldSnapshot snapshot, NavigationSearchSpecification request) => new Session(snapshot, request);
+        NavigationWorldSnapshot snapshot, NavigationSearchSpecification request) => new Session(snapshot, request, reservedWorkspaceBytes: _reservedWorkspaceBytes);
 
     public INavigationSearchSession<VehicleRoutingCheckpoint> RestoreSession(
         NavigationWorldSnapshot snapshot, VehicleRoutingCheckpoint checkpoint)
     {
         ArgumentNullException.ThrowIfNull(checkpoint);
-        return new Session(snapshot, checkpoint.Request, checkpoint.State);
+        return new Session(snapshot, checkpoint.Request, checkpoint.State, _reservedWorkspaceBytes);
     }
 
     private sealed class Session : INavigationSearchSession<VehicleRoutingCheckpoint>
@@ -90,6 +111,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
         private static readonly (int X, int Z)[] s_neighbors =
             [(0,-1),(1,0),(0,1),(-1,0),(1,-1),(1,1),(-1,1),(-1,-1)];
         private readonly NavigationWorldSnapshot _snapshot;
+        private readonly long _reservedWorkspaceBytes;
         private readonly NavigationGrid _grid;
         private readonly NavigationSectorGraph _graph;
         private readonly EndpointCandidateCursor _endpoints;
@@ -103,7 +125,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
         private NavigationRouteProposal? _route;
         private bool _disposed;
 
-        internal Session(NavigationWorldSnapshot snapshot, NavigationSearchSpecification request, VehicleSearchState? state = null)
+        internal Session(NavigationWorldSnapshot snapshot, NavigationSearchSpecification request, VehicleSearchState? state = null, long reservedWorkspaceBytes = 0)
         {
             ArgumentNullException.ThrowIfNull(snapshot);
             ArgumentNullException.ThrowIfNull(request);
@@ -111,11 +133,12 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
             if (snapshot.Revision != request.Revision || snapshot.KnowledgeScope != request.KnowledgeScope ||
                 snapshot.Capabilities != request.Capabilities)
                 throw new ArgumentException("Search and pinned snapshot must match.", nameof(snapshot));
-            if (request.MaximumWorkspaceBytes < 8192 + snapshot.Penalties.Count * 256L)
+            if (request.MaximumWorkspaceBytes < reservedWorkspaceBytes + 8192 + snapshot.Penalties.Count * 256L)
                 throw new ArgumentException("The request cannot reserve the fixed routing workspace.", nameof(request));
+            _reservedWorkspaceBytes = reservedWorkspaceBytes;
             _snapshot = snapshot; _grid = snapshot.Grid; _graph = snapshot.SectorGraph; Request = request;
             _entryLimit = (int)Math.Min(request.MaximumWork,
-                Math.Max(0, (request.MaximumWorkspaceBytes - 8192 - snapshot.Penalties.Count * 256L) / 1024));
+                Math.Max(0, (request.MaximumWorkspaceBytes - _reservedWorkspaceBytes - 8192 - snapshot.Penalties.Count * 256L) / 1024));
             _penalties = snapshot.Penalties.ToDictionary(p => p.Cell, p => p.AdditionalCost);
             foreach (var penalty in snapshot.Penalties)
             {
@@ -162,7 +185,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
         }
 
         private long WorkspaceBytes => Math.Min(Request.MaximumWorkspaceBytes,
-            8192L + _snapshot.Penalties.Count * 256L + _state.AllocatedEntries * 1024L);
+            _reservedWorkspaceBytes + 8192L + _snapshot.Penalties.Count * 256L + _state.AllocatedEntries * 1024L);
 
         private void Step()
         {
