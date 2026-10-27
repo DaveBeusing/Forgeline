@@ -20,7 +20,7 @@ public readonly record struct BridgeRepairActionReadModel(
 
 internal static partial class PlayerActionSnapshotFactory
 {
-    private static IReadOnlyList<BridgeRepairActionReadModel> CaptureBridgeRepairs(
+    private static System.Collections.ObjectModel.ReadOnlyCollection<BridgeRepairActionReadModel> CaptureBridgeRepairs(
         SimulationContext context, PresentationExtractionContext extraction, EntityId engineer)
     {
         var entities = context.Entities;
