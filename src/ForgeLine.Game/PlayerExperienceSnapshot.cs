@@ -173,6 +173,8 @@ public readonly record struct PlayerSelectionSummary(
     BuildingId CommonBuildingId = default)
 {
     public PlayerTacticalProtectionSummary? TacticalProtection { get; init; }
+    public PlayerBattlefieldStatus BattlefieldStatus { get; init; }
+    public double? Strength { get; init; }
 
     public bool HasSingleEntityDetails =>
         Count == 1;
@@ -754,7 +756,12 @@ public static class PlayerExperienceSnapshotFactory
                     buildings)
                 : PlayerWorkSummary.None,
             commonUnitId,
-            commonBuildingId);
+            commonBuildingId)
+        {
+            BattlefieldStatus = hasSingleEntityDetails
+                ? PlayerBattlefieldStatusCapture.Capture(entities, primary, player) : default,
+            Strength = hasReadiness ? readiness.Strength : null
+        };
     }
 
     public static PlayerWorkSummary CaptureWork(

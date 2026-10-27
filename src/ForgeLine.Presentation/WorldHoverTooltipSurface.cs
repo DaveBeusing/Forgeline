@@ -372,6 +372,15 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             Line(builder.Written);
         }
         if (details.HasReadiness) Percent("READINESS", details.Readiness);
+        if (details.HasReadiness && details.Strength is { } strength) Percent("STRENGTH", strength);
+        if (details.Count == 1)
+        {
+            string suppression = BattlefieldStatusText.Suppression(details.BattlefieldStatus);
+            if (suppression.Length > 0) Line(suppression);
+            if (details.BattlefieldStatus.Resupplying) Line("RESUPPLY ORDER ACTIVE");
+            string fire = BattlefieldStatusText.Fire(details.BattlefieldStatus, details.HasSupply, details.AmmunitionFraction);
+            if (fire.Length > 0) Line(fire);
+        }
         if (details.HasPower) Line(SelectionInspectorHudModel.ResolvePowerLabel(details.PowerState));
         if (details.Work.Kind != PlayerWorkKind.None)
         {
