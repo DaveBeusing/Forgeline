@@ -5,7 +5,7 @@ using ForgeLine.Game;
 namespace ForgeLine.Presentation;
 
 internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier,
-    Vector3 Facing = default, bool Input = false);
+    Vector3 Facing = default, bool Input = false, string Materials = "");
 
 /// <summary>Selects one copied endpoint; the construction preview still validates the connection.</summary>
 internal sealed class ConveyorEndpointPicker
@@ -80,9 +80,18 @@ internal sealed class ConveyorEndpointPicker
                     Math.Clamp(row.Piece.Placement.Tier + rise, 0, 1), socket.Facing, input);
             }
         }
-        if (chosen.IsValid) return true;
-        endpoint = bodyEndpoint;
-        return bodyFound;
+        if (!chosen.IsValid) endpoint = bodyEndpoint;
+        if (!chosen.IsValid && !bodyFound) return false;
+        string materials = network.BeltMaterials;
+        if (endpoint.Building.IsValid)
+        {
+            materials = "DETAILS UNAVAILABLE";
+            foreach (var information in network.PortInformation)
+                if (information.Building == endpoint.Building && information.Input == endpoint.Input)
+                { materials = information.Materials; break; }
+        }
+        endpoint = endpoint with { Materials = materials.Length == 0 ? "DETAILS UNAVAILABLE" : materials };
+        return true;
     }
 
     private static bool Usable(in ConveyorBuildingPort port, PlayerId player, bool input) =>

@@ -23,7 +23,8 @@ public readonly record struct HoverTooltipView(
     bool SelectionStatus = false,
     ulong SelectionRevision = 0,
     ulong MenuRevision = 0,
-    float TextScale = 1);
+    float TextScale = 1,
+    bool ActionReady = false);
 
 public sealed class HoverTooltipController
 {
@@ -41,6 +42,10 @@ public sealed class HoverTooltipController
     private HoverTooltipView _candidate;
     private Vector2 _anchor;
     private TimeSpan _stable;
+    private Vector2 _lastPointer;
+    private int _focusedIndex = -1;
+    private PlayerActionPanelMode _focusedMode;
+    private bool _preferFocus;
 
     public HoverTooltipView Update(InputState input, PresentationSnapshot? snapshot,
         EntityId hoveredEntity, RtsCamera camera, in GameplayHudLayout layout,
@@ -61,18 +66,30 @@ public sealed class HoverTooltipController
             pointer.X < 0 || pointer.Y < 0 || pointer.X >= layout.ViewportWidth || pointer.Y >= layout.ViewportHeight)
             return Reset();
 
+        bool pointerMoved = input.HasPointerPosition && Vector2.DistanceSquared(pointer, _lastPointer) > 1;
+        if (pointerMoved) _preferFocus = false;
+        else if (panel.SelectedIndex != _focusedIndex || panel.Mode != _focusedMode) _preferFocus = true;
+        _lastPointer = pointer; _focusedIndex = panel.SelectedIndex; _focusedMode = panel.Mode;
         var next = new HoverTooltipView(snapshot.SessionId, EntityId.Invalid, default, pointer,
             false, layout.ViewportWidth, layout.ViewportHeight, layout.Scale, TextScale: _settings.TextScale);
         int count = panel.SelectionPending ? 0 : PlayerActionDockInteractionLayout.GetItemCount(panel.Mode, snapshot.PlayerActions);
-        // The selected-object inspector is persistent while its ring is open;
-        // hovering an action sector must not replace the authorized object facts.
-        if (statusAvailable && !panel.Ring.Global && !panel.SelectionPending &&
+        // One persistent card keeps object facts and the currently inspected action together.
+        if (statusAvailable && !panel.SelectionPending &&
             snapshot.PlayerExperience is { } selectedExperience &&
-            selectedExperience.Selection.Count > 0 &&
+            (panel.Ring.Global ? selectedExperience.Selection.Count == 0 : selectedExperience.Selection.Count > 0) &&
             (!panel.Ring.SingleOwned || selectedExperience.Selection.PrimaryEntity == panel.Ring.Entity))
         {
             next = next with { SelectionStatus = true, SelectionRevision = panel.Ring.SelectionRevision,
                 MenuRevision = panel.Ring.Revision, PointerPosition = panel.Ring.Geometry.Center };
+            if (count > 0 && panel.Ring.Level is ActionRingLevel.Items or ActionRingLevel.Parameters)
+            {
+                int index = panel.SelectedIndex;
+                if (!_preferFocus && panel.Ring.TryHit(pointer, out var hovered) &&
+                    hovered.Target.Kind == PlayerActionDockControlKind.Item)
+                    index = hovered.Target.ItemIndex;
+                if (index >= 0 && index < count)
+                    next = next with { DockMode = panel.Mode, DockControl = (int)PlayerActionDockControlKind.Item, DockIndex = index };
+            }
         }
         else if (panel.Ring.TryHit(pointer, out var radial))
         {
@@ -126,7 +143,8 @@ public sealed class HoverTooltipController
         }
         else if (elapsed > TimeSpan.Zero && elapsed <= TimeSpan.FromMilliseconds(250)) _stable += elapsed;
         else if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMilliseconds(250)) _stable = TimeSpan.Zero;
-        _candidate = next with { Ready = next.SelectionStatus || _stable >= TimeSpan.FromMilliseconds(_settings.DelayMilliseconds) };
+        bool delayed = _stable >= TimeSpan.FromMilliseconds(_settings.DelayMilliseconds);
+        _candidate = next with { Ready = next.SelectionStatus || delayed, ActionReady = delayed && next.DockControl != 0 };
         return _candidate;
     }
 

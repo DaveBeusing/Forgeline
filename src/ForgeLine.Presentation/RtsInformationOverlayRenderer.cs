@@ -1153,16 +1153,20 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         var state = OnboardingPresentation.Resolve(layout, 0);
         if (!state.Visible) return;
-        float scale = MathF.Max(.875f, MathF.Min(layout.Scale, state.Panel.Height / 36));
-        float font = 14 * scale, padding = 6 * scale;
-        float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
         bool conveyor = placement.Title == "CONVEYOR";
-        var bounds = state.Panel with { Height = MathF.Min(state.Panel.Height, line * (conveyor ? 3 : 1) + 2 * padding) };
+        bool ports = !string.IsNullOrEmpty(placement.PortInformation);
+        int rows = ports ? 4 : conveyor ? 3 : 1;
+        float lineRatio = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize;
+        float scale = MathF.Min(layout.Scale, state.Panel.Height / (lineRatio * 14 * rows + 12));
+        if (scale <= 0) return;
+        float font = 14 * scale, padding = 6 * scale;
+        float line = lineRatio * font;
+        var bounds = state.Panel with { Height = MathF.Min(state.Panel.Height, line * rows + 2 * padding) };
         if (bounds.IsEmpty) return;
-        ulong revision = unchecked((uint)HashCode.Combine(placement.State, placement.Title, placement.Reason, placement.Hint));
+        ulong revision = unchecked((uint)HashCode.Combine(placement.State, placement.Title, placement.Reason, placement.Hint, placement.PortInformation));
         var visual = new NotificationStackLayout(bounds, font, 1,
             new(new(default, Local: true), bounds, default, default, default, false, revision));
-        _placementMotion.Update(visual, placement.SessionId, layout, now, animate && !conveyor);
+        _placementMotion.Update(visual, placement.SessionId, layout, now, animate && !conveyor && !ports);
         float opacity = _placementMotion.Opacity(0);
         _guidanceClip = bounds; _text.Clip = bounds; _skin.PanelClip(bounds);
         int vertexStart = _vertexCount;
@@ -1189,22 +1193,22 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         text.Append(placement.Title ?? "");
         text.Append(" / ");
         text.Append(placement.Reason ?? "");
-        if (!conveyor)
+        if (!conveyor && !ports)
         {
             text.Append(" / ");
             text.Append(placement.Hint ?? "");
         }
         var content = new HudRect(bounds.X + padding * 2 + iconSize,
-            conveyor ? bounds.Y + padding : bounds.Y + (bounds.Height - line) * .5f,
+            rows > 1 ? bounds.Y + padding : bounds.Y + (bounds.Height - line) * .5f,
             MathF.Max(1, bounds.Width - padding * 3 - iconSize), line);
         Span<char> shortText = stackalloc char[512];
         ReadOnlySpan<char> remaining = text.Written;
-        int rows = conveyor ? 3 : 1;
         for (int row = 0; row < rows; row++)
         {
-            if (conveyor && row == 2) remaining = placement.Hint.AsSpan();
+            if (ports && row == 1) remaining = placement.PortInformation.AsSpan();
+            if (rows > 1 && row == rows - 1) remaining = placement.Hint.AsSpan();
             scoped ReadOnlySpan<char> visible;
-            if (conveyor && row == 0)
+            if ((!ports && conveyor && row == 0) || (ports && row == 1))
             {
                 visible = NotificationText.Line(remaining, content.Width, font, out int consumed);
                 remaining = remaining[consumed..];

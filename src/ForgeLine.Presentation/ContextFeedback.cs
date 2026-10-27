@@ -8,7 +8,8 @@ public enum PlacementContextState : byte { None, Pending, Stale, Invalid, Valid,
 public readonly record struct PlacementContextFeedbackView(
     PlacementContextState State, string Title, string Reason, string Hint,
     IReadOnlyList<PlayerActionResourceAmount>? Costs = null,
-    SimulationSessionId SessionId = default, SimulationTick Tick = default)
+    SimulationSessionId SessionId = default, SimulationTick Tick = default,
+    string PortInformation = "")
 {
     public bool Visible => State != PlacementContextState.None;
 }
@@ -31,7 +32,17 @@ public static class PlacementContextFeedback
         BuildingPlacementPreview? preview, PresentationSnapshot? snapshot)
     {
         var view = ResolveCore(building, freshness, preview, snapshot);
-        return view with { SessionId = snapshot?.SessionId ?? default, Tick = snapshot?.Tick ?? default };
+        string ports = string.Empty;
+        if (freshness == PlacementPreviewFreshness.Current && preview is { } current &&
+            snapshot?.PlacementPreview is { } captured && captured.CompletedTick == snapshot.Tick &&
+            captured.Preview == current)
+        {
+            if (current.ConveyorInput is { } input)
+                ports = $"IN FLOW {ConveyorPortText.Direction(input.Facing, true)} ACCEPTS {current.ConveyorInputMaterials}";
+            if (current.ConveyorOutput is { } output)
+                ports += (ports.Length > 0 ? "; " : "") + $"OUT FLOW {ConveyorPortText.Direction(output.Facing, false)} CARRIES {current.ConveyorOutputMaterials}";
+        }
+        return view with { SessionId = snapshot?.SessionId ?? default, Tick = snapshot?.Tick ?? default, PortInformation = ports };
     }
 
     private static PlacementContextFeedbackView ResolveCore(BuildingId building, PlacementPreviewFreshness freshness,

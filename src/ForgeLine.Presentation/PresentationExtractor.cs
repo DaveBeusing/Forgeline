@@ -308,7 +308,8 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         var information = ports.Take(128).Select(port => new ConveyorPortInformation(port.Building, port.Input,
             ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port)))).ToArray();
         return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player,scenario.Inventories),ports)
-        { PortInformation = Array.AsReadOnly(information) };
+        { PortInformation = Array.AsReadOnly(information),
+            BeltMaterials = ConveyorPortInformationCapture.Materials(scenario, (1 << ConveyorSimulationSystem.EligibleResources.Count) - 1) };
     }
 
     private RenderInstance[] CaptureRenderInstances(

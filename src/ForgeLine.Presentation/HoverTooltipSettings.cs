@@ -8,6 +8,7 @@ public sealed record HoverTooltipSettings
     public static HoverTooltipSettings Default { get; } = new();
     public int DelayMilliseconds { get; init; } = 175;
     public HoverTooltipTextSize TextSize { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public float TextScale => TextSize switch
     {
         HoverTooltipTextSize.Large => 1.15f,

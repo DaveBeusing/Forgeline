@@ -14,6 +14,7 @@ public sealed record ConveyorConstructionReadModel(ulong RequestId, SimulationTi
     ConveyorPlan? Preview, double AvailableSteel, IReadOnlyList<ConveyorOwnedPiece> Pieces,
     IReadOnlyList<ConveyorBuildingPort> Ports)
 {
+    public string BeltMaterials { get; init; } = string.Empty;
     public IReadOnlyList<ConveyorPortInformation> PortInformation { get; init; } = Array.Empty<ConveyorPortInformation>();
 }
 public readonly record struct ConveyorFeaturePresentationMetadata(ConveyorPlacement Placement, string State)
@@ -47,6 +48,7 @@ public sealed class RtsConveyorConstructionController
     private float _scale;
     private EntityId _sourcePort;
     private ConveyorEndpoint? _snappedEndpoint;
+    private SimulationTick _endpointTick;
     private Vector3? _pointerTarget;
     private double _availableSteel;
     public bool IsActive { get; private set; }
@@ -115,7 +117,7 @@ public sealed class RtsConveyorConstructionController
         if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_anchorPointer.HasValue &&
             _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,_anchor.HasValue,out var endpoint))
         {
-            _snappedEndpoint=endpoint;
+            _snappedEndpoint=endpoint; _endpointTick=snapshot!.Tick;
             target=endpoint.Position;
             if(_anchor.HasValue)destination=endpoint.Building;
             else {_sourcePort=endpoint.Building;Tier=endpoint.Tier;}
@@ -137,7 +139,7 @@ public sealed class RtsConveyorConstructionController
                     {
                         target=mate.Position+Vector3.UnitY*5.8f-Vector3.Transform(local.Position,rotation);
                         Tier=mate.Tier-(int)MathF.Round((local.Position.Y-5.8f)/2);
-                        _snappedEndpoint=mate;snapModule=true;
+                        _snappedEndpoint=mate;_endpointTick=snapshot!.Tick;snapModule=true;
                         if(mate.Input)destination=mate.Building;else _sourcePort=mate.Building;
                         break;
                     }
@@ -206,13 +208,23 @@ public sealed class RtsConveyorConstructionController
     {
         string controls=Module==ConveyorModule.Route?$"T{Tier} / TAB BEND / T TIER / RMB CANCEL":
             $"T{Tier} / Q E ROTATE / T TIER / RMB CANCEL";
+        string portInformation = string.Empty;
+        bool factsCurrent = snapshot is { SessionId.IsSpecified: true } && snapshot.SessionId == _session && snapshot.Conveyors is { } network &&
+            network.Tick == snapshot.Tick && snapshot.PlayerExperience is { IsMatchComplete: false } experience &&
+            experience.Tick == snapshot.Tick;
+        if (Edit == ConveyorEdit.Build && factsCurrent)
+        {
+            portInformation = Module == ConveyorModule.Route ? $"FLOW OUT -> IN / {(XFirst ? "X FIRST" : "Z FIRST")}" : $"FLOW {Orientation.ToString().ToUpperInvariant()} / OUT -> IN";
+            if (_snappedEndpoint is { } socket && _endpointTick == snapshot!.Tick)
+                portInformation = $"{(socket.Input ? "IN ACCEPTS" : "OUT CARRIES")} {socket.Materials} / FLOW {ConveyorPortText.Direction(socket.Facing, socket.Input)}";
+        }
         if(!_anchor.HasValue && Module==ConveyorModule.Route && Edit==ConveyorEdit.Build && !_awaiting)
             return new(PlacementContextState.Pending,"CONVEYOR",_snappedEndpoint.HasValue?
                 "OUTPUT SNAPPED / CLICK TO START":"CHOOSE OUTPUT / CLICK BUILDING OR BELT OUTPUT",controls,
-                SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default);
+                SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default,PortInformation:portInformation);
         if(ChoosingDestination)
             return new(PlacementContextState.Pending,"CONVEYOR","CHOOSE INPUT / CLICK BUILDING OR BELT INPUT",controls,
-                SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default);
+                SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default,PortInformation:portInformation);
         string reason=_awaiting?"REQUEST PENDING":!Current?"CHECKING PLACEMENT":Preview is {} p?
             p.IsValid?$"READY / {p.Steel:0} STEEL / "+(_snappedEndpoint.HasValue?"SNAPPED / CLICK TO BUILD":"CLICK TO BUILD"):FailureReason(snapshot):"CHOOSE START AND END";
         IReadOnlyList<PlayerActionResourceAmount>? costs=Preview is {} plan?
@@ -220,7 +232,7 @@ public sealed class RtsConveyorConstructionController
         return new(_awaiting || !Current?PlacementContextState.Pending:Preview?.IsValid==true?
             PlacementContextState.Valid:Preview?.Failure==ConveyorFailure.InsufficientStock?
             PlacementContextState.MissingMaterials:PlacementContextState.Invalid,"CONVEYOR",reason,controls,costs,
-            snapshot?.SessionId??default,snapshot?.Tick??default);
+            snapshot?.SessionId??default,snapshot?.Tick??default,portInformation);
     }
     private bool ChoosingDestination => Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_awaiting &&
         _anchor.HasValue && (_anchorPointer.HasValue ||

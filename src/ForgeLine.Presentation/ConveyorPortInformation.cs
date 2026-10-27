@@ -5,6 +5,15 @@ namespace ForgeLine.Presentation;
 
 public readonly record struct ConveyorPortInformation(EntityId Building, bool Input, string Materials);
 
+internal static class ConveyorPortText
+{
+    public static string Direction(System.Numerics.Vector3 facing, bool input)
+    {
+        var flow = input ? -facing : facing;
+        return MathF.Abs(flow.X) > MathF.Abs(flow.Z) ? flow.X > 0 ? "+X" : "-X" : flow.Z > 0 ? "+Z" : "-Z";
+    }
+}
+
 internal static class ConveyorPortInformationCapture
 {
     public static string Materials(MatchRuntime scenario, int mask)

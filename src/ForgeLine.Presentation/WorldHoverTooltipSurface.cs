@@ -130,16 +130,11 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (resolved.Selection is not null) BlankLine();
         Line(resolved.Role);
         Line(resolved.Status);
+        if (resolved.ProductionInput is { MissingInput: true } input) EmitProductionInput(input);
+        Line(resolved.ActionTitle, true);
+        Line(resolved.ActionStatus);
         Line(resolved.WorkStatus);
         Line(resolved.Explanation);
-        if (resolved.Selection is { } selection)
-        {
-            EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
-            if (selection.Count == 1 && resolved.OwnedActions is { } actions)
-                EmitOperationalDetails(actions, selection.PrimaryEntity);
-        }
-        if (resolved.Feedback is { State: not PlayerCommandFeedbackState.None } feedback) EmitCommandFeedback(feedback);
-        if (resolved.World is { } world) EmitWorld(world);
         if (resolved.Costs is { } costs) EmitAmounts(costs, "NEED");
         if (resolved.Outputs is { } outputs) EmitAmounts(outputs, "OUT");
         if (resolved.ProductionTicks is { } ticks)
@@ -162,6 +157,45 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             }
         }
         Line(resolved.Hint);
+        if (resolved.Selection is { } selection)
+        {
+            EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
+            if (selection.Count == 1 && resolved.OwnedActions is { } actions)
+                EmitOperationalDetails(actions, selection.PrimaryEntity);
+        }
+        if (resolved.Feedback is { State: not PlayerCommandFeedbackState.None } feedback) EmitCommandFeedback(feedback);
+        if (resolved.World is { } world) EmitWorld(world);
+    }
+
+    private void EmitProductionInput(ProductionInputInformation input)
+    {
+        Line("PRODUCTION BLOCKED: MISSING LOCAL INPUT");
+        Span<char> buffer = stackalloc char[256];
+        var text = new TooltipTextBuilder(buffer);
+        text.Append("INPUT INVENTORY "); text.Number(input.Inventory.Value, "0");
+        text.Append(" / FACILITY "); text.Number(input.Entity.Index, "0");
+        text.Append(":"); text.Number(input.Entity.Generation, "0");
+        Line(text.Written);
+        if (input.Position is { } point)
+        {
+            text = new(buffer); text.Append("INPUT FACILITY AT ");
+            text.Number(point.X, "0"); text.Append(", "); text.Number(point.Y, "0"); text.Append(", "); text.Number(point.Z, "0");
+            Line(text.Written);
+        }
+        else Line("INPUT POSITION UNAVAILABLE");
+        foreach (var amount in input.MissingMaterials)
+        {
+            text = new(buffer); text.Append("MISSING "); text.Append(amount.DisplayName); text.Append(" ");
+            text.Number(Math.Max(0, amount.RequiredQuantity - amount.AvailableQuantity), "0.##");
+            text.Append(" / NEED "); text.Number(amount.RequiredQuantity, "0.##");
+            text.Append(" / UNRESERVED HERE "); text.Number(amount.AvailableQuantity, "0.##");
+            Line(text.Written);
+        }
+        if (input.MissingMaterials.Count == 0) Line("MATERIAL BREAKDOWN UNAVAILABLE AT CAPTURED TICK");
+        if (input.MoreMaterials) Line("ADDITIONAL INPUTS: SEE LOGISTICS REQUIREMENTS");
+        Line("LOGISTICS: STOCK POLICY / OPERATIONS: INPUT DIAGNOSIS");
+        if (input.Automatic) Line("AUTOMATIC PROCESSING: CONTROL INPUT DELIVERY");
+        else Line("PRODUCTION: REQUEST PRIORITY / PAUSE / CANCEL");
     }
 
     private void EmitSelectionStatus(in PlayerSelectionSummary selection, SelectedCombatGroup? group, FormationTemplate formation)
