@@ -194,7 +194,14 @@ public sealed partial class PlayerActionPanelController
                         ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions), Enabled: false);
                     continue;
                 }
-                var kind = PlayerActionDockInteractionLayout.FooterControl(i);
+                bool stockBand = Mode == PlayerActionPanelMode.Logistics &&
+                    actions?.Logistics is { IsCommandCore: true } core && SelectedIndex < core.Policies.Count;
+                var kind = stockBand ? i switch
+                {
+                    0 => PlayerActionDockControlKind.Activate, 1 => PlayerActionDockControlKind.Cancel,
+                    2 => PlayerActionDockControlKind.DecreaseMinimum, 3 => PlayerActionDockControlKind.IncreaseMinimum,
+                    4 => PlayerActionDockControlKind.DecreaseMaximum, _ => PlayerActionDockControlKind.IncreaseMaximum
+                } : PlayerActionDockInteractionLayout.FooterControl(i);
                 slots[i] = new(new(kind, Mode, SelectedIndex), ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions),
                     Present: PlayerActionDockHudModel.ResolveFooterLabel(kind, Mode).Length > 0);
             }

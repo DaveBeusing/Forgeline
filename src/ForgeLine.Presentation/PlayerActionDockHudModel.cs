@@ -537,6 +537,11 @@ internal static class PlayerActionDockHudModel
                 CanCycleSecondary(
                     mode,
                     actions),
+            PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum or
+            PlayerActionDockControlKind.DecreaseMaximum or PlayerActionDockControlKind.IncreaseMaximum =>
+                mode == PlayerActionPanelMode.Logistics && actions.Logistics is { IsCommandCore: true } coreStock &&
+                index >= 0 && index < coreStock.Policies.Count &&
+                DecideBandAdjustment(panel, coreStock, control).Allowed,
             PlayerActionDockControlKind.Decrease or
             PlayerActionDockControlKind.Increase =>
                 CanAdjust(
@@ -561,6 +566,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
             PlayerActionPanelMode.Logistics when actions?.BridgeRepairs.Count > 0 => "REPAIR / RESUME",
             PlayerActionPanelMode.Logistics when actions?.ConveyorRouting is not null => "APPLY ROUTING",
+            PlayerActionPanelMode.Logistics when actions?.Logistics is { IsCommandCore: true } => "EDIT STOCK",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
             PlayerActionPanelMode.Technology => "START RESEARCH",
@@ -702,16 +708,29 @@ internal static class PlayerActionDockHudModel
     internal static (double Next, bool Allowed, string Reason) DecideStockAdjustment(
         in PlayerActionPanelView panel, PlayerLogisticsActionReadModel logistics, int direction)
     {
-        return LogisticsQuantityEditor.DecideField(
-            panel.StockThresholdField, panel.StockMinimum, panel.StockTarget,
-            panel.StockMaximum, logistics.InventoryCapacity, direction);
+        return logistics.IsCommandCore
+            ? LogisticsQuantityEditor.DecideBand(panel.StockThresholdField, panel.StockMinimum, panel.StockMaximum, logistics.InventoryCapacity, direction)
+            : LogisticsQuantityEditor.DecideField(panel.StockThresholdField, panel.StockMinimum, panel.StockTarget,
+                panel.StockMaximum, logistics.InventoryCapacity, direction);
     }
+
+    internal static (double Next, bool Allowed, string Reason) DecideBandAdjustment(
+        in PlayerActionPanelView panel, PlayerLogisticsActionReadModel logistics, PlayerActionDockControlKind control) =>
+        LogisticsQuantityEditor.DecideBand(
+            control is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum
+                ? PlayerStockThresholdField.Minimum : PlayerStockThresholdField.Maximum,
+            panel.StockMinimum, panel.StockMaximum, logistics.InventoryCapacity,
+            control is PlayerActionDockControlKind.IncreaseMinimum or PlayerActionDockControlKind.IncreaseMaximum ? 1 : -1);
 
     public static string ResolveFooterLabel(
         PlayerActionDockControlKind control,
         PlayerActionPanelMode mode) =>
         control switch
         {
+            PlayerActionDockControlKind.DecreaseMinimum => "MIN -",
+            PlayerActionDockControlKind.IncreaseMinimum => "MIN +",
+            PlayerActionDockControlKind.DecreaseMaximum => "MAX -",
+            PlayerActionDockControlKind.IncreaseMaximum => "MAX +",
             PlayerActionDockControlKind.Activate =>
                 mode ==
                     PlayerActionPanelMode.Technology
@@ -1109,6 +1128,8 @@ internal static class PlayerActionDockHudModel
                 "NO ROUTE",
             LogisticsTransportRequestFailureReason.NoTruckAvailable =>
                 "NO TRUCK",
+            LogisticsTransportRequestFailureReason.NoDriveFuel =>
+                "NO DRIVE FUEL",
             LogisticsTransportRequestFailureReason.ReservationFailed =>
                 "RESERVATION",
             LogisticsTransportRequestFailureReason.AssignmentFailed =>

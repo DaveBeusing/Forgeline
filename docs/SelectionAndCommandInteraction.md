@@ -193,6 +193,27 @@ At execution time it revalidates every target against the live ECS and owner. A 
 
 The command exposes accepted/rejected target counts and execution tick for development diagnostics.
 
+## Production stock and Command Core refill
+
+The existing status card now reports each owned processor's real output-inventory
+stock, reserved quantity and free quantity (up to seven distinct output materials).
+The same copied information is available on authorized world hover. Recipe yield
+and lifetime production are separate concepts.
+
+Command Core / LOGISTICS / material opens the existing parameter ring with direct
+MIN - / MIN + / MAX - / MAX + controls, APPLY STOCK, REMOVE RULE, Next item and Back.
+The material click is navigation; APPLY STOCK is the explicit command boundary.
+Keyboard activation follows the same two stages; Secondary Setting chooses MIN
+or MAX for the ordinary quantity-adjustment keys. Existing session/selection/menu
+identity, pending-command, release-time validation and world-click ownership remain.
+
+An accepted Core edit installs the existing enabled stock policy with its target
+equal to MAX. Below MIN the existing scheduler chooses free owned Cargo Trucks,
+source surplus, route and physically possible shipment quantities to reach that
+goal. Current stock, saved thresholds, requested demand, incoming work and actual
+transport failure remain distinct copied observations. Other facilities retain
+their MIN/TARGET/MAX editor. See [operation and limits](LogisticsSetup.md).
+
 ## Read-only selection status
 
 `WorldHoverTooltipSurface` displays copied single/group status beside the open

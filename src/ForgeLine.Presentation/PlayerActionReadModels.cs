@@ -382,6 +382,7 @@ public sealed class PlayerLogisticsActionReadModel
     public int OrderStartIndex => Policies.Count + Requirements.Count;
     public int ItemCount => OrderStartIndex + Orders.Count;
     public int TotalOrderCount { get; init; }
+    public bool IsCommandCore { get; init; }
     public bool HasEnabledGraphNode { get; init; }
     public PlayerCargoFleet CargoFleet { get; init; }
     public CargoConvoyReadModel? SelectedConvoy { get; init; }
@@ -621,6 +622,7 @@ public sealed class PlayerActionSnapshot
 
     public PlayerProductionFacilityActionReadModel? Production { get; }
 
+    public ProductionOutputStock? ProductionOutput { get; init; }
     public ProductionInputInformation? ProductionInput { get; init; }
     public OperationsRuleSelectionSnapshot? OperationsRules { get; }
     public PolicyTemplateSelectionSnapshot? PolicyTemplates { get; init; }
@@ -727,7 +729,8 @@ internal static partial class PlayerActionSnapshotFactory
             tactical,
             technology,
             interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null)
-        { ProductionInput = ProductionInputInformationCapture.Capture(context, extraction, selectedFacility),
+        { ProductionOutput = ProductionOutputStockCapture.Capture(context, extraction, selectedFacility),
+            ProductionInput = ProductionInputInformationCapture.Capture(context, extraction, selectedFacility),
             BridgeRepairs = CaptureBridgeRepairs(context, extraction, selectedFacility),
             ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility),
             PolicyTemplates = interaction.OperationsOpen
@@ -1567,6 +1570,7 @@ internal static partial class PlayerActionSnapshotFactory
                 .ToArray(),
             orderRows)
         {
+            IsCommandCore = entities.TryGetComponent(entity, out CompletedBuilding coreIdentity) && coreIdentity.BuildingId == BuildingIds.CommandCore,
             HasEnabledGraphNode = scenario.Logistics.TryGetNodeForEntity(entity, out var localNode) &&
                 scenario.Logistics.TryGetNode(localNode, out var graphNode) && graphNode.Enabled,
             CargoFleet = CaptureFleet(),

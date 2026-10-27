@@ -18,7 +18,8 @@ internal readonly record struct HoverTooltipContent(
     FormationTemplate Formation = default, PlayerCommandFeedback? Feedback = null,
     PlayerActionSnapshot? OwnedActions = null,
     string ActionTitle = "", string ActionStatus = "",
-    ProductionInputInformation? ProductionInput = null);
+    ProductionInputInformation? ProductionInput = null,
+    ProductionOutputStock? ProductionOutput = null);
 
 internal static class HoverTooltipResolver
 {
@@ -54,7 +55,11 @@ internal static class HoverTooltipResolver
                 ProductionInput: snapshot.PlayerActions is { } inputActions &&
                     inputActions.SessionId == snapshot.SessionId && inputActions.Tick == snapshot.Tick &&
                     inputActions.ProductionInput?.Entity == experience.Selection.PrimaryEntity
-                        ? inputActions.ProductionInput : null);
+                        ? inputActions.ProductionInput : null,
+                ProductionOutput: snapshot.PlayerActions is { } outputActions &&
+                    outputActions.SessionId == snapshot.SessionId && outputActions.Tick == snapshot.Tick &&
+                    outputActions.ProductionOutput?.Entity == experience.Selection.PrimaryEntity
+                        ? outputActions.ProductionOutput : null);
             if (view.ActionReady && ResolveDock(snapshot, view, panel) is { } action)
                 content = content with { ActionTitle = action.Title, ActionStatus = action.Status,
                     Costs = action.Costs, Outputs = action.Outputs, ProductionTicks = action.ProductionTicks,
@@ -100,7 +105,7 @@ internal static class HoverTooltipResolver
         }
         if(world.Category==PlayerHoverCategory.Conveyor) explanation=world.Requirement;
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
-            WrapDetails: true, ProductionInput: world.ProductionInput);
+            WrapDetails: true, ProductionInput: world.ProductionInput, ProductionOutput: world.ProductionOutput);
     }
 
     private static HoverTooltipContent? ResolveDock(PresentationSnapshot snapshot, in HoverTooltipView view,
@@ -195,8 +200,16 @@ internal static class HoverTooltipResolver
                         var stock = logistics.Policies[index];
                         requirement = (panel.StockPreview.Length > 0 ? panel.StockPreview + "; " : string.Empty) + LogisticsStatusCatalog.PolicyDetails(logistics, stock) +
                             (logistics.HasEnabledGraphNode ? "; NETWORK NODE ACTIVE; LOCAL ACCESS OBSERVED SEPARATELY" : "; NO ACTIVE NETWORK NODE");
+                        if (logistics.IsCommandCore)
+                        {
+                            requirement = $"CORE STOCK {stock.CurrentQuantity:0.##}; DRAFT MIN {panel.StockMinimum:0.##} / MAX {panel.StockMaximum:0.##}; " +
+                                $"SAVED MIN {stock.DesiredMinimum:0.##} / REFILL TO {stock.DesiredTarget:0.##}. " + requirement;
+                        }
                         status = $"{(stock.HasPolicy ? "POLICY SAVED" : "NO SAVED POLICY")} / SOURCE {(string.IsNullOrEmpty(stock.SourceName) ? "NOT ASSIGNED" : stock.SourceName)} / {(stock.AssignedTruck.IsValid ? "CARGO TRUCK ASSIGNED" : "NO CARGO TRUCK ASSIGNED")}";
-                        hint = LogisticsStatusCatalog.Advice(stock.FailureReason);
+                        hint = logistics.IsCommandCore
+                            ? "SELECT MATERIAL / EDIT MIN MAX / APPLY STOCK ENABLES AUTO REFILL" +
+                                (stock.FailureReason == LogisticsTransportRequestFailureReason.None ? "" : "; " + LogisticsStatusCatalog.Advice(stock.FailureReason))
+                            : LogisticsStatusCatalog.Advice(stock.FailureReason);
                         if (stock.FailureReason == LogisticsTransportRequestFailureReason.NoTruckAvailable)
                         {
                             var fleet = logistics.CargoFleet;
@@ -231,7 +244,9 @@ internal static class HoverTooltipResolver
         if (mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } logisticsHelp)
         {
             if (index >= 0 && index < logisticsHelp.Policies.Count)
-                explanation = "MIN TRIGGERS REFILL USING STOCK + OUTSTANDING; TARGET REFILLS TO; MAX IS SAVED POLICY, NOT A HARD CAP. " +
+                explanation = (logisticsHelp.IsCommandCore
+                    ? "BELOW MIN: FREE OWN CARGO TRUCK COLLECTS SOURCE SURPLUS AND REFILLS TO MAX. INCOMING STOCK COUNTS; SHARED CAPACITY STILL APPLIES. "
+                    : "MIN TRIGGERS REFILL USING STOCK + OUTSTANDING; TARGET REFILLS TO; MAX IS SAVED POLICY, NOT A HARD CAP. ") +
                     LogisticsStatusCatalog.ServiceDetails(logisticsHelp.Policies[index].Service);
             else explanation = "CATALOG INPUTS; SHARED CAPACITY INCLUDES LOCAL STOCK AND OUTSTANDING DELIVERY DEMAND. PREVIEW CREATES NO ORDERS.";
             if (control is PlayerActionDockControlKind.CycleSecondary or PlayerActionDockControlKind.Increase or PlayerActionDockControlKind.Decrease)
@@ -264,6 +279,10 @@ internal static class HoverTooltipResolver
                 PlayerActionPanelMode.Supply => "TOGGLE AUTOMATIC RESUPPLY",
                 _ => "CYCLE STOCK THRESHOLD FIELD"
             },
+            PlayerActionDockControlKind.DecreaseMinimum => "DECREASE REFILL TRIGGER",
+            PlayerActionDockControlKind.IncreaseMinimum => "INCREASE REFILL TRIGGER",
+            PlayerActionDockControlKind.DecreaseMaximum => "DECREASE REFILL GOAL",
+            PlayerActionDockControlKind.IncreaseMaximum => "INCREASE REFILL GOAL",
             PlayerActionDockControlKind.Decrease => "DECREASE SELECTED VALUE",
             PlayerActionDockControlKind.Increase => "INCREASE SELECTED VALUE",
             _ => string.Empty

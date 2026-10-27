@@ -37,6 +37,10 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool orderDetail = ring.Level == ActionRingLevel.Parameters && panel.Mode == PlayerActionPanelMode.Logistics &&
                 actions?.Logistics is { } detailList && panel.SelectedIndex >= detailList.OrderStartIndex &&
                 panel.SelectedIndex < detailList.ItemCount && i < 6;
+            bool coreStock = ring.Level == ActionRingLevel.Parameters && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.Logistics is { IsCommandCore: true } core && panel.SelectedIndex >= 0 && panel.SelectedIndex < core.Policies.Count;
+            bool bandControl = target.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum or
+                PlayerActionDockControlKind.DecreaseMaximum or PlayerActionDockControlKind.IncreaseMaximum;
             bool enabled = slot.Enabled && (slot.Navigation == ActionRingNavigation.GroupControl ? ring.Group?.Participants(target.ItemIndex) > 0 : navigation || mode || PlayerActionDockHudModel.CanUseControl(item ? PlayerActionDockControlKind.Activate : target.Kind,
                 panel.Mode, target.ItemIndex, panel, actions));
             if (orderItem || orderDetail) enabled = true;
@@ -55,7 +59,8 @@ internal sealed partial class PlayerActionRingHudRenderer
             _skin.Icon(icon, center.X - iconSize / 2, center.Y - 28 * scale, iconSize,
                 new Vector4(enabled ? 1 : .55f, enabled ? 1 : .55f, enabled ? 1 : .55f, opacity));
             bool unavailableGlobal = ring.Global && slot.Key.Kind == 255;
-            string label = orderDetail ? i switch
+            string label = coreStock && target.Kind == PlayerActionDockControlKind.Activate ? "APPLY STOCK" :
+                coreStock && target.Kind == PlayerActionDockControlKind.Cancel ? "REMOVE RULE" : orderDetail ? i switch
             {
                 0 => "ORDER ID", 1 => "STATUS", 2 => "RESOURCE", 3 => "QUANTITY",
                 4 => "SOURCE", _ => "DESTINATION"
@@ -108,6 +113,19 @@ internal sealed partial class PlayerActionRingHudRenderer
                 value.Append("#"); value.Append(order.RequestId.Value);
                 value.Append(" "); value.Append(OrderState(order.State));
             }
+            else if (coreStock && bandControl && actions?.Logistics is { } bandStock)
+            {
+                if (!enabled) value.Append(PlayerActionDockHudModel.DecideBandAdjustment(panel, bandStock, target.Kind).Reason);
+                else value.Append(target.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum
+                    ? panel.StockMinimum : panel.StockMaximum, "F0");
+            }
+            else if (coreStock && target.Kind == PlayerActionDockControlKind.Activate)
+            {
+                value.Append("MIN "); value.Append(panel.StockMinimum, "F0");
+                value.Append(" / MAX "); value.Append(panel.StockMaximum, "F0");
+            }
+            else if (coreStock && target.Kind == PlayerActionDockControlKind.Cancel)
+                value.Append("AUTO REFILL");
             else if (!navigation && !mode && !item && panel.Mode == PlayerActionPanelMode.Logistics &&
                 actions?.Logistics is { } requirements && panel.SelectedIndex >= requirements.Policies.Count &&
                 target.Kind is PlayerActionDockControlKind.Decrease or PlayerActionDockControlKind.Increase)
@@ -149,6 +167,18 @@ internal sealed partial class PlayerActionRingHudRenderer
                 // The entry describes accepted simulation state, not the
                 // separately editable PRIOR value on the parameter page.
                 var stockPolicy = stockRows.Policies[target.ItemIndex];
+                if (stockRows.IsCommandCore)
+                {
+                    value.Append("HAVE "); value.Append(stockPolicy.CurrentQuantity, "F0");
+                    if (!stockPolicy.HasPolicy) value.Append(" / SET MIN MAX");
+                    else if (!stockPolicy.Enabled) value.Append(" / OFF");
+                    else if (stockPolicy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
+                    { value.Append(" / "); value.Append(PlayerActionDockHudModel.ResolveTransportFailureLabel(stockPolicy.FailureReason)); }
+                    else { value.Append(" / "); value.Append(PlayerActionDockHudModel.ResolveDistributionStateLabel(stockPolicy.DistributionState)); }
+                    _text.AddCentered(value.Written, new(center.X - halfWidth, center.Y + 12 * scale, halfWidth * 2, 16 * scale),
+                        12 * scale, text, width, height);
+                    continue;
+                }
                 value.Append(PlayerActionDockHudModel.ResolveLogisticsPriorityLabel(stockPolicy.Priority));
                 if (stockPolicy.DispatchPriority != stockPolicy.Priority &&
                     stockPolicy.Enabled)

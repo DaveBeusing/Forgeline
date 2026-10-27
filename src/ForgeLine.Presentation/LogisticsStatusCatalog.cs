@@ -51,6 +51,7 @@ public static class LogisticsStatusCatalog
     {
         LogisticsTransportRequestFailureReason.NoSourceSurplus => "CHECK SOURCE STOCK, PRODUCTION AND RESERVED AMOUNTS",
         LogisticsTransportRequestFailureReason.NoTruckAvailable => "CHECK CARGO WORK, RESERVATIONS AND DRIVE FUEL; SUPPLY TRUCKS ARE SEPARATE",
+        LogisticsTransportRequestFailureReason.NoDriveFuel => "REFUEL THE CARGO TRUCK DRIVE TANK; PHYSICAL FUEL SERVICE MUST COMPLETE",
         LogisticsTransportRequestFailureReason.NoRoute => "CHECK INFRASTRUCTURE; GRAPH CONNECTION AND LOCAL ACCESS ARE SEPARATE",
         LogisticsTransportRequestFailureReason.CapacitySaturated => "CHECK LINK OR HUB LOAD; A BUSY BAY IS A SEPARATE WAIT",
         LogisticsTransportRequestFailureReason.DestinationFull => "CONSUME OR MOVE DESTINATION STOCK",

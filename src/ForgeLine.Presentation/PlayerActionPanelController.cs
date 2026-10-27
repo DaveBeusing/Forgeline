@@ -731,6 +731,14 @@ public sealed partial class PlayerActionPanelController
         }
 
         PlayerStockPolicyActionReadModel policy = logistics.Policies[SelectedIndex];
+        if (logistics.IsCommandCore && _ringContext && _ringLevel != ActionRingLevel.Parameters)
+        {
+            _ringLevel = ActionRingLevel.Parameters;
+            _parameterItem = ObjectActionRingView.ItemKey(Mode, SelectedIndex, actions);
+            _ringRevision++; _presentedRing = default; _ringArmed = false;
+            StockThresholdField = PlayerStockThresholdField.Minimum;
+            return;
+        }
         if (!policy.HasPolicy && logistics.InventoryCapacity > 0 &&
             logistics.InventoryCapacity < LogisticsQuantityEditor.Minimum)
         {
@@ -743,10 +751,10 @@ public sealed partial class PlayerActionPanelController
                 logistics.Entity,
                 policy.ResourceId,
                 _stockMinimum,
-                _stockTarget,
+                logistics.IsCommandCore ? _stockMaximum : _stockTarget,
                 _stockMaximum,
                 LogisticsPriority,
-                policy.Enabled);
+                logistics.IsCommandCore || policy.Enabled);
     }
 
     private void ActivateSupply(
@@ -1006,7 +1014,9 @@ public sealed partial class PlayerActionPanelController
         _stockResourceId = policy.ResourceId;
         _stockResourceFromProposal = false;
         _stockMinimum = policy.DesiredMinimum;
-        _stockTarget = policy.DesiredTarget;
+        _stockTarget = logistics.IsCommandCore ? policy.DesiredMaximum : policy.DesiredTarget;
+        if (logistics.IsCommandCore && StockThresholdField == PlayerStockThresholdField.Target)
+            StockThresholdField = PlayerStockThresholdField.Minimum;
         _stockMaximum = policy.DesiredMaximum;
         LogisticsPriority = policy.Priority;
         if (_stockProposal is not null)
@@ -1166,6 +1176,18 @@ public sealed partial class PlayerActionPanelController
 
                 break;
 
+            case PlayerActionDockControlKind.DecreaseMinimum:
+            case PlayerActionDockControlKind.IncreaseMinimum:
+            case PlayerActionDockControlKind.DecreaseMaximum:
+            case PlayerActionDockControlKind.IncreaseMaximum:
+                if (PlayerActionDockHudModel.CanUseControl(hit.Kind, Mode, SelectedIndex, panel, actions))
+                {
+                    StockThresholdField = hit.Kind is PlayerActionDockControlKind.DecreaseMinimum or PlayerActionDockControlKind.IncreaseMinimum
+                        ? PlayerStockThresholdField.Minimum : PlayerStockThresholdField.Maximum;
+                    AdjustStockThreshold(actions, hit.Kind is PlayerActionDockControlKind.IncreaseMinimum or PlayerActionDockControlKind.IncreaseMaximum ? 1 : -1);
+                }
+                break;
+
             case PlayerActionDockControlKind.Decrease:
                 if (PlayerActionDockHudModel.CanUseControl(
                         PlayerActionDockControlKind.Decrease,
@@ -1285,6 +1307,12 @@ public sealed partial class PlayerActionPanelController
         if (Mode ==
             PlayerActionPanelMode.Logistics)
         {
+            if (actions?.Logistics is { IsCommandCore: true })
+            {
+                StockThresholdField = StockThresholdField == PlayerStockThresholdField.Minimum
+                    ? PlayerStockThresholdField.Maximum : PlayerStockThresholdField.Minimum;
+                return;
+            }
             StockThresholdField =
                 StockThresholdField switch
                 {
@@ -1390,9 +1418,12 @@ public sealed partial class PlayerActionPanelController
             return;
         }
 
-        var decision = LogisticsQuantityEditor.DecideField(
-            StockThresholdField, _stockMinimum, _stockTarget, _stockMaximum,
-            actions.Logistics.InventoryCapacity, direction);
+        bool band = actions.Logistics.IsCommandCore;
+        var decision = band
+            ? LogisticsQuantityEditor.DecideBand(StockThresholdField, _stockMinimum, _stockMaximum,
+                actions.Logistics.InventoryCapacity, direction)
+            : LogisticsQuantityEditor.DecideField(StockThresholdField, _stockMinimum, _stockTarget, _stockMaximum,
+                actions.Logistics.InventoryCapacity, direction);
         if (!decision.Allowed)
         {
             Feedback = decision.Reason;
@@ -1405,6 +1436,7 @@ public sealed partial class PlayerActionPanelController
             case PlayerStockThresholdField.Target: _stockTarget = decision.Next; break;
             case PlayerStockThresholdField.Maximum: _stockMaximum = decision.Next; break;
         }
+        if (band) _stockTarget = _stockMaximum;
     }
 
     private void AdjustSupplyThreshold(
