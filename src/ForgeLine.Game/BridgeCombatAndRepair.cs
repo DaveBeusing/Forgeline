@@ -24,6 +24,10 @@ public enum BridgeRepairFailure : byte
     StaleRevision, RevisionExhausted, EngineerUnavailable, DamagedAgain
 }
 
+// Preserve the launch target after the firing unit changes orders or is destroyed.
+// Shared decks must not intercept unrelated shots from units travelling over them.
+public readonly record struct BridgeProjectileTarget(EntityId Bridge);
+
 public readonly record struct BridgeRepairWork(PlayerId Owner, EntityId Engineer, EntityId MaterialSource,
     double StartHealth, double ExpectedHealth, BridgeRepairFailure Block = BridgeRepairFailure.None);
 

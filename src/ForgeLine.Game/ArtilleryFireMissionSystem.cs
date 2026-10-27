@@ -717,8 +717,7 @@ public sealed class ArtilleryFireMissionSystem : ISimulationSystem
                     candidates[index]);
             }
 
-            foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
+            foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>())
                 _impactCandidates.Add(bridge);
 
             return;

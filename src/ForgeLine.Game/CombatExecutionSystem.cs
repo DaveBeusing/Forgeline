@@ -404,6 +404,9 @@ public sealed class CombatExecutionSystem : ISimulationSystem
                     spawn.Definition.ProjectileRadiusMeters,
                     spawn.Definition.Damage));
 
+            if (context.Entities.HasComponent<BridgeCombat>(spawn.Target))
+                context.Entities.AddComponent(projectile, new BridgeProjectileTarget(spawn.Target));
+
             _runtime.RecordProjectileSpawned(
                 spawn.Source,
                 spawn.Target,
@@ -511,15 +514,14 @@ public sealed class CombatExecutionSystem : ISimulationSystem
 
         // Bridges are combat geometry only; registering them as spatial obstacles
         // would obstruct an operational crossing.
-        foreach (EntityId candidate in entities.Query<BridgeCombat, WorldTransform>(
-                     QueryIterationOrder.StableByEntityIndex))
+        if (entities.TryGetComponent(projectile, out BridgeProjectileTarget intent) &&
+            entities.TryGetComponent(intent.Bridge, out WorldTransform bridgePose))
         {
-            if (!IsEligibleProjectileTarget(entities, projectile, state, candidate))
-                continue;
+            EntityId candidate = intent.Bridge;
             AxisAlignedBounds bounds = ExpandBounds(
-                CreateTargetBounds(entities, candidate,
-                    entities.GetComponent<WorldTransform>(candidate)), state.RadiusMeters);
-            if (TryIntersectSegment(start, end, bounds, out float t) &&
+                CreateTargetBounds(entities, candidate, bridgePose), state.RadiusMeters);
+            if (IsEligibleProjectileTarget(entities, projectile, state, candidate) &&
+                TryIntersectSegment(start, end, bounds, out float t) &&
                 (t < bestT || (t == bestT && (!bestTarget.IsValid || candidate < bestTarget))))
             {
                 bestT = t;
@@ -621,6 +623,10 @@ public sealed class CombatExecutionSystem : ISimulationSystem
         {
             return false;
         }
+
+        if (entities.HasComponent<BridgeCombat>(candidate) &&
+            (!entities.TryGetComponent(projectile, out BridgeProjectileTarget intent) || intent.Bridge != candidate))
+            return false;
 
         if (combatant.Faction == state.Faction)
         {

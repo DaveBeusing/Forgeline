@@ -6,7 +6,7 @@ Status: accepted implementation; manual acceptance pending.
 
 Extend the existing StrategicInfrastructureSystem. Normal match initialization equips only RoadBridge crossings (at most the first 32 authored crossings) with neutral Structure combat contracts and 1,200 health. The neutral faction is selected deterministically from the highest unused participant faction value. Bridges have no player ControllableEntity and are excluded from automatic hostile acquisition and the opponents' copied hostile-contact lists. Explicit identified attack and ordinary projectile/artillery damage remain available.
 
-CombatEntityLifecycleSystem retains a destroyed bridge entity and delegates to infrastructure closure. The existing owner disables the real logistics edge, invalidates navigation and retains its stable crossing identity. Bridges use combat/sensor candidate queries outside the movement spatial index: making their hitboxes static spatial entries would obstruct intact crossings. Fords and other scenery do not acquire these contracts.
+CombatEntityLifecycleSystem retains a destroyed bridge entity and delegates to infrastructure closure. The existing owner disables the real logistics edge, invalidates navigation and retains its stable crossing identity. Bridges use combat/sensor candidate queries outside the movement spatial index: making their hitboxes static spatial entries would obstruct intact crossings. Bridge-only candidate queries use dense bounded component stores. A BridgeProjectileTarget component preserves the original explicit bridge launch target, including its generation, independently of subsequent shooter orders/loss. Shared decks intercept only projectiles launched at that bridge; ordinary area damage still applies. This avoids unrelated ground-level shots from units travelling over a bridge immediately hitting their own shared deck. Fords and other scenery do not acquire these contracts.
 
 RepairBridgeCommand enters through the session-bound gateway, carries full identities and an expected bridge revision, and is replayable. The infrastructure system checks a running match, current bridge identification, own live Combat Engineer within 32 m horizontally of the passage, and a live completed own material source within 64 m of that engineer. It pays 120 Steel and 20 Electronics from available, unreserved inventory exactly once. There is one BridgeRepairWork per bridge and at most one bridge job per engineer. Revision saturation rejects further repair submissions rather than wrapping.
 
@@ -18,7 +18,7 @@ Cargo order, reservation, inventory, fuel, docking, queue and locomotion owners 
 
 ## Recovery
 
-Envelope 1 remains. Payload 10 adds BridgeRepair command kind 17 and expected infrastructure revision. Authoritative schema 13 includes new bridge components and sensing/targeting/lifecycle semantics. Earlier authoritative checkpoints/replays are explicitly incompatible before reconstruction. Map/catalog digests and historical hashes remain unchanged. Raw host crossing commands remain unsupported external replay history.
+Envelope 1 remains. Payload 10 adds BridgeRepair command kind 17 and expected infrastructure revision. Authoritative schema 13 includes new bridge and projectile-intent components and sensing/targeting/lifecycle semantics. Earlier authoritative checkpoints/replays are explicitly incompatible before reconstruction. Map/catalog digests and historical hashes remain unchanged. Raw host crossing commands remain unsupported external replay history.
 
 ## Validation limits
 

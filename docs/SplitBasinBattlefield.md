@@ -105,7 +105,7 @@ Current terrain/vegetation sensing has no occlusion or elevation sight bonus. Ho
 
 ## Bridge operation
 
-The Basin Bridge is a neutral, explicitly targeted Structure with 1,200 health in the normal match runtime. Weapon damage uses the normal ammunition, target-class, intelligence and lifecycle rules. Its destruction closes the existing real road edge and navigation passage. Automatic hostile target acquisition excludes shared bridges.
+The Basin Bridge is a neutral, explicitly targeted Structure with 1,200 health in the normal match runtime. Weapon damage uses the normal ammunition, target-class, intelligence and lifecycle rules. Its destruction closes the existing real road edge and navigation passage. Automatic hostile target acquisition excludes shared bridges. Direct projectiles only hit the shared deck when it was their launch target; artillery area damage retains its ordinary behavior.
 
 Select an owned Combat Engineer and use its Logistics ring to inspect or start Repair / Resume for a currently identified bridge. A new kit costs 120 Steel plus 20 Electronics from an own living completed storage within 64 m of the engineer. The engineer must stand within 32 m horizontally of the crossing passage. The copied row and tooltip report lifecycle, health, progress, material source, available unreserved stock and policy rejection reasons. Up to eight identified bridges and 32 own storage candidates are considered.
 

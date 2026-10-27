@@ -375,8 +375,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                 visitor(candidates[index]);
             }
 
-            foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
+            foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>())
             {
                 Vector3 delta = context.Entities.GetComponent<WorldTransform>(bridge).Position - center;
                 if (delta.LengthSquared() > rangeMeters * rangeMeters) continue;

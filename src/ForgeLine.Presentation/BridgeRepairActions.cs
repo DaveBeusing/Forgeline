@@ -56,7 +56,7 @@ internal static partial class PlayerActionSnapshotFactory
         var rows = new List<BridgeRepairActionReadModel>(8);
         var bridges = new List<EntityId>(32);
         var faction = new FactionId(checked((uint)extraction.Player.Value));
-        foreach (EntityId entity in entities.Query<BridgeCombat, WorldTransform>(QueryIterationOrder.StableByEntityIndex))
+        foreach (EntityId entity in entities.Query<BridgeCombat, WorldTransform>())
             if (scenario.Intelligence.IsEntityCurrentlyIdentified(faction, entity)) bridges.Add(entity);
         foreach (EntityId bridge in bridges.OrderBy(Distance).ThenBy(e => e).Take(8))
         {
