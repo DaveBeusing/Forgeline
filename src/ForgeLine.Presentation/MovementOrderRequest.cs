@@ -9,7 +9,8 @@ public sealed class MovementOrderRequest
 
     public MovementOrderRequest(
         ReadOnlySpan<EntityId> entities,
-        Vector3 worldTarget)
+        Vector3 worldTarget,
+        bool append = false, bool patrol = false)
     {
         if (entities.IsEmpty)
         {
@@ -28,9 +29,12 @@ public sealed class MovementOrderRequest
         _entities = entities.ToArray();
         Array.Sort(_entities);
         WorldTarget = worldTarget;
+        Append = append; Patrol = patrol;
     }
 
     public ReadOnlySpan<EntityId> Entities => _entities;
 
     public Vector3 WorldTarget { get; }
+    public bool Append { get; }
+    public bool Patrol { get; }
 }

@@ -14,6 +14,14 @@ public static class PlayerActionRequestDispatcher
     {
         ArgumentNullException.ThrowIfNull(gateway);
 
+        if (request.AppendOrders && request.Kind is PlayerActionRequestKind.SubmitAttack or PlayerActionRequestKind.SubmitAttackMove)
+        {
+            receipt = gateway.SubmitQueuedOrders(player, request.TacticalEntities ?? [],
+                request.TacticalWorldTarget, request.TacticalTarget,
+                request.Kind == PlayerActionRequestKind.SubmitAttack ? QueuedOrderKind.Attack : QueuedOrderKind.AttackMove,
+                QueuedOrderEdit.Append, false, observedTick, request.TacticalFormation);
+            return true;
+        }
         switch (request.Kind)
         {
             case PlayerActionRequestKind.RepairBridge:

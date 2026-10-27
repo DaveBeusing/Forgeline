@@ -1626,19 +1626,20 @@ internal sealed class ClientApplication
                     {
                         EntityId[] movementEntities =
                             movementRequest.Entities.ToArray();
+                        FormationTemplate requestedFormation = activeFormation;
                         SimulationTick observedTick =
                             currentSnapshot?.Tick ??
                             SimulationTick.Zero;
 
                         RequireSubmission(
                             simulationHost,
-                            gateway =>
-                                gateway.SubmitMovement(
-                                    LocalPlayer,
-                                    movementEntities,
-                                    movementRequest.WorldTarget,
-                                    observedTick,
-                                    activeFormation));
+                            gateway => movementRequest.Append || movementRequest.Patrol
+                                ? gateway.SubmitQueuedOrders(LocalPlayer, movementEntities,
+                                    movementRequest.WorldTarget, EntityId.Invalid, QueuedOrderKind.Move,
+                                    movementRequest.Append ? QueuedOrderEdit.Append : QueuedOrderEdit.Replace,
+                                    movementRequest.Patrol, observedTick, requestedFormation)
+                                : gateway.SubmitMovement(LocalPlayer, movementEntities,
+                                    movementRequest.WorldTarget, observedTick, requestedFormation));
                     }
                 }
 
