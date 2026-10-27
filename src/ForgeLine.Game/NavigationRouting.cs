@@ -17,13 +17,14 @@ public readonly record struct NavigationAgent(
 
 public readonly record struct NavigationPendingPath(
     NavigationPathRequest Request,
-    MovementOrder OriginalOrder, Quaternion StartRotation = default);
+    MovementOrder OriginalOrder, Quaternion StartRotation = default,
+    NavigationBoundSearch? BoundSearch = null, ulong RootGeneration = 0, bool VehicleRouting = false);
 
 public readonly record struct NavigationRouteState(
     MovementOrder OriginalOrder,
     NavigationPath Path,
     int NextWaypointIndex,
-    SimulationTick ActiveWaypointTick, NavigationPathRequest? SourceRequest = null, Quaternion StartRotation = default)
+    SimulationTick ActiveWaypointTick, NavigationPathRequest? SourceRequest = null, Quaternion StartRotation = default, NavigationBoundSearch? BoundSearch = null)
 {
     public bool HasActiveWaypoint =>
         ActiveWaypointTick != SimulationTick.Zero &&
@@ -50,7 +51,7 @@ public readonly record struct HierarchicalNavigationDiagnosticsSnapshot(
     float LastRouteLengthMeters,
     TimeSpan LastLatency);
 
-public sealed class HierarchicalNavigationSystem : ISimulationSystem
+public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
 {
     private readonly HierarchicalPathfinder _pathfinder;
     private readonly ConcurrentQueue<NavigationPathResult> _completed = new();
@@ -89,12 +90,15 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
     public void UpdateWorld(NavigationWorld world)
     {
         _pathfinder.UpdateWorld(world);
+        if (VehicleRoutingConnected)
+            world.GetSectorGraph(NavigationCapabilities.For(NavigationMovementClass.Wheeled));
     }
 
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        AdvanceVehicleSearches(context);
         ApplyCompletedResults(context);
 
         _agents.Clear();
@@ -128,6 +132,26 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             return;
         }
 
+        if (UsesVehicleKernel(context, entity) &&
+            NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, _routingClearance, out var precise) &&
+            NavigationPrecisionOwnership.IsPrecise(precise))
+        {
+            if (precise.Pending is { } precisePending && precise.DirectOrder is null)
+            {
+                if (NavigationPrecisionOwnership.TryBeginOwnedQueueApproach(
+                        precise with { DirectOrder = precisePending.OriginalOrder }, out _))
+                    context.Entities.AddComponent(entity, precisePending.OriginalOrder);
+                else SetFailure(context, entity, precisePending.OriginalOrder, NavigationFailureReason.Canceled);
+            }
+            if (precise.DirectOrder is { } preciseOrder &&
+                context.Entities.TryGetComponent(entity, out NavigationRouteState previousRoute) &&
+                !IsManagedWaypoint(preciseOrder, previousRoute))
+                RemoveRoute(context, entity, removeManagedOrder: false);
+            CancelPending(context, entity);
+            // The normal GroundMovement queue/dock handoff runs in Movement.
+            return;
+        }
+
         bool hasRoute =
             context.Entities.TryGetComponent(
                 entity,
@@ -154,7 +178,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 entity,
                 transform,
                 agent,
-                replacement);
+                replacement, route.BoundSearch?.Binding.CommandGeneration ?? 0);
             return;
         }
 
@@ -203,7 +227,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                         route.OriginalOrder.SubmittedAtTick, context.Tick);
                     SupplyRescueTravel.RedirectOwnedOrder(
                         context, entity, route.OriginalOrder, recoveryOrder);
-                    ScheduleRequest(context, entity, transform, agent, recoveryOrder);
+                    ScheduleRequest(context, entity, transform, agent, recoveryOrder, route.BoundSearch?.Binding.CommandGeneration ?? 0);
                 }
 
                 return;
@@ -230,6 +254,9 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             return;
         }
 
+        if (context.Entities.TryGetComponent(entity, out NavigationPendingPath waiting) && waiting.VehicleRouting)
+            TryStartVehicleSearch(context, entity, waiting);
+
         if (hasRoute)
         {
             IssueNextWaypointOrComplete(
@@ -255,7 +282,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         RemoveRoute(context, entity, removeManagedOrder: true);
         var replacement = route.OriginalOrder with { AcceptedAtTick = context.Tick };
         SupplyRescueTravel.RedirectOwnedOrder(context, entity, route.OriginalOrder, replacement);
-        ScheduleRequest(context, entity, transform, agent, replacement);
+        ScheduleRequest(context, entity, transform, agent, replacement, route.BoundSearch?.Binding.CommandGeneration ?? 0);
         return true;
     }
 
@@ -264,7 +291,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         EntityId entity,
         in WorldTransform transform,
         in NavigationAgent agent,
-        in MovementOrder order)
+        in MovementOrder order, ulong commandGeneration = 0)
     {
         if (context.Entities.HasComponent<MovementOrder>(entity))
         {
@@ -286,8 +313,14 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             agent.Capabilities,
             World.Version);
 
-        var pending =
-            new NavigationPendingPath(request, order, transform.Rotation);
+        bool vehicleRouting = UsesVehicleKernel(context, entity);
+        if (vehicleRouting && commandGeneration == 0)
+        {
+            commandGeneration = _nextCommandGeneration;
+            _nextCommandGeneration = checked(_nextCommandGeneration + 1);
+        }
+        var pending = new NavigationPendingPath(request, order, transform.Rotation,
+            RootGeneration: commandGeneration, VehicleRouting: vehicleRouting);
 
         if (context.Entities.HasComponent<NavigationPendingPath>(entity))
         {
@@ -299,6 +332,12 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         }
 
         _queuedPathCount++;
+
+        if (vehicleRouting)
+        {
+            TryStartVehicleSearch(context, entity, pending);
+            return;
+        }
 
         if (context.Jobs.IsAvailable)
         {
@@ -391,16 +430,21 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 NavigationPendingPath>(entity);
 
             if (result.Request.NavigationVersion != World.Version ||
-                result.Search.Version != World.Version)
+                result.Search.Version != World.Version ||
+                result.Search.FailureReason == NavigationFailureReason.StaleNavigationVersion)
             {
                 _staleResultCount++;
                 // The request was validly owned, but its immutable world expired.
                 // Restore intent for ProcessAgent below instead of orphaning the
                 // truck or recursively draining newly scheduled results here.
                 var replacement = pending.OriginalOrder with { AcceptedAtTick = context.Tick };
-                context.Entities.AddComponent(entity, replacement);
                 SupplyRescueTravel.RedirectOwnedOrder(
                     context, entity, pending.OriginalOrder, replacement);
+                if (pending.VehicleRouting &&
+                    context.Entities.TryGetComponent(entity, out WorldTransform replanTransform) &&
+                    context.Entities.TryGetComponent(entity, out NavigationAgent replanAgent))
+                    ScheduleRequest(context, entity, replanTransform, replanAgent, replacement, pending.RootGeneration);
+                else context.Entities.AddComponent(entity, replacement);
                 continue;
             }
 
@@ -415,6 +459,16 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                     entity,
                     pending.OriginalOrder,
                     result.Search.FailureReason);
+                continue;
+            }
+
+            if (pending.BoundSearch is { } bound &&
+                (!NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, bound.Search.Vehicle.ClearanceMeters, out var currentVehicle) ||
+                 !NavigationPrecisionOwnership.Matches(currentVehicle, bound.Binding) ||
+                 currentVehicle.Profile != bound.Search.Vehicle || currentVehicle.Pose != bound.Search.Start))
+            {
+                _staleResultCount++;
+                context.Entities.AddComponent(entity, pending.OriginalOrder);
                 continue;
             }
 
@@ -449,7 +503,7 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
                 result.Search.Path,
                 NextWaypointIndex: 0,
                 ActiveWaypointTick: SimulationTick.Zero,
-                SourceRequest: result.Request, StartRotation: pending.StartRotation);
+                SourceRequest: result.Request, StartRotation: pending.StartRotation, BoundSearch: pending.BoundSearch);
 
             if (context.Entities.HasComponent<
                     NavigationRouteState>(entity))
@@ -482,6 +536,22 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
             {
                 context.Entities.RemoveComponent<
                     NavigationRouteState>(entity);
+            }
+
+            if (route.BoundSearch is { } bound)
+            {
+                // A projected endpoint is never permission for an unchecked tail.
+                // Only the existing precise queue owner can take over its exact pose.
+                if (bound.Search.TargetSemantics == NavigationTargetSemantics.DockAccess &&
+                    NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, bound.Search.Vehicle.ClearanceMeters, out var observation) &&
+                    NavigationPrecisionOwnership.Matches(observation, bound.Binding) &&
+                    NavigationPrecisionOwnership.TryBeginOwnedQueueApproach(
+                        observation with { RouteOrder = route.OriginalOrder }, out var serviceApproach))
+                {
+                    context.Entities.AddComponent(entity, serviceApproach);
+                    SupplyRescueTravel.RedirectOwnedOrder(context, entity, route.OriginalOrder, serviceApproach);
+                }
+                return;
             }
 
             if (route.Path.Waypoints.Count > 0 &&
@@ -534,6 +604,8 @@ public sealed class HierarchicalNavigationSystem : ISimulationSystem
         SimulationContext context,
         EntityId entity)
     {
+        if (_vehicleSearches.Remove(entity, out var search))
+        { search.Session.Cancel(); search.Session.Dispose(); }
         if (context.Entities.HasComponent<
                 NavigationPendingPath>(entity))
         {

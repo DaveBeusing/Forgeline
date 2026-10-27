@@ -119,7 +119,7 @@ A new/restarted/loaded session clears all four slots and unfinished drafts.
 Previously confirmed ordinary commands remain in the match's normal history and
 reconstruct through the existing Save/Replay path. No new authoritative component,
 command codec, payload, schema version or content identity is introduced:
-authoritative schema 11, payload 9 and envelope 1 are retained.
+authoritative schema 12, payload 9 and envelope 1 are retained.
 See [the ownership decision](adr/SessionLocalPolicyTemplates.md).
 
 ### Delivery and manual acceptance
@@ -141,3 +141,7 @@ settings, capacity and cost previews, mixed own/foreign/unsupported selections,
 disabled policies, existing rules/queues, partial rejection and interruption,
 then normal physical production and Save/Replay of confirmed commands. Native
 layout/input acceptance and successful affected-product compilation remain open.
+
+The final source synchronizes master `767e5ebc07e732ec47abfc38a4f0bf6f6a7855b2`
+with vehicle routing and its authoritative schema 12. Template work adds no further
+schema change. The PR prepares 0.1.492, one PATCH above that master.

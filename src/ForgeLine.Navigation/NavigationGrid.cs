@@ -65,7 +65,8 @@ public sealed class NavigationGrid
         int height,
         NavigationGridSettings settings,
         float chunkSizeMeters,
-        NavigationCellSample[] cells)
+        NavigationCellSample[] cells,
+        IReadOnlyList<AxisAlignedBounds>? staticObstacles = null)
     {
         Origin = origin;
         Width = width;
@@ -73,7 +74,13 @@ public sealed class NavigationGrid
         Settings = settings;
         ChunkSizeMeters = chunkSizeMeters;
         _cells = cells;
+        HasExactObstacleGeometry = staticObstacles is not null;
+        StaticObstacles = Array.AsReadOnly(staticObstacles?.ToArray() ?? []);
     }
+
+    public bool HasExactObstacleGeometry { get; }
+
+    public IReadOnlyList<AxisAlignedBounds> StaticObstacles { get; }
 
     public Vector2 Origin { get; }
 
@@ -332,7 +339,7 @@ public static class NavigationGridBuilder
             height,
             resolvedSettings,
             terrain.Settings.ChunkSizeMeters,
-            cells);
+            cells, obstacles);
     }
 
     private static bool[] RasterizeStaticObstacles(

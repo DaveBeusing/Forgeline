@@ -62,7 +62,7 @@ HUD region, filesystem store, UI-owned ECS mutation or new simulation authority 
 No new authoritative component, replay command, catalog value, payload member or
 schema is introduced. Confirmed ordinary StockPolicy and Production commands
 already reconstruct through normal history; local slots/previews do not. Keep
-authoritative schema 11, payload 9, envelope 1 and historical hashes unchanged.
+authoritative schema 12, payload 9, envelope 1 and historical hashes unchanged.
 
 No tests or qualification runs accompany this implementation. Existing assertions
 and CI gates remain untouched. Affected Economy, Game and Presentation product

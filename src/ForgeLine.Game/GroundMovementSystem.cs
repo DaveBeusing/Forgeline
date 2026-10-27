@@ -34,6 +34,8 @@ public sealed partial class GroundMovementSystem : ISimulationSystem
         _options.Validate();
     }
 
+    internal float NavigationClearanceMeters => _options.ObstacleClearanceMeters;
+
     public SimulationPhase Phase => SimulationPhase.Movement;
 
     public GroundMovementDiagnosticsSnapshot LastDiagnostics { get; private set; }

@@ -464,6 +464,7 @@ public sealed class MatchRuntime : IDisposable
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
             };
+        navigation.ConnectVehicleRouting(terrain, simulation, groundMovement.NavigationClearanceMeters);
         groundMovement.ConnectNavigation(navigation, terrain, battlefield.StaticNavigationObstacles);
         var strategicInfrastructure =
             new StrategicInfrastructureSystem(
