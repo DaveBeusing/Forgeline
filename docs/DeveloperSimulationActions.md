@@ -105,9 +105,15 @@ submit typed requests on that owner boundary. The menu owns client input and
 should read action descriptors, capture bounded correlated results, and keep
 `Accepted`/`Pending` distinct from `Applied`. A headless developer host can use
 the same `MatchRuntime.Services.DeveloperActions` contract on its simulation
-owner thread. The concrete UI transport and native end-to-end operation remain
-part of the combined developer-tools qualification; this package does not alter
-`ClientApplication`, `ClientSimulationHost` or menu files owned by those layers.
+owner thread. The integrated Developer client supplies that transport:
+ClientApplication creates ClientDeveloperMenuBackend, which submits actions and
+parameter edits through ClientSimulationHost.SubmitRuntimeDeveloper. The existing
+bounded host queue dispatches them on the simulation owner, where BindAccess and
+the Game gateway enforce execution checks. CaptureRuntimeDeveloperResults
+publishes at most 64 correlated results to the menu; Accepted admission and
+Pending tick work remain distinct from Applied/Rejected execution. Native and
+package evidence, including open acceptance limits, is recorded in
+[Developer tools qualification](DeveloperToolsQualification.md).
 
 Gameplay tuning is registered by the existing parameter provider. It uses the
 shared dispatcher for `SetParameter`, `ResetParameter` and `ResetParameters`;
@@ -115,7 +121,12 @@ initial profile values and ordered changes are replayed by the same command and
 save path. When composing a new provider or host adapter, bind it only after the
 runtime's scenario and owner thread exist, and before accepting actions.
 
-## Package acceptance
+## Historical Game-package acceptance
+
+The following results belong to the original Game package, before client
+integration. No new test or functional acceptance is implied by this
+documentation update. The integrated product still requires manual user approval.
+
 
 Implementation builds and package acceptance are separate. Acceptance for this
 package uses the smallest existing Game cases that demonstrate real inventory
