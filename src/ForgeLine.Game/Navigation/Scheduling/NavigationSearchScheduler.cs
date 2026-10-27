@@ -29,6 +29,8 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
     private readonly Func<NavigationSchedulerSnapshotKey, NavigationWorldSnapshot?> _resolveSnapshot;
     private readonly Func<NavigationBoundSearch, NavigationServiceClass> _selectServiceClass;
     private readonly JobScheduler? _jobs;
+    private readonly bool _preservePinnedCosts;
+    private readonly Dictionary<PlayerId, int> _viewerWork = new();
     private readonly NavigationSchedulingPolicy _policy;
     private readonly Entry?[] _entries;
     private readonly NavigationWorldSnapshot?[] _snapshots;
@@ -69,7 +71,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
         NavigationSchedulerCheckpointCodec<TKernelCheckpoint> codec,
         Func<NavigationSchedulerSnapshotKey, NavigationWorldSnapshot?> resolveSnapshot,
         Func<NavigationBoundSearch, NavigationServiceClass> selectServiceClass,
-        JobScheduler? jobs)
+        JobScheduler? jobs, bool preservePinnedCosts = false)
     {
         ArgumentNullException.ThrowIfNull(kernel);
         ArgumentNullException.ThrowIfNull(limits);
@@ -98,7 +100,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
         _codec = codec;
         _resolveSnapshot = resolveSnapshot;
         _selectServiceClass = selectServiceClass;
-        _jobs = jobs;
+        _jobs = jobs; _preservePinnedCosts = preservePinnedCosts;
         _policy = new NavigationSchedulingPolicy(policyLimits);
         _entries = new Entry?[policyLimits.MaximumEntries];
         _snapshots = new NavigationWorldSnapshot?[storage.MaximumSnapshotProfiles];
@@ -219,6 +221,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
         var failures = new List<Exception>();
         try
         {
+            _viewerWork.Clear();
             _policy.BeginTick(tick, workAllowance);
             _lastTick = tick;
             _hasAdvanced = true;
@@ -251,13 +254,24 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
                 if (entry.HasAdvanced) _continued = Add(_continued, 1);
                 entry.HasAdvanced = true;
                 int allowance = Math.Min(grant.WorkAllowance, remainingWork);
-                _outcomes[index] = new Outcome { Entry = entry, Allowance = allowance, Executed = true };
+                var outcome = new Outcome { Entry = entry, Allowance = allowance, WorkerAllowance = allowance,
+                    Executed = true, WorkerRequired = true };
+                if (entry.Session is INavigationCoordinatorSearchSession coordinated)
+                {
+                    var prepared = coordinated.Prepare(allowance);
+                    outcome.Advance = prepared;
+                    ValidateOutcome(outcome);
+                    outcome.CoordinatorWork = prepared.WorkConsumed;
+                    outcome.WorkerAllowance = allowance - prepared.WorkConsumed;
+                    outcome.WorkerRequired = prepared.Status == NavigationSearchStatus.Pending && outcome.WorkerAllowance > 0;
+                }
+                _outcomes[index] = outcome;
             }
             // Every session and fixed reservation is now established; workers
             // cannot race later admissions or decide which lease becomes free.
             for (int index = 0; index < grantCount; index++)
             {
-                if (!_outcomes[index].Executed) continue;
+                if (!_outcomes[index].WorkerRequired) continue;
                 int outcomeIndex = index;
                 if (_jobs is null)
                     Execute(outcomeIndex);
@@ -283,6 +297,21 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
                 }
             }
             if (failures.Count != 0) throw new AggregateException("Navigation batch failed before complete work accounting.", failures);
+            // Cache writes and lease-backed output work run only after all jobs join,
+            // in grant order, and can spend only their original grant's remainder.
+            for (int index = 0; index < grantCount; index++)
+            {
+                ref Outcome outcome = ref _outcomes[index];
+                if (outcome.WorkerRequired && outcome.Entry?.Session is INavigationCoordinatorSearchSession coordinated)
+                {
+                    ValidateOutcome(outcome);
+                    if (outcome.Advance.WorkConsumed > outcome.WorkerAllowance)
+                        throw new InvalidDataException("Worker exceeded its disjoint grant.");
+                    int remaining = outcome.Allowance - outcome.CoordinatorWork - outcome.Advance.WorkConsumed;
+                    outcome.Advance = coordinated.Complete(outcome.Advance, remaining);
+                    outcome.Advance = outcome.Advance with { WorkConsumed = checked(outcome.Advance.WorkConsumed + outcome.CoordinatorWork) };
+                }
+            }
             // Validate the whole batch before publishing or settling any result.
             for (int index = 0; index < grantCount; index++) ValidateOutcome(_outcomes[index]);
             int consumed = 0;
@@ -293,6 +322,8 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
                 NavigationSearchAdvance advance = Normalize(outcome, grant);
                 consumed = checked(consumed + advance.WorkConsumed);
                 _workConsumed = Add(_workConsumed, (ulong)advance.WorkConsumed);
+                PlayerId viewer = grant.Request.Pending.OriginalOrder.Issuer;
+                _viewerWork[viewer] = checked(_viewerWork.GetValueOrDefault(viewer) + advance.WorkConsumed);
                 NavigationPolicyContinuation continuation = advance.Status switch
                 {
                     NavigationSearchStatus.Pending => outcome.Executed ? NavigationPolicyContinuation.Continue : NavigationPolicyContinuation.Retry,
@@ -416,7 +447,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
 
     private void Execute(int index)
     {
-        try { _outcomes[index].Advance = _outcomes[index].Entry!.Session!.Advance(_outcomes[index].Allowance); }
+        try { _outcomes[index].Advance = _outcomes[index].Entry!.Session!.Advance(_outcomes[index].WorkerAllowance); }
         catch (Exception failure) { _outcomes[index].Failure = failure; }
     }
 
@@ -525,7 +556,12 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
 
     private bool IsCurrent(Entry entry)
     {
-        if (!_hasGeometry || entry.Request.Search.Revision.Geometry != _geometry) return false;
+        if (!_hasGeometry || entry.Request.Search.Revision.Geometry != _geometry ||
+            !ReferenceEquals(entry.Snapshot.Grid, _geometryGrid)) return false;
+        if (_preservePinnedCosts)
+            return entry.Request.Search.Revision == entry.Snapshot.Revision &&
+                entry.Request.Search.Capabilities == entry.Snapshot.Capabilities &&
+                entry.Request.Search.KnowledgeScope == entry.Snapshot.KnowledgeScope;
         int profile = FindSnapshot(entry.Request.Search.Capabilities, entry.Request.Search.KnowledgeScope);
         return profile >= 0 && ReferenceEquals(_snapshots[profile], entry.Snapshot) &&
             _snapshots[profile]!.Revision == entry.Request.Search.Revision;
@@ -554,6 +590,27 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
         for (int slot = 0; slot < _entries.Length; slot++) if (_entries[slot] is not null) _orderedEntries[count++] = slot;
         Array.Sort(_orderedEntries, 0, count, _entryComparer);
         return count;
+    }
+
+    internal bool IsActive(in NavigationOrderBinding binding)
+    {
+        int slot = Find(binding.Requester);
+        return slot >= 0 && _entries[slot]!.Request.Binding == binding && _entries[slot]!.Session is not null;
+    }
+
+    internal (int Retained, int Active, long Reserved, ulong Wait, ulong Work, int TickWork) CaptureViewer(PlayerId viewer)
+    {
+        int retained = 0, active = 0; long reserved = 0; ulong wait = 0, work = 0;
+        foreach (var entry in _entries)
+        {
+            if (entry is null || entry.Request.Binding.OriginalOrder.Issuer != viewer) continue;
+            retained++; if (entry.Session is not null) active++;
+            reserved += entry.ReservedBytes;
+            if (entry.HasQueuedAt && _hasAdvanced) wait = Math.Max(wait, _lastTick.Value - entry.QueuedAt.Value);
+            if (_policy.TryGetEntry(entry.Request.Binding.Requester, out var policy))
+                work += (ulong)policy.WorkConsumed;
+        }
+        return (retained, active, reserved, wait, work, _viewerWork.GetValueOrDefault(viewer));
     }
 
     private int Find(EntityId entity)
@@ -652,6 +709,9 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> :
     {
         internal Entry? Entry;
         internal int Allowance;
+        internal int WorkerAllowance;
+        internal int CoordinatorWork;
+        internal bool WorkerRequired;
         internal bool Executed;
         internal NavigationSearchAdvance Advance;
         internal Exception? Failure;

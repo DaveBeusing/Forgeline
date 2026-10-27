@@ -58,7 +58,7 @@ Artifact capture, reconstruction and authoring comparison include tactical areas
 
 ## Save/replay and acceptance
 
-Envelope 1 and payload 11 remain. Authoritative schema 15 covers changed damage/sensing rules, grid-rounded detection and the world.tactical_areas checkpoint domain. Existing movement, attack and fire-mission commands reconstruct the behavior. No new player command or dynamic cover component is necessary. Schema 14 and earlier saves/replays are incompatible before reconstruction; historical hashes and qualification records remain unchanged. See [recovery](SaveLoadReplayAndRecovery.md#cover-and-visual-occlusion-compatibility) and the [architecture decision](adr/ExplicitCoverAndVisualOcclusion.md).
+Envelope 1 and payload 11 remain. Authoritative schema 16 covers changed damage/sensing rules, grid-rounded detection and the world.tactical_areas checkpoint domain. Existing movement, attack and fire-mission commands reconstruct the behavior. No new player command or dynamic cover component is necessary. Schema 15 and earlier saves/replays are incompatible before reconstruction; historical hashes and qualification records remain unchanged. See [recovery](SaveLoadReplayAndRecovery.md#cover-and-visual-occlusion-compatibility) and the [architecture decision](adr/ExplicitCoverAndVisualOcclusion.md).
 
 Implemented — manual acceptance pending. The exact current master source tree is absent from the local mirror, so affected product compilation could not be performed here. Source and authored JSON/sidecar preparation are not MapCompiler qualification. No tests were created, changed, built or run; no smoke, benchmark, native qualification, workflow dispatch or rerun was initiated. Existing gates and fixtures are unchanged.
 

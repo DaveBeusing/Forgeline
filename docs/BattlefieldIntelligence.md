@@ -363,4 +363,4 @@ Additional visual work is limited to 32 areas and 64 interior terrain samples pe
 
 Sensors/All overlays show public green infantry-cover areas and amber screens. Owned unit tooltips report their own position-derived state. These copies expose no hostile cover occupancy, health, inventory or exact detected-only position. Existing coordinate artillery uses the copied coarse position and ordinary terrain projection; it does not reacquire a hidden target.
 
-See [rules, locations, budgets and manual acceptance](CoverAndVisualOcclusion.md) and [the architecture decision](adr/ExplicitCoverAndVisualOcclusion.md). Authoritative schema 15 rejects earlier sensing semantics; envelope 1/payload 11 remain. No new tests or qualification runs are claimed.
+See [rules, locations, budgets and manual acceptance](CoverAndVisualOcclusion.md) and [the architecture decision](adr/ExplicitCoverAndVisualOcclusion.md). Authoritative schema 16 rejects earlier sensing semantics; envelope 1/payload 11 remain. No new tests or qualification runs are claimed.

@@ -20,6 +20,6 @@ Bounded admission can delay exact observations in crowded or long-range cases. I
 
 ## Compatibility and validation
 
-Map format 4/revision 2 and authoritative schema 15 are explicit boundaries. Envelope 1 and payload 11 remain, including complete registered map identity. Older authoritative states and old compiled maps are rejected rather than reinterpreted. Historical fingerprints are not rewritten.
+Map format 4/revision 2 and authoritative schema 16 are explicit boundaries. Envelope 1 and payload 11 remain, including complete registered map identity. Older authoritative states and old compiled maps are rejected rather than reinterpreted. Historical fingerprints are not rewritten.
 
 Current master already includes the bridge action helper's CA1859 return-type correction. The integration retains it without changing tests or gates. Product compilation is unavailable because the exact current master tree is absent locally. No test, smoke, benchmark, native qualification or manually triggered workflow/rerun was performed. Automatic PR CI is separate evidence; manual acceptance remains outstanding.

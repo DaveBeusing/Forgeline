@@ -26,7 +26,7 @@ Map JSON SHA-256: `635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a
 
 Terrain SHA-256 over every little-endian height sample in chunk/Z/X order: `ee7f0c7e872c2e32528729eca98171ebbcbd9d0d4d846a007fb4d5eb0d9562cd`.
 
-The registry pins those bytes plus the mandatory digest sidecar. The original map integration used payload 7 and authoritative schema 8. Current captures use payload 11 and authoritative schema 15 with envelope 1; the exact compiled scenario identity is retained. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
+The registry pins those bytes plus the mandatory digest sidecar. The original map integration used payload 7 and authoritative schema 8. Current captures use payload 11 and authoritative schema 16 with envelope 1; the exact compiled scenario identity is retained. A mismatching saved map identity fails explicitly. The historical Central Divide legacy mapping remains separate. Setup, new/load/restart and installed-package validation resolve the selected descriptor rather than falling back to the default map.
 
 ## Reproduction
 
@@ -121,4 +121,4 @@ Revision 2 authors four infantry-cover rectangles near basin/outer approaches an
 
 Cover reduces direct infantry damage by 35%, without stacking or artillery/vehicle/structure protection. Screens restrict ground visual/radar identification outside the 32 m close exception; terrain can still block the close ray. Radar detection remains possible as a coarse grid-rounded contact. See [locations, budgets and acceptance limits](CoverAndVisualOcclusion.md).
 
-The new map digest above, matching sidecar and registered descriptor replace revision 1 only for new compatible matches. Existing terrain fingerprints and historical measurements are retained without becoming proof of the new sensing or combat behavior. Product compilation and manual acceptance, including Save/Replay at authoritative schema 15, remain outstanding.
+The new map digest above, matching sidecar and registered descriptor replace revision 1 only for new compatible matches. Existing terrain fingerprints and historical measurements are retained without becoming proof of the new sensing or combat behavior. Product compilation and manual acceptance, including Save/Replay at authoritative schema 16, remain outstanding.

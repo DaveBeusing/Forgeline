@@ -24,13 +24,14 @@ internal sealed partial class LogisticsNavigationCoordinator
         var revision = _snapshot is { } currentSnapshot && currentSnapshot.Revision.Geometry == _navigation.World.Version
             ? currentSnapshot.Revision : new NavigationSnapshotRevision(_navigation.World.Version, 0);
         var observations = new List<NavigationDiagnosticVehicle>();
+        bool coverageComplete = true;
         var traffic = _traffic.CaptureState();
         foreach (var entity in authorized.Order())
         {
             if (!entities.TryGetComponent(entity, out UnitIdentity unit) ||
                 unit.UnitId != UnitIds.CargoTruck && unit.UnitId != UnitIds.SupplyTruck ||
                 !NavigationMotionCapture.TryCaptureVehicle(entities, entity, _movementOptions, out var vehicle)) continue;
-            if (observations.Count == 128) return null;
+            if (observations.Count == 128) { coverageComplete = false; continue; }
             bool hasActor = _actors.TryGetValue(entity, out var actor) && actor.Active && actor.LastTick == _tick &&
                 actor.OriginalOrder == vehicle.RouteOrder && actor.OriginalOrder.Issuer == viewer;
             PredictiveTrafficVehicleState? wait = null;
@@ -114,18 +115,19 @@ internal sealed partial class LogisticsNavigationCoordinator
                 horizon.Source.SourceTick == context.Tick && horizon.Source.Revision == revision ? horizon : null;
             var facts = new NavigationDiagnosticVehicleFacts(viewer, entity, unit.UnitId,
                 new(NavigationModuleAvailability.Available, context.Tick, revision), vehicle.Pose, vehicle.Profile,
-                vehicle.Movement.Status, root, request, hasActor ? actor.Generation : null,
+                vehicle.Movement.Status, root, request, hasActor ? actor.Generation : ownedPending ? vehicle.Pending!.Value.RootGeneration : null,
                 new(hasActor ? NavigationModuleAvailability.Available : NavigationModuleAvailability.Unavailable, context.Tick, revision),
                 hasActor ? actor.LastAction : null, reason, hasActor ? new SimulationTick(actor.LastProgressTick) : null,
                 wait is { } w ? _tick - w.WaitingSince : hasActor ? 0UL : null,
                 hasActor ? actor.ReplanCount : lastReplan?.ActorReplans, wait?.RecoveryTarget, blocker, search, queue, dock, owns,
-                canMove, maximum, fuel, capacity, actualMotion, lastReplan, checkedHorizon, conflict);
+                canMove, maximum, fuel, capacity, actualMotion, lastReplan, checkedHorizon, conflict, _navigation.CaptureFleetRequestState(entity));
             observations.Add(new(facts, route, completeRoute, passages, completeReservations));
         }
         return new(runtime.Simulation.SessionId, viewer, context.Tick, revision,
             new(NavigationModuleAvailability.Available, NavigationModuleAvailability.Available,
                 _navigation.VehicleRoutingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
-                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
-            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick));
+                _navigation.VehicleSchedulingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
+                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
+            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick), _navigation.CaptureFleetDiagnostics(viewer, context.Tick), coverageComplete);
     }
 }

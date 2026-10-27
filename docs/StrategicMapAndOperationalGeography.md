@@ -243,4 +243,4 @@ Both registered battlefields now carry an immutable, bounded World TacticalAreaS
 
 Runtime map JSON and mandatory sidecars are registered together at revision 2. Central Divide digest: `0f64c67943ddd0e399f7cc7579f65c43feded449e6bb43182de3bdd9ff4d0682`; Split Basin digest: `635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a36e`. Terrain recipes/catalogs are unchanged. These prepared content bytes are not a claimed MapCompiler qualification; earlier maps and terrain fingerprints retain their historical revisions.
 
-Sensors/All overlays copy public outlines and labels; occupancy and hidden entity metrics are absent. [Cover and visual occlusion](CoverAndVisualOcclusion.md) specifies combat/sensing consumers, budget boundaries, schema-15 recovery and outstanding manual acceptance.
+Sensors/All overlays copy public outlines and labels; occupancy and hidden entity metrics are absent. [Cover and visual occlusion](CoverAndVisualOcclusion.md) specifies combat/sensing consumers, budget boundaries, schema-16 recovery and outstanding manual acceptance.

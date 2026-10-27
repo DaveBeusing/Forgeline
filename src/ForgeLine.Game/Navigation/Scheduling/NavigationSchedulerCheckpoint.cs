@@ -166,7 +166,7 @@ internal sealed class NavigationScheduledRequestCheckpoint
 /// </summary>
 internal sealed class NavigationSchedulerCheckpoint<TCheckpoint> where TCheckpoint : class
 {
-    internal const int CurrentRevision = 1;
+    internal const int CurrentRevision = 2;
     private const long FixedMetadataBytes = 4096;
 
     internal NavigationSchedulerCheckpoint(
@@ -184,7 +184,7 @@ internal sealed class NavigationSchedulerCheckpoint<TCheckpoint> where TCheckpoi
         ulong nextSubmissionSequence,
         ReadOnlySpan<NavigationSchedulerSnapshotKey> snapshotKeys,
         NavigationSchedulingPolicyCheckpoint policy,
-        ReadOnlySpan<NavigationScheduledRequestCheckpoint> entries)
+        ReadOnlySpan<NavigationScheduledRequestCheckpoint> entries, bool preservePinnedCosts = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(revision);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(contractRevision);
@@ -237,6 +237,7 @@ internal sealed class NavigationSchedulerCheckpoint<TCheckpoint> where TCheckpoi
             throw new ArgumentException("Scheduler checkpoint exceeds its complete byte limit.", nameof(entries));
 
         // Validate total retained capacity before allocating either owned outer array.
+        PreservePinnedCosts = preservePinnedCosts;
         Revision = revision;
         ContractRevision = contractRevision;
         Identity = identity;
@@ -255,6 +256,7 @@ internal sealed class NavigationSchedulerCheckpoint<TCheckpoint> where TCheckpoi
         EstimatedBytes = estimatedBytes;
     }
 
+    internal bool PreservePinnedCosts { get; }
     internal int Revision { get; }
     internal int ContractRevision { get; }
     internal NavigationSchedulerIdentity Identity { get; }
