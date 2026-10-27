@@ -43,6 +43,7 @@ public sealed class SettingsModel
 
     public void SetTooltips(HoverTooltipSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
         settings.Validate();
         Settings = Settings with { Tooltips = settings };
     }

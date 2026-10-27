@@ -18,7 +18,9 @@ public sealed record HoverTooltipSettings
 
     public void Validate()
     {
-        if (DelayMilliseconds is < 0 or > 1000 || !Enum.IsDefined(TextSize))
-            throw new ArgumentOutOfRangeException(nameof(HoverTooltipSettings));
+        if (DelayMilliseconds is < 0 or > 1000)
+            throw new InvalidDataException("Tooltip delay must be between 0 and 1000 milliseconds.");
+        if (!Enum.IsDefined(TextSize))
+            throw new InvalidDataException("Tooltip text size must be Standard, Large or ExtraLarge.");
     }
 }
