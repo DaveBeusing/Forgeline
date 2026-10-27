@@ -28,7 +28,8 @@ public readonly record struct PlayerHoverSummary(
     PlayerSelectionSummary OwnedDetails,
     double? RemainingQuantity = null,
     string ExtractionState = "",
-    string Requirement = "");
+    string Requirement = "",
+    ProductionInputInformation? ProductionInput = null);
 
 internal static class PlayerHoverSummaryFactory
 {
@@ -91,7 +92,8 @@ internal static class PlayerHoverSummaryFactory
                 _ => PlayerHoverCategory.Building
             };
             return new(entity, scenario.Simulation.SessionId, context.Tick, category,
-                details.DisplayName, SelectionInspectorHudModel.ResolveRoleIcon(details), details);
+                details.DisplayName, SelectionInspectorHudModel.ResolveRoleIcon(details), details,
+                ProductionInput: ProductionInputInformationCapture.Capture(context, extraction, entity));
         }
 
         bool positionVisible = scenario.Intelligence.GetTerrainState(faction,

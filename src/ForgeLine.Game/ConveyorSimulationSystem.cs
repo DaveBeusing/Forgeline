@@ -404,11 +404,17 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     }
     private int AcceptedResources(EntityRegistry entities, Node node)
     {
-        if (node.Port is not { } port) return (1 << EligibleResources.Count) - 1;
-        BuildingId id = entities.GetComponent<CompletedBuilding>(port.Building).BuildingId;
+        return node.Port is { } port ? AllowedResources(entities, port) : (1 << EligibleResources.Count) - 1;
+    }
+
+    /// <summary>Current material compatibility, shared by flow and copied port information.</summary>
+    public int AllowedResources(EntityRegistry entities, in ConveyorBuildingPort port)
+    {
+        if (!entities.TryGetComponent(port.Building, out CompletedBuilding building)) return 0;
+        BuildingId id = building.BuildingId;
         if (id == BuildingIds.Extractor)
             return !port.Input && entities.TryGetComponent(port.Building, out ResourceExtractor extractor) && extractor.Enabled &&
-                extractor.Owner == new FactionId(checked((uint)node.Owner.Value)) ? ResourceMask(extractor.ResourceId) : 0;
+                extractor.Owner == new FactionId(checked((uint)port.Owner.Value)) ? ResourceMask(extractor.ResourceId) : 0;
         if (id == BuildingIds.Smelter || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
         {
             int mask = 0;
@@ -432,12 +438,34 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         return id == BuildingIds.StorageDepot || id == BuildingIds.LogisticsHub || id == BuildingIds.CommandCore
             ? (1 << EligibleResources.Count) - 1 : 0;
 
-        static int ResourceMask(ResourceId resource)
-        {
-            for (int r = 0; r < EligibleResources.Count; r++)
-                if (EligibleResources[r] == resource) return 1 << r;
-            return 0;
-        }
+    }
+
+    private static int ResourceMask(ResourceId resource)
+    {
+        for (int r = 0; r < EligibleResources.Count; r++)
+            if (EligibleResources[r] == resource) return 1 << r;
+        return 0;
+    }
+
+    /// <summary>Catalog compatibility for an advisory, unbuilt socket; reserves no resources.</summary>
+    public int PreviewAllowedResources(BuildingDefinition building, bool input, ResourceId depositResource)
+    {
+        if (building.Id == BuildingIds.Extractor)
+            return input ? 0 : ResourceMask(depositResource);
+        if (building.Id == BuildingIds.SupplyDepot) return ResourceMask(ResourceIds.Ammunition);
+        if (building.Id == BuildingIds.StorageDepot || building.Id == BuildingIds.LogisticsHub || building.Id == BuildingIds.CommandCore)
+            return (1 << EligibleResources.Count) - 1;
+        int mask = 0;
+        if (building.Id == BuildingIds.Smelter || building.Id == BuildingIds.ElectronicsPlant || building.Id == BuildingIds.AmmunitionPlant)
+            foreach (var recipe in _recipes.Definitions)
+                if ((building.ProductionCapabilities & recipe.RequiredCapability) == recipe.RequiredCapability)
+                    foreach (var ingredient in input ? recipe.Inputs : recipe.Outputs)
+                        mask |= ResourceMask(ingredient.ResourceId);
+        if (input && (building.Id == BuildingIds.Barracks || building.Id == BuildingIds.VehicleFactory))
+            foreach (var unit in _units.Definitions)
+                if ((building.UnitProductionCapabilities & unit.RequiredProductionCapability) == unit.RequiredProductionCapability)
+                    foreach (var cost in unit.Costs) mask |= ResourceMask(cost.ResourceId);
+        return mask;
     }
 
     private static void Connect(List<Node> nodes)

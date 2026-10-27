@@ -12,7 +12,10 @@ namespace ForgeLine.Presentation;
 public readonly record struct ConveyorPreviewRequest(ulong Id, PlayerId Issuer, ConveyorBuildRequest Request);
 public sealed record ConveyorConstructionReadModel(ulong RequestId, SimulationTick Tick,
     ConveyorPlan? Preview, double AvailableSteel, IReadOnlyList<ConveyorOwnedPiece> Pieces,
-    IReadOnlyList<ConveyorBuildingPort> Ports);
+    IReadOnlyList<ConveyorBuildingPort> Ports)
+{
+    public IReadOnlyList<ConveyorPortInformation> PortInformation { get; init; } = Array.Empty<ConveyorPortInformation>();
+}
 public readonly record struct ConveyorFeaturePresentationMetadata(ConveyorPlacement Placement, string State)
 {
     public bool IsSpecified => State is not null;

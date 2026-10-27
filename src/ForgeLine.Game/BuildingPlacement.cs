@@ -59,6 +59,8 @@ public readonly record struct BuildingPlacementPreview(
     public AxisAlignedBounds? LoadingCorridor { get; init; }
     public ConveyorSocket? ConveyorInput { get; init; }
     public ConveyorSocket? ConveyorOutput { get; init; }
+    public string ConveyorInputMaterials { get; init; } = string.Empty;
+    public string ConveyorOutputMaterials { get; init; } = string.Empty;
 }
 
 public interface IBuildableAreaQuery
