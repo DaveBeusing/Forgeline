@@ -10,6 +10,8 @@ public readonly record struct OperationsView(bool Open, OperationsCategory Filte
     int Page = 0, EntityId Selected = default, SimulationSessionId Session = default, bool Suppressed = false, bool Notifications = false)
 {
     public OperationsRulePanelView? RuleControls { get; init; }
+    public PolicyTemplatePanelView? TemplateControls { get; init; }
+    public bool TemplateEntryFocused { get; init; }
     public bool RuleEntryFocused { get; init; }
     public int MeasurementPage { get; init; }
     public bool MeasurementFocused { get; init; }
@@ -46,7 +48,8 @@ public static class OperationsLayout
             >= 3 and <= 8 => new(p.X + 6 * x, p.Y + (146 + (index - 3) * 22) * s, 438 * x, 22 * s),
             9 => new(p.X + 6 * x, p.Y + 346 * s, 210 * x, 22 * s),
             11 => new(p.X + 6 * x, p.Y + 316 * s, 210 * x, 22 * s),
-            13 => new(p.X + 222 * x, p.Y + 316 * s, 222 * x, 22 * s),
+            13 => new(p.X + 222 * x, p.Y + 316 * s, 105 * x, 22 * s),
+            15 => new(p.X + 333 * x, p.Y + 316 * s, 111 * x, 22 * s),
             _ => new(p.X + 222 * x, p.Y + 346 * s, 222 * x, 22 * s)
         };
     }
@@ -92,16 +95,27 @@ public sealed class OperationsController
 {
     private readonly GameplayBindingRegistry _bindings;
     private readonly OperationsRulePanelController _rules;
+    private readonly PolicyTemplatePanelController _templates;
+    private bool _templateSubmission;
     private readonly ulong[] _keys = new ulong[Enum.GetValues<PlatformKey>().Length];
     private int _overviewFocus = 13;
     public OperationsController(GameplayBindingRegistry? bindings = null, TimeProvider? timeProvider = null)
-    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); }
+    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); _templates = new(_bindings); }
     public bool HasKeyboardFocus => View.Open && !View.Suppressed && !View.Notifications;
-    public bool TryTakeRuleRequest(out PlayerActionRequest request) => _rules.TryTakeRequest(out request);
-    public void ExpectRuleSubmission(ulong sequence) => _rules.ExpectSubmission(sequence);
-    public void RuleSubmissionFailed() => _rules.SubmissionFailed();
-    public void ObserveRuleSubmission(ulong sequence, PlayerCommandSubmissionReceipt? receipt) => _rules.ObserveSubmission(sequence, receipt);
-    public void ObserveRuleResult(in PlayerCommandResultReadModel result) => _rules.ObserveResult(result);
+    public bool TryTakeRuleRequest(out PlayerActionRequest request)
+    {
+        if (_templates.TryTakeRequest(out request)) { _templateSubmission = true; return true; }
+        _templateSubmission = false;
+        return _rules.TryTakeRequest(out request);
+    }
+    public void ExpectRuleSubmission(ulong sequence)
+    { if (_templateSubmission) _templates.ExpectSubmission(sequence); else _rules.ExpectSubmission(sequence); }
+    public void RuleSubmissionFailed()
+    { if (_templateSubmission) _templates.SubmissionFailed(); else _rules.SubmissionFailed(); }
+    public void ObserveRuleSubmission(ulong sequence, PlayerCommandSubmissionReceipt? receipt)
+    { _rules.ObserveSubmission(sequence, receipt); _templates.ObserveSubmission(sequence, receipt); }
+    public void ObserveRuleResult(in PlayerCommandResultReadModel result)
+    { _rules.ObserveResult(result); _templates.ObserveResult(result); }
     private ulong _press;
     private bool _armed;
     private ulong _armedPress;
@@ -117,19 +131,19 @@ public sealed class OperationsController
     private bool _consumeLeftGesture;
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; _rules.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); _templates.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
     public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
         View.Open && !View.Suppressed && OperationsLayout.Panel(layout).Contains(point);
     public void Close(InputState input, PresentationInteractionState interaction)
     {
-        _rules.Close(); View = default; _lastRouteFocus = default;
+        _rules.Close(); _templates.Close(); View = default; _lastRouteFocus = default;
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
     public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; _rules.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); _templates.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input)
     {
-        _rules.CancelInput(input);
+        _rules.CancelInput(input); _templates.CancelInput(input);
         SynchronizeKeys(input);
         _consumeLeftGesture |= _armed && input.IsMouseButtonDown(PlatformMouseButton.Left);
         _press = input.MousePressSequence(PlatformMouseButton.Left); _armed = false;
@@ -154,13 +168,15 @@ public sealed class OperationsController
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
         if (newSession || snapshot?.PlayerExperience?.IsMatchComplete == true)
         {
-            _rules.Close(); View = default; _lastRouteFocus = default; _armed = false;
+            _rules.Close(); _templates.Close(); _templates.Reset(_session); View = default; _lastRouteFocus = default; _armed = false;
             interaction.SetOperationsOpen(false);
         }
         View = View with { Suppressed = blocked || input.FocusLostThisFrame };
         if (View.Suppressed)
         {
             _armed = false;
+            if (View.TemplateControls.HasValue)
+            { _templates.Update(input, snapshot, layout, true, selection); View = View with { TemplateControls = _templates.View }; }
             if (View.RuleControls.HasValue)
             { _rules.Update(input, snapshot, layout, true, selection); View = View with { RuleControls = _rules.View }; }
             SynchronizeKeys(input);
@@ -170,6 +186,13 @@ public sealed class OperationsController
         interaction.SetOperationsOpen(View.Open);
         var panel = OperationsLayout.Panel(layout);
         bool captured = consumedGesture || input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
+        if (View.Open && View.TemplateControls.HasValue)
+        {
+            _armed = false;
+            _templates.Update(input, snapshot, layout, inputCaptured || transition || snapshot?.PlayerExperience is null, selection);
+            View = View with { TemplateControls = _templates.View.Open ? _templates.View : null };
+            return new(captured || input.HasPointerPosition && panel.Contains(input.PointerPosition));
+        }
         if (View.Open && View.RuleControls.HasValue)
         {
             _armed = false;
@@ -186,12 +209,13 @@ public sealed class OperationsController
         }
         if (View.Open && !View.Notifications && !panel.IsEmpty)
         {
-            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 0 : _overviewFocus == 0 ? 14 : 13;
-            View = View with { RuleEntryFocused = _overviewFocus == 13, MeasurementFocused = _overviewFocus == 14 };
+            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 15 : _overviewFocus == 15 ? 0 : _overviewFocus == 0 ? 14 : 13;
+            View = View with { RuleEntryFocused = _overviewFocus == 13, TemplateEntryFocused = _overviewFocus == 15, MeasurementFocused = _overviewFocus == 14 };
             if (Pressed(input, GameplayAction.Activate))
             {
                 if (_overviewFocus == 0) Close(input, interaction);
                 else if (_overviewFocus == 14) NextMeasurement();
+                else if (_overviewFocus == 15) OpenTemplates(input, snapshot, layout, selection);
                 else OpenRules(input, snapshot, layout, selection);
                 return new(true);
             }
@@ -262,6 +286,8 @@ public sealed class OperationsController
         { View = View with { Notifications = true, Page = 0 }; return new(true); }
         if (OperationsLayout.Control(layout, 13).Contains(origin) && OperationsLayout.Control(layout, 13).Contains(release))
         { OpenRules(input, snapshot, layout, selection); return new(true); }
+        if (OperationsLayout.Control(layout, 15).Contains(origin) && OperationsLayout.Control(layout, 15).Contains(release))
+        { OpenTemplates(input, snapshot, layout, selection); return new(true); }
         if (OperationsLayout.Control(layout, 14).Contains(origin) && OperationsLayout.Control(layout, 14).Contains(release))
         { NextMeasurement(); return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
@@ -330,9 +356,17 @@ public sealed class OperationsController
         return default;
     }
     private void NextMeasurement() => View = View with { MeasurementPage = View.MeasurementPage == int.MaxValue ? 0 : View.MeasurementPage + 1 };
+    private void OpenTemplates(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
+    {
+        _armed = false; _rules.Close();
+        _templates.Open();
+        _templates.Update(input, snapshot, layout, true, selection);
+        View = View with { RuleControls = null, TemplateControls = _templates.View, Selected = default };
+    }
     private void OpenRules(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
     {
         _armed = false;
+        _templates.Close();
         _rules.Open();
         _rules.Update(input, snapshot, layout, true, selection);
         View = View with { RuleControls = _rules.View, Selected = _rules.View.Data?.Facility ?? default };
