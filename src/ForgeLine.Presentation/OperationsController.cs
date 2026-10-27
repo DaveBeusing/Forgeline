@@ -11,6 +11,8 @@ public readonly record struct OperationsView(bool Open, OperationsCategory Filte
 {
     public OperationsRulePanelView? RuleControls { get; init; }
     public bool RuleEntryFocused { get; init; }
+    public int MeasurementPage { get; init; }
+    public bool MeasurementFocused { get; init; }
 }
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
     PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
@@ -36,6 +38,7 @@ public static class OperationsLayout
         if (s <= 0) return default;
         return index switch
         {
+            14 => new(p.X + 132 * x, p.Y + 6 * s, 84 * x, 22 * s),
             12 => new(p.X + 222 * x, p.Y + 6 * s, 138 * x, 22 * s),
             0 => new(p.X + 366 * x, p.Y + 6 * s, 78 * x, 22 * s),
             1 => new(p.X + 6 * x, p.Y + 120 * s, 210 * x, 22 * s),
@@ -183,11 +186,12 @@ public sealed class OperationsController
         }
         if (View.Open && !View.Notifications && !panel.IsEmpty)
         {
-            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 0 : 13;
-            View = View with { RuleEntryFocused = _overviewFocus == 13 };
+            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 0 : _overviewFocus == 0 ? 14 : 13;
+            View = View with { RuleEntryFocused = _overviewFocus == 13, MeasurementFocused = _overviewFocus == 14 };
             if (Pressed(input, GameplayAction.Activate))
             {
                 if (_overviewFocus == 0) Close(input, interaction);
+                else if (_overviewFocus == 14) NextMeasurement();
                 else OpenRules(input, snapshot, layout, selection);
                 return new(true);
             }
@@ -258,6 +262,8 @@ public sealed class OperationsController
         { View = View with { Notifications = true, Page = 0 }; return new(true); }
         if (OperationsLayout.Control(layout, 13).Contains(origin) && OperationsLayout.Control(layout, 13).Contains(release))
         { OpenRules(input, snapshot, layout, selection); return new(true); }
+        if (OperationsLayout.Control(layout, 14).Contains(origin) && OperationsLayout.Control(layout, 14).Contains(release))
+        { NextMeasurement(); return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {
@@ -267,13 +273,14 @@ public sealed class OperationsController
             else if (index == 2) View = View with { Page = OperationsLayout.Row(data, View with { Page = View.Page + 1 }, 0) is null ? 0 : View.Page + 1, Selected = default };
             else if (index is >= 3 and <= 8 && OperationsLayout.Row(data, View, index - 3) is { } row &&
                      _armedRowIndex == index && _armedRowEntity == row.Entity)
-                View = View with { Selected = row.Entity };
+                View = View with { Selected = row.Entity, MeasurementPage = 0 };
             else if (index == 11)
             {
                 EntityId target = NavigationTarget(snapshot, data, index);
                 if (target != _armedNavigationTarget || !OperationsWorldOverlay.CanFocus(snapshot, target)) return new(true);
                 _lastRouteFocus = target;
-                if (OperationsDiagnosisSnapshot.Resolve(snapshot) is { Root.IsValid: true })
+                if (OperationsDiagnosisSnapshot.Resolve(snapshot) is { Root.IsValid: true } ||
+                    OperationsCauseSnapshot.Resolve(snapshot)?.NextRelatedMember(View.Selected).IsValid == true)
                     View = View with { Selected = target };
                 return new(true, target);
             }
@@ -302,6 +309,8 @@ public sealed class OperationsController
         {
             EntityId chain = OperationsActionGuidance.NextChainEntity(OperationsDiagnosisSnapshot.Resolve(snapshot), View.Selected);
             if (chain.IsValid) return OperationsWorldOverlay.CanFocus(snapshot, chain) ? chain : default;
+            EntityId related = OperationsCauseSnapshot.Resolve(snapshot)?.NextRelatedMember(View.Selected, _lastRouteFocus) ?? default;
+            if (related.IsValid) return OperationsWorldOverlay.CanFocus(snapshot, related) ? related : default;
             EntityId first = default, next = default;
             foreach (var route in data.Routes)
             {
@@ -320,6 +329,7 @@ public sealed class OperationsController
                     ? queue.Building : facility.Entity;
         return default;
     }
+    private void NextMeasurement() => View = View with { MeasurementPage = View.MeasurementPage == int.MaxValue ? 0 : View.MeasurementPage + 1 };
     private void OpenRules(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
     {
         _armed = false;
