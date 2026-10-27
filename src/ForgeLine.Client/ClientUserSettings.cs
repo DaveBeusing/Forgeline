@@ -356,7 +356,8 @@ internal sealed class ClientSettingsStore
                 _path,
                 CreatedDefaults: false,
                 RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null,
-                RecoveryMessage: string.Join(" ", new[] { graphicsRecovery, bindingRecovery, tooltipRecovery }.Where(message => message is not null)));
+                RecoveryMessage: graphicsRecovery is null && bindingRecovery is null && tooltipRecovery is null ? null :
+                    string.Join(" ", new[] { graphicsRecovery, bindingRecovery, tooltipRecovery }.Where(message => message is not null)));
         }
         catch (Exception exception)
             when (exception is JsonException or

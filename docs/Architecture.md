@@ -407,3 +407,7 @@ remaining acceptance limits.
 World owns bounded immutable TacticalAreaSet data. Game carries it in compiled format-4/revision-2 maps and normal match composition. The existing damage owner derives infantry protection at impact; BattlefieldIntelligenceSystem uses an Intelligence-owned bounded ground visual policy for exact observation. Radar detection remains coarse, separate from identification and from terrain fog coverage. TerrainLineOfFirePolicy retains weapon authority. No scenery, rendering or UI state decides those results.
 
 Presentation copies only own unit protection and public static region outlines. Existing current-identification filtering remains the hostile-state boundary. The authoritative checkpoint includes world.tactical_areas and schema 16; existing command replay and compiled scenario identities remain the only recovery path. See [decision and limits](adr/ExplicitCoverAndVisualOcclusion.md).
+
+## Copied contextual information
+
+The existing ring status card and placement hint consume current copied production input and port material facts. Pointer and keyboard action inspection share the action resolver; user tooltip delay/text preferences belong to local settings schema 4. Simulation retains inventory, compatibility and command authority. No match-save/replay schema changes are introduced. See [decision, bounds and manual acceptance](adr/CopiedContextualInformation.md).
