@@ -410,6 +410,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     /// <summary>Current material compatibility, shared by flow and copied port information.</summary>
     public int AllowedResources(EntityRegistry entities, in ConveyorBuildingPort port)
     {
+        ArgumentNullException.ThrowIfNull(entities);
         if (!entities.TryGetComponent(port.Building, out CompletedBuilding building)) return 0;
         BuildingId id = building.BuildingId;
         if (id == BuildingIds.Extractor)
@@ -450,6 +451,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     /// <summary>Catalog compatibility for an advisory, unbuilt socket; reserves no resources.</summary>
     public int PreviewAllowedResources(BuildingDefinition building, bool input, ResourceId depositResource)
     {
+        ArgumentNullException.ThrowIfNull(building);
         if (building.Id == BuildingIds.Extractor)
             return input ? 0 : ResourceMask(depositResource);
         if (building.Id == BuildingIds.SupplyDepot) return ResourceMask(ResourceIds.Ammunition);
