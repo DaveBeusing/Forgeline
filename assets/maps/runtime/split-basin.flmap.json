@@ -1,5 +1,5 @@
 {
-  "formatVersion": 3,
+  "formatVersion": 4,
   "metadata": {
     "key": "battlefield.split_basin",
     "displayName": "Split Basin",
@@ -1541,9 +1541,119 @@
       }
     ]
   },
-  "mapRevision": 1,
+  "mapRevision": 2,
   "contentKey": "directorate.v1",
   "contentSha256": "205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63",
   "startRule": "directorate.starting-base.v1",
-  "objectiveRule": "command-core-elimination.v1"
+  "objectiveRule": "command-core-elimination.v1",
+  "tacticalAreas": [
+    {
+      "key": "cover.east_basin",
+      "displayName": "East basin cover",
+      "bounds": {
+        "minimum": {
+          "x": 1108,
+          "y": -64,
+          "z": 1175
+        },
+        "maximum": {
+          "x": 1208,
+          "y": 128,
+          "z": 1220
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.east_outer",
+      "displayName": "East outer cover",
+      "bounds": {
+        "minimum": {
+          "x": 1128,
+          "y": -64,
+          "z": 1815
+        },
+        "maximum": {
+          "x": 1228,
+          "y": 128,
+          "z": 1860
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.west_basin",
+      "displayName": "West basin cover",
+      "bounds": {
+        "minimum": {
+          "x": 840,
+          "y": -64,
+          "z": 1175
+        },
+        "maximum": {
+          "x": 940,
+          "y": 128,
+          "z": 1220
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.west_outer",
+      "displayName": "West outer cover",
+      "bounds": {
+        "minimum": {
+          "x": 820,
+          "y": -64,
+          "z": 1815
+        },
+        "maximum": {
+          "x": 920,
+          "y": 128,
+          "z": 1860
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "screen.east_grove",
+      "displayName": "East grove screen",
+      "bounds": {
+        "minimum": {
+          "x": 1388,
+          "y": -64,
+          "z": 1540
+        },
+        "maximum": {
+          "x": 1488,
+          "y": 128,
+          "z": 1680
+        }
+      },
+      "infantryDamageMultiplier": 1,
+      "blocksVisual": true
+    },
+    {
+      "key": "screen.west_grove",
+      "displayName": "West grove screen",
+      "bounds": {
+        "minimum": {
+          "x": 560,
+          "y": -64,
+          "z": 1540
+        },
+        "maximum": {
+          "x": 660,
+          "y": 128,
+          "z": 1680
+        }
+      },
+      "infantryDamageMultiplier": 1,
+      "blocksVisual": true
+    }
+  ]
 }

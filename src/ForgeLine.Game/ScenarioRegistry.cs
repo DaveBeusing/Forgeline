@@ -5,8 +5,8 @@ namespace ForgeLine.Game;
 // Registrations are application-owned data. Files cannot name types or introduce executable rules.
 public sealed class ScenarioRegistry
 {
-    public const string SplitBasinMapSha256 = "f82b732e563b611a9106279e260564ba91a77eb3a61e19dd1e439caf28d8c8b8";
-    public const string CentralDivideMapSha256 = "2f2b21f21697c665a8ab3ac607e7cebc6f82d1b9cf06f2838a02444f179f1f1f";
+    public const string SplitBasinMapSha256 = "635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a36e";
+    public const string CentralDivideMapSha256 = "0f64c67943ddd0e399f7cc7579f65c43feded449e6bb43182de3bdd9ff4d0682";
     public const string CentralDivideContentSha256 = "205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63";
     public const string CentralDivideMapPath = "central-divide.flmap.json";
     private readonly string _contentRoot;
@@ -17,14 +17,14 @@ public sealed class ScenarioRegistry
 
     public static ScenarioDescriptor CentralDivideDescriptor => new(
         CentralDivideScenario.CompositionKey, "Central Divide", CentralDivideMapPath,
-        new("prototype.vertical_slice", 1, CentralDivideMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
+        new("prototype.vertical_slice", 2, CentralDivideMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
             ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
             ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule))
         { Description = "3.072 KM - RIDGE / TWO CROSSINGS" };
 
     public static ScenarioDescriptor SplitBasinDescriptor => new(
         SplitBasinBattlefield.CompositionKey, "Split Basin", "split-basin.flmap.json",
-        new(SplitBasinBattlefield.MapKey, 1, SplitBasinMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
+        new(SplitBasinBattlefield.MapKey, 2, SplitBasinMapSha256, BattlefieldTerrainRecipe.CurrentVersion,
             ScenarioContentIdentity.DirectorateKey, CentralDivideContentSha256,
             ScenarioContentIdentity.StartRule, ScenarioContentIdentity.ObjectiveRule))
         { Description = "2.048 KM - OPEN BASIN / OUTER ROUTE" };

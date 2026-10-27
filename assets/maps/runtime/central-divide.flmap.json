@@ -1,5 +1,5 @@
 {
-  "formatVersion": 3,
+  "formatVersion": 4,
   "metadata": {
     "key": "prototype.vertical_slice",
     "displayName": "Central Divide",
@@ -9492,9 +9492,119 @@
       }
     ]
   },
-  "mapRevision": 1,
+  "mapRevision": 2,
   "contentKey": "directorate.v1",
   "contentSha256": "205d0887e816d8922c43996a6a8ad85d177cbbf168e551a87ce76d9cc81efd63",
   "startRule": "directorate.starting-base.v1",
-  "objectiveRule": "command-core-elimination.v1"
+  "objectiveRule": "command-core-elimination.v1",
+  "tacticalAreas": [
+    {
+      "key": "cover.northeast_approach",
+      "displayName": "East bridge cover",
+      "bounds": {
+        "minimum": {
+          "x": 1672,
+          "y": -64,
+          "z": 850
+        },
+        "maximum": {
+          "x": 1792,
+          "y": 128,
+          "z": 895
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.northwest_approach",
+      "displayName": "West bridge cover",
+      "bounds": {
+        "minimum": {
+          "x": 1280,
+          "y": -64,
+          "z": 850
+        },
+        "maximum": {
+          "x": 1400,
+          "y": 128,
+          "z": 895
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.southeast_approach",
+      "displayName": "East ford cover",
+      "bounds": {
+        "minimum": {
+          "x": 1692,
+          "y": -64,
+          "z": 2300
+        },
+        "maximum": {
+          "x": 1812,
+          "y": 128,
+          "z": 2345
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "cover.southwest_approach",
+      "displayName": "West ford cover",
+      "bounds": {
+        "minimum": {
+          "x": 1260,
+          "y": -64,
+          "z": 2300
+        },
+        "maximum": {
+          "x": 1380,
+          "y": 128,
+          "z": 2345
+        }
+      },
+      "infantryDamageMultiplier": 0.65,
+      "blocksVisual": false
+    },
+    {
+      "key": "screen.east_outskirts",
+      "displayName": "East visual screen",
+      "bounds": {
+        "minimum": {
+          "x": 2062,
+          "y": -64,
+          "z": 650
+        },
+        "maximum": {
+          "x": 2182,
+          "y": 128,
+          "z": 740
+        }
+      },
+      "infantryDamageMultiplier": 1,
+      "blocksVisual": true
+    },
+    {
+      "key": "screen.west_outskirts",
+      "displayName": "West visual screen",
+      "bounds": {
+        "minimum": {
+          "x": 890,
+          "y": -64,
+          "z": 650
+        },
+        "maximum": {
+          "x": 1010,
+          "y": 128,
+          "z": 740
+        }
+      },
+      "infantryDamageMultiplier": 1,
+      "blocksVisual": true
+    }
+  ]
 }

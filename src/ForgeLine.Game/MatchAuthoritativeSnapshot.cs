@@ -25,7 +25,7 @@ public sealed record MatchAuthoritativeSnapshot(
     InventoryStoreSnapshot Inventories,
     IReadOnlyList<AuthoritativeDomainSnapshot> Domains)
 {
-    public const int CurrentSchemaVersion = 13;
+    public const int CurrentSchemaVersion = 14;
 
     private static readonly JsonSerializerOptions s_jsonOptions =
         new()
@@ -44,6 +44,7 @@ public sealed record MatchAuthoritativeSnapshot(
         var domains =
             new List<AuthoritativeDomainSnapshot>
             {
+                CaptureDomain("world.tactical_areas", scenario.Battlefield.TacticalAreas.Areas),
                 CaptureDomain(
                     "simulation.pending_commands",
                     scenario.Simulation.PendingCommandCount),
