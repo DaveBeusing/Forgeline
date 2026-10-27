@@ -58,7 +58,9 @@ internal sealed partial class LogisticsNavigationCoordinator
                 failed.OriginalOrder.Issuer == viewer && failed.FailedAtTick <= context.Tick)
             {
                 root = failed.OriginalOrder;
-                search = failed.NavigationVersion == revision.Geometry ? NavigationSearchStatus.Unreachable : NavigationSearchStatus.Stale;
+                search = failed.NavigationVersion != revision.Geometry ? NavigationSearchStatus.Stale :
+                    failed.FailureReason == NavigationFailureReason.SearchBudgetExhausted ? NavigationSearchStatus.BudgetExhausted :
+                    failed.FailureReason == NavigationFailureReason.Canceled ? NavigationSearchStatus.Canceled : NavigationSearchStatus.Unreachable;
             }
             var queue = vehicle.QueueEntry is { } entry && entry.Owner == viewer && entry.Generation > 0 && entry.Position > 0 && authorized.Contains(entry.Building)
                 ? entry with { Predecessor = authorized.Contains(entry.Predecessor) ? entry.Predecessor : default } : (VehicleQueueEntry?)null;
@@ -122,8 +124,8 @@ internal sealed partial class LogisticsNavigationCoordinator
         }
         return new(runtime.Simulation.SessionId, viewer, context.Tick, revision,
             new(NavigationModuleAvailability.Available, NavigationModuleAvailability.Available,
-                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.NotConnected,
-                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
+                _navigation.VehicleRoutingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
+                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
             Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick));
     }
 }
