@@ -16,6 +16,11 @@ public static class PlayerActionRequestDispatcher
 
         switch (request.Kind)
         {
+            case PlayerActionRequestKind.SetConveyorRouting:
+                receipt = gateway.SubmitConveyorRouting(player, request.Facility,
+                    request.RoutingPreference, request.ExpectedRoutingRevision, observedTick);
+                return true;
+
             case PlayerActionRequestKind.SubmitOperationsRule:
                 receipt = gateway.SubmitOperationsRule(request.RuleOperation,
                     request.RuleDefinition with { Owner = player }, request.ExpectedRuleRevision,

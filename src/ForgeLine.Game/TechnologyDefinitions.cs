@@ -458,7 +458,7 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.LogisticsCoordination,
-                    EffectDescription = "Priority splitter routing awaits conveyor control integration; fair distribution is unrestricted.",
+                    EffectDescription = "Unlocks 3:1 preference for either splitter output, with one service turn in four retained for the other eligible branch. Balanced routing remains unrestricted.",
                     Key =
                         "directorate.technology.logistics_coordination",
                     DisplayName =
