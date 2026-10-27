@@ -192,7 +192,7 @@ public sealed class FactionIntelligenceStore
         faction.Contacts[entity] =
             new ContactRecord(
                 key,
-                position,
+                state == IntelligenceState.Detected ? CellCenter(WorldToCell(position)) : position,
                 state,
                 tick,
                 identityKey);

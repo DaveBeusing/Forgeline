@@ -386,10 +386,12 @@ public sealed class MatchRuntime : IDisposable
                 {
                     CellSizeMeters = 32.0f
                 });
+        var tacticalAreas = battlefield.TacticalAreas;
+        var visualOcclusion = new VisualOcclusionPolicy(terrain, tacticalAreas);
         var battlefieldIntelligence =
             new BattlefieldIntelligenceSystem(
                 intelligence,
-                spatialIndex, technologyDefinitions)
+                spatialIndex, technologyDefinitions, visualOcclusion)
             {
                 TimingEnabled =
                     runtimeSettings.EnableDebugCapture,
@@ -528,7 +530,7 @@ public sealed class MatchRuntime : IDisposable
                 combatRuntime,
                 weapons,
                 armor,
-                artilleryWeapons);
+                artilleryWeapons, tacticalAreas);
         var buildingDestruction = new BuildingCombatDestruction(
             inventories, buildingConstruction, production, unitProduction,
             technologyResearch, cargoTransport, automatedDistribution);

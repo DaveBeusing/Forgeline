@@ -36,6 +36,12 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     private readonly FactionIntelligenceStore _intelligence;
     private readonly TechnologyDefinitionCatalog _technologies;
     private readonly SpatialGridIndex? _spatialIndex;
+    private readonly VisualOcclusionPolicy? _visualOcclusion;
+    public const int MaximumVisualTracesPerTick = 2048;
+    public const int MaximumVisualTracesPerSensor = 128;
+    private int _visualTracesRemaining;
+    private int _sensorSlots, _sensorOrdinal;
+    private readonly List<EntityId> _bridgeCandidates = new(32);
     private readonly SpatialQueryBuffer _queryBuffer = new(512);
     private readonly Dictionary<EntityId, VisualCoverage> _visualCoverage =
         new();
@@ -61,11 +67,13 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
     public BattlefieldIntelligenceSystem(
         FactionIntelligenceStore intelligence,
         SpatialGridIndex? spatialIndex = null,
-        TechnologyDefinitionCatalog? technologies = null)
+        TechnologyDefinitionCatalog? technologies = null,
+        VisualOcclusionPolicy? visualOcclusion = null)
     {
         _intelligence = intelligence ??
             throw new ArgumentNullException(nameof(intelligence));
         _spatialIndex = spatialIndex;
+        _visualOcclusion = visualOcclusion;
         _technologies = technologies ?? DirectorateTechnologyDefinitions.CreateCatalog();
     }
 
@@ -123,6 +131,16 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                 : 0;
 
         ResetTick();
+        _visualTracesRemaining = MaximumVisualTracesPerTick;
+        _sensorOrdinal = 0;
+        _bridgeCandidates.Clear();
+        foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>())
+        {
+            if (_bridgeCandidates.Count == 32) break;
+            _bridgeCandidates.Add(bridge);
+        }
+        _sensorSlots = (int)Math.Max(1, Math.Min(int.MaxValue,
+            (long)context.Entities.GetComponentCount<VisualSensorState>() + context.Entities.GetComponentCount<RadarSensorState>()));
         _intelligence.BeginTick(context.Tick);
 
         ProcessVisualSensors(context);
@@ -146,6 +164,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            int traceBudget = NextSensorBudget(context.Tick);
             VisualSensorState sensor =
                 context.Entities.GetComponent<VisualSensorState>(
                     sensorEntity);
@@ -196,7 +215,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                 context,
                 sensorEntity,
                 sensor,
-                transform.Position);
+                transform.Position, traceBudget);
         }
     }
 
@@ -209,6 +228,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                      WorldTransform>(
                          QueryIterationOrder.StableByEntityIndex))
         {
+            int traceBudget = NextSensorBudget(context.Tick);
             if (!RadarOperation.IsOperational(context.Entities, sensorEntity))
             {
                 continue;
@@ -250,7 +270,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                 context,
                 sensorEntity,
                 sensor,
-                transform.Position);
+                transform.Position, traceBudget);
         }
     }
 
@@ -258,7 +278,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
         SimulationContext context,
         EntityId sensorEntity,
         VisualSensorState sensor,
-        Vector3 sensorPosition)
+        Vector3 sensorPosition, int sensorBudget)
     {
         ForEachCandidate(
             context,
@@ -278,6 +298,7 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                     return;
                 }
 
+                if (!VisualClear(sensorPosition, targetTransform.Position, ref sensorBudget)) return;
                 _intelligence.Observe(
                     sensor.Faction,
                     candidate,
@@ -288,14 +309,15 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
 
                 _identifiedContactsThisTick++;
                 _totalIdentifiedContacts++;
-            });
+            }, rotation: _visualOcclusion is null ? 0 :
+                context.Tick.Value / (ulong)sensor.UpdateIntervalTicks + sensorEntity.Index);
     }
 
     private void ScanRadarSensor(
         SimulationContext context,
         EntityId sensorEntity,
         RadarSensorState sensor,
-        Vector3 sensorPosition)
+        Vector3 sensorPosition, int sensorBudget)
     {
         float identificationRange = RadarOperation.IdentificationRange(context.Entities, sensorEntity, sensor, _technologies);
         float identificationRangeSquared = identificationRange * identificationRange;
@@ -324,7 +346,8 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                 IntelligenceState state =
                     identificationRange > 0.0f &&
                     delta.LengthSquared() <=
-                    identificationRangeSquared
+                    identificationRangeSquared &&
+                    VisualClear(sensorPosition, targetTransform.Position, ref sensorBudget)
                         ? IntelligenceState.Identified
                         : IntelligenceState.Detected;
 
@@ -346,14 +369,32 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
                     _detectedContactsThisTick++;
                     _totalDetectedContacts++;
                 }
-            });
+            }, rotation: _visualOcclusion is null ? 0 :
+                context.Tick.Value / (ulong)sensor.UpdateIntervalTicks + sensorEntity.Index);
+    }
+
+    // Rotate bounded admission across stable sensor slots without an unbounded history.
+    private int NextSensorBudget(SimulationTick tick)
+    {
+        int ordinal = _sensorOrdinal++;
+        int admitted = Math.Min(MaximumVisualTracesPerTick, _sensorSlots);
+        long relative = (ordinal - (long)(tick.Value % (ulong)_sensorSlots) + _sensorSlots) % _sensorSlots;
+        return relative < admitted ? Math.Min(MaximumVisualTracesPerSensor, MaximumVisualTracesPerTick / admitted) : 0;
+    }
+
+    private bool VisualClear(Vector3 source, Vector3 target, ref int sensorBudget)
+    {
+        if (_visualOcclusion is null) return true;
+        if (sensorBudget <= 0 || _visualTracesRemaining <= 0) return false;
+        sensorBudget--; _visualTracesRemaining--;
+        return _visualOcclusion.Evaluate(source, target) == VisualTraceResult.Clear;
     }
 
     private void ForEachCandidate(
         SimulationContext context,
         Vector3 center,
         float rangeMeters,
-        Action<EntityId> visitor)
+        Action<EntityId> visitor, ulong rotation = 0)
     {
         if (_spatialIndex is not null)
         {
@@ -366,22 +407,20 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
             ReadOnlySpan<EntityId> candidates =
                 _queryBuffer.Results;
 
-            for (int index = 0;
-                 index < candidates.Length;
-                 index++)
+            int total = candidates.Length + _bridgeCandidates.Count;
+            int first = total == 0 ? 0 : (int)(rotation % (ulong)total);
+            for (int index = 0; index < total; index++)
             {
+                int slot = (int)(((long)first + index) % total);
+                EntityId candidate = slot < candidates.Length ? candidates[slot] : _bridgeCandidates[slot - candidates.Length];
+                if (slot >= candidates.Length)
+                {
+                    Vector3 delta = context.Entities.GetComponent<WorldTransform>(candidate).Position - center;
+                    if (delta.LengthSquared() > rangeMeters * rangeMeters) continue;
+                }
                 _candidatesThisTick++;
                 _totalCandidates++;
-                visitor(candidates[index]);
-            }
-
-            foreach (EntityId bridge in context.Entities.Query<BridgeCombat, WorldTransform>())
-            {
-                Vector3 delta = context.Entities.GetComponent<WorldTransform>(bridge).Position - center;
-                if (delta.LengthSquared() > rangeMeters * rangeMeters) continue;
-                _candidatesThisTick++;
-                _totalCandidates++;
-                visitor(bridge);
+                visitor(candidate);
             }
 
             return;
