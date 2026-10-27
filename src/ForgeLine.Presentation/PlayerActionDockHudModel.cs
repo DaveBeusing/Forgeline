@@ -1128,6 +1128,8 @@ internal static class PlayerActionDockHudModel
                 "NO ROUTE",
             LogisticsTransportRequestFailureReason.NoTruckAvailable =>
                 "NO TRUCK",
+            LogisticsTransportRequestFailureReason.NoDriveFuel =>
+                "NO DRIVE FUEL",
             LogisticsTransportRequestFailureReason.ReservationFailed =>
                 "RESERVATION",
             LogisticsTransportRequestFailureReason.AssignmentFailed =>

@@ -171,6 +171,7 @@ internal sealed partial class PlayerActionRingHudRenderer
                 {
                     value.Append("HAVE "); value.Append(stockPolicy.CurrentQuantity, "F0");
                     if (!stockPolicy.HasPolicy) value.Append(" / SET MIN MAX");
+                    else if (!stockPolicy.Enabled) value.Append(" / OFF");
                     else if (stockPolicy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
                     { value.Append(" / "); value.Append(PlayerActionDockHudModel.ResolveTransportFailureLabel(stockPolicy.FailureReason)); }
                     else { value.Append(" / "); value.Append(PlayerActionDockHudModel.ResolveDistributionStateLabel(stockPolicy.DistributionState)); }
