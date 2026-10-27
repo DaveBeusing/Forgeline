@@ -17,17 +17,18 @@ public readonly record struct OperationsWindowMeasurement(EntityId Entity, Inven
 public sealed class OperationsObservationSnapshot
 {
     public OperationsObservationSnapshot(SimulationSessionId session, SimulationTick tick, PlayerId player,
-        IReadOnlyList<OperationsWindowMeasurement> measurements, int omittedSubjects)
+        IReadOnlyList<OperationsWindowMeasurement> measurements, int omittedSubjects, bool limited = false)
     {
         Session = session; Tick = tick; Player = player;
         Measurements = Array.AsReadOnly(measurements.Take(GameplayProgressJournal.MaximumOperationsSubjects).ToArray());
-        OmittedSubjects = omittedSubjects;
+        OmittedSubjects = omittedSubjects; Limited = limited || omittedSubjects > 0;
     }
     public SimulationSessionId Session { get; }
     public SimulationTick Tick { get; }
     public PlayerId Player { get; }
     public IReadOnlyList<OperationsWindowMeasurement> Measurements { get; }
     public int OmittedSubjects { get; }
+    public bool Limited { get; }
 }
 
 /// <summary>Optional observation on the simulation owner; no commands, persisted state or decision inputs.</summary>
@@ -104,8 +105,10 @@ public sealed partial class GameplayProgressJournal
             double? minimum = null, maximum = null, backlog = null;
             int covered = 0, knownWait = 0, knownBacklog = 0;
             bool invalid = false;
-            for (ulong value = first + 1; value <= tick.Value; value++)
+            int length = (int)(tick.Value - first);
+            for (int offset = 0; offset < length; offset++)
             {
+                ulong value = first + 1 + (ulong)offset;
                 var sample = Samples[(int)(value % OperationsWindowTicks)];
                 if (sample.Tick != value || sample.Seconds <= 0) continue;
                 covered++; quantity += sample.Quantity; seconds += sample.Seconds; invalid |= sample.InvalidQuantity;
