@@ -13,7 +13,8 @@ internal enum PlayerActionDockControlKind : byte
     CycleSecondary = 6,
     Decrease = 7,
     Increase = 8,
-    Page = 9
+    Page = 9,
+    DecreaseMinimum = 10, IncreaseMinimum = 11, DecreaseMaximum = 12, IncreaseMaximum = 13
 }
 
 internal readonly record struct PlayerActionDockHitTarget(

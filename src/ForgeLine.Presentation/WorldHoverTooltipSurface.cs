@@ -130,6 +130,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (resolved.Selection is not null) BlankLine();
         Line(resolved.Role);
         Line(resolved.Status);
+        if (resolved.ProductionOutput is { } output) EmitProductionOutput(output);
         if (resolved.ProductionInput is { MissingInput: true } input) EmitProductionInput(input);
         Line(resolved.ActionTitle, true);
         Line(resolved.ActionStatus);
@@ -165,6 +166,21 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         }
         if (resolved.Feedback is { State: not PlayerCommandFeedbackState.None } feedback) EmitCommandFeedback(feedback);
         if (resolved.World is { } world) EmitWorld(world);
+    }
+
+    private void EmitProductionOutput(ProductionOutputStock output)
+    {
+        Line("PRODUCED MATERIALS IN OUTPUT STOCK", true);
+        Span<char> buffer = stackalloc char[256];
+        foreach (var material in output.Materials)
+        {
+            var text = new TooltipTextBuilder(buffer);
+            text.Append(material.Name); text.Append(": "); text.Number(material.Quantity, "0.##");
+            text.Append(" / RESERVED "); text.Number(material.Reserved, "0.##");
+            text.Append(" / FREE "); text.Number(Math.Max(0, material.Quantity - material.Reserved), "0.##");
+            Line(text.Written);
+        }
+        if (output.MoreMaterials) Line("ADDITIONAL OUTPUT MATERIALS NOT SHOWN");
     }
 
     private void EmitProductionInput(ProductionInputInformation input)
@@ -259,7 +275,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         }
         if (actions.Logistics is { } logistics && logistics.Entity == selected)
         {
-            Line("LOGISTICS");
+            Line(logistics.IsCommandCore ? "LOGISTICS: SELECT MATERIAL / EDIT MIN MAX" : "LOGISTICS");
+            if (logistics.IsCommandCore) Line("APPLY STOCK: BELOW MIN AUTO COLLECTS TO MAX");
             var text = new TooltipTextBuilder(buffer);
             text.Append("STOCK "); text.Number(logistics.InventoryQuantity, "N0");
             text.Append(" / CAPACITY ");

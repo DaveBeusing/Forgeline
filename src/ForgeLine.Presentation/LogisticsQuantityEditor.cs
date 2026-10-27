@@ -51,6 +51,17 @@ internal static class LogisticsQuantityEditor
         };
     }
 
+    internal static (double Next, bool Allowed, string Reason) DecideBand(
+        PlayerStockThresholdField field, double minimum, double maximum, double capacity, int direction)
+    {
+        if (double.IsPositiveInfinity(capacity)) capacity = 0;
+        return field == PlayerStockThresholdField.Minimum
+            ? Decide(minimum, direction, Minimum, maximum, "MINIMUM IS 50", "INCREASE MAX FIRST")
+            : Decide(maximum, direction, Math.Max(Minimum, minimum),
+                capacity > 0 ? direction > 0 ? capacity : Math.Max(maximum, capacity) : double.MaxValue,
+                "DECREASE MIN FIRST", "INVENTORY CAPACITY REACHED");
+    }
+
     internal static bool FitsCapacity(double maximum, double capacity) =>
         double.IsFinite(maximum) && maximum >= 0 && capacity >= 0 &&
         (capacity == 0 || maximum <= capacity);
