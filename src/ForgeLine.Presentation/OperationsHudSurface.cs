@@ -6,7 +6,7 @@ using ForgeLine.Graphics;
 
 namespace ForgeLine.Presentation;
 
-internal sealed class OperationsHudSurface : IGameplayHudSurface
+internal sealed partial class OperationsHudSurface : IGameplayHudSurface
 {
     internal const int MaxVertices = 262_144;
     private const int MaxLines = 24;
@@ -77,7 +77,8 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     !_skin.Panel(_bounds, "panel.primary", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
                     Quad(_bounds, GameplayHudVisualStyle.PanelBackground with
                         { W = OperationsPanelVisuals.BackgroundOpacity * _panelOpacity });
-                if (view.RuleControls is { } rules) RenderRules(context, rules);
+                if (view.TemplateControls is { } templates) RenderTemplates(context, templates);
+                else if (view.RuleControls is { } rules) RenderRules(context, rules);
                 else if (view.Notifications) RenderNotificationDetails(context);
                 else
                 {
@@ -233,6 +234,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     else Line("SELECT A FACILITY FOR CAUSE AND CONTROLS");
                     _bounds = panel;
                     Control(context.Layout, 13, "RULES", selected: view.RuleEntryFocused);
+                    Control(context.Layout, 15, "TEMPLATES", selected: view.TemplateEntryFocused);
                     Control(context.Layout, 9, selected.HasValue ? "FOCUS FACILITY" : "SELECT FACILITY TO FOCUS", enabled: selected.HasValue);
                     bool controls = selected.HasValue && selected.Value.Controls != PlayerActionPanelMode.Closed;
                     Control(context.Layout, 10, controls ? "OPEN EXISTING CONTROLS" : "NO FACILITY CONTROLS", enabled: controls);

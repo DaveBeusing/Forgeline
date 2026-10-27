@@ -80,6 +80,16 @@ public sealed class InventoryStore
     public double GetTotalCapacity(InventoryId inventoryId) =>
         GetRequiredState(inventoryId).Specification.TotalCapacity;
 
+    /// <summary>Configured resource ceiling, including the shared total limit; not current free space.</summary>
+    public double GetResourceCapacity(InventoryId inventoryId, ResourceId resourceId)
+    {
+        ValidateResourceId(resourceId);
+        InventoryState state = GetRequiredState(inventoryId);
+        return state.Specification.Accepts(resourceId)
+            ? Math.Min(state.Specification.TotalCapacity, state.Specification.GetResourceCapacity(resourceId))
+            : 0.0;
+    }
+
     public double GetTotalQuantity(InventoryId inventoryId) =>
         GetRequiredState(inventoryId).TotalQuantity;
 
