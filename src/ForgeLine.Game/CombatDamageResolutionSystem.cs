@@ -1,6 +1,7 @@
 using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Simulation;
+using ForgeLine.World;
 
 namespace ForgeLine.Game;
 
@@ -18,6 +19,7 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
     private readonly WeaponCatalog? _weapons;
     private readonly ArmorCatalog? _armor;
     private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
+    private readonly TacticalAreaSet _tacticalAreas;
 
     private ulong _armoredHits;
     private ulong _frontHits;
@@ -30,13 +32,15 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
         CombatRuntime runtime,
         WeaponCatalog? weapons = null,
         ArmorCatalog? armor = null,
-        ArtilleryWeaponCatalog? artilleryWeapons = null)
+        ArtilleryWeaponCatalog? artilleryWeapons = null,
+        TacticalAreaSet? tacticalAreas = null)
     {
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
         _weapons = weapons;
         _armor = armor;
         _artilleryWeapons = artilleryWeapons;
+        _tacticalAreas = tacticalAreas ?? TacticalAreaSet.Empty;
     }
 
     public SimulationPhase Phase =>
@@ -81,6 +85,18 @@ public sealed class CombatDamageResolutionSystem : ISimulationSystem
                 ResolveDamage(
                     context,
                     request);
+            // First rule: occupied authored ground cover reduces direct infantry damage only.
+            // Artillery area damage, structures, vehicles and untyped developer damage are excluded.
+            if (request.Source.IsValid && request.DeveloperCorrelation == Guid.Empty &&
+                _weapons is not null && _weapons.TryGet(request.Weapon, out _) &&
+                (_artilleryWeapons is null || !_artilleryWeapons.TryGet(request.Weapon, out _)) &&
+                context.Entities.TryGetComponent(request.Target, out Targetable targetable) &&
+                targetable.Class == TargetClass.Infantry &&
+                context.Entities.TryGetComponent(request.Target, out WorldTransform pose))
+            {
+                double multiplier = _tacticalAreas.ProtectionAt(pose.Position).DamageMultiplier;
+                if (multiplier < 1) resolvedDamage = new DamagePayload(resolvedDamage.Amount * multiplier);
+            }
 
             HealthState updated =
                 health.ApplyDamage(

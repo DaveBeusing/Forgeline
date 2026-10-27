@@ -93,7 +93,8 @@ public static class SplitBasinBattlefield
             resources.ToArray(), objects.ToArray(), sites, nodes, edges, crossings,
             [new("objective.west_command_core", new PlayerId(1), starts[0].CommandCorePosition),
              new("objective.east_command_core", new PlayerId(2), starts[1].CommandCorePosition)],
-            obstacles, CentralDivideBattlefield.Create().TerrainVisual with { ProfileId = "split_basin.production" });
+            obstacles, CentralDivideBattlefield.Create().TerrainVisual with { ProfileId = "split_basin.production" })
+            { MapRevision = 2, TacticalAreas = AuthoredTacticalAreas.SplitBasin() };
         BattlefieldValidator.ValidateDefinition(definition);
         return definition;
     }

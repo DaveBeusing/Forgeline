@@ -43,7 +43,7 @@ internal static class BattlefieldArtifactValidation
         Require(map.Starts.Length is >= 2 and <= 16 && map.Objectives.Length <= 16 &&
             map.Resources.Length <= 4096 && map.WorldObjects.Length <= 16384 && map.Sites.Length <= 256 &&
             map.RoadNodes.Length <= 2048 && map.RoadEdges.Length <= 8192 && map.Crossings.Length <= 128 &&
-            map.StaticNavigationObstacles.Length <= 4096, "Compiled map exceeds a collection budget.");
+            map.StaticNavigationObstacles.Length <= 4096 && map.TacticalAreas.Length <= TacticalAreaSet.MaximumAreas, "Compiled map exceeds a collection budget.");
         Require(map.TerrainVisual.ControlSamplesPerSide <= 129 && map.TerrainVisual.MaterialAssetIds.Length <= 16,
             "Compiled map exceeds a terrain visual budget.");
         Require(map.Metadata.RecommendedPlayers == map.Starts.Length && map.Objectives.Select(o => o.Owner).Distinct().Count() == map.Starts.Length,
@@ -54,6 +54,8 @@ internal static class BattlefieldArtifactValidation
         Require(map.Starts.All(s => Bounds(s.BuildArea)) && map.Sites.All(s => Bounds(s.BuildArea) && Enum.IsDefined(s.Kind) && !string.IsNullOrWhiteSpace(s.DisplayName)) &&
             map.Crossings.All(c => Bounds(c.PassageBounds) && !string.IsNullOrWhiteSpace(c.DisplayName)) &&
             map.StaticNavigationObstacles.All(Bounds), "Compiled map contains an invalid area.");
+        _ = new TacticalAreaSet(map.TacticalAreas);
+        Require(map.TacticalAreas.All(a => Bounds(a.Bounds)), "Compiled map contains invalid tactical geography.");
         Require(map.RoadNodes.All(n => Point(n.Position)) && map.Objectives.All(o => Point(o.CommandCorePosition)),
             "Compiled map contains an invalid road node or objective position.");
         Require(map.Resources.All(r => float.IsFinite(r.HalfExtents.X) && float.IsFinite(r.HalfExtents.Y) && float.IsFinite(r.HalfExtents.Z) &&

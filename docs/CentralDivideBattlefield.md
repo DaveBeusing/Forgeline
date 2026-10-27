@@ -131,3 +131,9 @@ The South Ford keeps its existing generic host disable/restore lifecycle and is 
 No cargo order, reservation or loaded inventory is replaced by this feature. Existing versioned route invalidation, alternate routing, waiting and retry behavior remains responsible for in-flight cargo. A bridge repair does not teleport trucks or refund their loads. See [Bridge combat lifecycle](adr/BridgeCombatAndPaidRepair.md) and [save compatibility](SaveLoadReplayAndRecovery.md#bridge-combat-and-repair-compatibility).
 
 Implementation status: manual acceptance is outstanding. No new automated qualification, test or smoke run is claimed.
+
+## Explicit tactical geography
+
+Map revision 2 / artifact format 4 adds four authored infantry-cover rectangles and two visual screens. The Sensors layer shows green cover and amber screens, with public labels; owned unit hover/selection state reports current protection. Direct infantry hits receive 35% less damage inside cover; vehicles, buildings, bridges and artillery do not receive that modifier. Screens separately restrict visual/radar identification outside the 32 m close exception, while terrain can still block sight and radar can retain coarse detection.
+
+Locations, budgets and boundaries are listed in [Cover and visual occlusion](CoverAndVisualOcclusion.md). The complete registered map SHA-256 is `0f64c67943ddd0e399f7cc7579f65c43feded449e6bb43182de3bdd9ff4d0682`. Terrain recipes, roads, resources and decorative objects are unchanged. Authoritative schema 16 rejects older simulation states; previous map and gameplay qualification remains historical evidence. Compilation and manual acceptance of these new rules are outstanding.

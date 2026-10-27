@@ -19,7 +19,7 @@ public sealed record BattlefieldMapArtifact(
     AxisAlignedBounds[] StaticNavigationObstacles,
     BattlefieldTerrainVisualDefinition TerrainVisual)
 {
-    public const int CurrentFormatVersion = 3;
+    public const int CurrentFormatVersion = 4;
     public const int MaximumInputBytes = 4 * 1024 * 1024;
 
     public BattlefieldTerrainRecipe Terrain { get; init; } = null!;
@@ -28,6 +28,7 @@ public sealed record BattlefieldMapArtifact(
     public string ContentSha256 { get; init; } = string.Empty;
     public string StartRule { get; init; } = ScenarioContentIdentity.StartRule;
     public string ObjectiveRule { get; init; } = ScenarioContentIdentity.ObjectiveRule;
+    public TacticalAreaDefinition[] TacticalAreas { get; init; } = [];
 
     private static readonly JsonSerializerOptions SerializerOptions =
         CreateSerializerOptions();
@@ -55,6 +56,8 @@ public sealed record BattlefieldMapArtifact(
                     definition.TerrainVisual.MaterialAssetIds.ToArray()
             })
         {
+            MapRevision = definition.MapRevision,
+            TacticalAreas = definition.TacticalAreas.Areas.ToArray(),
             Terrain = (terrain ?? BattlefieldTerrainRecipe.CentralDivide()).Copy(),
             ContentSha256 = ScenarioContentIdentity.ComputeSha256(CentralDivideScenario.CreateContent())
         };
@@ -113,6 +116,7 @@ public sealed record BattlefieldMapArtifact(
         ArgumentNullException.ThrowIfNull(Objectives);
         ArgumentNullException.ThrowIfNull(StaticNavigationObstacles);
         ArgumentNullException.ThrowIfNull(TerrainVisual);
+        ArgumentNullException.ThrowIfNull(TacticalAreas);
         TerrainVisual.Validate();
         BattlefieldArtifactValidation.Validate(this);
         Terrain.Validate(Metadata);
@@ -128,7 +132,8 @@ public sealed record BattlefieldMapArtifact(
     private BattlefieldDefinition CreateDefinition() => new(
         Metadata, Starts.ToArray(), Resources.ToArray(), WorldObjects.ToArray(), Sites.ToArray(),
         RoadNodes.ToArray(), RoadEdges.ToArray(), Crossings.ToArray(), Objectives.ToArray(),
-        StaticNavigationObstacles.ToArray(), TerrainVisual with { MaterialAssetIds = TerrainVisual.MaterialAssetIds.ToArray() });
+        StaticNavigationObstacles.ToArray(), TerrainVisual with { MaterialAssetIds = TerrainVisual.MaterialAssetIds.ToArray() })
+        { MapRevision = MapRevision, TacticalAreas = new TacticalAreaSet(TacticalAreas) };
 
     public void ValidateMatches(
         BattlefieldDefinition definition)
@@ -136,7 +141,8 @@ public sealed record BattlefieldMapArtifact(
         ArgumentNullException.ThrowIfNull(definition);
         Validate();
 
-        if (Metadata != definition.Metadata ||
+        if (MapRevision != definition.MapRevision ||
+            !TacticalAreas.SequenceEqual(definition.TacticalAreas.Areas) || Metadata != definition.Metadata ||
             !Starts.SequenceEqual(definition.Starts) ||
             !Resources.SequenceEqual(definition.Resources) ||
             !WorldObjects.SequenceEqual(definition.WorldObjects) ||

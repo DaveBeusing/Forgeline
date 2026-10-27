@@ -401,3 +401,9 @@ owner; preset restarts use the transactional session loader. See
 [Developer tools menu](DeveloperToolsMenu.md) for operation and
 [Developer tools qualification](DeveloperToolsQualification.md) for evidence and
 remaining acceptance limits.
+
+## Explicit tactical geography and perception
+
+World owns bounded immutable TacticalAreaSet data. Game carries it in compiled format-4/revision-2 maps and normal match composition. The existing damage owner derives infantry protection at impact; BattlefieldIntelligenceSystem uses an Intelligence-owned bounded ground visual policy for exact observation. Radar detection remains coarse, separate from identification and from terrain fog coverage. TerrainLineOfFirePolicy retains weapon authority. No scenery, rendering or UI state decides those results.
+
+Presentation copies only own unit protection and public static region outlines. Existing current-identification filtering remains the hostile-state boundary. The authoritative checkpoint includes world.tactical_areas and schema 16; existing command replay and compiled scenario identities remain the only recovery path. See [decision and limits](adr/ExplicitCoverAndVisualOcclusion.md).

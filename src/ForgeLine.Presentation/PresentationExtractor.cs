@@ -950,7 +950,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         MatchRuntime scenario =
             extraction.Scenario;
 
-        return PlayerExperienceSnapshotFactory.Capture(
+        var experience = PlayerExperienceSnapshotFactory.Capture(
             context.Entities,
             extraction.Player,
             extraction.Side.CommandCore,
@@ -967,6 +967,8 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
             scenario.Services.BuildingDefinitions,
             context.Tick,
             scenario.Simulation.Clock.TicksPerSecond);
+        return experience with { Selection = PlayerTacticalProtection.Attach(context.Entities,
+            extraction.Player, experience.Selection, scenario.Battlefield.TacticalAreas) };
     }
 
     private BuildingPlacementPreviewReadModel? CapturePlacementPreview(

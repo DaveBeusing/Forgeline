@@ -164,6 +164,9 @@ public sealed class BattlefieldDefinition
         TerrainVisual.Validate();
     }
 
+    public int MapRevision { get; init; } = 1;
+    public TacticalAreaSet TacticalAreas { get; init; } = TacticalAreaSet.Empty;
+
     public BattlefieldMapMetadata Metadata { get; }
 
     public IReadOnlyList<BattlefieldStartPosition> Starts { get; }

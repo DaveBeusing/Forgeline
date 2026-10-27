@@ -14,7 +14,7 @@ public static class RtsStrategicOverlayHudModel
     {
         StrategicOverlayMode.Logistics => "LINE LINK X OFF - LOAD N/A",
         StrategicOverlayMode.Supply => "RING RANGE X CRITICAL/OFF",
-        StrategicOverlayMode.Sensors => "RINGS VISUAL/RADAR RANGE",
+        StrategicOverlayMode.Sensors => "GREEN COVER / AMBER SCREEN / RANGES",
         StrategicOverlayMode.Navigation => "BOX SECTOR POINT PORTAL",
         StrategicOverlayMode.Power => "X OFF DIAMOND BROWNOUT",
         StrategicOverlayMode.All => "LOCAL STATES - LOAD N/A", _ => "F10 LAYERS F11 MINIMAP"
