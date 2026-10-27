@@ -73,6 +73,18 @@ public sealed class NavigationRouteProposal
         Diagnostics = diagnostics;
     }
 
+    // JSON metadata must not bind a ref-struct constructor parameter.
+    [System.Text.Json.Serialization.JsonConstructor]
+    public NavigationRouteProposal(NavigationSearchSpecification request, Vector3 resolvedDestination,
+        IReadOnlyList<Vector3> waypoints, IReadOnlyList<NavigationRegionRevision> regions,
+        NavigationPathDiagnostics diagnostics)
+        : this(request, resolvedDestination,
+            (waypoints ?? throw new ArgumentNullException(nameof(waypoints))).ToArray(),
+            (regions ?? throw new ArgumentNullException(nameof(regions))).ToArray(),
+            diagnostics, Math.Max(1, waypoints.Count))
+    {
+    }
+
     public NavigationSearchSpecification Request { get; }
     public Vector3 ResolvedDestination { get; }
     public IReadOnlyList<Vector3> Waypoints { get; }
