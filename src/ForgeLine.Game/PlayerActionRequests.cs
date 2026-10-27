@@ -38,7 +38,8 @@ public enum PlayerActionRequestKind : byte
     CreateCargoConvoy = 28,
     DissolveCargoConvoy = 29,
     SubmitOperationsRule = 30,
-    SetConveyorRouting = 31
+    SetConveyorRouting = 31,
+    RepairBridge = 32
 }
 
 public readonly record struct PlayerActionRequest(
@@ -74,6 +75,13 @@ public readonly record struct PlayerActionRequest(
     EntityId[]? ConvoyEscorts = null,
     EntityId ConvoyGroup = default)
 {
+    public uint ExpectedInfrastructureRevision { get; init; }
+    public static PlayerActionRequest RepairBridge(EntityId engineer, EntityId bridge, EntityId source, uint revision) =>
+        new(PlayerActionRequestKind.RepairBridge, BuildingId.None, source, RecipeId.None,
+            UnitId.None, EntityId.Invalid, false, ProductionPriority.Normal,
+            ProductionRequestMode.OneShot, ResourceId.None, 0, TacticalEntities: [engineer], TacticalTarget: bridge)
+        { ExpectedInfrastructureRevision = revision };
+
     public ConveyorRoutingPreference RoutingPreference { get; init; }
     public uint ExpectedRoutingRevision { get; init; }
     public static PlayerActionRequest SetConveyorRouting(EntityId splitter,

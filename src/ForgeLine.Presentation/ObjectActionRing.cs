@@ -117,6 +117,11 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
                 var unitRequest = units.Requests[index - units.Units.Count].RequestEntity;
                 return new(2, unitRequest.Index, unitRequest.Generation);
             case PlayerActionPanelMode.Logistics:
+                if (actions.BridgeRepairs.Count > 0)
+                {
+                    var repair = actions.BridgeRepairs[index];
+                    return new(11, repair.Bridge.Index, repair.Bridge.Generation, repair.Revision);
+                }
                 if (actions.ConveyorRouting is { } routing)
                     return new((byte)(8 + index), routing.Entity.Index, routing.Entity.Generation, routing.Revision);
                 var logistics = actions.Logistics!;

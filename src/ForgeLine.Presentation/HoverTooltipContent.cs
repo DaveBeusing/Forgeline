@@ -88,7 +88,7 @@ internal static class HoverTooltipResolver
         }
         if(world.Category==PlayerHoverCategory.Conveyor) explanation=world.Requirement;
         return new(world.DisplayName, role, world.ExtractionState, hint, world, Explanation: explanation,
-            WrapDetails: world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
+            WrapDetails: world.Category == PlayerHoverCategory.Bridge || world.OwnedDetails.Count == 1 && snapshot.PlayerActions is { } owned &&
                 (owned.Logistics?.Entity == world.Entity || owned.Supply?.Entity == world.Entity));
     }
 
@@ -164,6 +164,12 @@ internal static class HoverTooltipResolver
                     costs = units.Units[index].Costs;
                     ticks = units.Units[index].ProductionTicks;
                     requirement = units.Units[index].TechnologyUnlocked ? string.Empty : "REQUIRES TECHNOLOGY";
+                    break;
+                case PlayerActionPanelMode.Logistics when actions.BridgeRepairs.Count > 0 &&
+                    index < actions.BridgeRepairs.Count:
+                    var bridge = actions.BridgeRepairs[index];
+                    requirement = bridge.Details;
+                    hint = bridge.Failure == BridgeRepairFailure.None ? "CLICK TO REPAIR / RESUME" : BridgeRepairText.Describe(bridge.Failure);
                     break;
                 case PlayerActionPanelMode.Logistics when actions.Logistics is { } logistics:
                     if (index >= logistics.Policies.Count)

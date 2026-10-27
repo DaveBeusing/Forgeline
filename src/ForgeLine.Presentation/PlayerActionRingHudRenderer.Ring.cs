@@ -135,6 +135,14 @@ internal sealed partial class PlayerActionRingHudRenderer
             { value.Append("ORDERS "); value.Append(logisticsSummary.TotalOrderCount); }
             else if (mode) value.Append(PlayerActionDockHudModel.ResolveModeShortcut(target.Mode, panel.Bindings));
             else if (item && panel.Mode == PlayerActionPanelMode.Logistics &&
+                actions?.BridgeRepairs.Count > 0 && target.ItemIndex < actions.BridgeRepairs.Count)
+            {
+                var repair = actions.BridgeRepairs[target.ItemIndex];
+                value.Append("HP "); value.Append((int)repair.Health); value.Append("/");
+                value.Append((int)repair.MaximumHealth); value.Append(" / ");
+                value.Append(repair.Paid ? "KIT PAID" : "120 ST / 20 EL");
+            }
+            else if (item && panel.Mode == PlayerActionPanelMode.Logistics &&
                 actions?.Logistics is { } stockRows &&
                 target.ItemIndex >= 0 && target.ItemIndex < stockRows.Policies.Count)
             {
