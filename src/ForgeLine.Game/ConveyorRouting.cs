@@ -18,6 +18,9 @@ public readonly record struct ConveyorRoutingState(ConveyorRoutingPreference Pre
 
 public static class ConveyorRoutingPolicy
 {
+    public const string EffectDescription =
+        "Unlocks 3:1 preference for either splitter output; the other eligible branch retains one turn in four. Balanced routing remains unrestricted.";
+
     public static ConveyorRoutingFailure Evaluate(EntityRegistry entities, PlayerId owner, EntityId target,
         ConveyorRoutingPreference preference, uint expectedRevision)
     {

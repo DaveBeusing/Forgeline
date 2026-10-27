@@ -690,6 +690,13 @@ public sealed partial class PlayerActionPanelController
 
     private void ActivateLogistics(PlayerActionSnapshot actions)
     {
+        if (actions.ConveyorRouting is { } routing)
+        {
+            if (SelectedIndex is >= 0 and < 3 && routing.Failure(SelectedIndex) == ConveyorRoutingFailure.None)
+                _pendingRequest = PlayerActionRequest.SetConveyorRouting(routing.Entity,
+                    (ConveyorRoutingPreference)SelectedIndex, routing.Revision);
+            return;
+        }
         var logistics = actions.Logistics;
         if (logistics is null ||
             SelectedIndex < 0 ||

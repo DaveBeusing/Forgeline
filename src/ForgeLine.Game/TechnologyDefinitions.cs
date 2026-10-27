@@ -458,7 +458,9 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.LogisticsCoordination,
-                    EffectDescription = "Unlocks 3:1 preference for either splitter output, with one service turn in four retained for the other eligible branch. Balanced routing remains unrestricted.",
+                    // Registered catalog text participates in compiled-map identity.
+                    // The copied technology view uses ConveyorRoutingPolicy.EffectDescription.
+                    EffectDescription = "Priority splitter routing awaits conveyor control integration; fair distribution is unrestricted.",
                     Key =
                         "directorate.technology.logistics_coordination",
                     DisplayName =
