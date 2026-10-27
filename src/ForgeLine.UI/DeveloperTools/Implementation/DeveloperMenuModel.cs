@@ -44,8 +44,27 @@ public sealed class DeveloperMenuModel
     private DeveloperValue[] _actionValues = [];
     public IReadOnlyList<DeveloperValue> ActionValues => Array.AsReadOnly(_actionValues);
     public DeveloperMenuActionForm? ActionForm => _actionForm;
-    public DeveloperMenuModel(DeveloperToolsProviders providers, DebugOverlayController debug, IDeveloperMenuBackend? backend = null)
-    { _providers = providers; _debug = debug; _backend = backend; }
+    public DeveloperMenuModel(DeveloperToolsProviders providers, DebugOverlayController debug, IDeveloperMenuBackend? backend = null,
+        IReadOnlyList<DeveloperVisualizationSwitch>? visualizationSwitches = null,
+        IReadOnlyList<DeveloperVisualizationCommand>? visualizationCommands = null)
+    {
+        _providers = providers; _debug = debug; _backend = backend;
+        if (visualizationSwitches?.Count > 16 || visualizationCommands?.Count > 4)
+            throw new ArgumentException("Too many visualization controls.");
+        VisualizationSwitches = Array.AsReadOnly(visualizationSwitches?.ToArray() ?? []);
+        VisualizationCommands = Array.AsReadOnly(visualizationCommands?.ToArray() ?? []);
+    }
+    public IReadOnlyList<DeveloperVisualizationSwitch> VisualizationSwitches { get; }
+    public IReadOnlyList<DeveloperVisualizationCommand> VisualizationCommands { get; }
+    public void RunVisualizationCommand(DeveloperVisualizationCommand command)
+    {
+        if (Available && (command.Available?.Invoke() ?? true)) Feedback = command.Execute();
+    }
+    public void SelectSection(DeveloperMenuSection section)
+    {
+        if (!Enum.IsDefined(section)) throw new ArgumentOutOfRangeException(nameof(section));
+        Section = section;
+    }
     public bool Visible { get; private set; }
     public bool Available => _snapshotReady && _access is { IsActive: true } && _access.Capability.IsCompiled && _access.Session == _session;
     public bool OwnsMenuPause => Visible && _observation?.MenuPauseTransferred == true;

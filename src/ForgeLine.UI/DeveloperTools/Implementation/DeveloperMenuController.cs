@@ -15,10 +15,10 @@ public sealed class DeveloperMenuController : IDisposable
     public DeveloperMenuController(DeveloperMenuModel model) => Model = model;
     public DeveloperMenuModel Model { get; }
     public bool Visible => Model.Visible;
-    public bool Open(InputState input)
+    public bool Open(InputState input, DeveloperMenuSection section = DeveloperMenuSection.Session)
     {
         bool opened = Model.Open(); _focus = 0; _scroll = 0; _stamp = long.MinValue;
-        if (opened) input.SuppressHeldInput();
+        if (opened) { Model.SelectSection(section); input.SuppressHeldInput(); }
         return opened;
     }
     public void Update(InputState input, FrontendLayout layout, bool focused)
@@ -34,7 +34,9 @@ public sealed class DeveloperMenuController : IDisposable
         if (click && FrontendHitTesting.DetailRow(pointer.X, pointer.Y, layout, Math.Min(_rows.Count - _scroll, layout.Geometry.VisibleDetailRows)) is int row)
         {
             _focus = row + _scroll;
-            if (FrontendHitTesting.DetailAdjust(pointer.X, pointer.Y, layout, layout.Geometry.VisibleDetailRows) is int direction)
+            if (_rows[_focus].Line.ValueKind == FrontendValueKind.Toggle)
+                _rows[_focus].Activate?.Invoke();
+            else if (FrontendHitTesting.DetailAdjust(pointer.X, pointer.Y, layout, layout.Geometry.VisibleDetailRows) is int direction)
                 _rows[_focus].Adjust?.Invoke(direction);
             else _rows[_focus].Activate?.Invoke();
             _stamp = long.MinValue;
@@ -43,7 +45,7 @@ public sealed class DeveloperMenuController : IDisposable
         {
             if (input.WasKeyPressed(PlatformKey.Left)) { _rows[_focus].Adjust?.Invoke(-1); _stamp = long.MinValue; }
             if (input.WasKeyPressed(PlatformKey.Right)) { _rows[_focus].Adjust?.Invoke(1); _stamp = long.MinValue; }
-            if (input.WasKeyPressed(PlatformKey.Enter)) { _rows[_focus].Activate?.Invoke(); _stamp = long.MinValue; }
+            if (input.WasKeyPressed(PlatformKey.Enter) || input.WasKeyPressed(PlatformKey.Space) && _rows[_focus].Line.ValueKind == FrontendValueKind.Toggle) { _rows[_focus].Activate?.Invoke(); _stamp = long.MinValue; }
         }
         Rebuild();
         int capacity = layout.Geometry.VisibleDetailRows;
@@ -58,6 +60,8 @@ public sealed class DeveloperMenuController : IDisposable
         var hash = new HashCode(); hash.Add(Model.Section); hash.Add(Model.Feedback); hash.Add(Model.HostPaused);
         hash.Add(Model.Inspector); hash.Add(Model.Observation?.Tick); hash.Add(Model.Observation?.Loading); hash.Add(Model.WriteBlocked);
         hash.Add(Model.SessionWriteBlocked); hash.Add(Model.Observation?.PresetAvailability);
+        foreach (var toggle in Model.VisualizationSwitches) { hash.Add(toggle.Read()); hash.Add(toggle.Available?.Invoke()); }
+        foreach (var command in Model.VisualizationCommands) hash.Add(command.Available?.Invoke());
         hash.Add(Model.Debug.View); hash.Add(Model.Providers.Menu.Status); hash.Add(Model.Providers.Sessions.Status);
         hash.Add(Model.Providers.Actions.Status); hash.Add(Model.Providers.Parameters.Status); hash.Add(Model.Providers.Presets.Status);
         foreach (var draft in Model.Drafts) { hash.Add(draft.Observed); hash.Add(draft.Value); hash.Add(draft.NeedsReview); }
