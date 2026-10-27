@@ -25,6 +25,16 @@ public sealed class ActionableAlertSnapshot
     public SimulationTick Tick { get; }
     public PlayerId Player { get; }
     public IReadOnlyList<ActionableAlert> Alerts { get; }
+    internal ActionableAlertSnapshot WithCauses(OperationsCauseSnapshot? causes)
+    {
+        if (causes is null || causes.Session != Session || causes.Tick != Tick || causes.Player != Player) return this;
+        int powerGroups = 0;
+        foreach (var group in causes.Groups) if (group.Reason == OperationsDiagnosisReason.NoPower) powerGroups++;
+        if (powerGroups == 0) return this;
+        return new(Session, Tick, Player, Alerts.Select(alert => alert.Identity.Kind == PlayerAlertState.LowPower
+            ? alert with { Label = FormattableString.Invariant($"POWER CONSTRAINED / {powerGroups} SHARED CAUSE(S){(causes.Limited ? " / LIMITED" : "")}"),
+                Target = causes.NextPowerMember(default) } : alert).ToArray());
+    }
     public static ActionableAlertSnapshot? Resolve(PresentationSnapshot? snapshot) =>
         snapshot is { SessionId.IsSpecified: true, PlayerExperience: { } experience, Alerts: { } alerts } &&
         alerts.Session == snapshot.SessionId && alerts.Tick == snapshot.Tick && experience.Tick == snapshot.Tick &&

@@ -90,7 +90,7 @@ public sealed class OperationsDiagnosisSnapshot
     public OperationsDiagnosisSnapshot(SimulationSessionId session, SimulationTick tick, PlayerId player,
         IReadOnlyList<OperationsDiagnosisRow> rows, IReadOnlyList<OperationsDiagnosisLink>? links = null,
         int totalRows = -1, EntityId root = default, int omittedSteps = 0, bool cycle = false,
-        bool missingObservation = false, int branches = 0, int totalLinks = -1)
+        bool missingObservation = false, int branches = 0, int totalLinks = -1, OperationsObservationSnapshot? observation = null, bool distributionObserved = false)
     {
         ArgumentNullException.ThrowIfNull(rows);
         Session = session;
@@ -101,7 +101,7 @@ public sealed class OperationsDiagnosisSnapshot
         TotalRows = totalRows < 0 ? rows.Count : totalRows;
         TotalLinks = totalLinks < 0 ? links?.Count ?? 0 : totalLinks;
         Root = root; OmittedSteps = omittedSteps; HasCycle = cycle;
-        MissingObservation = missingObservation; Branches = branches;
+        MissingObservation = missingObservation; Branches = branches; Observation = observation; DistributionObserved = distributionObserved;
     }
 
     public SimulationSessionId Session { get; }
@@ -116,6 +116,8 @@ public sealed class OperationsDiagnosisSnapshot
     public bool HasCycle { get; }
     public bool MissingObservation { get; }
     public int Branches { get; }
+    public OperationsObservationSnapshot? Observation { get; }
+    public bool DistributionObserved { get; }
 
     public static OperationsDiagnosisSnapshot? Resolve(PresentationSnapshot? snapshot) =>
         snapshot is { PlayerExperience: { } experience, PlayerActions: { } actions, Diagnosis: { } diagnosis } &&
@@ -156,6 +158,18 @@ public sealed class OperationsDiagnosisSnapshot
             " EXTRA BRANCHES " + Branches.ToString(CultureInfo.InvariantCulture) +
             (HasCycle ? " CYCLE" : "") + (MissingObservation ? " NOT OBSERVED" : "")
         };
+        if (Observation is { } observed && observed.Session == Session && observed.Tick == Tick && observed.Player == Player)
+        {
+            lines.Add("WINDOW " + GameplayProgressJournal.OperationsWindowTicks + " TICKS / OMITTED SUBJECTS " + observed.OmittedSubjects + (observed.Limited ? " / LIMITED SUBJECT COVERAGE" : ""));
+            foreach (var flow in observed.Measurements)
+                lines.Add(flow.Entity + " " + flow.Resource + " INPUT INVENTORY " + flow.Inventory +
+                    " WINDOW (" + flow.StartExclusive.Value + "," + flow.EndInclusive.Value + "]" +
+                    " COVERED " + flow.CoveredTicks + " SECONDS " + Number(flow.Seconds) +
+                    " DELIVERED " + Number(flow.DeliveredQuantity) + " PER SECOND " + Number(flow.DeliveredPerSecond) +
+                    " WAIT " + Number(flow.WaitingFraction) + " WAIT TICKS " + flow.WaitObservedTicks +
+                    " BACKLOG " + Number(flow.Backlog) + " MIN " + Number(flow.MinimumBacklog) + " MAX " + Number(flow.MaximumBacklog) +
+                    " BACKLOG TICKS " + flow.BacklogObservedTicks);
+        }
         foreach (var row in Rows)
             lines.Add(row.Subject + " " + row.Entity + " " + row.Resource +
                 " STATUS " + row.Status + " BLOCK " + Label(row.PrimaryReason) +

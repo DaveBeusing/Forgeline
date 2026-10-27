@@ -89,6 +89,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
                 Line("OPERATIONS", true);
                 Control(context.Layout, 0, "CLOSE");
+                Control(context.Layout, 14, "FLOW >", selected: view.MeasurementFocused);
                 Control(context.Layout, 12, view.Notifications ? "FACILITIES" : "NOTIFICATIONS");
                 var data = OperationsSnapshot.Resolve(context.Snapshot);
                 if (data is null) Line("WAITING FOR CURRENT OWNED DATA");
@@ -97,8 +98,17 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     Span<char> text = stackalloc char[192];
                     var b = new OperationsTextBuilder(text);
                     b.Append("FACILITIES "); b.Number(data.FacilityCount, "0"); b.Append(" LISTED "); b.Number(data.Facilities.Count, "0");
-                    b.Append(" ROUTES "); b.Number(data.RouteCount, "0"); Line(b.Written);
-                    b = new(text); b.Append("TICK "); b.Number(data.Tick.Value, "0"); b.Append(" / NET FLOW N/A: NO FLOW COUNTERS"); Line(b.Written);
+                    b.Append(" ROUTES "); b.Number(data.RouteCount, "0");
+                    if (OperationsCauseSnapshot.Resolve(context.Snapshot) is { } causes)
+                    { b.Append(" GROUPS "); b.Number(causes.Groups.Count, "0"); if (causes.Limited) b.Append("+"); }
+                    Line(b.Written);
+                    b = new(text); b.Append("INPUT WINDOW "); b.Number(ForgeLine.Game.GameplayProgressJournal.OperationsWindowTicks, "0");
+                    b.Append("t / BOUNDED");
+                    var observed = OperationsDiagnosisSnapshot.Resolve(context.Snapshot)?.Observation;
+                    if (observed is { Limited: true }) b.Append(" / LIMITED SUBJECTS");
+                    Line(b.Written);
+                    if (!RenderObservation(context, data, view, text))
+                    {
                     for (int i = 0; i < Math.Min(6, data.Resources.Count); i += 2)
                     {
                         b = new(text);
@@ -108,6 +118,7 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                     }
                     if (data.Resources.Count > 6)
                     { b = new(text); b.Append(data.Resources[6].Name); b.Append(" "); b.Number(data.Resources[6].Quantity, "0"); Line(b.Written); }
+                    }
                     _line = 0;
                     Control(context.Layout, 1, view.Filter switch
                     {
@@ -181,9 +192,11 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             { routes++; if (!route.Enabled) unavailable++; }
                         }
                         b = new(text);
+                        bool hasRelated = OperationsCauseSnapshot.Resolve(context.Snapshot)?.NextRelatedMember(detail.Entity).IsValid == true;
                         if (currentDiagnosis is { Root.IsValid: true } chain)
                         {
-                            b.Append(OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid ? "TRACE NEXT / EXTRA BRANCHES " : "TRACE END / EXTRA BRANCHES "); b.Number(chain.Branches, "0");
+                            b.Append(OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid ? "TRACE NEXT / EXTRA BRANCHES " :
+                                hasRelated ? "RELATED > / EXTRA BRANCHES " : "TRACE END / EXTRA BRANCHES "); b.Number(chain.Branches, "0");
                             if (transport is { PrimaryReason: not (OperationsDiagnosisReason.None or OperationsDiagnosisReason.Unknown) } transportBlock)
                             { b.Append(" / "); b.Append(OperationsDiagnosisSnapshot.Label(transportBlock.PrimaryReason)); }
                             b.Append(" OMITTED "); b.Number(chain.OmittedSteps + chain.TotalLinks - chain.Links.Count + chain.TotalRows - chain.Rows.Count, "0");
@@ -192,8 +205,10 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
                             if (chain.HasCycle) b.Append(" / CYCLE");
                             if (chain.MissingObservation) b.Append(" / NOT OBSERVED");
                             Control(context.Layout, 11, b.Written,
-                                enabled: OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid);
+                                enabled: OperationsActionGuidance.NextChainEntity(chain, detail.Entity).IsValid || hasRelated);
                         }
+                        else if (hasRelated)
+                            Control(context.Layout, 11, "SHARED CAUSE / RELATED >", enabled: true);
                         else if (transport is { } reported)
                         {
                             b.Append("STATE "); b.Append(reported.Status);
@@ -240,6 +255,33 @@ internal sealed class OperationsHudSurface : IGameplayHudSurface
         _text.Render(context.Graphics);
         LastRenderedVertexCount = _count + _text.VertexCount + _skin.Vertices;
     }
+    private bool RenderObservation(in GameplayHudRenderContext context, OperationsSnapshot data, in OperationsView view, Span<char> text)
+    {
+        if (!view.Selected.IsValid) return false;
+        var diagnosis = OperationsDiagnosisSnapshot.Resolve(context.Snapshot);
+        if (OperationsMeasurementDisplay.Find(diagnosis, view.Selected, view.MeasurementPage) is not { } flow)
+        { Line("INPUT FLOW / WAIT / BACKLOG NOT OBSERVED"); Line("SELECT OWNED FACILITY AND KEEP OPERATIONS OPEN"); return true; }
+        var b = new OperationsTextBuilder(text);
+        string resource = "UNKNOWN RESOURCE";
+        for (int i = 0; i < data.Resources.Count; i++)
+            if (data.Resources[i].Resource == flow.Resource) { resource = data.Resources[i].Name; break; }
+        b.Append(resource); b.Append(" DEL "); Number(ref b, flow.DeliveredQuantity, "0.##");
+        b.Append(" / "); Number(ref b, flow.DeliveredPerSecond, "0.##"); b.Append("/s"); Line(b.Written);
+        b = new(text); b.Append("COVER "); b.Number(flow.CoveredTicks, "0"); b.Append("/600t ");
+        b.Number(flow.Seconds, "0.##"); b.Append("s WAIT "); Number(ref b, flow.WaitingFraction, "P0");
+        b.Append(" ("); b.Number(flow.WaitObservedTicks, "0"); b.Append("t)"); Line(b.Written);
+        b = new(text); b.Append("BACKLOG "); Number(ref b, flow.Backlog, "0.##");
+        b.Append(" ["); Number(ref b, flow.MinimumBacklog, "0.##"); b.Append(".."); Number(ref b, flow.MaximumBacklog, "0.##");
+        b.Append("] "); b.Number(flow.BacklogObservedTicks, "0"); b.Append("t"); Line(b.Written);
+        var current = OperationsMeasurementDisplay.Current(diagnosis, flow);
+        b = new(text); b.Append("REQ "); Number(ref b, current?.OutstandingRequestQuantity);
+        b.Append(" RSV "); Number(ref b, current?.ReservedQuantity);
+        b.Append(" CONF "); Number(ref b, current?.ConfirmedIncomingQuantity);
+        b.Append(" LOAD "); Number(ref b, OperationsMeasurementDisplay.Loaded(diagnosis, flow));
+        Line(b.Written);
+        return true;
+    }
+
     private void RenderRules(in GameplayHudRenderContext context, in OperationsRulePanelView view)
     {
         Line("RULES", true);

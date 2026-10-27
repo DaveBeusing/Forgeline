@@ -43,6 +43,10 @@ public sealed class ActionableAlertController
     private bool _hasFocusCursor;
     private bool _pressFocus;
     private bool _pressPaging;
+    private OperationsCauseSnapshot? _pressedCauses;
+    private OperationsCauseSnapshot? _expandedCauses;
+    private OperationsCauseSnapshot? _focusedCauses;
+    private EntityId _lastPowerMember;
     private float _expansionPosition;
     private EntityId _expandedTarget;
     private int _expandedStackRevision;
@@ -77,9 +81,10 @@ public sealed class ActionableAlertController
         { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
         var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
+        var causes = OperationsCauseSnapshot.Resolve(snapshot);
         if ((_expansion.Open || _expansionPosition > 0) &&
             (!HasExpandedCard(plain) || _expandedStackRevision != plain.Revision ||
-                !ExpandedSourceCurrent(alerts)))
+                !ExpandedSourceCurrent(alerts, causes)))
         { _expansion = default; _expansionPosition = 0; }
         float requested = _expansion.Open ? 1 : 0;
         bool settleDetails = !animateDetails || changed || !double.IsFinite(seconds) ||
@@ -101,6 +106,7 @@ public sealed class ActionableAlertController
             if (_row < 0) return new(captured);
             var card = stack.Card(_row);
             _item = card.Item;
+            _pressedCauses = causes;
             _pressedStack = stack;
             _details = card.Item.Hidden > 0 || card.Truncated && !card.Details.IsEmpty && card.Details.Contains(origin);
             _pressFocus = !_details && !card.Action.IsEmpty && card.Action.Contains(origin);
@@ -139,8 +145,9 @@ public sealed class ActionableAlertController
             else
             {
                 _expansion = new(item, releasedCard.Identity, releasedCard.Revision, true,
-                    _expansionPosition, 0, BuildDetail(experience, alerts, item, localFeedback));
+                    _expansionPosition, 0, BuildDetail(experience, alerts, item, localFeedback, causes));
                 _expandedTarget = _target;
+                _expandedCauses = causes;
                 _expandedStackRevision = plain.Revision;
                 _expansionPosition = 0;
             }
@@ -153,6 +160,17 @@ public sealed class ActionableAlertController
             if (alerts.Alerts[i].Identity == _identity && alerts.Alerts[i].Target == _target &&
                 alerts.Alerts[i].Identity.Kind == item.Kind) { stillCurrent = true; break; }
         if (!stillCurrent) return new(true);
+        if (item.Kind == PlayerAlertState.LowPower && causes is not null)
+        {
+            if (!OperationsCauseSnapshot.SameMembership(_pressedCauses, causes)) return new(true);
+            EntityId previous = OperationsCauseSnapshot.SameMembership(_focusedCauses, causes) ? _lastPowerMember : default;
+            EntityId member = causes.NextPowerMember(previous);
+            if (member.IsValid)
+            {
+                _focusedCauses = causes; _lastPowerMember = member;
+                return new(true, member, Category: OperationsCategory.Power);
+            }
+        }
         if (!_target.IsValid)
         {
             Unavailable();
@@ -199,9 +217,11 @@ public sealed class ActionableAlertController
         return false;
     }
 
-    private bool ExpandedSourceCurrent(ActionableAlertSnapshot? alerts)
+    private bool ExpandedSourceCurrent(ActionableAlertSnapshot? alerts, OperationsCauseSnapshot? causes)
     {
         if (_expansion.Item.Feedback || _expansion.Item.Local) return true;
+        if (_expansion.Item.Kind == PlayerAlertState.LowPower &&
+            !OperationsCauseSnapshot.SameMembership(_expandedCauses, causes)) return false;
         if (alerts is null) return false;
         for (int i = 0; i < alerts.Alerts.Count; i++)
             if (alerts.Alerts[i].Identity == _expansion.Identity &&
@@ -210,7 +230,7 @@ public sealed class ActionableAlertController
     }
 
     private static string BuildDetail(in PlayerExperienceSnapshot experience,
-        ActionableAlertSnapshot? alerts, in AlertNotification item, string localFeedback)
+        ActionableAlertSnapshot? alerts, in AlertNotification item, string localFeedback, OperationsCauseSnapshot? causes)
     {
         Span<char> summary = stackalloc char[2048];
         var text = new StringBuilder(320);
@@ -239,6 +259,17 @@ public sealed class ActionableAlertController
             text.AppendLine("NEXT ACTION: REVIEW LOGISTICS ORDERS AND OWNED CARGO FLEET; ADD CAPACITY ONLY IF THIS CONDITION PERSISTS");
             return text.ToString();
         }
+        if (item.Kind == PlayerAlertState.LowPower && causes is not null)
+        {
+            foreach (var group in causes.Groups)
+            {
+                if (group.Reason != OperationsDiagnosisReason.NoPower) continue;
+                text.Append("SHARED POWER DEFICIT / NETWORK ").Append(group.Network).Append(" / OBSERVED FACILITIES ").AppendLine(group.Members.Count.ToString(CultureInfo.InvariantCulture));
+                foreach (var member in group.Members) text.Append("FACILITY ").AppendLine(member.ToString());
+            }
+            text.AppendLine(causes.Limited ? "CAUSE COVERAGE: LIMITED" : "CAUSE COVERAGE: CURRENT OWNED OBSERVATIONS");
+            text.AppendLine("FOCUS CYCLES AFFECTED FACILITIES; OPEN THEIR EXISTING CONTROLS IN OPERATIONS");
+        }
         int affected = item.Kind == PlayerAlertState.SupplyCritical ? experience.CriticalSupplyUnits :
             item.Kind == PlayerAlertState.ProductionBlocked ? experience.BlockedProductionFacilities : 0;
         text.Append("AFFECTED: ").AppendLine(affected > 0 ? affected.ToString(CultureInfo.InvariantCulture) : "N/A");
@@ -259,5 +290,6 @@ public sealed class ActionableAlertController
         _expansionPosition = 0;
         _expandedTarget = default;
         _expandedStackRevision = 0;
+        _pressedCauses = null; _expandedCauses = null; _focusedCauses = null; _lastPowerMember = default;
     }
 }
