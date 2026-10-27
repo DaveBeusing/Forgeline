@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Ecs;
@@ -14,6 +15,8 @@ public sealed partial class HierarchicalNavigationSystem
     private const long VehicleWorkspaceBytes = 8 * 1024 * 1024;
     private readonly VehicleRoutingKernel _vehicleKernel = new();
     private readonly Dictionary<EntityId, VehicleSearchWork> _vehicleSearches = new();
+    private readonly Dictionary<ulong, NavigationWorldSnapshot> _routingSnapshots = new();
+    private readonly HashSet<ulong> _incompleteCosts = new();
     private readonly Dictionary<ulong, CongestionPenaltyMemory> _congestion = new();
     private readonly Dictionary<ulong, List<CongestionObservation>> _observations = new();
     private TerrainWorld? _routingTerrain;
@@ -54,13 +57,15 @@ public sealed partial class HierarchicalNavigationSystem
             World.GetSectorGraph(NavigationCapabilities.For(NavigationMovementClass.Wheeled));
         }
         _costTick = context.Tick.Value;
+        _routingSnapshots.Clear(); _incompleteCosts.Clear();
         foreach (var observations in _observations.Values) observations.Clear();
         // Only owned logistics observations enter a scope. Physical collision
         // captures and hidden enemy states never become route costs.
         int inspected = 0;
+        bool complete = true;
         foreach (var entity in context.Entities.Query<ControllableEntity, GroundMovementState>(QueryIterationOrder.StableByEntityIndex))
         {
-            if (++inspected > 4096) break;
+            if (++inspected > 4096) { complete = false; break; }
             if (!UsesVehicleKernel(context, entity) ||
                 !context.Entities.TryGetComponent(entity, out WorldTransform transform)) continue;
             var owner = context.Entities.GetComponent<ControllableEntity>(entity).Owner;
@@ -73,7 +78,8 @@ public sealed partial class HierarchicalNavigationSystem
                 _congestion.Add(scope, memory); _observations.Add(scope, new());
             }
             var batch = _observations[scope];
-            if (batch.Count == 128 || !World.Grid.TryWorldToCell(transform.Position, out var cell)) continue;
+            if (batch.Count == 128) { _incompleteCosts.Add(scope); continue; }
+            if (!World.Grid.TryWorldToCell(transform.Position, out var cell)) continue;
             var state = context.Entities.GetComponent<GroundMovementState>(entity);
             bool delayed = state.StalledTicks > 0 && state.Status is GroundMovementStatus.Moving or GroundMovementStatus.Stuck;
             var kind = !delayed ? CongestionObservationKind.Clear :
@@ -85,25 +91,33 @@ public sealed partial class HierarchicalNavigationSystem
         foreach (var pair in _congestion)
         {
             var batch = _observations[pair.Key].OrderBy(o => o.Cell.Z).ThenBy(o => o.Cell.X).ToArray();
-            pair.Value.Record(pair.Key, _costTick, batch);
+            if (pair.Value.Record(pair.Key, _costTick, batch) != 0 || !complete)
+                _incompleteCosts.Add(pair.Key);
         }
     }
 
     private NavigationWorldSnapshot CaptureRoutingWorld(in NavigationPendingPath pending)
     {
         ulong scope = pending.OriginalOrder.Issuer.Value;
-        var penalties = _congestion.TryGetValue(scope, out var memory)
-            ? memory.CaptureState().Entries.Select(entry => new NavigationCellPenalty(entry.Cell,
-                memory.GetAdditionalCost(scope, entry.Cell, _costTick))).Where(p => p.AdditionalCost > 0).ToArray()
+        if (_routingSnapshots.TryGetValue(scope, out var cached) && cached.Capabilities == pending.Request.Capabilities)
+            return cached;
+        bool costsAvailable = _congestion.TryGetValue(scope, out var memory) && !_incompleteCosts.Contains(scope);
+        var penalties = costsAvailable
+            ? memory!.CaptureState().Entries.Select(entry => new NavigationCellPenalty(entry.Cell,
+                memory!.GetAdditionalCost(scope, entry.Cell, _costTick))).Where(p => p.AdditionalCost > 0).ToArray()
             : Array.Empty<NavigationCellPenalty>();
-        return new(World, World.GetSectorGraph(pending.Request.Capabilities), pending.Request.Capabilities,
-            _routingTerrain, Math.Max(1UL, _costTick), scope, NavigationModuleAvailability.Available, [], penalties);
+        var snapshot = new NavigationWorldSnapshot(World, World.GetSectorGraph(pending.Request.Capabilities), pending.Request.Capabilities,
+            _routingTerrain, costsAvailable ? Math.Max(1UL, _costTick) : 0, scope,
+            costsAvailable ? NavigationModuleAvailability.Available : NavigationModuleAvailability.Unavailable, [], penalties);
+        if (_routingSnapshots.Count < 16) _routingSnapshots[scope] = snapshot;
+        return snapshot;
     }
 
     private void TryStartVehicleSearch(SimulationContext context, EntityId entity, in NavigationPendingPath pending)
     {
         if (_vehicleSearches.ContainsKey(entity) || _vehicleSearches.Count == MaximumVehicleSearches) return;
         if (!NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, _routingClearance, out var vehicle) ||
+            vehicle.Owner != pending.OriginalOrder.Issuer ||
             vehicle.Pose.Position != pending.Request.Start || vehicle.Pose.Rotation != pending.StartRotation)
         { CompleteVehicleFailure(pending, NavigationFailureReason.Canceled); return; }
         var snapshot = CaptureRoutingWorld(pending);
@@ -121,7 +135,7 @@ public sealed partial class HierarchicalNavigationSystem
             service ? NavigationTargetSemantics.DockAccess : NavigationTargetSemantics.Transit, goal, vehicle.Profile, snapshot, limits);
         context.Entities.SetComponent(entity, pending with { BoundSearch = bound });
         _vehicleSearches.Add(entity, new(bound, snapshot, _routingSession,
-            _vehicleKernel.CreateSession(snapshot, bound.Search)));
+            _vehicleKernel.CreateSession(snapshot, bound.Search), Stopwatch.GetTimestamp()));
     }
 
     private void AdvanceVehicleSearches(SimulationContext context)
@@ -149,7 +163,7 @@ public sealed partial class HierarchicalNavigationSystem
             NavigationPath? path = advance.Status == NavigationSearchStatus.Found && advance.Route is { } proposal
                 ? NavigationPath.FromProposal(proposal, work.Snapshot.Grid) : null;
             var request = context.Entities.GetComponent<NavigationPendingPath>(pair.Key).Request;
-            _completed.Enqueue(new(request, new(request.NavigationVersion, advance.FailureReason, path), TimeSpan.Zero));
+            _completed.Enqueue(new(request, new(request.NavigationVersion, advance.FailureReason, path), Stopwatch.GetElapsedTime(work.StartedAt)));
             work.Session.Dispose(); _vehicleSearches.Remove(pair.Key);
         }
     }
@@ -158,7 +172,7 @@ public sealed partial class HierarchicalNavigationSystem
     {
         var binding = work.Bound.Binding;
         return work.SessionId == _routingSession && context.Entities.IsAlive(entity) &&
-            work.Snapshot.Revision.Geometry == World.Version &&
+            work.Snapshot.Revision.Geometry == World.Version && ReferenceEquals(work.Snapshot.Grid, World.Grid) &&
             context.Entities.TryGetComponent(entity, out NavigationPendingPath pending) &&
             pending.BoundSearch == work.Bound && pending.RootGeneration == binding.CommandGeneration &&
             !context.Entities.HasComponent<MovementOrder>(entity) &&
@@ -181,11 +195,12 @@ public sealed partial class HierarchicalNavigationSystem
     {
         Algorithm = VehicleRoutingKernel.AlgorithmRevision, NextRequest = _nextRequestId,
         NextCommandGeneration = _nextCommandGeneration, LastServed = _lastServedRequest, CostTick = _costTick,
+        IncompleteCostScopes = _incompleteCosts.Order().ToArray(),
         Congestion = _congestion.OrderBy(p => p.Key).Select(p => p.Value.CaptureState()).ToArray(),
         Searches = _vehicleSearches.OrderBy(p => p.Value.Bound.Binding.RequestId)
             .Select(p => new { p.Value.Bound, Penalties = p.Value.Snapshot.Penalties, State = p.Value.Session.CaptureState().Json }).ToArray()
     };
 
     private sealed record VehicleSearchWork(NavigationBoundSearch Bound, NavigationWorldSnapshot Snapshot,
-        SimulationSessionId SessionId, INavigationSearchSession<VehicleRoutingCheckpoint> Session);
+        SimulationSessionId SessionId, INavigationSearchSession<VehicleRoutingCheckpoint> Session, long StartedAt);
 }

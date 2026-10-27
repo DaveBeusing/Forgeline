@@ -354,7 +354,8 @@ internal static class TechnologyActionSnapshotFactory
                     block,
                     progress,
                     requestEntity,
-                    definition.Unlocks, definition.EffectDescription));
+                    definition.Unlocks, definition.Id == TechnologyIds.LogisticsCoordination
+                        ? ConveyorRoutingPolicy.EffectDescription : definition.EffectDescription));
         }
 
         return result.ToArray();

@@ -37,7 +37,8 @@ public enum PlayerActionRequestKind : byte
     CancelTechnologyResearch = 27,
     CreateCargoConvoy = 28,
     DissolveCargoConvoy = 29,
-    SubmitOperationsRule = 30
+    SubmitOperationsRule = 30,
+    SetConveyorRouting = 31
 }
 
 public readonly record struct PlayerActionRequest(
@@ -73,6 +74,15 @@ public readonly record struct PlayerActionRequest(
     EntityId[]? ConvoyEscorts = null,
     EntityId ConvoyGroup = default)
 {
+    public ConveyorRoutingPreference RoutingPreference { get; init; }
+    public uint ExpectedRoutingRevision { get; init; }
+    public static PlayerActionRequest SetConveyorRouting(EntityId splitter,
+        ConveyorRoutingPreference preference, uint expectedRevision) =>
+        new(PlayerActionRequestKind.SetConveyorRouting, BuildingId.None, splitter, RecipeId.None,
+            UnitId.None, EntityId.Invalid, false, ProductionPriority.Normal,
+            ProductionRequestMode.OneShot, ResourceId.None, 0)
+        { RoutingPreference = preference, ExpectedRoutingRevision = expectedRevision };
+
     public OperationsRuleDefinition RuleDefinition { get; init; }
     public OperationsRuleOperation RuleOperation { get; init; }
     public uint ExpectedRuleRevision { get; init; }

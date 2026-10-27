@@ -23,7 +23,7 @@ The initial Directorate catalog is:
 | Technology | Domain | Phase | Prerequisite | Facility | Cost | Ticks | Effect |
 | --- | --- | --- | --- | --- | --- | ---: | --- |
 | Industrial Standardization | Industry | Industrial Foundation (T1) | — | Command Core | 80 Steel, 20 Electronics | 120 | Field Engineering: Combat Engineer production |
-| Logistics Coordination | Logistics | Industrial Foundation (T1) | Industrial Standardization | Command Core | 60 Steel, 25 Electronics | 100 | Capability exists; priority routing consumer blocked on conveyor control integration |
+| Logistics Coordination | Logistics | Industrial Foundation (T1) | Industrial Standardization | Command Core | 60 Steel, 25 Electronics | 100 | Unlocks either splitter output's bounded 3:1 service preference; Balanced remains unrestricted |
 | Mechanized Systems | Warfare | Mechanized Warfare (T2) | Industrial Standardization | Vehicle Factory | 100 Steel, 50 Electronics | 160 | Mobile Artillery production |
 | Sensor Fusion | Intelligence | Mechanized Warfare (T2) | Industrial Standardization | Radar | 60 Steel, 70 Electronics | 140 | Owned powered radar identification x1.25, capped at detection |
 
@@ -54,7 +54,12 @@ Industrial Standardization retains Combat Engineer production. Mechanized System
 
 Research introduced authoritative schema 8 for production, sensing and opponent decisions. Authoritative schema 9 also retires unreferenced order groups and destroyed unit supply inventories; earlier authoritative saves/replays are explicitly incompatible. Envelope 1 and payload 7 retain the compiled-scenario identity contract. No completion, priority rule or lifecycle migration is invented when loading an older document. The compiled scenario artifact, content fingerprint and registration remain qualified together; frozen legacy identities are retained and rejected when incompatible.
 
-Logistics Coordination's capability currently has no routing consumer: master 3c261dc has fair conveyor distribution but no priority-routing state, command or control. The priority-routing unlock, matching player availability/rejection and opponent use remain blocked by that concrete integration dependency. This is not a completed four-effect progression tree.
+Logistics Coordination now unlocks a real consumer in ConveyorSimulationSystem:
+a selected owned Splitter can prefer physical output A or B with a bounded 3:1
+service cycle. Balanced distribution remains available without the technology.
+ConveyorRoutingPolicy supplies the authoritative gate and the same copied
+availability/reason used by the Logistics action ring. No throughput, inventory,
+power, reservation or resource-compatibility limit is bypassed.
 
 ## Capability gates
 
@@ -64,7 +69,7 @@ The Directorate Combat Engineer and Mobile Artillery definitions require their r
 
 ## Opponent investment
 
-The research planner shares the normal opponent decision cadence after logistics/defense priorities; it does not run new selection between decisions. It considers at most three authored technologies, 32 captured owned buildings and the preferred construction source plus at most 32 owned storage sources. Industrial Standardization comes first. Mechanized Systems is relevant while the existing artillery target is unmet, and Sensor Fusion requires a real owned radar. Logistics Coordination is not selected while priority routing has no consumer.
+The research planner shares the normal opponent decision cadence after logistics/defense priorities; it does not run new selection between decisions. It considers at most three authored technologies, 32 captured owned buildings and the preferred construction source plus at most 32 owned storage sources. Industrial Standardization comes first. Mechanized Systems is relevant while the existing artillery target is unmet, and Sensor Fusion requires a real owned radar. Logistics Coordination remains excluded from opponent investment because the existing opponent has no authored splitter layout or routing policy to use. Player research and splitter controls are connected; no automatic conveyor-building strategy is introduced.
 
 The current progression correction also protects an active unit request's unpaid
 inputs at a candidate source and subtracts them from the aggregate replacement
@@ -97,7 +102,7 @@ The technology state is session-local because it lives in the simulation entity 
 
 ## Current scope boundary
 
-Three technologies have implemented consumers. The fourth remains explicitly dependent on missing priority-routing integration, including matching authoritative rejection, copied client availability and old-priority-rule compatibility coverage. The existing paid normal-profile tests specify two research investments, physical Cargo-supplied artillery and active/completed research reconstruction without extra initial stock. Current baseline CI fails the Mechanized Systems completion assertion; those tests are behavioral references, not acceptance of this correction. No universal research timing or final balance guarantee is established.
+All four representative technologies now have product consumers. Logistics Coordination supplies bounded splitter preference through the normal command and snapshot paths. Manual routing, UI and Save/Replay acceptance of this change remain outstanding. The existing paid normal-profile tests specify two research investments, physical Cargo-supplied artillery and active/completed research reconstruction without extra initial stock. Current baseline CI fails the Mechanized Systems completion assertion; those tests are behavioral references, not acceptance of this correction. No universal research timing or final balance guarantee is established.
 
 This work does not add universal credits, wall-clock research, campaign/meta progression, a final T0–T5 tree or final balance values. Native visuals, physical D3D12 performance and human gameplay acceptance remain separate from automated behavior evidence.
 
@@ -133,3 +138,32 @@ Mechanized Systems with unchanged totals from roughly tick 30,000 onward. These
 totals do not identify the physical truck/dock/fuel blocker. The manual check must
 trace the progression sidecar's transport and industry details if production
 stops again; this scheduling correction does not establish a cargo-motion fix.
+
+## Logistics Coordination: splitter controls
+
+Select one owned Splitter and open its Logistics category in the object action
+ring (the existing Logistics shortcut also opens it). Choose BALANCED, OUTPUT A
+3:1 or OUTPUT B 3:1. The configured choice is marked SET. Before completion of
+Logistics Coordination, either preference displays LOGISTICS COORDINATION REQUIRED,
+the same reason returned by command execution. Balanced is available independently.
+Owned port markers identify OUT A/OUT B and FAIR or the configured 3/1 weight.
+
+The preference controls successful service turns, with at most one ordinary
+transfer quantum per turn. For two continuously eligible offered branches the
+other branch retains one turn per four. Different resource, damage or receiving
+capacity limits can change actual delivered quantities; this is not guaranteed
+end-to-end 75% delivery. A blocked output is skipped without accumulating debt.
+
+The existing registered catalog includes descriptive strings in its compiled
+scenario digest. Its historical Logistics Coordination description is retained
+verbatim to preserve registered map/content identity; it is not an availability
+gate. The copied technology action view uses ConveyorRoutingPolicy.EffectDescription
+for the active effect. Authored IDs, costs, durations, capabilities and compiled
+map files are unchanged.
+
+Current compatibility is authoritative schema **11**, payload **9**, envelope **1**.
+Earlier authoritative ordering is incompatible and is never accepted by rewriting
+a historical checksum. See [bounded routing decision](adr/BoundedConveyorPriorityRouting.md).
+
+No tests, smoke runs, benchmarks or manual CI reruns were created or executed for
+this change. Product compilation is not yet established; manual user review is pending.

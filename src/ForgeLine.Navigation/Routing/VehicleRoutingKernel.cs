@@ -49,6 +49,7 @@ internal sealed class VehicleSearchState
     public int Obstacle { get; set; }
     public bool CellsChecked { get; set; }
     public bool ExactEnd { get; set; }
+    public bool HasConnectedStart { get; set; }
     public Vector3 CandidatePosition { get; set; }
     public EndpointCandidateCursorState StartEndpoint { get; set; }
     public EndpointCandidateCursorState Endpoint { get; set; }
@@ -93,6 +94,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
         private readonly NavigationSectorGraph _graph;
         private readonly EndpointCandidateCursor _endpoints;
         private readonly EndpointCandidateCursor _starts;
+        private readonly EndpointCandidateCursorState _initialEndState;
         private PriorityQueue<VehicleFrontierEntry, (float Score, float Remaining, int Index)> _frontier = new();
         private readonly Dictionary<NavigationCellCoordinate, float> _penalties;
         private readonly int _entryLimit;
@@ -109,6 +111,8 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
             if (snapshot.Revision != request.Revision || snapshot.KnowledgeScope != request.KnowledgeScope ||
                 snapshot.Capabilities != request.Capabilities)
                 throw new ArgumentException("Search and pinned snapshot must match.", nameof(snapshot));
+            if (request.MaximumWorkspaceBytes < 8192 + snapshot.Penalties.Count * 256L)
+                throw new ArgumentException("The request cannot reserve the fixed routing workspace.", nameof(request));
             _snapshot = snapshot; _grid = snapshot.Grid; _graph = snapshot.SectorGraph; Request = request;
             _entryLimit = (int)Math.Min(request.MaximumWork,
                 Math.Max(0, (request.MaximumWorkspaceBytes - 8192 - snapshot.Penalties.Count * 256L) / 1024));
@@ -123,6 +127,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
                 ? request.OriginalDestination : _grid.GetCellCenter(new(0, 0));
             _endpoints = new(_grid, request.Revision.Geometry, request.Capabilities, cursorTarget,
                 request.Goal.MaximumProjectionDistance, request.MaximumEndpointCandidates);
+            _initialEndState = _endpoints.CaptureState();
             _starts = new(_grid, request.Revision.Geometry, request.Capabilities,
                 _grid.TryWorldToCell(request.Start.Position, out _) ? request.Start.Position : cursorTarget,
                 _grid.Settings.CellSizeMeters * 3, request.MaximumEndpointCandidates);
@@ -183,12 +188,18 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
                     else if (startStep == EndpointCandidateStep.CandidateLimitReached)
                         Finish(NavigationSearchStatus.BudgetExhausted, NavigationFailureReason.SearchBudgetExhausted);
                     else if (startStep == EndpointCandidateStep.EnumerationComplete)
-                        Finish(NavigationSearchStatus.Unreachable, NavigationFailureReason.StartBlocked);
+                        Finish(NavigationSearchStatus.Unreachable, _state.HasConnectedStart
+                            ? NavigationFailureReason.NoLocalRoute : NavigationFailureReason.StartBlocked);
                     break;
                 case VehicleSearchStage.StartConnection:
                     if (!InspectClearance(out bool startDone))
                     { _state.Stage = VehicleSearchStage.StartCandidate; break; }
-                    if (startDone) _state.Stage = VehicleSearchStage.Candidate;
+                    if (startDone)
+                    {
+                        _state.HasConnectedStart = true;
+                        _endpoints.RestoreState(_initialEndState);
+                        _state.Stage = VehicleSearchStage.Candidate;
+                    }
                     break;
                 case VehicleSearchStage.Candidate:
                     var step = _endpoints.MoveNext(1, out var candidate, out _);
@@ -201,7 +212,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
                     else if (step == EndpointCandidateStep.CandidateLimitReached)
                         Finish(NavigationSearchStatus.BudgetExhausted, NavigationFailureReason.SearchBudgetExhausted);
                     else if (step == EndpointCandidateStep.EnumerationComplete)
-                        Finish(NavigationSearchStatus.Unreachable, NavigationFailureReason.NoLocalRoute);
+                        _state.Stage = VehicleSearchStage.StartCandidate;
                     break;
                 case VehicleSearchStage.EndConnection:
                     if (!InspectClearance(out bool endDone))

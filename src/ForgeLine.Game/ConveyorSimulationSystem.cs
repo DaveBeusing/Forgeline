@@ -114,6 +114,16 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 node.AllowedResources = AcceptedResources(entities, node);
                 nodes.Add(node);
             }
+        foreach (var node in nodes)
+            if (node.Port is null && entities.TryGetComponent(node.Entity, out ConveyorPiece routingPiece) &&
+                routingPiece.Placement.Module == ConveyorModule.Splitter &&
+                entities.TryGetComponent(node.Entity, out ConveyorRoutingState routing) &&
+                routing.Preference != ConveyorRoutingPreference.Balanced &&
+                TechnologyStateQueries.IsCapabilityUnlocked(entities, node.Owner, TechnologyCapabilityIds.LogisticsCoordination))
+            {
+                node.Routing = routing;
+                node.ServiceCursor = routing.ServiceCursor;
+            }
         Connect(nodes);
         // Admit building cargo only when an authored, resource-compatible sink is reachable.
         // Full/offline sinks still propagate backpressure through the finite physical buffers.
@@ -192,9 +202,14 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             foreach (var sender in nodes)
             {
                 if (!offers.TryGetValue(sender, out var candidates)) continue;
-                for (int i = 0; i < sender.Outputs.Count; i++)
+                for (int i = 0; i < (sender.Routing.HasValue ? 4 : sender.Outputs.Count); i++)
                 {
-                    var link = sender.Outputs[(sender.OutputCursor + i) % sender.Outputs.Count];
+                    int serviceSlot = (sender.ServiceCursor + i) % 4;
+                    int preferred = sender.Routing?.Preference == ConveyorRoutingPreference.OutputB ? 1 : 0;
+                    var link = sender.Routing.HasValue
+                        ? sender.OutputForSlot(serviceSlot < 3 ? preferred : 1 - preferred)
+                        : sender.Outputs[(sender.OutputCursor + i) % sender.Outputs.Count];
+                    if (link is null) continue;
                     if (!candidates.Contains(link)) continue;
                     int resource = FindResource(link);
                     if (resource < 0) continue;
@@ -205,6 +220,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     quantity = Math.Min(quantity, Math.Min(available[sender.Inventory][resource], Room(receiver, id)));
                     quantity = Math.Min(quantity, _stock.GetAddableQuantity(receiver.Inventory, id, quantity));
                     if (quantity <= Epsilon || !_stock.Transfer(sender.Inventory, receiver.Inventory, id, quantity).Succeeded) continue;
+                    Progress?.ObserveOperationsDelivery(context.Tick, receiver.Owner, receiver.Entity, receiver.Inventory, id, quantity);
                     if (receiver.Port is { Input: true } &&
                         entities.TryGetComponent(receiver.Entity, out CompletedBuilding deliveredBuilding))
                         Progress?.Record(context.Tick, receiver.Owner, GameplayProgressKind.ConveyorDelivered,
@@ -214,6 +230,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     sender.OutRemaining -= quantity; sender.Sent += quantity;
                     receiver.InRemaining -= quantity; receiver.Received += quantity;
                     sender.OutputCursor = (sender.Outputs.IndexOf(link) + 1) % sender.Outputs.Count;
+                    if (sender.Routing.HasValue) sender.ServiceCursor = (serviceSlot + 1) % 4;
                     receiver.InputCursor = (receiver.Inputs.IndexOf(link) + 1) % receiver.Inputs.Count;
                     sender.ResourceCursor = (resource + 1) % EligibleResources.Count;
                     progress = true;
@@ -234,6 +251,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 }
                 continue;
             }
+            if (node.Routing is { } routing)
+                entities.SetComponent(node.Entity, routing with { ServiceCursor = node.ServiceCursor });
             var piece = entities.GetComponent<ConveyorPiece>(node.Entity);
             double buffered = _stock.GetResourceQuantities(node.Inventory).Sum(r=>r.Quantity);
             bool moving = node.Sent > Epsilon || node.Received > Epsilon;
@@ -256,10 +275,10 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 Network = node.Root.Entity,
                 InputA = node.Inputs.Count > 0 ? node.Inputs[0].Source.Entity : default,
                 InputB = node.Inputs.Count > 1 ? node.Inputs[1].Source.Entity : default,
-                OutputA = node.Outputs.Count > 0 ? node.Outputs[0].Destination.Entity : default,
-                OutputB = node.Outputs.Count > 1 ? node.Outputs[1].Destination.Entity : default,
-                OutputAPerSecond = node.Outputs.Count > 0 ? node.Outputs[0].Transferred / seconds : 0,
-                OutputBPerSecond = node.Outputs.Count > 1 ? node.Outputs[1].Transferred / seconds : 0
+                OutputA = node.OutputForSlot(0)?.Destination.Entity ?? default,
+                OutputB = node.OutputForSlot(1)?.Destination.Entity ?? default,
+                OutputAPerSecond = (node.OutputForSlot(0)?.Transferred ?? 0) / seconds,
+                OutputBPerSecond = (node.OutputForSlot(1)?.Transferred ?? 0) / seconds
             });
         }
 
@@ -434,9 +453,11 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         }
         var proposals = new List<Link>();
         var counts = new Dictionary<(Node, int), int>();
-        foreach (var source in nodes) foreach (var output in source.Sockets)
+        foreach (var source in nodes) for (int socketIndex = 0, outputSlot = 0; socketIndex < source.Sockets.Length; socketIndex++)
         {
+            var output = source.Sockets[socketIndex];
             if (output.Input) continue;
+            int physicalOutput = outputSlot++;
             var key = Key(source.Owner, output.Position);
             int matches = 0, inputSlot = 0;
             Node? matched = null;
@@ -456,7 +477,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             // Ambiguous overlapping sockets fail closed instead of cloning or choosing an arbitrary connection.
             if (matches == 1 && matched is not null)
             {
-                proposals.Add(new(source, matched, output.Position, inputSlot));
+                proposals.Add(new(source, matched, output.Position, inputSlot, physicalOutput));
                 var input = (matched, inputSlot);
                 counts[input] = counts.TryGetValue(input, out int count) ? count + 1 : 1;
             }
@@ -483,6 +504,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             InputCursor = flow.InputCursor; OutputCursor = flow.OutputCursor; ResourceCursor = flow.ResourceCursor;
             Parent = this;
         }
+        public ConveyorRoutingState? Routing;
+        public int ServiceCursor;
         public EntityId BrokenSupport { get; init; }
         public EntityId Entity { get; }
         public PlayerId Owner { get; }
@@ -498,10 +521,16 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         public int AllowedResources=(1 << EligibleResources.Count)-1;
         public List<Link> Inputs { get; } = [];
         public List<Link> Outputs { get; } = [];
+        public Link? OutputForSlot(int slot)
+        {
+            foreach (var output in Outputs)
+                if (output.OutputSlot == slot) return output;
+            return null;
+        }
         public Node Parent;
         public Node Root => Parent == this ? this : Parent = Parent.Root;
     }
-    private sealed record Link(Node Source, Node Destination, Vector3 Position, int InputSlot)
+    private sealed record Link(Node Source, Node Destination, Vector3 Position, int InputSlot, int OutputSlot)
     {
         public double Transferred { get; set; }
     }

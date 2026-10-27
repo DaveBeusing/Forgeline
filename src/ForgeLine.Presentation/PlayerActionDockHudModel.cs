@@ -289,6 +289,9 @@ internal static class PlayerActionDockHudModel
                     : string.Empty;
 
             case PlayerActionPanelMode.Logistics:
+                if (actions.ConveyorRouting is { } routing)
+                    return ConveyorRoutingActionReadModel.Title(index) +
+                        ((int)routing.Preference == index ? " (SET)" : "");
                 return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
                     ? index < logistics.Policies.Count ? logistics.Policies[index].DisplayName
@@ -432,6 +435,10 @@ internal static class PlayerActionDockHudModel
                         "UNAVAILABLE");
 
             case PlayerActionPanelMode.Logistics:
+                if (actions.ConveyorRouting is { } routing)
+                    return routing.Failure(index) == ConveyorRoutingFailure.None
+                        ? PlayerActionDockItemState.Enabled
+                        : PlayerActionDockItemState.Disabled(ConveyorRoutingPolicy.Describe(routing.Failure(index)));
                 return actions.Logistics is PlayerLogisticsActionReadModel logistics &&
                        index < logistics.ItemCount
                     ? index < logistics.Policies.Count &&
@@ -498,6 +505,8 @@ internal static class PlayerActionDockHudModel
         actions is not null && actions.PendingCommandCount == 0 &&
         !(panel.ContextualPending && panel.ContextualActivationTick == actions.Tick &&
           panel.ContextualSessionId == actions.SessionId) &&
+        !(mode == PlayerActionPanelMode.Logistics && actions.ConveyorRouting is not null &&
+          control != PlayerActionDockControlKind.Activate) &&
         !(mode == PlayerActionPanelMode.Logistics && actions.Logistics is { } orders &&
           index >= orders.OrderStartIndex) &&
         control switch
@@ -542,6 +551,7 @@ internal static class PlayerActionDockHudModel
             PlayerActionPanelMode.Production or PlayerActionPanelMode.UnitProduction => "QUEUE",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.OrderStartIndex => "VIEW ORDER",
             PlayerActionPanelMode.Logistics when actions?.Logistics is { } logistics && index >= logistics.Policies.Count => "USE INPUTS",
+            PlayerActionPanelMode.Logistics when actions?.ConveyorRouting is not null => "APPLY ROUTING",
             PlayerActionPanelMode.Logistics => "APPLY POLICY",
             PlayerActionPanelMode.Supply => index < 2 ? "APPLY AUTO" : "REQUEST SUPPLY",
             PlayerActionPanelMode.Technology => "START RESEARCH",
@@ -836,6 +846,8 @@ internal static class PlayerActionDockHudModel
     public static string ResolveCommandFeedbackReason(
         in PlayerCommandFeedback feedback)
     {
+        if (feedback.RoutingFailure != ConveyorRoutingFailure.None)
+            return ConveyorRoutingPolicy.Describe(feedback.RoutingFailure);
         if (feedback.PlacementFailure !=
             BuildingPlacementFailureReason.None)
         {

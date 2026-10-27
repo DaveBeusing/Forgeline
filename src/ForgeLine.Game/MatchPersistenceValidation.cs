@@ -47,6 +47,9 @@ internal static class MatchPersistenceValidation
             Require(Enum.IsDefined(command!.Kind) && command.Entities is not null,
                 "Invalid command kind or entity collection.");
             Require(command.Entities!.All(entity => entity.IsValid), "Invalid command entity identity.");
+            if (command.Kind == ReplayCommandKind.ConveyorRouting)
+                Require(command.Issuer.IsSpecified && command.TargetEntity.IsValid &&
+                    Enum.IsDefined(command.RoutingPreference), "Invalid conveyor routing command.");
             Require(Finite(command.Position) && double.IsFinite(command.Value1) &&
                 double.IsFinite(command.Value2) && double.IsFinite(command.Value3) &&
                 Finite(command.ConveyorRequest.Start) && Finite(command.ConveyorRequest.End),

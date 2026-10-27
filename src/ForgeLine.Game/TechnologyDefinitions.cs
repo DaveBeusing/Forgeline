@@ -458,6 +458,8 @@ public static class DirectorateTechnologyDefinitions
                 {
                     Id =
                         TechnologyIds.LogisticsCoordination,
+                    // Registered catalog text participates in compiled-map identity.
+                    // The copied technology view uses ConveyorRoutingPolicy.EffectDescription.
                     EffectDescription = "Priority splitter routing awaits conveyor control integration; fair distribution is unrestricted.",
                     Key =
                         "directorate.technology.logistics_coordination",

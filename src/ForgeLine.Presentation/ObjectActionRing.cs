@@ -8,7 +8,7 @@ namespace ForgeLine.Presentation;
 
 internal enum ActionRingLevel : byte { Categories, Items, Parameters, Group }
 internal enum ActionRingNavigation : byte { None, Back, Previous, Next, Parameters, NextItem, Close, Group, GroupControl }
-internal readonly record struct ActionRingKey(byte Kind, uint Id, uint Generation = 0);
+internal readonly record struct ActionRingKey(byte Kind, uint Id, uint Generation = 0, uint Revision = 0);
 internal readonly record struct ActionRingSlot(PlayerActionDockHitTarget Target, ActionRingKey Key,
     ActionRingNavigation Navigation = ActionRingNavigation.None, bool Present = true, bool Enabled = true);
 [InlineArray(8)] internal struct ActionRingSlots { private ActionRingSlot _first; }
@@ -117,6 +117,8 @@ public readonly record struct ObjectActionRingView(EntityId Entity, SimulationSe
                 var unitRequest = units.Requests[index - units.Units.Count].RequestEntity;
                 return new(2, unitRequest.Index, unitRequest.Generation);
             case PlayerActionPanelMode.Logistics:
+                if (actions.ConveyorRouting is { } routing)
+                    return new((byte)(8 + index), routing.Entity.Index, routing.Entity.Generation, routing.Revision);
                 var logistics = actions.Logistics!;
                 if (index < logistics.Policies.Count) { id = logistics.Policies[index].ResourceId.Value; break; }
                 if (index < logistics.OrderStartIndex)

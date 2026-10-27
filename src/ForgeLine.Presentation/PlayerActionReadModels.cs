@@ -554,6 +554,19 @@ public sealed class PlayerTacticalActionReadModel
         _artillery;
 }
 
+public readonly record struct ConveyorRoutingActionReadModel(EntityId Entity,
+    ConveyorRoutingPreference Preference, uint Revision, EntityId OutputA, EntityId OutputB,
+    ConveyorRoutingFailure BalancedFailure, ConveyorRoutingFailure OutputAFailure, ConveyorRoutingFailure OutputBFailure)
+{
+    public ConveyorRoutingFailure Failure(int index) => index switch
+    {
+        0 => BalancedFailure, 1 => OutputAFailure, 2 => OutputBFailure,
+        _ => ConveyorRoutingFailure.InvalidPreference
+    };
+    public static string Title(int index) => index switch
+    { 0 => "BALANCED", 1 => "OUTPUT A 3:1", 2 => "OUTPUT B 3:1", _ => "" };
+}
+
 public sealed class PlayerActionSnapshot
 {
     private readonly IReadOnlyList<PlayerConstructionActionReadModel> _construction;
@@ -605,6 +618,7 @@ public sealed class PlayerActionSnapshot
     public PlayerProductionFacilityActionReadModel? Production { get; }
 
     public OperationsRuleSelectionSnapshot? OperationsRules { get; }
+    public ConveyorRoutingActionReadModel? ConveyorRouting { get; init; }
 
     public PlayerUnitProductionFacilityActionReadModel? UnitProduction { get; }
 
@@ -705,7 +719,20 @@ internal static class PlayerActionSnapshotFactory
             supply,
             tactical,
             technology,
-            interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null);
+            interaction.OperationsOpen ? CaptureRules(context, extraction, production) : null)
+        { ConveyorRouting = CaptureRouting(context, extraction.Player, selectedFacility) };
+    }
+
+    private static ConveyorRoutingActionReadModel? CaptureRouting(SimulationContext context, PlayerId player, EntityId entity)
+    {
+        if (!context.Entities.TryGetComponent(entity, out ConveyorPiece piece) || piece.Owner != player ||
+            piece.Placement.Module != ConveyorModule.Splitter) return null;
+        var state = context.Entities.TryGetComponent(entity, out ConveyorRoutingState current) ? current : default;
+        var flow = context.Entities.TryGetComponent(entity, out ConveyorFlowState observed) ? observed : default;
+        return new(entity, state.Preference, state.Revision, flow.OutputA, flow.OutputB,
+            ConveyorRoutingPolicy.Evaluate(context.Entities, player, entity, ConveyorRoutingPreference.Balanced, state.Revision),
+            ConveyorRoutingPolicy.Evaluate(context.Entities, player, entity, ConveyorRoutingPreference.OutputA, state.Revision),
+            ConveyorRoutingPolicy.Evaluate(context.Entities, player, entity, ConveyorRoutingPreference.OutputB, state.Revision));
     }
 
     private static OperationsRuleSelectionSnapshot? CaptureRules(SimulationContext context,

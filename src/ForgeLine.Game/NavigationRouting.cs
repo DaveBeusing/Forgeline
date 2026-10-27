@@ -90,6 +90,8 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
     public void UpdateWorld(NavigationWorld world)
     {
         _pathfinder.UpdateWorld(world);
+        if (VehicleRoutingConnected)
+            world.GetSectorGraph(NavigationCapabilities.For(NavigationMovementClass.Wheeled));
     }
 
     public void Execute(SimulationContext context)
@@ -127,6 +129,26 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
                 entity,
                 out NavigationAgent agent))
         {
+            return;
+        }
+
+        if (UsesVehicleKernel(context, entity) &&
+            NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, _routingClearance, out var precise) &&
+            NavigationPrecisionOwnership.IsPrecise(precise))
+        {
+            if (precise.Pending is { } precisePending && precise.DirectOrder is null)
+            {
+                if (NavigationPrecisionOwnership.TryBeginOwnedQueueApproach(
+                        precise with { DirectOrder = precisePending.OriginalOrder }, out _))
+                    context.Entities.AddComponent(entity, precisePending.OriginalOrder);
+                else SetFailure(context, entity, precisePending.OriginalOrder, NavigationFailureReason.Canceled);
+            }
+            if (precise.DirectOrder is { } preciseOrder &&
+                context.Entities.TryGetComponent(entity, out NavigationRouteState previousRoute) &&
+                !IsManagedWaypoint(preciseOrder, previousRoute))
+                RemoveRoute(context, entity, removeManagedOrder: false);
+            CancelPending(context, entity);
+            // The normal GroundMovement queue/dock handoff runs in Movement.
             return;
         }
 

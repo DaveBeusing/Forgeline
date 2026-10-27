@@ -16,6 +16,7 @@ internal sealed class NotificationDetailText
     private float _width, _size;
     private string _local = "";
     private ulong _session;
+    private OperationsCauseSnapshot? _causes;
     public IReadOnlyList<string> Lines => _lines;
     public void Update(PresentationSnapshot snapshot, float width, float size, string local, int page = 0, int pageSize = 6)
     {
@@ -23,7 +24,10 @@ internal sealed class NotificationDetailText
         pageSize = Math.Clamp(pageSize, 1, 6);
         var experience = snapshot.PlayerExperience ?? default;
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
-        bool changed = _session != snapshot.SessionId.Value || _width != width || _size != size || _local != local ||
+        var causes = OperationsCauseSnapshot.Resolve(snapshot);
+        bool causesChanged = !OperationsCauseSnapshot.SameMembership(_causes, causes);
+        _causes = causes;
+        bool changed = causesChanged || _session != snapshot.SessionId.Value || _width != width || _size != size || _local != local ||
             _experience.Alerts != experience.Alerts || _experience.Feedback != experience.Feedback ||
             _experience.CriticalSupplyUnits != experience.CriticalSupplyUnits ||
             _experience.BlockedProductionFacilities != experience.BlockedProductionFacilities ||
@@ -69,6 +73,20 @@ internal sealed class NotificationDetailText
                     text.AppendLine();
                 }
                 else text.AppendLine(NotificationText.Format(experience, alerts, item, buffer).ToString());
+            }
+            if (causes is not null)
+            {
+                foreach (var group in causes.Groups)
+                {
+                    text.Append("SHARED CAUSE / ").Append(OperationsDiagnosisSnapshot.Label(group.Reason));
+                    if (group.Network.IsSpecified) text.Append(" / POWER NETWORK ").Append(group.Network);
+                    if (group.Cause.IsValid) text.Append(" / CAUSE ").Append(group.Cause);
+                    if (group.Resource.IsSpecified) text.Append(" / RESOURCE ").Append(group.Resource);
+                    text.Append(" / ").Append(group.Members.Count).AppendLine(" OBSERVED FACILITIES");
+                    foreach (var member in group.Members) text.Append("FACILITY ").AppendLine(member.ToString());
+                }
+                text.AppendLine(causes.Limited ? "CAUSE CAPTURE LIMITED / OTHER CAUSES MAY BE UNOBSERVED" : "CAUSES FROM CURRENT OWNED OBSERVATIONS / NO COMPLETE-BASE CLAIM");
+                if (causes.Groups.Count > 0) text.AppendLine("FACILITIES: USE FOCUS, TRACE NEXT AND OPEN EXISTING CONTROLS");
             }
             if (local.Length > 0) text.AppendLine(local);
             _content = text.Length > 0 ? text.ToString() : "NO CURRENT NOTIFICATIONS";

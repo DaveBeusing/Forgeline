@@ -129,6 +129,7 @@ public sealed class PresentationSnapshot
     public ActionableAlertSnapshot? Alerts { get; }
 
     public OperationsDiagnosisSnapshot? Diagnosis { get; init; }
+    public OperationsCauseSnapshot? OperationsCauses { get; init; }
 
     public int InstanceCount => _instances.Length;
 

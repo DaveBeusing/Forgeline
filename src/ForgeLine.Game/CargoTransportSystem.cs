@@ -1039,6 +1039,7 @@ public sealed class CargoTransportSystem : ISimulationSystem
         Progress?.Record(context.Tick, transport.Owner, GameplayProgressKind.CargoUnloaded, entity, entity, destination.Entity,
             order.SubmittedAtTick.Value, order.ResourceId, unloadQuantity,
             context.Entities.TryGetComponent(destination.Entity, out CompletedBuilding deliveredBuilding) ? deliveredBuilding.BuildingId.Value : 0);
+        Progress?.ObserveOperationsDelivery(context.Tick, transport.Owner, destination.Entity, destinationInventory, order.ResourceId, unloadQuantity);
         _deliveredQuantity += unloadQuantity;
 
         CargoTransportRuntimeState unloadedState =

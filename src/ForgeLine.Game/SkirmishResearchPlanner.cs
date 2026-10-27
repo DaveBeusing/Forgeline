@@ -64,7 +64,7 @@ public sealed class SkirmishResearchPlanner(TechnologyDefinitionCatalog technolo
 
         if (priority) { Record(default, SkirmishResearchReason.Priority); return; }
 
-        // Logistics Coordination is deliberately excluded until an integrated priority-routing consumer exists.
+        // This opponent has no authored splitter layout; keep its investments relevant to its actual units and industry.
         foreach (TechnologyId id in new[] { TechnologyIds.IndustrialStandardization,
                      TechnologyIds.MechanizedSystems, TechnologyIds.SensorFusion })
         {

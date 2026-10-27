@@ -247,6 +247,12 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
 
         _extraction?.Scenario.Services.GroundMovement.SetNavigationDiagnosticObservations(interaction.NavigationDiagnosticsOpen);
         if (_extraction is { } diagnosticSource) diagnosticSource.Scenario.Progress.SetNavigationDiagnosticWindow(diagnosticSource.Player, interaction.NavigationDiagnosticsOpen, context.Tick);
+        var operationsDiagnosis = _extraction is null ? null :
+            OperationsMeasurementCapture.Attach(context, _extraction,
+                OperationsChainCapture.Capture(context, _extraction, playerActions, playerExperience, instances, interaction.SelectedEntities),
+                playerActions, instances, interaction.OperationsOpen && playerExperience is { IsMatchComplete: false });
+        var operationsCauses = _extraction is not null && playerExperience is { IsMatchComplete: false }
+            ? OperationsCauseCapture.Capture(context, _extraction, instances) : null;
         _buffer.Publish(
             new PresentationSnapshot(
                 instances,
@@ -272,7 +278,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction, instances,
                     interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet) : null) { Diagnosis = _extraction is null ? null : OperationsChainCapture.Capture(context, _extraction, playerActions, playerExperience, instances, interaction.SelectedEntities),
+                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet).WithCauses(operationsCauses) : null) { Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses,
                     NavigationDiagnosis = interaction.NavigationDiagnosticsOpen ? CaptureNavigationDiagnostics(context, instances) : null,
                     Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     SelectedOrders = _extraction is null || interaction.SelectedEntities.Count == 0

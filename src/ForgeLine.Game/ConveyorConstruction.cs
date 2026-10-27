@@ -94,7 +94,8 @@ public sealed record ConveyorPlan(ConveyorFailure Failure, IReadOnlyList<Conveyo
 }
 public enum ConveyorLinkStatus : byte { Structural, NoInput, Disconnected, Blocked, Congested, Damaged, Critical, Destroyed, Flowing, Offline }
 public readonly record struct ConveyorOwnedPiece(EntityId Entity, ConveyorPiece Piece, ConveyorLinkStatus Status=ConveyorLinkStatus.NoInput,
-    ConveyorFlowState? Flow=null, IReadOnlyList<InventoryResourceQuantity>? Cargo=null);
+    ConveyorFlowState? Flow=null, IReadOnlyList<InventoryResourceQuantity>? Cargo=null,
+    ConveyorRoutingState? Routing=null);
 
 public static class ConveyorGeometry
 {
@@ -270,6 +271,7 @@ public sealed class ConveyorConstructionService
                 status=health.IsDepleted?ConveyorLinkStatus.Destroyed:health.Fraction<.25?ConveyorLinkStatus.Critical:ConveyorLinkStatus.Damaged;
             if (entities.TryGetComponent(row.Entity, out ConveyorFlowState flow)) status=flow.Status;
             rows[i]=row with {Status=status,
+                Routing=entities.TryGetComponent(row.Entity,out ConveyorRoutingState routing)?routing:null,
                 Flow=entities.TryGetComponent(row.Entity,out ConveyorFlowState state)?state:null,
                 Cargo=inventories is not null && entities.TryGetComponent(row.Entity,out ConveyorFlowState stock) && inventories.Contains(stock.Buffer)?
                     Array.AsReadOnly(inventories.GetResourceQuantities(stock.Buffer)):null};

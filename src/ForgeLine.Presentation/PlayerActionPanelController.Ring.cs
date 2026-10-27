@@ -178,7 +178,8 @@ public sealed partial class PlayerActionPanelController
                     new(255, 0), Enabled: false);
             slots[4] = new(default, default, ActionRingNavigation.Previous, first > 0);
             slots[5] = new(default, default, ActionRingNavigation.Next, first + 4 < count);
-            slots[6] = new(default, default, ActionRingNavigation.Parameters, count > 0);
+            slots[6] = new(default, default, ActionRingNavigation.Parameters,
+                Present: actions?.ConveyorRouting is null, Enabled: count > 0);
             slots[7] = new(default, default, ActionRingNavigation.Back);
         }
         else
