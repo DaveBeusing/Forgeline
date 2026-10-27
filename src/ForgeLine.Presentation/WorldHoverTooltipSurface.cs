@@ -286,12 +286,24 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (details.TacticalProtection is { } protection)
         {
             if (protection.IsInfantry)
-                Line(protection.DamageMultiplier < 1
-                    ? FormattableString.Invariant($"COVER: -{(1 - protection.DamageMultiplier) * 100:0}% DIRECT DAMAGE / {protection.CoverName}")
-                    : "OPEN: NO INFANTRY COVER");
+            {
+                if (protection.DamageMultiplier < 1)
+                {
+                    var cover = new TooltipTextBuilder(text);
+                    cover.Append("COVER: -"); cover.Number((1 - protection.DamageMultiplier) * 100, "0");
+                    cover.Append("% DIRECT DAMAGE / "); cover.Append(protection.CoverName);
+                    Line(cover.Written);
+                }
+                else Line("OPEN: NO INFANTRY COVER");
+            }
             else if (protection.CoverName.Length > 0) Line("INFANTRY COVER: VEHICLE NOT PROTECTED");
             if (protection.ScreenName.Length > 0)
-                Line("VISUAL SCREEN: " + protection.ScreenName + " / SCREEN BYPASS WITHIN 32m; RADAR CAN DETECT");
+            {
+                var screen = new TooltipTextBuilder(text);
+                screen.Append("VISUAL SCREEN: "); screen.Append(protection.ScreenName);
+                screen.Append(" / SCREEN BYPASS WITHIN 32m; RADAR CAN DETECT");
+                Line(screen.Written);
+            }
         }
         if (details.HasHealth) Percent("HEALTH", details.HealthFraction);
         if (details.HasSupply)
