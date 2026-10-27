@@ -20,6 +20,45 @@ Each accepted unit receives a `CombatOrderState`. Multi-unit orders may also cre
 
 A later combat order replaces prior combat intent. New combat orders cancel an active `ResupplyOrder`; commands never create Fuel, Ammunition, targets, damage, or hidden knowledge directly.
 
+## Bounded unit order sequences and patrol
+
+Eligible living owned mobile combat/scout units can retain at most 16 movement or tactical entries per unit. At most 1,024 units have sequence state across the match; a single queue edit admits no more than 1,024 supplied identities. Invalid, duplicate, foreign, recycled or ineligible entities are rejected independently. Cargo Trucks, Supply Trucks and their cargo/loading orders remain under the existing logistics owners and cannot enter this queue.
+
+The existing viewport interaction supports:
+
+- Right click: the existing replacement Move; remove the unit's previous sequence.
+- Shift + right click: append Move after the current order and retained entries.
+- Resolve Attack or Attack Move targeting while holding Shift: append that tactical order.
+- Ctrl + right click: replace with a two-waypoint patrol between the unit's actual current position and the chosen point.
+- Ctrl + Shift + right click: append a waypoint to an already existing patrol cycle.
+- Existing Stop or Hold: discard the sequence and apply the existing command. A normal replacement Attack, AttackMove, Retreat/recovery, or accepted manual fire mission also discards older queued intentions.
+
+A patrol endpoint within two horizontal meters of its starting point is rejected. Shift-patrol without an existing patrol is rejected, and a finite entry cannot be appended after an endless patrol. Full queues and admission failures leave the existing sequence intact; normal command feedback reports rejected targets. A finite append compacts already consumed entries before checking its 16 retained-entry capacity. Cancellation of pending queue state through the command API leaves the current underlying order alone; Stop is the player action for stopping current tactical movement and clearing the sequence.
+
+Queue acceptance means the intent was retained, not that a target has already been reached or a later attack applied. A rejected activation stops the sequence with a visible QUEUE REJECTED state. A blocked route retains its entry rather than being counted as complete or silently skipped. A user can replace/cancel it or use the ordinary recovery mechanisms.
+
+### Completion, priorities and formation
+
+Each unit advances at most one entry per fixed tick. Move requires the existing movement/formation intents to have finished and actual horizontal proximity within two meters of the destination. Attack/AttackMove requires the existing TacticalCombatState to report Complete. Unknown intelligence, combat engagement, failed navigation and an unfinished current Hold/fire mission do not become fictitious completion.
+
+A finite append waits for the current movement/formation/combat/fire mission. Its current active formation remains authoritative until the formation owner releases it. Later queued legs execute per unit through the normal commands; they do not create new shared formations at each waypoint. A new manual multi-unit formation order follows the normal group path and replaces the affected units' sequences. This feature does not promise formation cohesion throughout a recurring patrol.
+
+ResupplyOrder suspends queue progression. After actual service completion, an active queued leg is reissued through the existing command path; the queue cannot create resources, complete service or waive Fuel/Ammunition. Retreat and explicit replacement orders take precedence by clearing old queue state at normal command acceptance. Owner changes, destruction, loss of movement eligibility and stale entity generations retire the queue. A pending sequence does not own vehicle bay, convoy, loading or navigation-scheduler state.
+
+Patrol retains one bounded waypoint array and cycles its cursor. Automatic legs execute existing single-unit commands on the simulation owner, without submitting additional recorded commands or creating repeated combat/formation groups. Only explicit player edits enter the replay command journal. A patrol does not produce an ever-growing waypoint list, per-cycle history or new strategic opponent behavior.
+
+### Intelligence, observation and recovery
+
+Queued Attack requires a currently identified target when the edit executes, then uses PlayerTacticalActionCommand again when activated. Lost identification or incompatible targets cannot grant hidden pursuit. Next-attack markers use current authorized intelligence contact positions only; no enemy transform is read by the queue projection.
+
+The existing selected-order status includes current order, next kind, pending count, loop and suspended/blocked/rejected state. Current world segments retain their normal style; a pale amber segment shows the next permitted coordinate. The combined current/next connection cap remains 1,024, within the existing 8,192-line overlay budget. Missing target observations produce no invented marker.
+
+Authoritative schema 14 includes the bounded queue array/cursor, ownership, active/wait/resume flags and status. Payload 11 adds typed queued-order edits; envelope 1 remains unchanged. Schema-13 and earlier authoritative checkpoints/replays are explicitly incompatible. A queued-order command in a payload older than 11 is rejected. Loading reconstructs the externally recorded edits and fixed-tick progress; automatic patrol legs are reproduced by the system rather than recorded repeatedly. Historical hashes are not rewritten.
+
+Implementation is complete with manual acceptance outstanding. Tests are not created, changed, built or manually executed for this work, and no smoke/native/benchmark/qualification run or workflow dispatch/rerun is requested. Product compiler results are source-specific and do not establish functional acceptance. Manual review covers Shift appends through an existing formation, full queues, blocked routes, old/new unit generations, interrupted attacks, multiple patrol loops, supply interruption/resumption, manual replacement/Retreat, current/next markers and save/load/replay continuation.
+
+See [bounded queued orders and patrol](adr/BoundedQueuedOrdersAndPatrol.md) for the ownership and persistence decision.
+
 ## Phase Ownership
 
 ```text
@@ -27,6 +66,7 @@ InputCommands
     combat commands create intent
         ↓
 OrderProcessing
+    QueuedOrderSystem (bounded deferred intent)
     TacticalOrderPreparationSystem
         ↓
 AiDecisions
