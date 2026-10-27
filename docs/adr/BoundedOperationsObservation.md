@@ -18,7 +18,7 @@ A shared power cause requires an actual network membership, a current network de
 
 ## Compatibility
 
-These histories, watch scopes and groups are observations only. They are excluded from authoritative hashes, command journals, save payloads and replay configuration. No new authoritative state or command exists; envelope 1, payload schema 8 and authoritative schema 10 remain unchanged. Historic hashes are not rewritten. Fresh sessions, save restoration and replay observation start new coverage instead of pretending earlier transfers were captured.
+These histories, watch scopes and groups are observations only. They are excluded from authoritative hashes, command journals, save payloads and replay configuration. No new authoritative state or command exists; envelope 1, payload schema 9 and authoritative schema 12 remain unchanged. Historic hashes are not rewritten. Fresh sessions, save restoration and replay observation start new coverage instead of pretending earlier transfers were captured.
 
 The existing milestone and navigation-delivery observations retain their semantics. Neither decision-making nor replay execution reads the new Operations observer. Opening/closing the panel changes observation scope only.
 

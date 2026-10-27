@@ -24,7 +24,7 @@ ConveyorSimulationSystem produces transient ConveyorFlowObservation values from 
 
 A cause identity names the actual generation-stable piece, foot, source or destination. A first fact is not proof that no other constraint exists. Missing evidence stays unknown; an empty buffer is not evidence that an unseen supplier is empty. The projection redacts a fact whose cause object is not authorized.
 
-These observations are not ECS components and are not serialized. The existing persisted ConveyorFlowState, including its historical Cause string, remains unchanged. Current player-facing diagnosis and the conveyor overview use the new observations instead of the old combined full/reserved/offline/rejecting explanation. At the current integration baseline, envelope 1, payload schema 8 and authoritative schema 10 remain unchanged by Operations observation. Earlier schema-6 statements described the original chain implementation, not the current save format.
+These observations are not ECS components and are not serialized. The existing persisted ConveyorFlowState, including its historical Cause string, remains unchanged. Current player-facing diagnosis and the conveyor overview use the new observations instead of the old combined full/reserved/offline/rejecting explanation. At the current integration baseline, envelope 1, payload schema 9 and authoritative schema 12 remain unchanged by Operations observation. Earlier schema-6 statements described the original chain implementation, not the current save format.
 
 ## Links and production inputs
 
