@@ -2,13 +2,32 @@
 
 ## Revision and current state
 
-Contract revision **1** is `NavigationIntegrationContract.Revision`. The namespace roots remain `ForgeLine.Navigation` and `ForgeLine.Game`. Folders express ownership; no project or dependency is added.
+Contract revision **3** is `NavigationIntegrationContract.Revision`. The namespace roots remain `ForgeLine.Navigation` and `ForgeLine.Game`. Folders express ownership; no project or dependency is added.
 
-Base: `cdb60b1a926e770f25eb1ec350548bb00349ff49`, 0.1.472-dev. Navigation recovery PR #354 and adjacent technology/rescue PR #350 are already integrated. This foundation retains them unchanged and prepares exactly one PATCH increment to 0.1.473-dev.
+Historical foundation base: `cdb60b1a926e770f25eb1ec350548bb00349ff49`, 0.1.472-dev. Navigation recovery PR #354 and adjacent technology/rescue PR #350 are already integrated. This foundation retains them unchanged and prepares exactly one PATCH increment to 0.1.473-dev.
 
-**All six new integration slots are NotConnected.** This is a contract/read-adapter foundation, not a new pathfinder, traffic algorithm or gameplay integration. No service is registered, existing runtime behavior is unchanged, and there is no new in-game panel. The only existing-file edit is `Directory.Build.props`; no core caller, component registration, save schema, project, workflow, test or content identity changes.
+The normal MatchRuntime connects Traffic, continuous Motion, Routing and copied
+Diagnostics for the defined Cargo/Supply logistics scope. Scheduling/cache and
+RegionalUpdates remain NotConnected. Standalone legacy navigation instances do
+not acquire routing availability merely by constructing a kernel.
 
-The foundation must be reviewed and integrated into master before the six domain branches start from current master. Do not force a merge or start downstream work from this unreviewed feature branch. Interface implementations must not report Available merely because they compile.
+VehicleRoutingKernel supplies bounded resumable hierarchy/refinement/fallback,
+real checked endpoint connectors and copied results. NavigationRequests assigns
+and retains root generations, advances the existing pending requests in bounded
+slices and checks full binding/profile/world freshness before movement admission.
+Owned congestion costs are finite, scoped, delayed and expiring. Existing Fuel,
+GroundMovement and precise Dock/Queue authorities remain in place. No regional
+storage or prepared fleet scheduler is activated. See
+[Connected vehicle routing](CongestionAwareRouting.md) for exact scope, bounds,
+current implementation calls, conservative clearance and pending manual approval.
+Authoritative schema 12 records the new routing state; envelope 1/payload 9 remain
+unchanged. [The routing ADR](../adr/BoundedVehicleRoutingIntegration.md) records
+the compatibility decision.
+
+The signature directory and original foundation evidence below retain their
+historical ownership context. Current source declarations remain authoritative
+where later additive contract revisions extended that directory. Availability
+requires actual composition and must never be inferred from compilation alone.
 
 ## Exclusive implementation slots
 
@@ -35,7 +54,7 @@ Shared declarations belong only to `src/ForgeLine.Navigation/Contracts/`, `src/F
 
 Region/cost arrays are copied into read-only wrappers. The terrain adapter copies the chunk container and retains existing immutable heightfields without exposing the container. Existing grid/graph APIs retain their canonical read-only ownership: never cast legacy collection properties to arrays and mutate them. Retain the published snapshot until all readers finish. A worker never receives EntityRegistry or a live spatial index.
 
-`HasTerrain == false` makes height/normal queries return false. Fallback XZ grid bounds do not invent terrain heights. Missing region stamps require global geometry invalidation, not an assumption that a route is unaffected. Regional stamps must be valid and no newer than the global geometry revision. Snapshots are not recreated for each vehicle; copying and retained capacity count toward publication/memory budgets.
+`HasTerrain == false` makes height/normal queries return false. Fallback XZ grid bounds do not invent terrain heights. Missing region stamps require global geometry invalidation, not an assumption that a route is unaffected. Regional stamps must be valid and no newer than the global geometry revision. Routing cost snapshots are shared on demand within an owning scope and tick; copying and retained capacity count toward publication/memory budgets.
 
 `KnowledgeScope` is an opaque Game-owned faction-knowledge token. Scope, full capabilities, vehicle profile, goal constraints and revisions participate in cache keys. Physical collision knowledge is not a visibility-filtered cost field. A cost-only change must not discard physically safe paths en masse. Unavailable cost data supplies no invented penalties and remains explicitly NotConnected/Unavailable.
 
@@ -45,7 +64,7 @@ Region/cost arrays are copied into read-only wrappers. The terrain adapter copie
 
 `AdaptPendingRequest` retains the existing request ID, start, capability profile, original target and world version. The caller supplies the rotation captured with the start, explicit goal semantics/constraints and existing Game generations. Original gameplay destination and resolved navigational endpoint are distinct. A projected DockAccess endpoint never authorizes service at the exact dock pose.
 
-`NavigationOrderBinding` retains the complete EntityId (index and generation), complete MovementOrder (issuer, both ticks, kind and heading), request ID, command generation, dock generation and queue generation. Legacy commands have no separate command-generation counter. **The foundation does not fabricate or install one.** Central integration must assign a checked monotonic generation at actual command acceptance and persist it. A tick or constant 1 is not a substitute: same-tick identical-position replacement commands must remain distinguishable.
+`NavigationOrderBinding` retains the complete EntityId (index and generation), complete MovementOrder (issuer, both ticks, kind and heading), request ID, command generation, dock generation and queue generation. Legacy MovementOrder retains its existing fields. The connected NavigationRequests owner assigns a checked monotonic root generation when admitting a new vehicle root, carries it in NavigationPendingPath/NavigationBoundSearch and retains it across replans. The authoritative routing checkpoint records the counter. A tick or constant 1 is not a substitute: same-tick identical-position replacement orders invalidate old pending work and receive a new root generation.
 
 Dock/queue generation zero means absent or unconfirmed, not authority. A copied building slot must still match full truck identity and visit generation before service. Entity obstacle keys map exactly to the existing index/generation; AuthoredGeometry and TrafficReservation keys retain their producer's stable identity in separate source domains. Do not replace source identities with coordinate hashes.
 
@@ -144,7 +163,7 @@ The following declarations are the authored integration surface; compiler-genera
 [Source](../../src/ForgeLine.Navigation/Contracts/NavigationIntegrationLimits.cs)
 
 ```csharp
-public static class NavigationIntegrationContract // public const int Revision = 1
+public static class NavigationIntegrationContract // public const int Revision = 3
 public enum NavigationModuleAvailability : byte { NotConnected = 0, Available = 1, Unavailable = 2 }
 public sealed record NavigationIntegrationLimits(
     int WorkPerTick, int WorkPerSearch, int MaximumActiveSearches,

@@ -1,311 +1,168 @@
-# Congestion-aware routing preparation
+# Connected vehicle routing and endpoint selection
 
-## Delivery state and prerequisite
+## Product scope
 
-This change implements **three independent internal preparation components**.
-It does not implement the resumable hierarchical search kernel or connect a new
-route-selection service. Existing gameplay still uses the original navigation
-pipeline. No route, movement transform, inventory, fuel balance, queue or dock
-reservation is changed by these components.
+MatchRuntime connects VehicleRoutingKernel through
+HierarchicalNavigationSystem.ConnectVehicleRouting after initial navigation world
+construction. Normal strategic Cargo Truck and Supply Truck orders with Wheeled
+capabilities use this kernel. The existing NavigationRequests owner advances it;
+GroundMovementSystem remains the only transform writer. Military/formation paths
+retain the existing HierarchicalPathfinder path. No second movement system,
+regional storage, fleet scheduler or route cache is enabled here.
 
-Initial master was `cdb60b1a926e770f25eb1ec350548bb00349ff49`, version
-`0.1.472-dev`. Publication was synchronized with current master
-`574040b1cde354bc1414a692e2ec075968e0959a`, version `0.1.473-dev`, after the
-conveyor changes in PR #357 landed. Navigation recovery [PR #354](https://github.com/DaveBeusing/Forgeline/pull/354)
-and adjacent technology/rescue [PR #350](https://github.com/DaveBeusing/Forgeline/pull/350)
-are already merged. Shared-contract [PR #356](https://github.com/DaveBeusing/Forgeline/pull/356),
-head `df9290ead9bd09b608a1720d992fac0163d8598a`, is still open at preparation.
-Its revision-1 search, snapshot, clearance and binding declarations are absent
-from master. They have not been copied, imported or redefined here.
+Precise queue/dock ownership is unchanged. NavigationPrecisionOwnership excludes
+heading-constrained and already precise service motion from coarse admission.
+An owned first queue entry may admit DockAccess coarse travel; its projected
+endpoint cannot grant a slot, change FIFO order or establish service arrival.
+The existing GroundMovement handoff alone begins the exact owned local approach.
 
-The independent work starts from master. Its reconciled single PATCH increment is
-473 to 474, not an allocation of the later integrated version. After the prerequisite
-lands, synchronize this same branch with current master and reconcile exactly
-one PATCH again before integration. Do not start a competing implementation.
+## Search and result lifecycle
 
-| Area | Current delivery |
-| --- | --- |
-| Sustained observed congestion and deterministic decay | Internal policy implemented; no observation publisher connected |
-| Bounded deterministic endpoint enumeration | Internal probe cursor implemented; no reachability claim |
-| Stable route-choice scoring and hysteresis | Internal policy implemented; no shared result or fuel adapter connected |
-| Resumable hierarchical search, clearance, reconstruction | Pending prerequisite and implementation |
-| Full target binding and fuel authorization | Pending shared-contract and existing-authority integration |
-| Actual refined corridor and selected-alternative result metadata | Pending kernel/result integration |
-| Fleet scheduling, world publication, central caller changes | Separate integration ownership |
-| Save/replay activation and manual acceptance | Pending |
+A request pins the immutable grid, prepared sector graph, copied scope costs,
+full movement capabilities and actual vehicle profile. Its binding retains the
+complete entity generation, original MovementOrder and target, request ID,
+checked monotonic root generation, dock generation and queue generation.
+A new root admitted by NavigationRequests receives a new generation, including
+identical same-tick replacements. Traffic/world replans retain that root generation
+while allocating a new request ID. The system is bound to its simulation's entity
+registry and session. Changed commands, profile, pose, grid or service generations
+cancel an old continuation before it can publish movement.
 
-No new public API, project, dependency, test, workflow, save schema or composition
-registration is introduced. The source files remain in the two routing ownership
-directories. The only existing file changed is `Directory.Build.props`.
+Each Advance slice performs explicit charged stages:
 
-## Congestion history and soft costs
+1. Enumerate bounded start connectors without relocating the vehicle.
+2. Enumerate original/alternative endpoint probes with EndpointCandidateCursor.
+3. Prove real start/end connections using the conservative vehicle envelope.
+4. Search the prepared sector graph with stable numeric frontier ties.
+5. Reconstruct a sector corridor, refine locally, expand it by one sector if
+   necessary, then attempt bounded unrestricted grid search.
+6. Reconstruct the actual predecessor chain, waypoints and traversed sector
+   dependencies, accounting for publication copies before returning Found.
 
-[`CongestionPenaltyMemory`](../../src/ForgeLine.Game/Navigation/RouteSelection/CongestionPenaltyMemory.cs)
-is internal to Game. One instance belongs to one opaque knowledge scope and one
-unchanged grid coordinate space. The producer must filter observations according
-to that faction's knowledge, aggregate vehicles into unique cells, validate the
-cells against the pinned grid, and sort by Z then X. A physical collision frame
-must never be published as faction-visible congestion or diagnostics.
+Endpoint and start candidates, graph edges, local neighbors, clearance cell and
+obstacle inspections, predecessor steps and publication work share one request
+cap. Calling Advance again does not reset consumed work or memory accounting.
+Candidate/work/workspace exhaustion returns BudgetExhausted with
+SearchBudgetExhausted, never global disconnection. Unreachable requires exhausted
+admissible searches and enumeration in the pinned navigation model. Invalid
+inputs, cancellation, stale geometry and pending work remain distinct.
 
-`Record(scope, tick, observations)` accepts one complete aggregate batch at each
-strictly increasing recorded simulation tick. Invalid/duplicate/unsorted input
-is rejected before changing history. Kinds are `Clear`, `TrafficDelay` and
-`DockQueueWait`. Missing observations, skipped simulation ticks and changes of
-kind break evidence of continuous delay. They do not invent newly observed
-traffic. Clear observations and missing samples allow existing costs to decay.
+Start projection is only a proposal: the complete connector from the real start
+is checked before any waypoint can be exposed. Alternative target cells likewise
+need a checked connector to the unchanged original destination, or an endpoint
+within the explicit allowed goal domain. No unchecked straight tail is appended.
+A projected service endpoint can only hand off through the existing precise
+queue owner. Source original/resolved goals, profile, scope and geometry/cost
+revisions remain in NavigationPath.Proposal.
 
-Activation requires at least two consecutive observed ticks. Dock FIFO waiting
-has a strictly longer configured grace period. Let n be the number of consecutive
-observations and A the applicable activation threshold. The activation term is
-zero for n < A; afterwards it is:
+Clearance uses a rotation-independent circumscribed vehicle envelope, including
+the actual GroundMovement clearance. It checks every terrain cell crossed by
+the swept horizontal envelope and the original static obstacle bounds retained
+by NavigationGridBuilder. This is conservative and can reject a physically valid
+narrow passage; it is not a minimum-turn-radius planner. Grid topology, terrain
+availability, slope limits and diagonal corner clearance remain required.
+The existing continuous physical sweeps and traffic arbitration still veto
+every actual move, including moving vehicles and exact service geometry.
 
-`maximumPenalty * min(1, (n - A + 1) / rampTicks)`.
+## Observed congestion and selection
 
-The retained penalty is the maximum of that term and the previously observed
-penalty after decay. A lookup at age d returns
-`max(0, retainedPenalty - decayPerTick * d)`, or zero once d reaches expiry.
-All terms are finite, nonnegative and bounded. This cost never makes a traversable
-cell a permanent terrain blocker. FIFO grace does not grant access to the dock.
+CongestionPenaltyMemory is connected per owning player. Only that player's own
+Cargo/Supply observations are aggregated, sorted and recorded; the global
+physical collision frame and hidden enemy state never become route costs.
+OutOfFuel and tactically paused states do not create traffic evidence. Missing
+observations break continuous-delay evidence and permit existing costs to decay.
+Truncated scans, aggregation/history omissions and unknown scopes publish costs
+as Unavailable with no penalty array; they do not report complete cost coverage.
 
-Storage uses a fixed-capacity sorted array. Existing cells receive the current
-observation before eviction priorities are compared. Capacity pressure evicts
-the oldest observed tick, then the larger Z/X cell; ties favor smaller cells.
-`Record` returns the number of delayed-cell observations omitted by capacity.
-The future publisher must retain that information as incomplete cost coverage;
-absence of a penalty is not evidence of a physically clear corridor.
+The publisher uses these bounded, unmeasured operational values:
 
-`GetAdditionalCost(scope, cell, tick)` is a pure lookup, including future decay.
-It does not advance observation time or change activation history. Earlier reads
-and mismatched knowledge scopes are rejected. No cost revision is allocated by
-this helper; publication owns that shared revision.
+| Setting | Value |
+| --- | ---: |
+| Knowledge scopes / observations and retained cells per scope | 16 / 128 |
+| Own logistics observation scan per tick | 4,096 entities |
+| Ordinary sustained delay activation / dock FIFO grace | 20 / 80 ticks |
+| Penalty ramp / expiry | 40 / 200 ticks |
+| Maximum soft penalty / linear decay | 12 / 0.1 per tick |
 
-Settings have no operational defaults or measured tuning claims:
+Publication is separately bounded by those scan/aggregation/history capacities;
+it is not hidden in a search work unit. Snapshot costs are copied once per scope
+and tick on demand and pinned until each reader completes. Cost revision is that
+deterministic publication tick. Local steps consume cell costs; sector search
+uses the maximum observed penalty in each destination sector. Costs remain
+finite, nonnegative and soft, never terrain blockers. A cost-only change neither
+invalidates an active geometric route nor starts speculative replans.
 
-| Setting | Constraint and purpose |
-| --- | --- |
-| `MaximumCells` | Positive fixed storage capacity |
-| `MaximumObservationsPerTick` | Positive aggregate input bound |
-| `ActivationTicks` | At least 2 consecutive observations |
-| `DockQueueGraceTicks` | Strictly greater than ordinary activation |
-| `RampTicks` | Positive ticks to reach the penalty cap |
-| `ExpiryTicks` | Positive maximum observation age |
-| `MaximumPenalty` | Positive finite soft-cost cap |
-| `DecayPerTick` | Positive finite tick decay |
+The first complete geometrically valid endpoint route is submitted to the
+existing SupplyRescueTravel and CargoDeliveryFuelPolicy final authorization,
+exactly once, before exposing a waypoint. No alternative repeatedly consumes the
+prepared Cargo fuel budget. RouteChoicePolicy remains an independent preparation
+for future coherent multi-alternative affordability comparison; it is not
+advertised as connected. Existing traffic progress/replan intervals continue to
+bound reactive replans. No measured improvement or global optimality is claimed.
 
-Publication work is bounded by those configured capacities, but is not a search
-`Advance` implementation. Validation, lookups, compaction, insertion/eviction,
-checkpoint copying and shared snapshot publication must be budgeted at their
-own integration boundary. Do not hide a complete `Record` call in one search
-work unit. No scheduler, route cache or traffic-reservation system is created.
+The continuous-motion adapter creates an explicitly cost-free physical-frame
+view of the accepted waypoints; this is not a cost reassessment or another route
+choice. The source NavigationPath.Proposal preserves the searched cost revision,
+scope and actual corridor.
 
-## Endpoint probes and accounting
+## Work, ownership and persistence
 
-[`EndpointCandidateCursor`](../../src/ForgeLine.Navigation/Routing/EndpointCandidateCursor.cs)
-is internal to Navigation. Construction captures a grid, matching geometry
-version, capabilities, original destination, maximum horizontal projection
-distance and candidate cap. Invalid/out-of-world input is rejected. The owner
-must obtain the grid and version from the same approved snapshot; the legacy
-grid itself carries no revision. A stale owner must discard the cursor.
+| Vehicle search bound | Value |
+| --- | ---: |
+| Search work per tick / slice / request | 16,384 / 2,048 / 1,048,576 |
+| Active continuations | 8 |
+| Reserved peak workspace per request / active aggregate | 8 MiB / 64 MiB |
+| Start candidates / endpoint candidates | 16 / 16 |
 
-`MoveNext(inspectionAllowance, out probe, out workConsumed)` inspects the original
-destination first. It then enumerates cell centers in deterministic square rings,
-with stable perimeter order. Each original/cell inspection or empty perimeter-side
-transition consumes one work unit. Out-of-grid spans are clipped with constant
-arithmetic rather than walked coordinate by coordinate. Zero allowance advances
-nothing and still reports an already terminal state. Work never exceeds allowance.
+NavigationRequests services active continuations in stable rotating request order.
+Additional requests remain in the existing per-entity NavigationPendingPath
+component until a slot opens. There is no second global input queue. Allocation
+accounting is monotonic across discarded refinement/candidate storage and reserves
+checkpoint/publication copies conservatively. This integration is not the
+prepared NavigationSearchScheduler; scheduling/cache and regional availability
+remain NotConnected. Routing availability is reported only by the connected
+MatchRuntime path. Standalone legacy navigation instances remain unconnected.
 
-The existing grid's terrain/static-blocker/slope predicate is reused. A final
-squared XZ distance check enforces the projection radius; the radius only bounds
-proposals, not connection lengths or physical access. The exact target remains
-separate from every alternative probe. Maximum candidate count and radius are
-explicit inputs; future composition must keep the shared candidate limit within
-the route-choice policy's capacity.
+Authoritative schema **12** records root/request counters, rotation fairness,
+cost publication history and complete detached continuations with their pinned
+penalties in navigation.routing.v1. Pending/accepted bindings also travel in ECS
+snapshots. The existing save/replay reconstruction replays the same commands and
+fixed work slices, then compares the complete authoritative checkpoint. Envelope
+1 and payload 9 remain unchanged; older authoritative checkpoints are explicitly
+incompatible. Historical hashes are not rewritten and no old frontier is guessed.
+The existing total document-size limit still applies; an oversized save fails
+without replacing the previous file. See
+[the routing decision](../adr/BoundedVehicleRoutingIntegration.md).
 
-| Cursor result | Meaning |
-| --- | --- |
-| `Pending` | More enumeration work remains |
-| `Candidate` | One geometrically unproven probe; not a route or arrival |
-| `EnumerationComplete` | The configured coordinate domain was inspected |
-| `CandidateLimitReached` | Candidate budget stopped enumeration; incomplete |
+## Compilation and manual acceptance
 
-None of these results means that the requested destination is unreachable. Even
-complete enumeration is only evidence about proposed cells, not completed route
-searches. The kernel must prove connectivity from the current reachable region,
-real start/end connectors, oriented vehicle clearance, slope, diagonal clearance,
-goal tolerance and any heading requirement. This cursor does not project a start
-pose, jump an obstacle or permit an unproven `LocalApproach`.
+Only Navigation/Game and their product dependencies are compiled, using the
+pinned SDK. No tests are created, edited, built or manually executed, and no
+smoke, benchmark, headless/native qualification, workflow dispatch or rerun is
+started. Source inspection and compiler success are not functional acceptance.
 
-`CaptureState` returns a value-only cursor state. `RestoreState` validates the
-pinned grid metadata/version, capabilities, original target, limits and cursor
-bounds before replacing progress. This is an internal piece of the future kernel
-checkpoint, not a new shared checkpoint protocol or persisted save format.
+Manual approval remains outstanding. Exercise ordinary physical Cargo/Supply
+travel; short FIFO waits; sustained observed blockage and expiry after reopening;
+a disconnected nearest endpoint with a farther legal connector; enclosed goals;
+blocked starts; real Fuel rejection; same-tick replacement and changed dock/queue
+generations during a suspended search; world rebuilds; and save/load/replay
+continuation. Check that narrow-corridor conservatism does not strand the normal
+map's service routes. Natural match completion remains unverified.
 
-## Route scoring and hysteresis
+Status: implemented in the defined logistics scope; manual user approval pending.
 
-[`RouteChoicePolicy.Evaluate`](../../src/ForgeLine.Game/Navigation/RouteSelection/RouteChoicePolicy.cs)
-is an internal stateless numeric policy. The future adapter must first prove that
-all assessments belong to one complete entity/order/command/dock/queue binding,
-the same knowledge scope, geometry and authorized goal. Full entity generation
-and actual command generation are required; a tick or a target-position hash is
-not a replacement. This policy deliberately does not duplicate the pending shared
-`NavigationOrderBinding` contract.
-
-Each candidate has a nonzero stable producer identity and finite, nonnegative
-travel, congestion, checked connection and checked exit costs. Their finite sum
-is the score. Candidate IDs must not depend on array order. The policy rejects
-duplicates, caps a batch at a configured value of at most 16, and resolves equal
-candidate scores by stable ID. That cap is a structural limit, not measured tuning.
-
-Only `Eligible` candidates participate in selection. This status requires proof
-of physical legality, complete connectors to the unchanged authorized target,
-and the applicable existing Game fuel authorization. Other states explicitly
-retain incomplete work, blocked geometry, pending fuel or insufficient fuel.
-The policy does not calculate fuel, validate a sweep, grant a dock or issue movement.
-
-All assessments, including the current choice, must be evaluated at the supplied
-current tick and cost revision. Completed multi-tick results therefore require a
-fresh, budgeted assessment against a coherent valid cost/fuel view. Merely changing
-their timestamp is insufficient. Stale/incomparable batches wait without erasing
-the current route. A cost-only revision never directly invalidates its geometry.
-
-For a feasible current route, switching requires its configured minimum hold time
-and a strictly positive score improvement at least as large as both the absolute
-threshold and `currentScore * relativeThreshold`. Equal-cost ties do not churn an
-active route. A proven hard geometry blockage bypasses hold/improvement requirements
-only for an otherwise eligible replacement. Congestion alone cannot claim that state.
-
-An active route with pending fuel authorization waits. If it has insufficient
-fuel, an affordable alternative still needs the documented hold/improvement
-criteria; otherwise the decision is `AwaitFuel`, even if that alternative is
-physically legal. This conservative rule does not treat financial infeasibility
-as a hard geometry blockage. Integration must not silently broaden this policy or
-grant fuel to bypass it.
-
-`SelectAlternative`, `KeepActive`, `AwaitMoreWork`, `AwaitFuel`, `InvalidInput` and
-batch-local `NoFeasibleAlternative` remain distinct. No result claims global
-`Unreachable`. Incomplete exploration/candidate caps remain incomplete, and missing
-active assessments do not silently select a replacement.
-
-The caller owns and persists active alternative identity and its accepted selection
-tick under the full binding. It changes them only after a selection is actually
-accepted. Pending/invalid decisions preserve waiting orders, loaded cargo and
-existing reservations. No state is retained inside the policy itself.
-
-## Existing-authority fuel handover
-
-The current `HierarchicalNavigationSystem.ApplyCompletedResults` invokes
-`SupplyRescueTravel.ValidateCompletedRoute` and
-`CargoDeliveryFuelPolicy.ValidateCompletedRoute` before exposing waypoints.
-These remain the authority. Both currently accept the legacy `NavigationPath`.
-
-In particular, Cargo validation removes its prepared `CargoDeliveryFuelBudget`.
-Calling it once per candidate would consume the budget on the first call; later
-calls can return true when no matching budget remains. **Do not use repeated
-validation calls as independent candidate approvals.** The integration owner must
-provide a coherent non-mutating assessment through the existing authority and one
-final accepted-route authorization, or retain a single-candidate authorization
-boundary without claiming that other candidates were assessed.
-
-The completed route must include real checked start/destination connections and
-the necessary queue/dock approach/exit segments. Existing fuel methods currently
-measure legacy waypoints and the original endpoint; an unchecked straight tail
-cannot establish a connector's physical legality. A future adapter must preserve
-Cargo ownership, reserve policy and recovery recipient identity, and refresh any
-required same-tick Supply/Rescue budget. No second fuel calculator is added here.
-
-## Required kernel implementation and delegation
-
-After the shared prerequisite is integrated, implement the existing revision-1
-`INavigationSearchKernel<TCheckpoint>` / `INavigationSearchSession<TCheckpoint>`
-against `NavigationWorldSnapshot`, `NavigationSearchSpecification`, geometry and
-the agreed workspace ownership. Do not invent shadow public contracts. Confirm
-workspace leasing and the ownership of refined-corridor/alternative metadata with
-the common interface owner before exposing new cross-module signatures.
-
-The full state machine is still outstanding: high-level expansion, corridor
-construction, local refinement, expanded corridor, bounded general fallback,
-candidate reachability, swept clearance, predecessor traversal, waypoint/actual
-corridor reconstruction and immutable result publication. Charge all work, including
-child work exactly once, and retain the request-wide cap across every tick. No
-synchronous `FindPath` may hide inside a small `Advance` step. Reuse terrain/slope
-and diagonal rules, stable frontier ties and prepared graph topology.
-
-Only exhausted admissible search in valid geometry may return `Unreachable`.
-Work, candidate or workspace exhaustion must remain `BudgetExhausted`/incomplete.
-Geometry changes invalidate affected sessions; cost changes preserve physically
-valid routes. Return the actual refined corridor and traversed dependencies,
-geometry/cost revisions, original/resolved goal, effort and selected alternative.
-The initial high-level corridor is not proof of the actual fallback route.
-
-| Existing boundary | Central integration action |
-| --- | --- |
-| `HierarchicalPathfinder.FindPath` | Delegate to the one completed kernel or retire the old orchestration after caller migration |
-| `HighLevelRouteSearch.TryFindRoute` | Replace its synchronous expansion/reconstruction with resumable stages; no second permanent algorithm |
-| `LocalPathSearch.TryFindPath` | Move refinement/fallback into resumable work while preserving traversal and diagonal rules |
-| `LocalPathFrontier` | Reuse/extract storage only through agreed exclusive workspace ownership; no separate pool/cache here |
-| `NavigationSectorGraph` / `NavigationGrid` | Reuse immutable graph/grid queries; graph preparation belongs to publication work |
-| `NavigationRouting.ScheduleRequest` / `Compute` | Admit the shared bound request through the scheduler; no second global queue |
-| `NavigationRouting.ApplyCompletedResults` | Validate full binding/revisions, approved goal and current fuel before adopting a route |
-| `VehicleDockingService.Approach` / `Exit` | Preserve the same building, FIFO entry, exclusive slot and exact service pose |
-| `CargoTransportSystem` / `SupplyRescueTravel` | Retain current source/recipient, carried inventory and recovery ownership |
-
-No method in that table is changed by this preparation. The existing navigation
-pipeline remains the only active routing authority.
-
-## State, ordering and continuation handover
-
-After prerequisite integration, the required order is: capture authorized traffic;
-update bounded congestion history; publish the shared immutable costs/world;
-admit a fully bound request; advance the one kernel under scheduler allowance;
-prove connectors/clearance; refresh coherent cost and existing-authority fuel
-assessments; evaluate preference; revalidate ownership and finally authorize the
-accepted route before the normal movement phase. Only `GroundMovementSystem`
-changes final transforms. Arrival and exact dock service remain separate checks.
-
-Congestion checkpoints contain revision 1, exact settings, scope, last recorded
-tick and detached sorted entries with delay-start/last-observed ticks and retained
-penalty. Restore rejects inconsistent timing, order, capacity and activation/cost
-history before mutation. The integration owner must additionally validate content
-and world-coordinate identity and replace instances when that identity changes.
-
-Endpoint cursor state belongs in the future kernel checkpoint alongside frontier,
-predecessors, reconstruction cursors, alternative progress and consumed work.
-Selection identity/tick belong to the Game binding. These records are currently
-unregistered and do not change saves. Central integration must assess/persist
-authoritative state before enabling them; losing history on load would alter
-activation, hysteresis and simulation decisions.
-
-Continuation: integrate/review PR #356 through normal repository policy, synchronize
-this branch from master, implement the missing kernel/adapters in the owned paths,
-then hand off the above caller edits to central integration. Full interface revision,
-base/HEAD SHAs, version reconciliation and current evidence belong in the PR.
-
-## Compilation and acceptance
-
-The required final commands are:
+Final source compilation: Release Game and its Navigation/product dependencies
+compiled in both Public and Developer variants with SDK 10.0.402, zero warnings
+and zero errors. Product source: d509c793931e32e4db2e6b0e665de634328152c6. Commands:
 
 ```powershell
-dotnet build src/ForgeLine.Navigation/ForgeLine.Navigation.csproj --configuration Release
-dotnet build src/ForgeLine.Game/ForgeLine.Game.csproj --configuration Release
+dotnet build src/ForgeLine.Game/ForgeLine.Game.csproj -c Release --no-restore -p:ForgeLineEnableDeveloperTools=false --nologo -m:1 -nr:false
+dotnet build src/ForgeLine.Game/ForgeLine.Game.csproj -c Release --no-restore -p:ForgeLineEnableDeveloperTools=true --nologo -m:1 -nr:false
 ```
 
-Local Release compilation is **not executed**: the available environment has no
-`dotnet` executable. The repository continues to require SDK 10.0.401 with its
-existing latest-patch policy, C# 14, analyzers and warnings-as-errors. No settings
-were relaxed. Existing automatically triggered PR CI may supply separate source-
-matched evidence; it is not a manually requested test run or gameplay acceptance.
-
-No automated tests were created, modified or manually executed. No benchmark,
-soak, smoke, headless or visual-reference execution, replacement test script,
-additional workflow, dispatch or rerun was requested. Existing tests and CI gates
-are unchanged. No performance improvement is measured or claimed.
-
-Manual acceptance remains pending after complete integration: short FIFO queue
-without detour; sustained observed blockage with a legal alternative; reopening
-without oscillation; nearest endpoint disconnected but a farther one reachable;
-fully enclosed goal; invalid start connection; insufficient fuel including real
-connector/exit distance; replacement command during a suspended search; and
-save/restore retaining congestion age and active-route hold time.
-
-**Status: independent components implemented / local build not executed /
-full kernel and overall integration pending / manual acceptance outstanding.**
+The compiler workspace contains the pinned product sources retrieved from the
+repository plus this change; it contains no test projects. Normal product restore
+completed first. Earlier compiler attempts failed before single-node restore,
+and a later compile found a local-name collision in the precise-owner guard;
+that error was corrected before the final passing builds. No functional,
+Save/Replay or natural-match execution is implied by compilation.
