@@ -205,6 +205,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     quantity = Math.Min(quantity, Math.Min(available[sender.Inventory][resource], Room(receiver, id)));
                     quantity = Math.Min(quantity, _stock.GetAddableQuantity(receiver.Inventory, id, quantity));
                     if (quantity <= Epsilon || !_stock.Transfer(sender.Inventory, receiver.Inventory, id, quantity).Succeeded) continue;
+                    Progress?.ObserveOperationsDelivery(context.Tick, receiver.Owner, receiver.Entity, receiver.Inventory, id, quantity);
                     if (receiver.Port is { Input: true } &&
                         entities.TryGetComponent(receiver.Entity, out CompletedBuilding deliveredBuilding))
                         Progress?.Record(context.Tick, receiver.Owner, GameplayProgressKind.ConveyorDelivered,
