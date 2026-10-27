@@ -4,6 +4,28 @@ namespace ForgeLine.Input;
 
 public sealed record RtsCameraBindings
 {
+    public RtsCameraBindings WithoutRetiredFunctionKeys()
+    {
+        PlatformKey[] keys = [PanForward, PanForwardAlternate, PanBackward, PanBackwardAlternate,
+            PanLeft, PanLeftAlternate, PanRight, PanRightAlternate, RotateLeft, RotateRight, PitchUp, PitchDown];
+        if (!keys.Any(GameplayBindingRegistry.IsRetiredFunctionKey)) return this;
+        PlatformKey[] defaults = [PlatformKey.W, PlatformKey.Up, PlatformKey.S, PlatformKey.Down,
+            PlatformKey.A, PlatformKey.Left, PlatformKey.D, PlatformKey.Right, PlatformKey.Q, PlatformKey.E, PlatformKey.R, PlatformKey.F];
+        var used = keys.Where(k => !GameplayBindingRegistry.IsRetiredFunctionKey(k)).ToHashSet();
+        for (int i = 0; i < keys.Length; i++)
+            if (GameplayBindingRegistry.IsRetiredFunctionKey(keys[i]))
+            {
+                keys[i] = !used.Contains(defaults[i]) ? defaults[i] : defaults.First(k => !used.Contains(k));
+                used.Add(keys[i]);
+            }
+        return this with
+        {
+            PanForward = keys[0], PanForwardAlternate = keys[1], PanBackward = keys[2], PanBackwardAlternate = keys[3],
+            PanLeft = keys[4], PanLeftAlternate = keys[5], PanRight = keys[6], PanRightAlternate = keys[7],
+            RotateLeft = keys[8], RotateRight = keys[9], PitchUp = keys[10], PitchDown = keys[11]
+        };
+    }
+
     public PlatformKey PanForward { get; init; } = PlatformKey.W;
 
     public PlatformKey PanForwardAlternate { get; init; } = PlatformKey.Up;

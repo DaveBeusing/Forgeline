@@ -24,14 +24,7 @@ public sealed class RtsBuildingPlacementController
     private bool _leftWasDown;
     private bool _escapeWasDown;
     private bool _rotateWasDown;
-    private readonly Dictionary<PlatformKey, bool> _selectionKeys = new()
-    {
-        [PlatformKey.F4] = false,
-        [PlatformKey.F5] = false,
-        [PlatformKey.F6] = false,
-        [PlatformKey.F7] = false,
-        [PlatformKey.F8] = false
-    };
+    private readonly Dictionary<PlatformKey, bool> _selectionKeys = new();
     private BuildingPlacementRequest? _pendingRequest;
     private bool _hasPreviewRequest;
     private ulong _previewRequestId;
@@ -67,10 +60,11 @@ public sealed class RtsBuildingPlacementController
 
         _issuer = issuer;
         _bindings = bindings ?? GameplayBindingRegistry.Default;
-        _placementHint = $"GRID 4 M / SHIFT + CLICK REPEAT AFTER ACCEPTANCE / Q LEFT / E RIGHT / {_bindings.Prompt(GameplayAction.RotatePlacement)} RIGHT / ESC CANCEL";
+        _placementHint = $"GRID 4 M / SHIFT + CLICK REPEAT AFTER ACCEPTANCE / Q LEFT / E RIGHT / ESC CANCEL";
         _selectionKeys.Clear();
         for (int i = (int)GameplayAction.CorePlacement; i <= (int)GameplayAction.SmelterPlacement; i++)
-            _selectionKeys.TryAdd(_bindings.Key((GameplayAction)i), false);
+            if (_bindings.Key((GameplayAction)i) is not PlatformKey.Unknown)
+                _selectionKeys.TryAdd(_bindings.Key((GameplayAction)i), false);
     }
 
     public BuildingId ActiveBuilding { get; private set; } = BuildingId.None;
@@ -475,6 +469,7 @@ public sealed class RtsBuildingPlacementController
         BuildingId buildingId,
         bool allowSelection)
     {
+        if (key == PlatformKey.Unknown) return;
         bool down =
             input.IsKeyDown(key);
         bool wasDown =

@@ -16,6 +16,9 @@ public static class DeveloperMenuView
         void Control(string label, string value, Action action, bool enabled = true, Action<int>? adjust = null) =>
             rows.Add(new(new(label, value, !enabled, IsSelectable: enabled, CanDecrease: enabled && adjust is not null,
                 CanIncrease: enabled && adjust is not null, ValueKind: adjust is null ? FrontendValueKind.Text : FrontendValueKind.Choice), enabled ? action : null, enabled ? adjust : null));
+        void Check(string label, bool value, Action action, bool enabled = true) =>
+            rows.Add(new(new(label, value ? "ON" : "OFF", !enabled, IsSelectable: enabled,
+                ValueKind: FrontendValueKind.Toggle, IsOn: value), enabled ? action : null));
         bool writable = !model.WriteBlocked;
         Control("SECTION", model.Section.ToString(), () => model.ChangeSection(1), true, model.ChangeSection);
         var p = model.Providers;
@@ -93,9 +96,16 @@ public static class DeveloperMenuView
                     p.Actions.Status.Availability == DeveloperProviderAvailability.Available);
                 break;
             case DeveloperMenuSection.Visualization:
-                Control("DEBUG MASTER", model.Debug.Enabled ? "ON" : "OFF", model.Debug.ToggleMaster);
+                Check("DEBUG MASTER", model.Debug.Enabled, model.Debug.ToggleMaster, model.Available);
                 foreach (var category in Enum.GetValues<DebugOverlayCategory>().Where(c => c is not (DebugOverlayCategory.None or DebugOverlayCategory.All)))
-                    Control(category.ToString(), (model.Debug.Categories & category) != 0 ? "ON" : "OFF", () => model.Debug.ToggleCategory(category));
+                    Check(category.ToString(), (model.Debug.Categories & category) != 0,
+                        () => model.Debug.ToggleCategory(category), model.Available);
+                foreach (var toggle in model.VisualizationSwitches)
+                    Check(toggle.Label, toggle.Read(), toggle.Toggle, model.Available && (toggle.Available?.Invoke() ?? true));
+                foreach (var command in model.VisualizationCommands)
+                    Control(command.Label, "RUN ONCE", () => model.RunVisualizationCommand(command),
+                        model.Available && (command.Available?.Invoke() ?? true));
+                Info("CONTROLS", "Checkboxes replace developer Shift+F shortcuts. Debug master gates its categories.");
                 Info("DATA", "Only chosen simulation categories request extraction. Rendering needs no simulation debug snapshot.");
                 Info("SIMULATION DEBUG DATA", model.DebugDataTick is { } captured ? "Captured at tick " + captured.Value +
                     (captured != model.Inspector.Tick ? " / older than current snapshot" : "") : "Unavailable; waiting for selected category capture", model.DebugDataTick is null);
@@ -122,7 +132,7 @@ public static class DeveloperMenuView
     {
         var lines = rows.Skip(scroll).Take(capacity).Select((row, i) => row.Line with { IsFocused = i + scroll == focus }).ToArray();
         return FrontendSurfaceView.Detail("DEVELOPER TOOLS", lines,
-            "UP/DOWN / WHEEL SCROLL   LEFT/RIGHT ADJUST   ENTER APPLY / SELECT   ESC BACK TO PAUSE", secondaryAction: "BACK TO PAUSE")
+            "UP/DOWN / WHEEL SCROLL   LEFT/RIGHT ADJUST   ENTER / SPACE TOGGLE   F1 / ESC BACK TO PAUSE", secondaryAction: "BACK TO PAUSE")
             with { Feedback = feedback, TotalDetailRows = rows.Count, DetailRowOffset = scroll, PauseContext = true };
     }
 }

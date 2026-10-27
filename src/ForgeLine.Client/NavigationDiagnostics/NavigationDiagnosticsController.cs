@@ -11,6 +11,42 @@ internal sealed class NavigationDiagnosticsController(bool authorized)
     internal bool OwnsShortcut(PlatformKey key, bool openingThisFrame) =>
         authorized && (Open || openingThisFrame) && key is PlatformKey.F10 or PlatformKey.F11 or PlatformKey.F12;
 
+    internal bool Available => authorized;
+    internal NavigationDiagnosticLayers EnabledLayers => _layers;
+    internal void ToggleOpen()
+    {
+        if (!authorized) return;
+        Open = !Open;
+        if (!Open) { _layers = NavigationDiagnosticLayers.None; _scroll = 0; Feedback = ""; }
+    }
+    internal void ToggleLayer(NavigationDiagnosticLayers layer)
+    {
+        if (authorized && Open) _layers ^= layer;
+    }
+    internal string ScrollDetails(int direction)
+    {
+        if (authorized && Open) _scroll = Math.Clamp(_scroll + direction, 0, 18);
+        return "Navigation detail offset: " + _scroll;
+    }
+    internal string ExportReport(PresentationSnapshotBuffer snapshots, SimulationSessionId activeSession,
+        IReadOnlyCollection<EntityId> selection, PlayerId viewer, string map, ulong seed)
+    {
+        EntityId selected = selection.Count == 1 ? selection.First() : default;
+        var view = new NavigationDiagnosticsView(authorized && Open, Layers, activeSession, selected);
+        if (!authorized || !Open || !selected.IsValid || !snapshots.TryReadLatest(out var latest) ||
+            !NavigationDiagnosticsViewModel.TryGetVehicle(latest, view, out _) || latest.NavigationDiagnosis?.Viewer != viewer)
+            return Feedback = "Export rejected: current owned selection unavailable.";
+        var result = NavigationDiagnosticReportExporter.TryWrite(latest, activeSession, latest.Tick, viewer, selected, map, seed);
+        return Feedback = result.Exported ? $"Exported {System.IO.Path.GetFileName(result.Path)}" : $"Export failed: {result.Failure}";
+    }
+
+    internal void BindSession(SimulationSessionId activeSession)
+    {
+        if (_session != activeSession)
+        {
+            _session = activeSession; _selected = default; Open = false; _layers = NavigationDiagnosticLayers.None; _focusedLayer = 0; _scroll = 0; Feedback = "";
+        }
+    }
     private SimulationSessionId _session;
     private EntityId _selected;
     internal bool Open { get; private set; }
@@ -22,10 +58,7 @@ internal sealed class NavigationDiagnosticsController(bool authorized)
         PresentationSnapshotBuffer snapshots, SimulationSessionId activeSession, IReadOnlyCollection<EntityId> selection,
         PlayerId viewer, string map, ulong seed, bool nextLayer = false, bool clearLayers = false, int scrollDelta = 0)
     {
-        if (_session != activeSession)
-        {
-            _session = activeSession; _selected = default; Open = false; _layers = NavigationDiagnosticLayers.None; _focusedLayer = 0; _scroll = 0; Feedback = "";
-        }
+        BindSession(activeSession);
         if (!authorized || !activeSession.IsSpecified) return default;
         if (canInteract && toggle)
         {

@@ -298,7 +298,8 @@ internal static class FrontendPresentationAdapter
             new("ROTATE LEFT", Key(bindings.RotateLeft)),
             new("ROTATE RIGHT", Key(bindings.RotateRight)),
             new("PLACE TURN LEFT", "Q (WHILE PLACING)"),
-            new("PLACE TURN RIGHT", "E / " + gameplay.Prompt(GameplayAction.RotatePlacement) + " (WHILE PLACING)"),
+            new("PLACE TURN RIGHT", gameplay.Key(GameplayAction.RotatePlacement) == ForgeLine.Platform.PlatformKey.Unknown ?
+                "E (WHILE PLACING)" : "E / " + gameplay.Prompt(GameplayAction.RotatePlacement) + " (WHILE PLACING)"),
             new("RING PAGE PREV", "Q (PAGED SUBMENU)"),
             new("RING PAGE NEXT", "E (PAGED SUBMENU)"),
             new("PITCH UP", Key(bindings.PitchUp)),
@@ -316,16 +317,14 @@ internal static class FrontendPresentationAdapter
             new("RECALL CONTROL GROUP", "DIGIT"),
             new("FOCUS CONTROL GROUP", "DOUBLE DIGIT"),
             new("CLEAR CONTROL GROUP", "CTRL + SHIFT + DIGIT"),
-            new("DETAILED STATS", "SHIFT + F1"),
             new("OPTIONAL GUIDE", "SHIFT + F12"),
             new("WORLD DEBUG", "F2")
         };
         if (!DeveloperToolsCapability.Current.IsCompiled || developerSessionActive == false) lines.RemoveAll(line => line.Label == "WORLD DEBUG");
         else
         {
-            lines.Add(new("RENDER DEBUG", "SHIFT + F2"));
-            lines.Add(new("DEBUG CATEGORIES", "SHIFT + F4-F9"));
-            lines.Add(new("DEVELOPER TOOLS", "PAUSE / DEVELOPER TOOLS"));
+            lines.Add(new("DEVELOPER TOOLS", "F1 / PAUSE MENU"));
+            lines.Add(new("DIAGNOSTIC CHECKBOXES", "F1 / VISUALIZATION"));
         }
         lines.AddRange(GameplayBindingRegistry.Definitions.Select(definition =>
             new FrontendDetailLineView(definition.Label, gameplay.Prompt(definition.Action))));

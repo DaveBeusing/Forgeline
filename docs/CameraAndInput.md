@@ -100,7 +100,7 @@ Camera bindings are represented by `RtsCameraBindings`. Selection conventions us
 
 The pre-alpha client persists the existing `RtsCameraBindings` contract in `%LOCALAPPDATA%\\FORGELINE\\settings.json`. Camera pan, rotation, pitch, and drag-pan bindings can therefore be changed without adding a second input model. Settings validation rejects unknown/no-button values and duplicate primary camera actions. Settings also exposes twenty-five gameplay actions, including dock navigation and activation. Schema 1 migrates without rewriting camera values; invalid gameplay overrides alone recover while valid camera/display settings survive. See [editing and overlap rules](GameplayInputAccessibilityAndQualification.md).
 
-`F1` (or `F12`) toggles the in-game controls reference. F1, F12, Escape, and the Back button close it. Escape closes help without opening pause. The reference uses active camera bindings and the configured edge-scroll state. `Shift + F1` toggles development metrics; `Space` toggles explicit player pause. Help and pause use the existing simulation-owner control boundary.
+Escape opens Pause and its Controls page. In an activated Developer build, unmodified F1 opens the existing developer menu at Visualization; F1/Escape returns to Pause. There are no legacy F1/F12 help bindings. Shift+F12 only toggles the optional match guide; metrics and diagnostic switches use the F1 checkboxes. Space retains explicit player pause. All modal entry and exit use the existing simulation-owner control boundary.
 
 ## Raw Input
 
@@ -245,7 +245,7 @@ Terrain remains world/presentation state rather than simulation gameplay state. 
 
 ## Navigation Regression Coverage
 
-Camera tests verify view-projected left/right and forward/backward movement after rotation, keyboard/edge equivalence, drag polarity, 60/144 Hz distance, zoom limits and resized viewport edges. Input tests cover focus loss, pointer leave/re-entry, HUD pointer capture and held-input suppression. Client tests cover first-press help, repeat suppression, F1/F12 and Escape close, Back dismissal and focus transitions. Selection tests cover modal drag cancellation with selection preserved. Frontend tests verify the complete controls text and footer at 1024x720, 1600x900 and 2560x1440, including raised UI scale and reusable buffer growth.
+Camera tests verify view-projected left/right and forward/backward movement after rotation, keyboard/edge equivalence, drag polarity, 60/144 Hz distance, zoom limits and resized viewport edges. Input tests cover focus loss, pointer leave/re-entry, HUD pointer capture and held-input suppression. Historical client cases cover the former help path; current F1 checkbox-menu and retired-key migration behavior still require manual input review. Selection tests cover modal drag cancellation with selection preserved. Frontend tests verify the complete controls text and footer at 1024x720, 1600x900 and 2560x1440, including raised UI scale and reusable buffer growth.
 
 Camera target navigation remains unbounded as before; zoom and pitch retain their configured bounds. No new map clamp or projection was introduced.
 
@@ -271,12 +271,15 @@ See [named regions and migration](FrontendLayout.md) and [qualification](Fronten
 
 ## Gameplay usability
 
-F1 and unmodified F12 do not open a gameplay help page. Escape opens Pause,
-where Controls and Settings remain available. Shift+F1 toggles the detailed
-performance overlay. Normal HUD counters are absent; metric sampling remains
-available to diagnostics and qualification.
-Windows generic Shift/Control messages are decoded by scan code/extended bit,
-and brief Shift+F1 presses survive release before the next platform frame.
+F1 opens Visualization only with compiled and active developer tools. Public F1
+and unmodified F12 have no help action. Escape opens Pause/Controls/Settings.
+Performance metrics use the developer menu checkbox; the live loop no longer
+handles Shift+F1. F3-F9 and their old placement/debug combinations are retired.
+Gameplay overrides using them are dropped during settings load; affected camera
+slots receive available ordinary default keys without resetting other settings.
+F10/F11 remain player overlay/minimap keys. Windows modifier decoding and
+press/release suppression retain their normal ownership.
+
 
 Enabled action cards activate on the first click. Clicking a building card
 starts its placement preview; the next world click places it through the
@@ -340,6 +343,6 @@ The player-facing minimap grows toward the upper-left from a fixed lower-right a
 
 ## Contextual Q/E rotation and radial paging
 
-The original camera Q/E bindings remain the default whenever no active contextual owner has priority. During building placement, Q turns the authorized building preview one 90-degree step counterclockwise and E clockwise; F9 or its valid gameplay remap continues to turn clockwise. During an open item/group radial submenu with more than one real page, Q/E navigate previous/next without rotating the camera. Other menu levels leave Q/E with the camera. The client suppresses camera pan, pitch and rotation bindings mapped to Q/E while placement or an actual paginated ring owns those keys. Other saved camera keys, as well as wheel and drag behavior, retain their existing semantics. Modal/help/settings/pause frames remain blocked at the client boundary.
+The original camera Q/E bindings remain the default whenever no active contextual owner has priority. During building placement, Q turns the authorized building preview one 90-degree step counterclockwise and E clockwise. The rotation action is initially unbound and can be assigned another permitted key; F3-F9 are retired. During an open item/group radial submenu with more than one real page, Q/E navigate previous/next without rotating the camera. Other menu levels leave Q/E with the camera. The client suppresses camera pan, pitch and rotation bindings mapped to Q/E while placement or an actual paginated ring owns those keys. Other saved camera keys, as well as wheel and drag behavior, retain their existing semantics. Modal/help/settings/pause frames remain blocked at the client boundary.
 
 Focused hover tests verify 30/60/144 Hz motion, mid-transition direction changes, immediate obstacle-driven contraction, current map projection, expanded-only command input and allocation-free steady updates. Real physical-pointer, native D3D12 screenshot and display/DPI acceptance remain separate validation gates; synthetic geometry tests do not replace those checks.

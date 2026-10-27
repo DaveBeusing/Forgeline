@@ -437,11 +437,11 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             builder.NewLine();
             builder.Append(_bindings.Text("L LOGISTICS  Y SUPPLY  K COMBAT"));
             builder.NewLine();
-            builder.Append(_bindings.Text("SHIFT+F1 PERFORMANCE METRICS  F2 WORLD DEBUG  F3 FORMATION"));
+            builder.Append(_bindings.Text("ESC CONTROLS / B BUILD / F10 LAYERS / F11 MINIMAP"));
             builder.NewLine();
-            builder.Append(_bindings.Text("F4 COMMAND CORE  F5 POWER PLANT  F6 EXTRACTOR"));
+            builder.Append(_bindings.Text("B BUILD / CHOOSE COMMAND CORE, POWER OR EXTRACTOR"));
             builder.NewLine();
-            builder.Append(_bindings.Text("F7 STORAGE DEPOT  F8 SMELTER  F9 ROTATE BUILDING"));
+            builder.Append(_bindings.Text("B BUILD / CHOOSE STORAGE OR SMELTER / Q E ROTATE"));
             builder.NewLine();
             builder.Append(_bindings.Text("F10 STRATEGIC OVERLAY  F11 MINIMAP  ESC PAUSE / CONTROLS"));
             builder.NewLine();

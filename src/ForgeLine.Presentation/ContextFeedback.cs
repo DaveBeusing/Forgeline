@@ -61,11 +61,11 @@ public static class PlacementContextFeedback
         if (!current.IsValid)
             return new(PlacementContextState.Invalid, title, PlayerActionDockHudModel.ResolvePlacementFailureLabel(current.Failure),
                 current.Failure == BuildingPlacementFailureReason.ResourceDepositRequired
-                    ? "PLACE THE EXTRACTOR ON A RESOURCE DEPOSIT" : "CHOOSE ANOTHER LOCATION / F9 ROTATE");
+                    ? "PLACE THE EXTRACTOR ON A RESOURCE DEPOSIT" : "CHOOSE ANOTHER LOCATION / Q E ROTATE");
         if (action is { HasRequiredResources: false })
             return new(PlacementContextState.MissingMaterials, title, "MISSING CORE MATERIALS", "REPLENISH COMMAND CORE CONSTRUCTION STOCK", action.Costs);
         return new(PlacementContextState.Valid, title, "LOCATION VALID AT CAPTURED TICK",
-            "LEFT CLICK REQUEST / ESC CANCEL / F9 ROTATE", action?.Costs);
+            "LEFT CLICK REQUEST / Q E ROTATE / ESC CANCEL", action?.Costs);
     }
 }
 

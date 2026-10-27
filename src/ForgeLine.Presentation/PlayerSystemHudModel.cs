@@ -38,10 +38,10 @@ internal static class PlayerSystemHudModel
             4 =>
                 "F10 STRATEGIC OVERLAY  F11 MINIMAP  ESC PAUSE / CONTROLS",
             5 =>
-                "ESC OR SPACE PAUSE  SHIFT+F1 METRICS  F2 WORLD DEBUG",
+                "ESC OR SPACE PAUSE / CONTROLS",
             6 => "SHIFT+F12 EXPAND / COLLAPSE OPTIONAL MATCH GUIDE",
             7 => "HOME BASE FOCUS  CTRL+DIGIT ASSIGN  DOUBLE DIGIT GROUP FOCUS",
-            8 => "SHIFT+CLICK REPEAT BUILD AFTER ACCEPTANCE  F9 ROTATE  ESC CANCEL",
+            8 => "SHIFT+CLICK REPEAT BUILD AFTER ACCEPTANCE  Q E ROTATE  ESC CANCEL",
             9 => "OBJECTIVE DESTROY THE ENEMY COMMAND CORE",
             _ =>
                 string.Empty
