@@ -45,6 +45,7 @@ public sealed record SkirmishDecisionDiagnostic(
     SkirmishEconomyDiagnostic Economy)
 {
     public SkirmishObjectiveDiagnostic? Objective { get; init; }
+    public SkirmishResearchReadModel Research { get; init; }
 }
 
 public sealed record SkirmishEligibilityLossDiagnostic(
@@ -66,6 +67,7 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
     private const ulong PeriodicCaptureTicks = 1_000;
 
     private readonly InventoryStore _inventories;
+    private readonly SkirmishOpponentSystem? _opponents;
     private readonly UnitDefinitionCatalog _units;
     private readonly IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration> _configurations;
     private readonly FactionIntelligenceStore? _intelligence;
@@ -78,12 +80,14 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
         InventoryStore inventories,
         UnitDefinitionCatalog units,
         IReadOnlyDictionary<PlayerId, SkirmishOpponentConfiguration> configurations,
-        FactionIntelligenceStore? intelligence = null)
+        FactionIntelligenceStore? intelligence = null,
+        SkirmishOpponentSystem? opponents = null)
     {
         _inventories = inventories ?? throw new ArgumentNullException(nameof(inventories));
         _units = units ?? throw new ArgumentNullException(nameof(units));
         _configurations = configurations ?? throw new ArgumentNullException(nameof(configurations));
         _intelligence = intelligence;
+        _opponents = opponents;
     }
 
     public SimulationPhase Phase => SimulationPhase.AiDecisions;
@@ -114,7 +118,8 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
 
             SkirmishOpponentController controller = context.Entities.GetComponent<SkirmishOpponentController>(entity);
             SkirmishOpponentConfiguration configuration = _configurations[controller.Player];
-            SkirmishDecisionDiagnostic current = Capture(context, controller.Player, state, configuration);
+            SkirmishDecisionDiagnostic current = Capture(context, controller.Player, state, configuration) with
+            { Research = _opponents?.CaptureResearch(entity) ?? default };
             ObservedDecisions++;
 
             if (_latest.TryGetValue(controller.Player, out SkirmishDecisionDiagnostic? previous) &&
@@ -489,7 +494,7 @@ public sealed class SkirmishProgressionDiagnostics : ISimulationSystem
     private static string BuildTransitionKey(SkirmishDecisionDiagnostic entry) =>
         $"{entry.StrategicState}/{entry.Goal}/{entry.CombatCandidates}/{entry.EligibleAttackers}/" +
         $"{entry.ScoutExclusions}/{entry.ReadinessExclusions}/{entry.FuelExclusions}/{entry.AmmunitionExclusions}/" +
-        $"{entry.ActiveResupplyOrders}/" +
+        $"{entry.ActiveResupplyOrders}/{entry.Research.Technology}/{entry.Research.Reason}/{entry.Research.Block}/" +
         string.Join(";", entry.Production.Select(static facility =>
             $"{facility.Entity}:{facility.ActiveUnit}:{facility.Status}:" +
             string.Join(",", facility.Inputs.Where(static input => input.Missing > 0.0).Select(static input => input.Resource)))) +
