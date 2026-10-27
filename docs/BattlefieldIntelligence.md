@@ -79,13 +79,13 @@ Presentation can request a bounded snapshot for the active terrain world. Bounde
 - visual range;
 - update interval in simulation ticks.
 
-Visual sensors identify compatible enemy intelligence signatures inside range.
+Visual sensors identify compatible enemy intelligence signatures inside range only after the bounded ground visual-occlusion policy permits the observation.
 
 A visual scan therefore:
 
 1. queries nearby candidates through the existing spatial index when available;
 2. rejects self, friendly entities, stale entities, and entities without a visual-detectable intelligence signature;
-3. records an `Identified` contact at the observed simulation position;
+3. requires an admitted clear visual trace through authored screens and sampled terrain, then records an `Identified` contact at the observed simulation position;
 4. updates faction visual terrain coverage.
 
 The ECS fallback remains available for headless compositions without a spatial index.
@@ -111,12 +111,12 @@ This prevents lower-frequency sensing from becoming a hidden transform leak.
 
 A radar-detectable enemy inside detection range produces a `Detected` contact.
 
-If an identification range is configured and the target is inside that smaller range, radar may produce `Identified` instead.
+If an identification range is configured and the target is inside that smaller range, radar may produce `Identified` only after a successful bounded visual trace. Screens and terrain do not stop radar detection; they can stop exact identification.
 
 Detected-only contacts expose:
 
 - opaque contact key;
-- last-known position;
+- last-known rounded intelligence-grid coordinate, rather than exact hidden world position (current grid: 32 m, Y=0);
 - last-seen tick;
 - detection state.
 
@@ -323,7 +323,6 @@ Later intelligence work may add:
 - SIGINT;
 - stealth and signature strength;
 - weather attenuation;
-- terrain occlusion for visual sensors;
 - confidence/uncertainty models;
 - contact aging policies;
 - allied intelligence sharing;
@@ -355,3 +354,13 @@ Atmospheric scene fog is independent of tactical fog of war. Its copied color, d
 Unexplored/hidden enemy transforms cannot supply fog depth, color or shadow casters. Radar-only and last-known contacts remain bounded copied Overlay markers, with the existing identity/targetability rules. HUD, minimap, warning colors and tactical icons are composed after haze. Atmospheric opacity is not an intelligence state and cannot grant or revoke detection, identification or a combat target.
 
 Native pixel regressions verify hidden-object invariance and exact Overlay preservation; existing extraction/targeting and deterministic save tests remain authoritative. See [Graphics](Graphics.md#atmospheric-fog-and-scene-depth) for visual controls and qualification limits.
+
+## Explicit cover and ground visual occlusion
+
+Normal matches load explicit tactical geography from revision-2, format-4 maps. Visual screens block ground observation into, out of or across their horizontal region outside a 32 m close exception. Terrain is checked separately with fixed eye offsets and bounded samples; the screen exception does not bypass a hill. Terrain Visible fog cells remain range/exploration state and do not grant enemy entity access.
+
+Additional visual work is limited to 32 areas and 64 interior terrain samples per trace, 128 attempts per sensor and 2,048 per tick. Deterministic sensor admission and spatial-candidate rotation bound work without claiming immediate identification under overload. Exhaustion or unavailable terrain produces no new exact observation. Radar may still produce only a coarse contact. The existing current-tick identification, faction isolation, stale observation and copied-presentation boundaries remain authoritative.
+
+Sensors/All overlays show public green infantry-cover areas and amber screens. Owned unit tooltips report their own position-derived state. These copies expose no hostile cover occupancy, health, inventory or exact detected-only position. Existing coordinate artillery uses the copied coarse position and ordinary terrain projection; it does not reacquire a hidden target.
+
+See [rules, locations, budgets and manual acceptance](CoverAndVisualOcclusion.md) and [the architecture decision](adr/ExplicitCoverAndVisualOcclusion.md). Authoritative schema 16 rejects earlier sensing semantics; envelope 1/payload 11 remain. No new tests or qualification runs are claimed.

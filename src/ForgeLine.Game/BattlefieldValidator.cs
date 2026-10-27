@@ -11,7 +11,12 @@ public static class BattlefieldValidator
     {
         ArgumentNullException.ThrowIfNull(definition);
 
+        ArgumentNullException.ThrowIfNull(definition.TacticalAreas);
         var errors = new List<string>();
+        if (definition.MapRevision < 1 || definition.TacticalAreas.Areas.Any(a =>
+            a.Bounds.Minimum.X < 0 || a.Bounds.Minimum.Z < 0 ||
+            a.Bounds.Maximum.X > definition.Metadata.WidthMeters || a.Bounds.Maximum.Z > definition.Metadata.HeightMeters))
+            errors.Add("Tactical geography must fit the authored map revision.");
 
         ValidateMetadata(
             definition,

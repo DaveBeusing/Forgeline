@@ -387,7 +387,7 @@ session. New Game, Restart and Load discard them. Accepted ordinary Build and
 Conveyor inputs already use existing replay codecs and authoritative site/inventory
 state. There is no new authoritative component, command kind, saved template,
 registered content identity or schema: envelope 1, payload 11 and authoritative
-schema 14 remain current. A save between steps retains paid work but does not
+schema 16 remain current. A save between steps retains paid work but does not
 resume the unsent template continuation on load. Historical hashes stay intact.
 
 Status: implemented; manual user review outstanding. Product compilation does

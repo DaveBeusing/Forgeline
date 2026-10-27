@@ -172,6 +172,8 @@ public readonly record struct PlayerSelectionSummary(
     UnitId CommonUnitId = default,
     BuildingId CommonBuildingId = default)
 {
+    public PlayerTacticalProtectionSummary? TacticalProtection { get; init; }
+
     public bool HasSingleEntityDetails =>
         Count == 1;
 

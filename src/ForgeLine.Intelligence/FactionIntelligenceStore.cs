@@ -192,10 +192,17 @@ public sealed class FactionIntelligenceStore
         faction.Contacts[entity] =
             new ContactRecord(
                 key,
-                position,
+                state == IntelligenceState.Detected ? CoarsePosition(position) : position,
                 state,
                 tick,
                 identityKey);
+    }
+
+    private Vector3 CoarsePosition(Vector3 position)
+    {
+        float spacing = _settings.CellSizeMeters;
+        return new Vector3(MathF.Round(position.X / spacing) * spacing, 0,
+            MathF.Round(position.Z / spacing) * spacing);
     }
 
     public IntelligenceState GetTerrainState(

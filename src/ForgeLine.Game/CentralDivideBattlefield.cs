@@ -31,7 +31,7 @@ public static class CentralDivideBattlefield
             CreateCrossings(),
             CreateObjectives(),
             CreateBarrierObstacles(),
-            CreateTerrainVisual());
+            CreateTerrainVisual()) { MapRevision = 2, TacticalAreas = AuthoredTacticalAreas.CentralDivide() };
 
         BattlefieldValidator.ValidateDefinition(definition);
         return definition;

@@ -99,6 +99,9 @@ public readonly record struct StrategicPowerNetworkReadModel(
             0;
 }
 
+public readonly record struct StrategicTacticalAreaReadModel(
+    string Label, Vector3 A, Vector3 B, Vector3 C, Vector3 D, bool BlocksVisual);
+
 public sealed class StrategicOverlaySnapshot
 {
     private readonly IReadOnlyList<StrategicLogisticsNodeReadModel> _logisticsNodes;
@@ -165,6 +168,7 @@ public sealed class StrategicOverlaySnapshot
     public PlayerId Player { get; }
 
     public StrategicOverlayMode RequestedMode { get; }
+    public IReadOnlyList<StrategicTacticalAreaReadModel> TacticalAreas { get; init; } = [];
 
     public IReadOnlyList<StrategicLogisticsNodeReadModel> LogisticsNodes =>
         _logisticsNodes;
@@ -275,7 +279,29 @@ internal static class StrategicOverlaySnapshotFactory
             navigationSectors,
             navigationPortals,
             powerEntities,
-            powerNetworks, extraction.Scenario.Simulation.SessionId, extraction.Player);
+            powerNetworks, extraction.Scenario.Simulation.SessionId, extraction.Player)
+        { TacticalAreas = all || mode == StrategicOverlayMode.Sensors
+            ? Array.AsReadOnly(CaptureTacticalAreas(extraction.Scenario)) : Array.Empty<StrategicTacticalAreaReadModel>() };
+    }
+
+    private static StrategicTacticalAreaReadModel[] CaptureTacticalAreas(MatchRuntime scenario)
+    {
+        var rows = new List<StrategicTacticalAreaReadModel>(TacticalAreaSet.MaximumAreas);
+        Vector3 Ground(float x, float z)
+        {
+            scenario.Terrain.TrySampleHeight(x, z, out float height);
+            return new Vector3(x, height + .3f, z);
+        }
+        // Authored geography is public. No entity occupancy, identity or enemy state is copied.
+        foreach (var area in scenario.Battlefield.TacticalAreas.Areas)
+        {
+            var b = area.Bounds;
+            string label = area.BlocksVisual ? area.DisplayName + " / VISUAL SCREEN" :
+                FormattableString.Invariant($"{area.DisplayName} / INFANTRY -{(1 - area.InfantryDamageMultiplier) * 100:0}% DIRECT");
+            rows.Add(new(label, Ground(b.Minimum.X, b.Minimum.Z), Ground(b.Maximum.X, b.Minimum.Z),
+                Ground(b.Maximum.X, b.Maximum.Z), Ground(b.Minimum.X, b.Maximum.Z), area.BlocksVisual));
+        }
+        return rows.ToArray();
     }
 
     private static StrategicLogisticsNodeReadModel[] CaptureLogisticsNodes(

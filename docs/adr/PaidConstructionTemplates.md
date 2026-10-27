@@ -48,7 +48,7 @@ or restarting never reconstructs local continuation.
 
 No new authoritative state or replay command is introduced. Accepted ordinary
 Build and Conveyor commands use existing serialization and normal reservation,
-site and infrastructure state. Envelope 1, payload 11, authoritative schema 14,
+site and infrastructure state. Envelope 1, payload 11, authoritative schema 16,
 registered map/catalog identities and historical hashes remain unchanged.
 A partially applied save retains accepted work while discarding unsent intent.
 

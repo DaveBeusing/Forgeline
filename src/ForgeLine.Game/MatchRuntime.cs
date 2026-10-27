@@ -386,10 +386,12 @@ public sealed class MatchRuntime : IDisposable
                 {
                     CellSizeMeters = 32.0f
                 });
+        var tacticalAreas = battlefield.TacticalAreas;
+        var visualOcclusion = new VisualOcclusionPolicy(terrain, tacticalAreas);
         var battlefieldIntelligence =
             new BattlefieldIntelligenceSystem(
                 intelligence,
-                spatialIndex, technologyDefinitions)
+                spatialIndex, technologyDefinitions, visualOcclusion)
             {
                 TimingEnabled =
                     runtimeSettings.EnableDebugCapture,
@@ -466,7 +468,9 @@ public sealed class MatchRuntime : IDisposable
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
             };
-        navigation.ConnectVehicleRouting(terrain, simulation, groundMovement.NavigationClearanceMeters);
+        navigation.ConnectVehicleRouting(terrain, simulation, groundMovement.NavigationClearanceMeters, scheduler,
+            runtimeSettings.Composition.Key + "|" + runtimeSettings.Seed.ToString(System.Globalization.CultureInfo.InvariantCulture) +
+            "|" + System.Text.Json.JsonSerializer.Serialize(runtimeSettings.Composition.Identity));
         groundMovement.ConnectNavigation(navigation, terrain, battlefield.StaticNavigationObstacles);
         var strategicInfrastructure =
             new StrategicInfrastructureSystem(
@@ -528,7 +532,7 @@ public sealed class MatchRuntime : IDisposable
                 combatRuntime,
                 weapons,
                 armor,
-                artilleryWeapons);
+                artilleryWeapons, tacticalAreas);
         var buildingDestruction = new BuildingCombatDestruction(
             inventories, buildingConstruction, production, unitProduction,
             technologyResearch, cargoTransport, automatedDistribution);
@@ -897,6 +901,7 @@ public sealed class MatchRuntime : IDisposable
 #if FORGELINE_DEVELOPER_TOOLS
         (Services.DeveloperActions as DeveloperCommandGateway)?.Dispose();
 #endif
+        Services.Navigation.Dispose();
         Replay.Dispose();
         OperationsRules.Dispose();
         _ownedScheduler?.Dispose();
