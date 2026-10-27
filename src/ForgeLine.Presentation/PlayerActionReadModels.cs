@@ -795,6 +795,9 @@ internal static partial class PlayerActionSnapshotFactory
             actions.Add(new(new BuildingId(ConveyorGeometry.MenuBase+(uint)module),
                 "Conveyor / "+ConveyorGeometry.Name(module), new[]{CreateAmount(scenario,constructionInventory,ResourceIds.Steel,minimum)},false));
         }
+        for (uint template = 1; template <= 2; template++)
+            actions.Add(new(new BuildingId(PaidConstructionTemplates.MenuBase + template),
+                "Template / " + PaidConstructionTemplates.Name((int)template), Array.Empty<PlayerActionResourceAmount>(), false));
         return actions.ToArray();
     }
 

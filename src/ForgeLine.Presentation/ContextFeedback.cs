@@ -18,6 +18,7 @@ public static class PlacementContextFeedback
     public static PlacementContextFeedbackView Resolve(RtsBuildingPlacementController controller, PresentationSnapshot? snapshot)
     {
         ArgumentNullException.ThrowIfNull(controller);
+        if (controller.Templates.IsActive) return controller.Templates.Context(snapshot);
         if (controller.Conveyor.IsActive) return controller.Conveyor.Context(snapshot);
         if (controller.AwaitingResult)
             return new(PlacementContextState.Pending, "BUILDING PLACEMENT", "BUILD REQUEST PENDING",

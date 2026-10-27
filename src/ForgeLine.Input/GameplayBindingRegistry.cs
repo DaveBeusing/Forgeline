@@ -58,8 +58,8 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.CorePlacement, PlatformKey.F4, "PLACE CORE", GameplayBindingScope.Global),
         new(GameplayAction.PowerPlacement, PlatformKey.F5, "PLACE POWER", GameplayBindingScope.Global),
         new(GameplayAction.ExtractorPlacement, PlatformKey.F6, "PLACE EXTRACTOR", GameplayBindingScope.Global),
-        new(GameplayAction.StoragePlacement, PlatformKey.F7, "PLACE STORAGE", GameplayBindingScope.Global),
-        new(GameplayAction.SmelterPlacement, PlatformKey.F8, "PLACE SMELTER", GameplayBindingScope.Global),
+        new(GameplayAction.StoragePlacement, PlatformKey.F7, "PLACE STORAGE / CTRL TEMPLATE", GameplayBindingScope.Global),
+        new(GameplayAction.SmelterPlacement, PlatformKey.F8, "PLACE SMELTER / CTRL TEMPLATE", GameplayBindingScope.Global),
         new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global),
         new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
     ];

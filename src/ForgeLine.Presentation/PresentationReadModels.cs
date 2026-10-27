@@ -59,6 +59,11 @@ public sealed class PresentationInteractionState
     private bool _navigationDiagnosticsOpen;
     public void SetNavigationDiagnosticsOpen(bool open)
     { lock (_gate) _navigationDiagnosticsOpen = open; }
+    private ConstructionTemplatePreviewRequest? _templateRequest;
+    public void SetTemplateRequest(ConstructionTemplatePreviewRequest? request)
+    { lock (_gate) _templateRequest = request; }
+    public ConstructionTemplatePreviewRequest? CaptureTemplateRequest()
+    { lock (_gate) return _templateRequest; }
     private ConveyorPreviewRequest? _conveyorRequest;
     public void SetConveyorRequest(ConveyorPreviewRequest? request)
     { lock (_gate) _conveyorRequest=request; }
