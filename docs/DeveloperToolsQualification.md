@@ -10,7 +10,10 @@ The tested product source is `ad318ab3ad38e6feaaad92856a883c2c5f993bcb`,
 tree `e66203eec545b2e4f67c34ba47db138c2f991f9c`. Focused integration and package
 checks passed. Overall qualification remains blocked by required suite/terminal
 failures and incomplete physical DPI/human approval. This is a reviewable
-implementation, not a complete product acceptance or integration into master.
+implementation with incomplete product acceptance. PR #379 was subsequently
+merged into master as 89086e68cc72798544b8b75d81c7d36d6bd13811. The evidence
+below remains attributed to its original tested source; integration does not
+resolve the documented qualification failures or supply human approval.
 
 ## Integration corrections before acceptance
 

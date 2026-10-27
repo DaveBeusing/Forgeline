@@ -6,12 +6,14 @@ The foundation starts at master 20a6e0f6cbf4dbfadf5f2143a7a782b0db3b2c26
 (0.1.478-dev), after research, runtime assets, navigation and diagnostic integration.
 It is synchronized with master864b8977b4d9addd85d837b401188f7da89432e4,
 including the subsequent conveyor-demolition integration.
-It adds build capability and typed contracts. The simulation-action package
-adds the Game-owned authoritative dispatcher, domain handlers and bounded
-Save/Replay payloads; it does not implement the operational menu, preset file
-I/O or client transport. Public diagnostics remain available. Official binaries
-are the access-control boundary: someone who
-changes and rebuilds these public sources controls their own host.
+The integrated product now includes the operational menu, Game-owned dispatcher,
+session controls, parameter transport and preset file I/O through PR #379
+(merge 89086e68cc72798544b8b75d81c7d36d6bd13811). ClientApplication composes
+ClientDeveloperMenuBackend by default; ClientSimulationHost retains the sole
+simulation owner and bounded transport. See [Developer tools menu](DeveloperToolsMenu.md)
+and [Developer presets](DeveloperPresets.md) for operation.
+Official binaries are the access-control boundary: someone who changes and
+rebuilds these public sources controls their own host.
 
 ## Build and capability
 
@@ -82,9 +84,11 @@ actual action gateway and gameplay parameter provider in Developer builds; the
 session owner must bind/revoke its live access on the simulation thread and
 transport client requests through that boundary. The gateway exposes correlated
 results through `CaptureResults`, and its five domain actions use real runtime
-effects. Public composition still rejects developer provider injection. The
-session host, menu, preset file I/O and their central files retain their existing
-ownership. See [Developer simulation actions](DeveloperSimulationActions.md) for
+effects. Public composition still rejects developer provider injection. ClientDeveloperMenuBackend connects those providers to the live menu and delegates
+session controls to ClientSimulationHost and file operations to
+ClientDeveloperPresetSessionAdapter. Runtime requests cross the host queue before
+the simulation owner invokes the Game dispatcher. The original module ownership
+remains in place. See [Developer simulation actions](DeveloperSimulationActions.md) for
 operation contracts, persistence schema 8 and integration handoff.
 
 ## Requests, results and revision domains
@@ -198,8 +202,9 @@ once an actual authoritative value changed. A reset is another ordered event; it
 cannot delete earlier changes or clear that flag. Presentation changes and host
 speed do not mark authoritative state. Initial non-default authoritative values
 must be recorded by the runtime owner as applied initialization before simulation.
-The foundation provides data/projection contracts only; it does not write a live
-history, replay record, authoritative hash or save document.
+The neutral foundation defines data/projection contracts. The integrated Game
+runtime supplies live ordered history, replay records, authoritative hash
+contributions and save data through the existing persistence owner.
 
 ## File ownership handoff
 
@@ -215,7 +220,14 @@ history, replay record, authoritative hash or save document.
 Change shared contracts in the integration branch before consumers adopt them.
 Do not duplicate adapters, parsers or dispatcher authority in parallel consumers.
 
-## Acceptance status
+## Current integration and acceptance
+
+The live provider paths are integrated. See [Developer tools qualification](DeveloperToolsQualification.md)
+for the combined source-specific evidence and unresolved overall qualification.
+Manual user approval remains outstanding. Documentation reconciliation changes
+no commands, authoritative state, preset or Save/Replay schemas.
+
+## Historical foundation acceptance
 
 Implementation used affected-product compiler builds only, with no test files,
 test/smoke runs or benchmarks before the explicit acceptance boundary.
