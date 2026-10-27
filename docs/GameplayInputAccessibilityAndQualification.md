@@ -124,8 +124,7 @@ for its matching simulation session and correlation ID. Full/stopping host bound
 gateway rejections resolve to REJECTED; an earlier command's delayed response cannot recolor
 a newer marker. A bounded 128-result scratch handles a result drained before its receipt,
 matching the existing gateway outstanding limit. A final marker lasts 0.8 seconds; pending
-markers remain until the outcome or an existing lifecycle cancellation. Labels and pending/
-warning/invalid shapes supplement color. Acceptance means the order was admitted, not that
+markers remain until the outcome or an existing lifecycle cancellation. Labels, the hollow pending square and the invalid symbol supplement color. Acceptance means the order was admitted, not that
 movement, damage or a queued leg has completed. Exact rejection reasons/counts remain in
 the existing authoritative notification/status surface.
 
@@ -134,3 +133,5 @@ modifier gestures, retained click origin, captured UI transitions, stale action 
 session/correlation mismatch, early results, partial acceptance and admission rejection.
 Native Windows interaction/terrain/DPI acceptance remains a separate gate; no screenshot
 or performance baseline is implicitly approved by these source-level cases.
+
+[Executed command input qualification](CommandInputQualification.md) records the build, selected tests, native captures and remaining acceptance gates.
