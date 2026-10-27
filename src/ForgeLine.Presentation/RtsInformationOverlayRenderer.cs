@@ -15,6 +15,12 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private TacticalDisplaySettings _displaySettings;
+    internal void ConfigureDisplay(TacticalDisplaySettings settings)
+    {
+        _displaySettings = settings;
+        _text.HighContrast = settings.HighContrast;
+    }
     private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
@@ -2154,7 +2160,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int height,
         float opacity = 1)
     {
-        if (_skin.Icon(icon, x, y, size, new Vector4(1,1,1,opacity))) return;
+        // Authored icons contain their original colors. Alternate team palettes use
+        // the established distinct procedural glyphs instead of tinting baked art.
+        bool alternateTeam = _displaySettings.TeamPalette != TacticalTeamPalette.Standard &&
+            icon is RtsUiIcon.MinimapFriendlyUnit or RtsUiIcon.MinimapVisibleEnemy or RtsUiIcon.MinimapDetectedContact;
+        if (!alternateTeam && _skin.Icon(icon, x, y, size, new Vector4(1,1,1,opacity))) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -2210,12 +2220,18 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             RtsUiIconCatalog.Get(
                 icon);
 
-        return _runtimePalette is not null &&
+        Vector4 color = _runtimePalette is not null &&
                _runtimePalette.TryResolve(
                    definition.AssetId,
                    out Vector4 runtimeColor)
             ? runtimeColor
             : definition.FallbackTint;
+        return icon switch
+        {
+            RtsUiIcon.MinimapFriendlyUnit => _displaySettings.TeamColor(false, color),
+            RtsUiIcon.MinimapVisibleEnemy or RtsUiIcon.MinimapDetectedContact => _displaySettings.TeamColor(true, color),
+            _ => color
+        };
     }
 
     private void EmitPixelLine(Vector2 a, Vector2 b, float thickness, Vector4 color, int width, int height)

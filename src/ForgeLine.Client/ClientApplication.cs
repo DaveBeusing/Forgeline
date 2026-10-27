@@ -1278,6 +1278,7 @@ internal sealed class ClientApplication
                         preAlphaUx,
                         frontendSurface,
                         FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                        TacticalDisplay: _settings.TacticalDisplay,
                         MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
@@ -1882,6 +1883,7 @@ internal sealed class ClientApplication
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                    TacticalDisplay: _settings.TacticalDisplay,
                     NotificationExpansion: alertController.Expansion, NavigationDiagnostics: navigationView),
                     gameplayDraw, debugDraw, selectionController.Selection.Entities);
                 lastPublishedCamera = publicationCamera;

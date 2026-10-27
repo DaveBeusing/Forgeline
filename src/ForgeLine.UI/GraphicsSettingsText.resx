@@ -61,4 +61,12 @@
   <data name="StandardTooltipText" xml:space="preserve"><value>STANDARD</value></data>
   <data name="LargeTooltipText" xml:space="preserve"><value>LARGE</value></data>
   <data name="ExtraLargeTooltipText" xml:space="preserve"><value>EXTRA LARGE</value></data>
+  <data name="DisplayPreset" xml:space="preserve"><value>READABILITY PRESET</value></data>
+  <data name="DisplayPresetHelp" xml:space="preserve"><value>Standard: 100%. Readable: 125% and reduced motion. High Contrast also adds outlined text and blue/orange team glyphs. APPLY saves; BACK discards.</value></data>
+  <data name="HighContrast" xml:space="preserve"><value>HIGH CONTRAST TEXT</value></data>
+  <data name="HighContrastHelp" xml:space="preserve"><value>White text with a black outline and opaque action-ring backgrounds. Status text and shape cues remain visible.</value></data>
+  <data name="TeamPalette" xml:space="preserve"><value>MINIMAP TEAM COLORS</value></data>
+  <data name="TeamPaletteHelp" xml:space="preserve"><value>Standard, blue/orange or grayscale. Friendly, enemy and detected-contact glyphs retain distinct shapes.</value></data>
+  <data name="ResetAccessibility" xml:space="preserve"><value>RESET READABILITY</value></data>
+  <data name="ResetAccessibilityHelp" xml:space="preserve"><value>Reset UI scale, contrast, team colors, motion and tooltips in this draft. Other settings remain. APPLY saves; BACK discards.</value></data>
 </root>

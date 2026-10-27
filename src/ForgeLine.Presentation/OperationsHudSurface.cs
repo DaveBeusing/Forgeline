@@ -12,6 +12,7 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
     private const int MaxLines = 24;
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _text.HighContrast = settings.HighContrast;
     private readonly IGraphicsPipeline _pipeline;
     private readonly GameplayHudSkin _skin;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);
