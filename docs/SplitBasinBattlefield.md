@@ -119,6 +119,6 @@ Manual acceptance of weapon destruction, paid completion, cargo continuity and S
 
 Revision 2 authors four infantry-cover rectangles near basin/outer approaches and two deliberate grove visual screens. Open Sensors to view green cover and amber screens, then use normal movement commands; single owned unit hover/selection status reports its own current state. Only these gameplay entries provide the rules, regardless of decorative object density.
 
-Cover reduces direct infantry damage by 35%, without stacking or artillery/vehicle/structure protection. Screens restrict ground visual/radar identification outside the 32 m close exception; terrain can still block the close ray. Radar detection remains possible as a coarse cell-centered contact. See [locations, budgets and acceptance limits](CoverAndVisualOcclusion.md).
+Cover reduces direct infantry damage by 35%, without stacking or artillery/vehicle/structure protection. Screens restrict ground visual/radar identification outside the 32 m close exception; terrain can still block the close ray. Radar detection remains possible as a coarse grid-rounded contact. See [locations, budgets and acceptance limits](CoverAndVisualOcclusion.md).
 
 The new map digest above, matching sidecar and registered descriptor replace revision 1 only for new compatible matches. Existing terrain fingerprints and historical measurements are retained without becoming proof of the new sensing or combat behavior. Product compilation and manual acceptance, including Save/Replay at authoritative schema 15, remain outstanding.

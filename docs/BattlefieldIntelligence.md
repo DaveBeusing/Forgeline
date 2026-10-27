@@ -116,7 +116,7 @@ If an identification range is configured and the target is inside that smaller r
 Detected-only contacts expose:
 
 - opaque contact key;
-- last-known intelligence-cell center, rather than exact hidden world position (current grid: 32 m, Y=0);
+- last-known rounded intelligence-grid coordinate, rather than exact hidden world position (current grid: 32 m, Y=0);
 - last-seen tick;
 - detection state.
 
