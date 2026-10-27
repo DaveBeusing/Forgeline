@@ -196,7 +196,12 @@ public sealed partial class HierarchicalNavigationSystem
         Algorithm = VehicleRoutingKernel.AlgorithmRevision, NextRequest = _nextRequestId,
         NextCommandGeneration = _nextCommandGeneration, LastServed = _lastServedRequest, CostTick = _costTick,
         IncompleteCostScopes = _incompleteCosts.Order().ToArray(),
-        Congestion = _congestion.OrderBy(p => p.Key).Select(p => p.Value.CaptureState()).ToArray(),
+        Congestion = _congestion.OrderBy(p => p.Key).Select(p =>
+        {
+            var state = p.Value.CaptureState();
+            return new { state.Revision, state.Settings, state.KnowledgeScope,
+                state.HasTick, state.Tick, Entries = state.Entries.ToArray() };
+        }).ToArray(),
         Searches = _vehicleSearches.OrderBy(p => p.Value.Bound.Binding.RequestId)
             .Select(p => new { p.Value.Bound, Penalties = p.Value.Snapshot.Penalties, State = p.Value.Session.CaptureState().Json }).ToArray()
     };
