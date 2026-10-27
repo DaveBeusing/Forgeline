@@ -57,9 +57,9 @@ The three version boundaries have separate responsibilities:
 | Save/replay payload | 7 | Configuration, recorded command history, and checkpoint/replay metadata |
 | Authoritative simulation state | 8 | Deterministic reconstruction and checkpoint comparison |
 
-New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 7, but discovery, loading and replaying also require authoritative schema 9. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 7, but discovery, loading and replaying also require authoritative schema 10. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
-Payload schema 8 adds typed developer simulation commands, an optional initial developer parameter profile and the ordered parameter audit. Developer action payload schema 1 records the operation, complete target identity, correlation, expected revision, typed finite values and whether execution was activated at its recorded tick. Commands remain in their original full sequence even when their later result is Rejected; replay therefore preserves rejected and pending command ordering. Developer initial parameters are separate from later command-driven changes, and recovery verifies the ordered audit and authoritative `developer.state.v1` contribution. Developer Save/Replay requires a compiled Developer host and explicit `RestoreDeveloper` or `PlayDeveloperReplay` capability. Public recovery rejects these payloads before handler execution; diagnostic flags and persisted markers do not create access. The authoritative state schema remains 9. See [Developer simulation actions](DeveloperSimulationActions.md) for the operation and host-binding contract.
+Payload schema 8 adds typed developer simulation commands, an optional initial developer parameter profile and the ordered parameter audit. Developer action payload schema 1 records the operation, complete target identity, correlation, expected revision, typed finite values and whether execution was activated at its recorded tick. Commands remain in their original full sequence even when their later result is Rejected; replay therefore preserves rejected and pending command ordering. Developer initial parameters are separate from later command-driven changes, and recovery verifies the ordered audit and authoritative `developer.state.v1` contribution. Developer Save/Replay requires a compiled Developer host and explicit `RestoreDeveloper` or `PlayDeveloperReplay` capability. Public recovery rejects these payloads before handler execution; diagnostic flags and persisted markers do not create access. The current authoritative state schema is 10 (see opponent progression below). See [Developer simulation actions](DeveloperSimulationActions.md) for the operation and host-binding contract.
 
 Authoritative schema 8 adds owned radar identification effects, artillery production capability gating, bounded paid opponent research and its supply-established fact. Valid schema-7 saves/replays are explicitly incompatible; reconstruction cannot silently reinterpret earlier production or sensing rules. Envelope 1 is retained; payload 7 records the compiled scenario identity.
 
@@ -229,3 +229,18 @@ The active-detour recovery fixture uses a reproducible 64 m flat battlefield wit
 The bounded raid intent is an ordinary authoritative component. Member and target generations, contact cursor, last known/ordered coordinates and stable tick deadlines participate in the complete hash. Candidate rankings and debug caches are derived. Existing tactical player commands and internal opponent scheduling regenerate the intent without a new external command codec.
 
 `SkirmishRaidMatchTests` serializes an active normal-stock raid through both Save and Replay, resolves the authored composition, and compares complete authoritative hashes and the intent after increments of 0, 1, 7 and 24 ticks. This also detects duplicate group creation during reconstruction. `PreRaidCheckpointsAreRejectedBeforeReconstruction` verifies explicit rejection of authoritative schema 6; readable payload schema 6 is not permission to reinterpret old simulation state. See [bounded raid behavior and its scene parameters](SkirmishOpponent.md#bounded-logistics-raids).
+
+## Opponent progression compatibility
+
+Authoritative schema **10** changes opponent investment and recovery ordering:
+unpaid active production inputs are protected from research/construction,
+essential fleet replacement is separate from optional fleet growth, core assault
+roles can reclaim an unpaid production slot, and optional expansion waits for the
+live core force. Sensor Fusion yields to needed Mechanized Systems.
+
+These decisions reconstruct different ordinary commands and entity histories.
+Schema-9 and earlier saves/replays are explicitly incompatible; no historical
+hash is rewritten and no old simulation is claimed reproducible. No new
+authoritative component, command codec or payload member is introduced.
+Envelope format 1 and payload schema 8 remain unchanged. Research/source debug
+observations and bounded progression histories are derived and are not persisted.

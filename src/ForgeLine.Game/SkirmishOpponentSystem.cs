@@ -4750,6 +4750,9 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             UnitDefinition definition =
                 _units[unitId];
 
+            if (unitId == UnitIds.CombatEngineer && !HasLiveCoreAssaultForce(owned, configuration))
+                continue;
+
             if (!TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner, definition.RequiredTechnologyCapability) || !facility.Supports(
                     definition.RequiredProductionCapability))
             {
