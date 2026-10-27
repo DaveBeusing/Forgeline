@@ -675,7 +675,7 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 presentationInteraction,
                 ref pendingPlacementHostSequence,
-                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback);
+                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback, actionPanel);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -1334,7 +1334,7 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         inputSnapshot?.Tick ??
-                            SimulationTick.Zero, inputState);
+                            SimulationTick.Zero, inputState, actionPanel);
                 }
             }
 
@@ -1496,7 +1496,7 @@ internal sealed class ClientApplication
                     tacticalTargetingController,
                     presentationInteraction,
                     inputSnapshot?.Tick ??
-                        SimulationTick.Zero, inputState);
+                        SimulationTick.Zero, inputState, actionPanel);
             }
 
             if (minimapInteraction.TryTakeOverlaySelection(
@@ -1592,7 +1592,7 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         currentSnapshot?.Tick ??
-                            SimulationTick.Zero, inputState);
+                            SimulationTick.Zero, inputState, actionPanel);
                 }
 
                 if (targetingWasActive && !tacticalTargetingController.IsActive &&
@@ -2084,7 +2084,8 @@ internal sealed class ClientApplication
         RtsTacticalTargetingController tacticalTargetingController,
         PresentationInteractionState presentationInteraction,
         SimulationTick observedTick,
-        InputState? initiatingInput = null)
+        InputState? initiatingInput = null,
+        PlayerActionPanelController? actionPanel = null)
     {
         switch (request.Kind)
         {
@@ -2150,13 +2151,14 @@ internal sealed class ClientApplication
                 }
 
                 return receipt;
-            }, marker);
+            }, marker, actionPanel);
     }
 
     private static void RequireSubmission(
         ClientSimulationHost simulationHost,
         Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission,
-        RtsCommandFeedback? marker = null)
+        RtsCommandFeedback? marker = null,
+        PlayerActionPanelController? actionPanel = null)
     {
         bool submitted = simulationHost.TrySubmit(simulationHost.SessionId, submission, out ulong sequence);
         if (marker is not null)
@@ -2164,6 +2166,8 @@ internal sealed class ClientApplication
             marker.TrackSubmission(sequence, simulationHost.SessionId);
             if (!submitted) marker.ObserveSubmission(sequence, null);
         }
+        else if (!submitted && actionPanel is not null)
+            actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - COMMAND BOUNDARY FULL / STOPPING");
         else if (!submitted)
             throw new InvalidOperationException("Simulation command boundary is full or stopping.");
     }
@@ -2175,7 +2179,8 @@ internal sealed class ClientApplication
         PresentationInteractionState interaction,
         ref ulong placementHostSequence,
         OperationsController operations,
-        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback)
+        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback,
+        PlayerActionPanelController actionPanel)
     {
         while (simulationHost.TryReadSubmissionCompletion(
                    out ClientSubmissionCompletion completion))
@@ -2191,6 +2196,7 @@ internal sealed class ClientApplication
             if (completion.Receipt is
                 PlayerCommandSubmissionReceipt receipt)
             {
+                if (!receipt.Accepted) actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - COMMAND BOUNDARY FULL");
                 lastCommandReceipt =
                     receipt;
                 continue;
@@ -2199,6 +2205,7 @@ internal sealed class ClientApplication
             if (completion.Failure !=
                 ClientSubmissionFailure.None)
             {
+                actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - SESSION UNAVAILABLE");
                 Console.Error.WriteLine(
                     $"[simulation:submission-rejected] sequence={completion.HostSequence} " +
                     $"reason={completion.Failure}");
