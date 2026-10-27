@@ -1482,7 +1482,7 @@ internal sealed class ClientApplication
                             movementEntities,
                             minimapMovement.WorldTarget,
                             observedTick,
-                            activeFormation), selectionController.CommandFeedback);
+                            activeFormation), selectionController.CommandFeedback, actionPanel);
             }
 
             if (minimapInteraction.TryTakeActionRequest(
@@ -1653,7 +1653,7 @@ internal sealed class ClientApplication
                                     movementRequest.Append ? QueuedOrderEdit.Append : QueuedOrderEdit.Replace,
                                     movementRequest.Patrol, observedTick, requestedFormation)
                                 : gateway.SubmitMovement(LocalPlayer, movementEntities,
-                                    movementRequest.WorldTarget, observedTick, requestedFormation), selectionController.CommandFeedback);
+                                    movementRequest.WorldTarget, observedTick, requestedFormation), selectionController.CommandFeedback, actionPanel);
                     }
                 }
 
@@ -2166,9 +2166,9 @@ internal sealed class ClientApplication
             marker.TrackSubmission(sequence, simulationHost.SessionId);
             if (!submitted) marker.ObserveSubmission(sequence, null);
         }
-        else if (!submitted && actionPanel is not null)
+        if (!submitted && actionPanel is not null)
             actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - COMMAND BOUNDARY FULL / STOPPING");
-        else if (!submitted)
+        else if (!submitted && marker is null)
             throw new InvalidOperationException("Simulation command boundary is full or stopping.");
     }
 
