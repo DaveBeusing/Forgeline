@@ -9,6 +9,7 @@ public sealed class InputState
     private readonly ulong[] _keyPressSequences = new ulong[Enum.GetValues<PlatformKey>().Length];
     private readonly bool[] _keyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
     private readonly bool[] _shiftKeyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
+    private readonly bool[] _controlKeyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
     private readonly HashSet<PlatformMouseButton> _mouseButtonsDown = [];
     private readonly ulong[] _mousePressSequences = new ulong[Enum.GetValues<PlatformMouseButton>().Length];
     private readonly bool[] _mouseShift = new bool[Enum.GetValues<PlatformMouseButton>().Length];
@@ -39,6 +40,7 @@ public sealed class InputState
     {
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
+        Array.Clear(_controlKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _pointerDelta = Vector2.Zero;
@@ -57,6 +59,8 @@ public sealed class InputState
                     {
                         _keyPressSequences[(int)inputEvent.Key]++;
                         _keyPressed[(int)inputEvent.Key] = true;
+                        _controlKeyPressed[(int)inputEvent.Key] =
+                            IsKeyDown(PlatformKey.LeftControl) || IsKeyDown(PlatformKey.RightControl);
                         _shiftKeyPressed[(int)inputEvent.Key] =
                             IsKeyDown(PlatformKey.LeftShift) || IsKeyDown(PlatformKey.RightShift);
                     }
@@ -128,6 +132,8 @@ public sealed class InputState
     public bool WasKeyPressed(PlatformKey key) => _keyPressed[(int)key];
     public bool WasKeyPressedWithShift(PlatformKey key) => _shiftKeyPressed[(int)key];
 
+    public bool WasKeyPressedWithControl(PlatformKey key) => _controlKeyPressed[(int)key];
+
     public ulong MousePressSequence(PlatformMouseButton button) => _mousePressSequences[(int)button];
 
     public bool WasMousePressedWithShift(PlatformMouseButton button) => _mouseShift[(int)button];
@@ -136,6 +142,7 @@ public sealed class InputState
     {
         _keyPressed[(int)key] = false;
         _shiftKeyPressed[(int)key] = false;
+        _controlKeyPressed[(int)key] = false;
         if (_keysDown.Remove(key)) _suppressedKeys.Add(key);
     }
 
@@ -159,6 +166,7 @@ public sealed class InputState
     {
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
+        Array.Clear(_controlKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _suppressedKeys.Clear();
@@ -175,6 +183,7 @@ public sealed class InputState
     {
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
+        Array.Clear(_controlKeyPressed);
         _mousePressPositions.Clear();
         _mouseButtonsReleased.Clear();
         _suppressedKeys.UnionWith(_keysDown);
