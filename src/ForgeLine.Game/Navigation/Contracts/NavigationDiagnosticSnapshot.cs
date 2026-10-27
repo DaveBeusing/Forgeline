@@ -5,6 +5,16 @@ using ForgeLine.Simulation;
 
 namespace ForgeLine.Game;
 
+public enum NavigationFleetRequestState : byte { WaitingForAdmission, QueuedForBudget, Searching }
+
+public readonly record struct NavigationFleetDiagnostics(
+    PlayerId Viewer, SimulationTick Tick, NavigationModuleAvailability Availability,
+    int RetainedRequests, int ActiveSearches, int WaitingSearches, long ReservedWorkspaceBytes,
+    ulong MaximumWaitTicks, ulong CurrentRequestWork, int WorkConsumedThisTick,
+    long ArenaRents, long ArenaReuses, long ArenaReturns,
+    ulong CachePositiveHits, ulong CacheNegativeHits, ulong CacheMisses, ulong CacheWrites, ulong CacheBudgetDeferrals,
+    int WorkPerTick, int WorkPerSearch, int MaximumEntries, int MaximumActiveSearches, long MaximumCacheBytes);
+
 public readonly record struct NavigationDiagnosticStamp(
     NavigationModuleAvailability Availability, SimulationTick SourceTick, NavigationSnapshotRevision Revision);
 
@@ -30,7 +40,7 @@ public readonly record struct NavigationDiagnosticVehicleFacts(
     EntityId? VisibleBlocker, NavigationSearchStatus? SearchStatus,
     VehicleQueueEntry? Queue, VehicleDockVisit? Dock, bool? OwnsDock,
     bool? CanMove, float? EffectiveMaximumSpeed, double? FuelQuantity, double? FuelCapacity,
-    NavigationMotionProposal? ActualMotion, NavigationDiagnosticReplan? LastReplan, NavigationCheckedHorizon? CheckedHorizon, NavigationDiagnosticConflict? Conflict);
+    NavigationMotionProposal? ActualMotion, NavigationDiagnosticReplan? LastReplan, NavigationCheckedHorizon? CheckedHorizon, NavigationDiagnosticConflict? Conflict, NavigationFleetRequestState? FleetState = null);
 
 /// <summary>Copied own-vehicle observations. No collision frame or mutable route crosses this boundary.</summary>
 public sealed class NavigationDiagnosticVehicle
@@ -57,7 +67,7 @@ public sealed class NavigationDiagnosticSnapshot
 {
     internal NavigationDiagnosticSnapshot(SimulationSessionId session, PlayerId viewer, SimulationTick tick,
         NavigationSnapshotRevision revision, NavigationModuleConnections modules, NavigationIntegrationLimits limits,
-        ReadOnlySpan<NavigationDiagnosticVehicle> vehicles, NavigationDeliveryWindow? deliveries)
+        ReadOnlySpan<NavigationDiagnosticVehicle> vehicles, NavigationDeliveryWindow? deliveries, NavigationFleetDiagnostics? fleet = null)
     {
         if (!session.IsSpecified || !viewer.IsSpecified || vehicles.Length > 128)
             throw new ArgumentException("Invalid diagnostic session or bound.");
@@ -70,7 +80,9 @@ public sealed class NavigationDiagnosticSnapshot
         Session = session; Viewer = viewer; Tick = tick; Revision = revision; Modules = modules; Limits = limits;
         Vehicles = Array.AsReadOnly(vehicles.ToArray());
         CompletedDeliveries = deliveries;
+        Fleet = fleet;
     }
+    public NavigationFleetDiagnostics? Fleet { get; }
     public NavigationDeliveryWindow? CompletedDeliveries { get; }
     public SimulationSessionId Session { get; }
     public PlayerId Viewer { get; }

@@ -149,13 +149,28 @@ internal static partial class NavigationDiagnosticReportEncoder
                 }, source);
             }
             writer.WriteStartObject("fleet");
-            WriteUnavailable(writer, "waitingSearches", MissingNavigationObservation);
-            WriteUnavailable(writer, "activeSearches", MissingNavigationObservation);
-            WriteUnavailable(writer, "searchWork", MissingNavigationObservation);
-            WriteUnavailable(writer, "maximumWaitTicks", MissingNavigationObservation);
-            WriteUnavailable(writer, "cacheHits", MissingNavigationObservation);
-            WriteUnavailable(writer, "cacheBytes", MissingNavigationObservation);
-            WriteUnavailable(writer, "activeWorkspaces", MissingNavigationObservation);
+            var fleetSource = snapshot.NavigationDiagnosis;
+            if (connected && fleetSource is { Fleet: { } fleet } && fleet.Tick == fleetSource.Tick && fleet.Viewer == fleetSource.Viewer)
+            {
+                WriteCurrent(writer, "fleetScheduler", fleet, fleetSource);
+                WriteCurrent(writer, "waitingSearches", fleet.WaitingSearches, fleetSource);
+                WriteCurrent(writer, "activeSearches", fleet.ActiveSearches, fleetSource);
+                WriteCurrent(writer, "searchWork", fleet.WorkConsumedThisTick, fleetSource);
+                WriteCurrent(writer, "maximumWaitTicks", fleet.MaximumWaitTicks, fleetSource);
+                WriteCurrent(writer, "cacheHits", fleet.CachePositiveHits + fleet.CacheNegativeHits, fleetSource);
+                WriteCurrent(writer, "activeWorkspaces", fleet.ActiveSearches, fleetSource);
+            }
+            else
+            {
+                WriteUnavailable(writer, "fleetScheduler", MissingNavigationObservation);
+                WriteUnavailable(writer, "waitingSearches", MissingNavigationObservation);
+                WriteUnavailable(writer, "activeSearches", MissingNavigationObservation);
+                WriteUnavailable(writer, "searchWork", MissingNavigationObservation);
+                WriteUnavailable(writer, "maximumWaitTicks", MissingNavigationObservation);
+                WriteUnavailable(writer, "cacheHits", MissingNavigationObservation);
+                WriteUnavailable(writer, "activeWorkspaces", MissingNavigationObservation);
+            }
+            WriteUnavailable(writer, "cacheBytes", "shared_cache_bytes_are_not_an_owned_vehicle_observation");
             WriteUnavailable(writer, "regionalUpdates", MissingNavigationObservation);
             if (connected) WriteCurrent(writer, "completedDeliveries", snapshot.NavigationDiagnosis!.CompletedDeliveries, snapshot.NavigationDiagnosis!);
             else WriteUnavailable(writer, "completedDeliveries", "authoritative_delivery_observation_not_available");
@@ -166,7 +181,7 @@ internal static partial class NavigationDiagnosticReportEncoder
             if (connected)
             {
                 var source = snapshot.NavigationDiagnosis!;
-                WriteUnavailable(writer, "drivingCorridor", "footprint_routing_module_not_connected");
+                WriteUnavailable(writer, "drivingCorridor", "exact_driving_corridor_observation_not_available");
                 WriteCurrent(writer, "orientedVehicleHull", new { detail.Facts.Pose, detail.Facts.Profile.HalfExtents }, source);
                 WriteCurrent(writer, "grantedBrakingLookahead", detail.Facts.CheckedHorizon, source);
                 WriteCurrent(writer, "observedConflict", detail.Facts.Conflict, source);

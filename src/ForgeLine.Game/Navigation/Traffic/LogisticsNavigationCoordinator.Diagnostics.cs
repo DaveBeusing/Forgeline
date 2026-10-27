@@ -114,18 +114,19 @@ internal sealed partial class LogisticsNavigationCoordinator
                 horizon.Source.SourceTick == context.Tick && horizon.Source.Revision == revision ? horizon : null;
             var facts = new NavigationDiagnosticVehicleFacts(viewer, entity, unit.UnitId,
                 new(NavigationModuleAvailability.Available, context.Tick, revision), vehicle.Pose, vehicle.Profile,
-                vehicle.Movement.Status, root, request, hasActor ? actor.Generation : null,
+                vehicle.Movement.Status, root, request, hasActor ? actor.Generation : ownedPending ? vehicle.Pending!.Value.RootGeneration : null,
                 new(hasActor ? NavigationModuleAvailability.Available : NavigationModuleAvailability.Unavailable, context.Tick, revision),
                 hasActor ? actor.LastAction : null, reason, hasActor ? new SimulationTick(actor.LastProgressTick) : null,
                 wait is { } w ? _tick - w.WaitingSince : hasActor ? 0UL : null,
                 hasActor ? actor.ReplanCount : lastReplan?.ActorReplans, wait?.RecoveryTarget, blocker, search, queue, dock, owns,
-                canMove, maximum, fuel, capacity, actualMotion, lastReplan, checkedHorizon, conflict);
+                canMove, maximum, fuel, capacity, actualMotion, lastReplan, checkedHorizon, conflict, _navigation.CaptureFleetRequestState(entity));
             observations.Add(new(facts, route, completeRoute, passages, completeReservations));
         }
         return new(runtime.Simulation.SessionId, viewer, context.Tick, revision,
             new(NavigationModuleAvailability.Available, NavigationModuleAvailability.Available,
                 _navigation.VehicleRoutingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
-                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
-            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick));
+                _navigation.VehicleSchedulingConnected ? NavigationModuleAvailability.Available : NavigationModuleAvailability.NotConnected,
+                NavigationModuleAvailability.NotConnected, NavigationModuleAvailability.Available),
+            Limits, observations.ToArray(), runtime.Progress.CaptureNavigationDeliveryWindow(viewer, context.Tick), _navigation.CaptureFleetDiagnostics(viewer, context.Tick));
     }
 }
