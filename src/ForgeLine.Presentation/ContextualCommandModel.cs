@@ -64,7 +64,7 @@ internal static class ContextualCommandModel
             mode = PlayerActionPanelMode.Construction;
         else if (actions.UnitProduction is not null && index-- == 0) mode = PlayerActionPanelMode.UnitProduction;
         else if (actions.Production is { IsAutomatic: false } && index-- == 0) mode = PlayerActionPanelMode.Production;
-        else if ((actions.Logistics is not null || actions.ConveyorRouting is not null) && index-- == 0) mode = PlayerActionPanelMode.Logistics;
+        else if ((actions.BridgeRepairs.Count > 0 || actions.Logistics is not null || actions.ConveyorRouting is not null) && index-- == 0) mode = PlayerActionPanelMode.Logistics;
         else if (actions.Supply is not null && index-- == 0) mode = PlayerActionPanelMode.Supply;
         if (mode == PlayerActionPanelMode.Closed) return false;
         command = new(mode, -1, PlayerActionDockHudModel.ResolveModeLabel(mode),

@@ -312,7 +312,7 @@ public sealed class FactionIntelligenceStore
     }
 
     public FactionIntelligenceSnapshot Capture(
-        FactionId faction)
+        FactionId faction, uint? excludedIdentityKey = null)
     {
         RequireFaction(faction);
 
@@ -342,6 +342,7 @@ public sealed class FactionIntelligenceStore
 
         IntelligenceContact[] contacts =
             state.Contacts.Values
+                .Where(contact => excludedIdentityKey is null || contact.IdentityKey != excludedIdentityKey.Value)
                 .OrderBy(static contact => contact.ContactKey)
                 .Select(ToPublicContact)
                 .ToArray();

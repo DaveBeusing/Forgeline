@@ -13,7 +13,8 @@ public enum PlayerHoverCategory : byte
     Construction,
     Deposit,
     IdentifiedContact,
-    Conveyor
+    Conveyor,
+    Bridge
 }
 
 // Facts are authorized before publication. Unavailable numeric facts are nullable.
@@ -60,6 +61,21 @@ internal static class PlayerHoverSummaryFactory
                 "Conveyor / "+ConveyorGeometry.Slug(conveyor.Placement.Module),RtsUiIcon.CommandBuild,detail,
                 ExtractionState:row.Status.ToString(),
                 Requirement:info+" BUILD MENU / V TO REPAIR, REMOVE OR REPLACE. OCCUPIED PARTS MUST DRAIN; REPAIR WRECKS TO RECOVER CARGO.");
+        }
+        if (entities.HasComponent<BridgeCombat>(entity) &&
+            scenario.Intelligence.IsEntityCurrentlyIdentified(faction, entity))
+        {
+            var infrastructure = entities.GetComponent<StrategicInfrastructure>(entity);
+            var state = entities.GetComponent<StrategicInfrastructureState>(entity);
+            var health = entities.GetComponent<ForgeLine.Combat.HealthState>(entity);
+            string status = FormattableString.Invariant(
+                $"{state.State.ToString().ToUpperInvariant()} / HP {health.Current:0}/{health.Maximum:0} / WORK {state.RestorationProgressTicks}/{infrastructure.RestorationTicks}");
+            bool paid = entities.TryGetComponent(entity, out BridgeRepairWork work);
+            if (paid && work.Block != BridgeRepairFailure.None) status += " / " + BridgeRepairText.Describe(work.Block);
+            return new(entity, scenario.Simulation.SessionId, context.Tick, PlayerHoverCategory.Bridge,
+                infrastructure.Key, RtsUiIcon.UnitLogistics, PlayerSelectionSummary.Empty,
+                ExtractionState: status, Requirement: paid ? "KIT PAID / PAYING PLAYER'S ENGINEER TO RESUME" :
+                    "COMBAT ENGINEER WITHIN 32m / OWN STOCK WITHIN 64m / 120 STEEL + 20 ELECTRONICS");
         }
         if (owned)
         {

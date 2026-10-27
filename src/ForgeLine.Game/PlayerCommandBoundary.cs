@@ -30,7 +30,8 @@ public enum PlayerCommandKind : byte
     Demolition = 12,
     OperationsRule = 13,
     ConveyorConstruction = 14,
-    ConveyorRouting = 15
+    ConveyorRouting = 15,
+    BridgeRepair = 16
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -67,7 +68,8 @@ public readonly record struct PlayerCommandResultReadModel(
     BuildingDemolitionTargetResult[]? DemolitionTargets = null,
     OperationsRuleResult OperationsResult = OperationsRuleResult.None,
     ConveyorFailure ConveyorResult = ConveyorFailure.None,
-    ConveyorRoutingFailure RoutingResult = ConveyorRoutingFailure.None);
+    ConveyorRoutingFailure RoutingResult = ConveyorRoutingFailure.None,
+    BridgeRepairFailure BridgeResult = BridgeRepairFailure.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -140,6 +142,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     private readonly ArtilleryWeaponCatalog? _artilleryWeapons;
     private readonly TechnologyDefinitionCatalog? _technologies;
     private readonly OperationsRuleSystem? _operationsRules;
+    private readonly StrategicInfrastructureSystem? _infrastructure;
     private ulong _nextCorrelationId = 1;
 
     public PlayerCommandGateway(
@@ -152,7 +155,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         ArtilleryWeaponCatalog? artilleryWeapons = null,
         TechnologyDefinitionCatalog? technologies = null,
         BuildingDemolitionSystem? demolition = null,
-        OperationsRuleSystem? operationsRules = null)
+        OperationsRuleSystem? operationsRules = null,
+        StrategicInfrastructureSystem? infrastructure = null)
     {
         _simulation =
             simulation ??
@@ -164,6 +168,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         if (operationsRules is not null && !operationsRules.Matches(simulation))
             throw new ArgumentException("Rule system belongs to a different match.", nameof(operationsRules));
         _operationsRules = operationsRules;
+        if (infrastructure is not null && !infrastructure.Matches(simulation))
+            throw new ArgumentException("Infrastructure belongs to a different match.", nameof(infrastructure));
+        _infrastructure = infrastructure;
 
         if (!matchStateEntity.IsValid)
         {
@@ -741,6 +748,21 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             source,
             observedTick,
             envelope);
+    }
+
+    public PlayerCommandSubmissionReceipt SubmitBridgeRepair(PlayerId issuer, EntityId engineer,
+        EntityId bridge, EntityId sourceInventory, uint expectedRevision, SimulationTick observedTick)
+    {
+        var infrastructure = _infrastructure ?? throw new InvalidOperationException("Bridge repairs are unavailable.");
+        if (!TryBeginSubmission(PlayerCommandKind.BridgeRepair, issuer, observedTick,
+            out PlayerCommandCorrelationId correlation, out SimulationTick targetTick,
+            out SimulationCommandSource source, out PlayerCommandSubmissionReceipt rejected)) return rejected;
+        var command = new RepairBridgeCommand(infrastructure, issuer, engineer, bridge, sourceInventory,
+            expectedRevision, observedTick);
+        SimulationCommandEnvelope envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(new(correlation, PlayerCommandKind.BridgeRepair, envelope,
+            null, null, null, null, null, null, null, BridgeCommand: command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.BridgeRepair, source, observedTick, envelope);
     }
 
     public PlayerCommandSubmissionReceipt SubmitConveyorRouting(PlayerId issuer, EntityId target,
@@ -1362,6 +1384,16 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     DemolitionTargets: demolition.Targets);
             }
 
+            case PlayerCommandKind.BridgeRepair:
+            {
+                RepairBridgeCommand command = pending.BridgeCommand!;
+                if (command.ExecutedAtTick == SimulationTick.Zero) return null;
+                return new(SessionId, pending.CorrelationId, pending.Kind,
+                    command.Accepted ? PlayerCommandFeedbackState.Accepted : PlayerCommandFeedbackState.Rejected,
+                    command.Accepted ? 1 : 0, command.Accepted ? 0 : 1,
+                    BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick, BridgeResult: command.Result);
+            }
             case PlayerCommandKind.ConveyorRouting:
             {
                 ConveyorRoutingCommand command = pending.RoutingCommand!;
@@ -1668,7 +1700,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Production,
                 PlayerCommandKind.UnitProduction =>
                     PlayerCommandFeedbackKind.UnitProduction,
-                PlayerCommandKind.Logistics or PlayerCommandKind.OperationsRule or PlayerCommandKind.ConveyorRouting =>
+                PlayerCommandKind.Logistics or PlayerCommandKind.OperationsRule or PlayerCommandKind.ConveyorRouting or PlayerCommandKind.BridgeRepair =>
                     PlayerCommandFeedbackKind.Logistics,
                 PlayerCommandKind.Supply =>
                     PlayerCommandFeedbackKind.Supply,
@@ -1691,7 +1723,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             result.ResolvedAtTick,
             result.ActionFailure,
             result.TacticalFailure,
-            result.RoutingResult);
+            result.RoutingResult,
+            result.BridgeResult);
 
     private readonly record struct PendingCommand(
         PlayerCommandCorrelationId CorrelationId,
@@ -1709,7 +1742,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         DemolishBuildingsCommand? DemolitionCommand = null,
         OperationsRuleCommand? OperationsCommand = null,
         ConveyorConstructionCommand? ConveyorCommand = null,
-        ConveyorRoutingCommand? RoutingCommand = null)
+        ConveyorRoutingCommand? RoutingCommand = null,
+        RepairBridgeCommand? BridgeCommand = null)
     {
         public static PendingCommand ForOperationsRule(
             PlayerCommandCorrelationId correlation, in SimulationCommandEnvelope envelope,

@@ -363,7 +363,8 @@ internal sealed class ClientApplication
                     scenario.Services.TechnologyDefinitions,
                 demolition:
                     scenario.Services.Demolition,
-                operationsRules: scenario.OperationsRules);
+                operationsRules: scenario.OperationsRules,
+                infrastructure: scenario.Services.StrategicInfrastructure);
         var presentationExtraction =
             new PresentationExtractionContext(
                 scenario,

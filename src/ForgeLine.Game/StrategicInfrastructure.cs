@@ -169,7 +169,8 @@ public sealed class RestoreStrategicInfrastructureCommand
             !context.Entities.TryGetComponent(
                 Infrastructure,
                 out StrategicInfrastructure infrastructure) ||
-            !infrastructure.Restorable)
+            !infrastructure.Restorable ||
+            context.Entities.HasComponent<BridgeCombat>(Infrastructure))
         {
             Accepted = false;
             return;
@@ -187,7 +188,7 @@ public sealed class RestoreStrategicInfrastructureCommand
     }
 }
 
-public sealed class StrategicInfrastructureSystem
+public sealed partial class StrategicInfrastructureSystem
     : ISimulationSystem
 {
     private readonly LogisticsNetwork _logistics;
@@ -298,6 +299,8 @@ public sealed class StrategicInfrastructureSystem
             switch (request.Kind)
             {
                 case StrategicInfrastructureRequestKind.Disable:
+                    if (context.Entities.HasComponent<BridgeCombat>(request.Infrastructure))
+                    { changed |= DisableCombatBridge(context, request.Infrastructure); break; }
                     if (state.State !=
                         StrategicInfrastructureOperationalState.Disabled)
                     {
@@ -311,7 +314,7 @@ public sealed class StrategicInfrastructureSystem
                     break;
 
                 case StrategicInfrastructureRequestKind.Restore:
-                    if (!infrastructure.Restorable ||
+                    if (context.Entities.HasComponent<BridgeCombat>(request.Infrastructure) || !infrastructure.Restorable ||
                         state.State ==
                         StrategicInfrastructureOperationalState.Operational)
                     {
@@ -375,6 +378,9 @@ public sealed class StrategicInfrastructureSystem
             {
                 continue;
             }
+
+            if (context.Entities.HasComponent<BridgeCombat>(entity))
+            { changed |= AdvanceBridgeRestoration(context, entity, infrastructure, state); continue; }
 
             uint progress =
                 checked(

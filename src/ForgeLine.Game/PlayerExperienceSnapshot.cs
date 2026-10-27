@@ -54,7 +54,8 @@ public readonly record struct PlayerCommandFeedback(
         PlayerLogisticsActionFailureReason.None,
     PlayerTacticalActionFailureReason TacticalFailure =
         PlayerTacticalActionFailureReason.None,
-    ConveyorRoutingFailure RoutingFailure = ConveyorRoutingFailure.None)
+    ConveyorRoutingFailure RoutingFailure = ConveyorRoutingFailure.None,
+    BridgeRepairFailure BridgeFailure = BridgeRepairFailure.None)
 {
     public static PlayerCommandFeedback None =>
         new(

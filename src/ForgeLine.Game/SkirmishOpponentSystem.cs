@@ -484,7 +484,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         FactionId faction)
     {
         _intelligenceCaptures++;
-        return _intelligence.Capture(faction);
+        return _intelligence.Capture(faction, excludedIdentityKey: BridgeCombat.IdentityKey);
     }
 
     private SkirmishEconomyAssessment AssessEconomyMeasured(

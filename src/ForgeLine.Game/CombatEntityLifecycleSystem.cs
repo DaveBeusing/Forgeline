@@ -14,13 +14,15 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
     private readonly BuildingCombatDestruction? _buildings;
     private readonly Action<SimulationContext>? _staticTopologyChanged;
     private readonly InventoryStore? _inventories;
+    private readonly Action<SimulationContext, EntityId>? _bridgeDestroyed;
 
     public CombatEntityLifecycleSystem(
         CombatRuntime runtime,
         SpatialGridIndex? spatialIndex = null,
         BuildingCombatDestruction? buildings = null,
         Action<SimulationContext>? staticTopologyChanged = null,
-        InventoryStore? inventories = null)
+        InventoryStore? inventories = null,
+        Action<SimulationContext, EntityId>? bridgeDestroyed = null)
     {
         _runtime = runtime ??
             throw new ArgumentNullException(nameof(runtime));
@@ -28,6 +30,7 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
         _buildings = buildings;
         _staticTopologyChanged = staticTopologyChanged;
         _inventories = inventories;
+        _bridgeDestroyed = bridgeDestroyed;
     }
 
     public SimulationPhase Phase =>
@@ -68,6 +71,11 @@ public sealed class CombatEntityLifecycleSystem : ISimulationSystem
                     destruction.Entity);
             }
 
+            if (context.Entities.HasComponent<BridgeCombat>(destruction.Entity))
+            {
+                _bridgeDestroyed?.Invoke(context, destruction.Entity);
+                continue;
+            }
             // Conveyor wrecks retain their original entity, inventory and real support obstruction.
             // Repair is the explicit recovery path; occupied demolition/replacement is refused.
             if (context.Entities.HasComponent<ConveyorPiece>(destruction.Entity))
