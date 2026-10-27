@@ -2,7 +2,7 @@ namespace ForgeLine.Navigation;
 
 public static class NavigationIntegrationContract
 {
-    public const int Revision = 3;
+    public const int Revision = 4;
 }
 
 public enum NavigationModuleAvailability : byte

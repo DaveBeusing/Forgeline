@@ -55,9 +55,9 @@ The three version boundaries have separate responsibilities:
 | --- | ---: | --- |
 | Document envelope | 1 | Header, document kind, serialized payload, and payload checksum |
 | Save/replay payload | 11 | Configuration, recorded command history, and checkpoint/replay metadata |
-| Authoritative simulation state | 14 | Deterministic reconstruction and checkpoint comparison |
+| Authoritative simulation state | 15 | Deterministic reconstruction and checkpoint comparison |
 
-New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 11, but discovery, loading and replaying now require authoritative schema 14. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
+New captures before developer action persistence use payload schema 7 and authoritative schema 9. The reader accepts supported payload schemas 1 through 11, but discovery, loading and replaying now require authoritative schema 15. An older payload layout being readable does not establish simulation compatibility. The schema-1 composition migration still runs only after the envelope checksum is validated and does not upgrade an old authoritative checkpoint.
 
 Payload schema 8 adds typed developer simulation commands, an optional initial developer parameter profile and the ordered parameter audit. Developer action payload schema 1 records the operation, complete target identity, correlation, expected revision, typed finite values and whether execution was activated at its recorded tick. Commands remain in their original full sequence even when their later result is Rejected; replay therefore preserves rejected and pending command ordering. Developer initial parameters are separate from later command-driven changes, and recovery verifies the ordered audit and authoritative `developer.state.v1` contribution. Developer Save/Replay requires a compiled Developer host and explicit `RestoreDeveloper` or `PlayDeveloperReplay` capability. Public recovery rejects these payloads before handler execution; diagnostic flags and persisted markers do not create access. Developer persistence originally retained authoritative schema 9; later compatibility changes are listed below. See [Developer simulation actions](DeveloperSimulationActions.md) for the operation and host-binding contract.
 
@@ -67,7 +67,7 @@ Authoritative schema 9 adds bounded transient combat-group lifetime and disposal
 
 The preceding authoritative schema 7 retains the completed-building combat contract, power-gated radar observations, and building destruction's economic, logistics, and navigation cleanup. It adds bounded raid intent, stable member/contact identities, the contact cursor and tactical delegation policy. These rules change reconstructed entities and simulation outcomes. Saves carrying authoritative state schema 6 and replays declaring `AuthoritativeSchemaVersion = 6` therefore fail with `IncompatibleVersion` before runtime reconstruction, even when their document and checkpoint checksums are valid. Earlier incompatible state schemas remain rejected as well.
 
-The raid simulation-contract change introduced no payload fields. Compiled scenario loading subsequently adds ScenarioIdentity to configuration and raises the payload to 7; the envelope remains format 1 without changing the then-current authoritative schema 7. Research introduced authoritative schema 8; current compatibility requires schema 14. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
+The raid simulation-contract change introduced no payload fields. Compiled scenario loading subsequently adds ScenarioIdentity to configuration and raises the payload to 7; the envelope remains format 1 without changing the then-current authoritative schema 7. Research introduced authoritative schema 8; current compatibility requires schema 15. No migration rewrites historical checkpoint hashes or treats former combat/radar behavior as current behavior.
 
 ## Save Payload
 
@@ -219,7 +219,7 @@ Operations controls retain the existing OperationsRule command codec and envelop
 
 MatchPersistenceTests now exercises active grouped partial resupply, a replacing Hold order and subsequent navigation through supported recorded player adapters. A second explicit finite-stock composition issues two real stock policies, accepts a loaded convoy with an escort, records manual detachment, and completes both 200 Fuel and 200 Ammunition deliveries. Both cargo orders finish, source reservations return to zero and normal dock proximity releases the temporary group. Remote Reserved/Busy visits retain their normal queue/slot owner until physical approach.
 
-Each active checkpoint serializes saves and replay documents, reconstructs with the matching composition resolver and compares complete authoritative hashes immediately and after 1, 8 and 20 cumulative continuation ticks. These cases add no persistence exception, command type or serialized component. Those tactical cases retained the then-current authoritative schema 6 and existing envelope/payload versions; the appended navigation budget failure uses the existing failure-reason enum field. Current authoritative compatibility is schema 14 as specified below.
+Each active checkpoint serializes saves and replay documents, reconstructs with the matching composition resolver and compares complete authoritative hashes immediately and after 1, 8 and 20 cumulative continuation ticks. These cases add no persistence exception, command type or serialized component. Those tactical cases retained the then-current authoritative schema 6 and existing envelope/payload versions; the appended navigation budget failure uses the existing failure-reason enum field. Current authoritative compatibility is schema 15 as specified below.
 
 The active-detour recovery fixture uses a reproducible 64 m flat battlefield with a wall across the direct path, normal player movement and the production navigation/movement systems. It verifies an active refined route outside the blocked span, save/replay hash equality immediately and after 1, 8, 20 and 620 cumulative ticks, then normal arrival with no pending or active route.
 
@@ -288,10 +288,27 @@ Manual acceptance remains outstanding, including recovery during disabled, activ
 
 ## Queued unit orders and patrol compatibility
 
-Current captures use authoritative schema **14**, payload schema **11**, envelope **1**. The new QueuedOrders command (kind 18) records the issuer, full unit identities, edit operation, Move/AttackMove/Attack kind, coordinate or target, formation and submitted tick. Replay reconstructs normal fixed-tick sequence progression. Patrol legs call existing commands directly on the simulation owner and do not grow the external command journal per cycle.
+Current captures use authoritative schema **15**, payload schema **11**, envelope **1**. The new QueuedOrders command (kind 18) records the issuer, full unit identities, edit operation, Move/AttackMove/Attack kind, coordinate or target, formation and submitted tick. Replay reconstructs normal fixed-tick sequence progression. Patrol legs call existing commands directly on the simulation owner and do not grow the external command journal per cycle.
 
 The ECS checkpoint includes the bounded per-unit queue's immutable entries, cursor, owner, repeating/active/wait/resume flags, status and issued tick. Limits are 16 retained entries per unit and 1,024 units globally. Current/next UI projections are observations, not additional persisted authorities. Queue attacks are revalidated through current faction intelligence on activation; historical knowledge cannot grant a hidden target.
 
 Schema-13 and earlier authoritative saves/replays are explicitly incompatible. Existing payload layout reading does not waive that simulation check. QueuedOrders in payloads older than 11 fail validation before reconstruction. No migration invents pre-existing queues or patrol waypoints, changes old checkpoints or rewrites historical hashes. The preceding routing, inventory, reservation, dock, supply, ownership and lifecycle rules remain authoritative. See [queued orders and patrol](adr/BoundedQueuedOrdersAndPatrol.md).
 
 No queue save/load/replay qualification is claimed from compilation. Manual review must include an active finite sequence, a multi-cycle patrol, an active resupply interruption, blocked routing, replacement/Retreat and subsequent continuation under the current formats.
+
+## Fleet scheduling compatibility
+
+Authoritative schema 15 supersedes the schema-14 routing semantics with the
+connected fleet policy/admission ledger, exact suspended continuations and pinned
+input publications. Arena initialization and total work remain correlated with
+scheduler state. Derived route payloads retain exact cache order/expiry/access
+state because lookup work can affect completion ticks. Pool warmth is not a
+simulation decision. Authoritative JSON uses explicit data projections instead
+of helpers whose constructors accept ReadOnlySpan, correcting the baseline
+congestion-checkpoint metadata failure.
+
+Normal recovery reconstructs these services through the original command/tick
+path and compares the complete checkpoint. Earlier authoritative checkpoints are
+explicitly incompatible. Envelope 1/payload 11, the 128-MiB document bound and
+atomic replacement remain unchanged; no historical hash is rewritten.
+See [the fleet scheduling ADR](adr/BoundedFleetNavigationScheduling.md).

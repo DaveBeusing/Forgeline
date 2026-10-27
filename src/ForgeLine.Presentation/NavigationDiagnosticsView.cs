@@ -53,6 +53,14 @@ public static class NavigationDiagnosticsViewModel
         if (!TryGetVehicle(snapshot, view, out var vehicle))
         {
             lines.Add("Current observation unavailable. Select one visible owned Cargo / Supply Truck.");
+            if (snapshot is { NavigationDiagnosis: { Fleet: { } fleetTotals } fleetSource, PlayerExperience: { } player } &&
+                fleetSource.Session == view.Session && snapshot.SessionId == view.Session &&
+                fleetSource.Tick == snapshot.Tick && fleetTotals.Tick == snapshot.Tick &&
+                fleetTotals.Viewer == fleetSource.Viewer && player.Player == fleetSource.Viewer && player.Tick == snapshot.Tick)
+            {
+                AddFleetLines(lines, fleetTotals);
+                if (!fleetSource.VehicleCoverageComplete) lines.Add("Vehicle observations are capped; own scheduler totals remain current.");
+            }
             return lines;
         }
         var f = vehicle.Facts;
@@ -81,10 +89,22 @@ public static class NavigationDiagnosticsViewModel
         lines.Add($"Modules: traffic {source.Modules.Traffic}, motion {source.Modules.Motion}");
         lines.Add($"Footprint routing {source.Modules.Routing} | scheduler {source.Modules.Scheduling} | regions {source.Modules.RegionalUpdates}");
         lines.Add($"Limits: {source.Limits.WorkPerTick} work/tick | {source.Limits.WorkPerSearch} work/search | {source.Limits.MaximumNeighbors} neighbors");
+        if (source.Fleet is { } fleet && fleet.Viewer == source.Viewer && fleet.Tick == source.Tick)
+            AddFleetLines(lines, fleet);
+        if (!source.VehicleCoverageComplete) lines.Add("Vehicle observations are capped; own scheduler totals remain current.");
         lines.Add($"Visible owned fleet {source.Vehicles.Count} | timing / allocations not connected");
         lines.Add(source.CompletedDeliveries is { } deliveries ? $"Completed deliveries {deliveries.CompletedDeliveries} in ({deliveries.StartExclusive.Value}, {deliveries.EndInclusive.Value}] ticks" : "Completed-delivery observation window unavailable");
         if (!string.IsNullOrWhiteSpace(view.Feedback)) lines.Add(view.Feedback);
         return lines.AsReadOnly();
+    }
+
+    private static void AddFleetLines(List<string> lines, NavigationFleetDiagnostics fleet)
+    {
+        lines.Add($"Own searches {fleet.ActiveSearches} active / {fleet.WaitingSearches} waiting | oldest {fleet.MaximumWaitTicks} ticks");
+        lines.Add($"Own search work {fleet.WorkConsumedThisTick} this tick | reserved {fleet.ReservedWorkspaceBytes} bytes");
+        lines.Add($"Own cache hits {fleet.CachePositiveHits + fleet.CacheNegativeHits} / misses {fleet.CacheMisses} | writes {fleet.CacheWrites} | deferrals {fleet.CacheBudgetDeferrals}");
+        lines.Add($"Own arenas rents {fleet.ArenaRents} / reuses {fleet.ArenaReuses} / returns {fleet.ArenaReturns}");
+        lines.Add($"Fleet limits {fleet.WorkPerTick} work/tick | {fleet.MaximumActiveSearches} active / {fleet.MaximumEntries} retained");
     }
 
     public static string Status(in NavigationDiagnosticVehicleFacts facts)
@@ -92,7 +112,13 @@ public static class NavigationDiagnosticsViewModel
         if (facts.Movement == GroundMovementStatus.OutOfFuel) return "OutOfFuel";
         if (facts.BlockReason == NavigationBlockReason.SearchWork) return "WaitingForBudget";
         if (facts.SearchStatus == NavigationSearchStatus.Pending)
-            return facts.LastReplan.HasValue ? "Replanning" : "WaitingForSearch";
+            return facts.FleetState switch
+            {
+                NavigationFleetRequestState.WaitingForAdmission => "WaitingForAdmission",
+                NavigationFleetRequestState.QueuedForBudget => "WaitingForBudget",
+                NavigationFleetRequestState.Searching => "Searching",
+                _ => facts.LastReplan.HasValue ? "Replanning" : "WaitingForSearch"
+            };
         if (facts.Movement != GroundMovementStatus.Moving &&
             facts.BlockReason == NavigationBlockReason.MovingVehicle)
             return "WaitingForTraffic";

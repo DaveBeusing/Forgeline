@@ -51,7 +51,7 @@ public readonly record struct HierarchicalNavigationDiagnosticsSnapshot(
     float LastRouteLengthMeters,
     TimeSpan LastLatency);
 
-public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
+public sealed partial class HierarchicalNavigationSystem : ISimulationSystem, IDisposable
 {
     private readonly HierarchicalPathfinder _pathfinder;
     private readonly ConcurrentQueue<NavigationPathResult> _completed = new();
@@ -100,6 +100,7 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
 
         AdvanceVehicleSearches(context);
         ApplyCompletedResults(context);
+        AdmitWaitingVehicleSearches(context);
 
         _agents.Clear();
         foreach (EntityId entity in context.Entities.Query<
@@ -605,7 +606,7 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem
         EntityId entity)
     {
         if (_vehicleSearches.Remove(entity, out var search))
-        { search.Session.Cancel(); search.Session.Dispose(); }
+        { _fleetScheduler?.Cancel(search.Bound.Binding); }
         if (context.Entities.HasComponent<
                 NavigationPendingPath>(entity))
         {

@@ -466,7 +466,9 @@ public sealed class MatchRuntime : IDisposable
                 DebugCaptureEnabled =
                     runtimeSettings.EnableDebugCapture
             };
-        navigation.ConnectVehicleRouting(terrain, simulation, groundMovement.NavigationClearanceMeters);
+        navigation.ConnectVehicleRouting(terrain, simulation, groundMovement.NavigationClearanceMeters, scheduler,
+            runtimeSettings.Composition.Key + "|" + runtimeSettings.Seed.ToString(System.Globalization.CultureInfo.InvariantCulture) +
+            "|" + System.Text.Json.JsonSerializer.Serialize(runtimeSettings.Composition.Identity));
         groundMovement.ConnectNavigation(navigation, terrain, battlefield.StaticNavigationObstacles);
         var strategicInfrastructure =
             new StrategicInfrastructureSystem(
@@ -897,6 +899,7 @@ public sealed class MatchRuntime : IDisposable
 #if FORGELINE_DEVELOPER_TOOLS
         (Services.DeveloperActions as DeveloperCommandGateway)?.Dispose();
 #endif
+        Services.Navigation.Dispose();
         Replay.Dispose();
         OperationsRules.Dispose();
         _ownedScheduler?.Dispose();

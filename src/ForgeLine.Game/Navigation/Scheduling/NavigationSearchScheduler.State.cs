@@ -42,7 +42,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> where
         return new NavigationSchedulerCheckpoint<TKernelCheckpoint>(NavigationSchedulerCheckpoint<TKernelCheckpoint>.CurrentRevision,
             NavigationIntegrationContract.Revision, _identity, _limits, _policyLimits, _storage,
             _codec.CodecRevision, _geometry, _hasGeometry, _lastTick, _hasAdvanced,
-            _nextSubmissionSequence, snapshots, policy, entries);
+            _nextSubmissionSequence, snapshots, policy, entries, _preservePinnedCosts);
     }
 
     public void RestoreState(NavigationSchedulerCheckpoint<TKernelCheckpoint> checkpoint)
@@ -52,7 +52,7 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> where
         if (checkpoint.Revision != NavigationSchedulerCheckpoint<TKernelCheckpoint>.CurrentRevision ||
             checkpoint.ContractRevision != NavigationIntegrationContract.Revision || checkpoint.Identity != _identity ||
             checkpoint.IntegrationLimits != _limits || checkpoint.PolicyLimits != _policyLimits ||
-            checkpoint.StorageLimits != _storage || checkpoint.CodecRevision != _codec.CodecRevision ||
+            checkpoint.StorageLimits != _storage || checkpoint.CodecRevision != _codec.CodecRevision || checkpoint.PreservePinnedCosts != _preservePinnedCosts ||
             checkpoint.EstimatedBytes > _storage.MaximumCheckpointBytes ||
             checkpoint.HasAdvanced != checkpoint.Policy.Ledger.HasTick ||
             checkpoint.LastTick != checkpoint.Policy.Ledger.Tick)
@@ -121,13 +121,13 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> where
                 throw new ArgumentException("A staged retry must retain the original command's waiting age.", nameof(checkpoint));
             if (!saved.IsActive && !saved.NeedsAdmission && hasPolicy &&
                 policyEntry.Status == NavigationPolicyEntryStatus.Ready && policyEntry.WorkConsumed > 0 &&
-                snapshotKeys.Contains(saved.SnapshotKey))
+                (snapshotKeys.Contains(saved.SnapshotKey) || _preservePinnedCosts && saved.SnapshotKey.Revision.Geometry == checkpoint.CurrentGeometry))
                 throw new ArgumentException("A current unfinished search requires its exact active frontier checkpoint.", nameof(checkpoint));
             if (saved.IsActive)
             {
                 if (!hasPolicy || policyEntry.Status != NavigationPolicyEntryStatus.Ready ||
                     policyEntry.WorkConsumed >= saved.Request.Search.MaximumWork ||
-                    !snapshotKeys.Contains(saved.SnapshotKey))
+                    !(snapshotKeys.Contains(saved.SnapshotKey) || _preservePinnedCosts && saved.SnapshotKey.Revision.Geometry == checkpoint.CurrentGeometry))
                     throw new ArgumentException("An active checkpoint must retain current, resumable work.", nameof(checkpoint));
                 active++;
                 reserved = checked(reserved + saved.Request.Search.MaximumWorkspaceBytes);
@@ -175,6 +175,9 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> where
                 _reservedBytes += entry.ReservedBytes;
                 _activeCount++;
                 TKernelCheckpoint state = _codec.Decode(saved.KernelPayload);
+                if (state is VehicleFleetCheckpoint fleet &&
+                    (!_policy.TryGetEntry(entry.Request.Binding.Requester, out var ledger) || fleet.WorkConsumed != ledger.WorkConsumed))
+                    throw new InvalidDataException("Fleet continuation work does not match the scheduler ledger.");
                 entry.Session = _kernel.RestoreSession(entry.Snapshot, state);
                 if (entry.Session is null || entry.Session.Request != entry.Request.Search)
                     throw new InvalidDataException("Restored kernel state does not match the original search specification.");
@@ -189,6 +192,26 @@ internal sealed partial class NavigationSearchScheduler<TKernelCheckpoint> where
         // Diagnostic totals do not affect restored scheduling decisions.
         _started = _continued = _canceled = _stale = 0;
         _workConsumed = checkpoint.Policy.Counters.WorkConsumed;
+    }
+
+    internal object CaptureAuthoritativeState()
+    {
+        var state = CaptureState();
+        return new
+        {
+            state.Revision, state.ContractRevision, state.PreservePinnedCosts, state.Identity, state.IntegrationLimits,
+            state.PolicyLimits, state.StorageLimits, state.CodecRevision, state.CurrentGeometry,
+            state.HasGeometry, state.LastTick, state.HasAdvanced, state.NextSubmissionSequence,
+            state.SnapshotKeys,
+            Policy = new { state.Policy.Revision, state.Policy.Limits, state.Policy.Ledger,
+                state.Policy.Counters, state.Policy.Entries },
+            Entries = state.Entries.Select(entry => new
+            {
+                entry.Request, entry.ServiceClass, entry.InputSequence, entry.QueuedAt,
+                entry.HasQueuedAt, entry.NeedsAdmission, entry.SnapshotKey, entry.IsActive,
+                KernelPayload = entry.KernelPayload.ToArray()
+            }).ToArray()
+        };
     }
 
     private NavigationWorldSnapshot Resolve(NavigationSchedulerSnapshotKey key)
