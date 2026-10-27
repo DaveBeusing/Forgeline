@@ -29,7 +29,8 @@ public enum PlayerCommandKind : byte
     Technology = 11,
     Demolition = 12,
     OperationsRule = 13,
-    ConveyorConstruction = 14
+    ConveyorConstruction = 14,
+    ConveyorRouting = 15
 }
 
 public enum PlayerCommandSubmissionFailure : byte
@@ -65,7 +66,8 @@ public readonly record struct PlayerCommandResultReadModel(
         PlayerTacticalActionFailureReason.None,
     BuildingDemolitionTargetResult[]? DemolitionTargets = null,
     OperationsRuleResult OperationsResult = OperationsRuleResult.None,
-    ConveyorFailure ConveyorResult = ConveyorFailure.None);
+    ConveyorFailure ConveyorResult = ConveyorFailure.None,
+    ConveyorRoutingFailure RoutingResult = ConveyorRoutingFailure.None);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -741,6 +743,19 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitConveyorRouting(PlayerId issuer, EntityId target,
+        ConveyorRoutingPreference preference, uint expectedRevision, SimulationTick observedTick)
+    {
+        if (!TryBeginSubmission(PlayerCommandKind.ConveyorRouting, issuer, observedTick,
+            out PlayerCommandCorrelationId correlation, out SimulationTick targetTick,
+            out SimulationCommandSource source, out PlayerCommandSubmissionReceipt rejected)) return rejected;
+        var command = new ConveyorRoutingCommand(issuer, target, preference, expectedRevision, observedTick);
+        SimulationCommandEnvelope envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(new(correlation, PlayerCommandKind.ConveyorRouting, envelope,
+            null, null, null, null, null, null, null, RoutingCommand: command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.ConveyorRouting, source, observedTick, envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitConveyor(
         ConveyorConstructionService service, PlayerId issuer, ConveyorBuildRequest request,
         EntityId payer, SimulationTick observedTick)
@@ -1347,6 +1362,16 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     DemolitionTargets: demolition.Targets);
             }
 
+            case PlayerCommandKind.ConveyorRouting:
+            {
+                ConveyorRoutingCommand command = pending.RoutingCommand!;
+                if (command.ExecutedAtTick == SimulationTick.Zero) return null;
+                return new(SessionId, pending.CorrelationId, pending.Kind,
+                    command.Accepted ? PlayerCommandFeedbackState.Accepted : PlayerCommandFeedbackState.Rejected,
+                    command.Accepted ? 1 : 0, command.Accepted ? 0 : 1,
+                    BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None,
+                    command.ExecutedAtTick, RoutingResult: command.Result);
+            }
             case PlayerCommandKind.ConveyorConstruction:
             {
                 ConveyorConstructionCommand command = pending.ConveyorCommand!;
@@ -1643,7 +1668,7 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     PlayerCommandFeedbackKind.Production,
                 PlayerCommandKind.UnitProduction =>
                     PlayerCommandFeedbackKind.UnitProduction,
-                PlayerCommandKind.Logistics or PlayerCommandKind.OperationsRule =>
+                PlayerCommandKind.Logistics or PlayerCommandKind.OperationsRule or PlayerCommandKind.ConveyorRouting =>
                     PlayerCommandFeedbackKind.Logistics,
                 PlayerCommandKind.Supply =>
                     PlayerCommandFeedbackKind.Supply,
@@ -1665,7 +1690,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             result.PlacementFailure,
             result.ResolvedAtTick,
             result.ActionFailure,
-            result.TacticalFailure);
+            result.TacticalFailure,
+            result.RoutingResult);
 
     private readonly record struct PendingCommand(
         PlayerCommandCorrelationId CorrelationId,
@@ -1682,7 +1708,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         PlayerTechnologyActionCommand? TechnologyCommand = null,
         DemolishBuildingsCommand? DemolitionCommand = null,
         OperationsRuleCommand? OperationsCommand = null,
-        ConveyorConstructionCommand? ConveyorCommand = null)
+        ConveyorConstructionCommand? ConveyorCommand = null,
+        ConveyorRoutingCommand? RoutingCommand = null)
     {
         public static PendingCommand ForOperationsRule(
             PlayerCommandCorrelationId correlation, in SimulationCommandEnvelope envelope,

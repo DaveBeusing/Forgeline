@@ -23,7 +23,8 @@ public enum ReplayCommandKind : byte
     CancelConstruction = 12,
     OperationsRule = 13,
     ConveyorConstruction = 14,
-    DeveloperAction = 15
+    DeveloperAction = 15,
+    ConveyorRouting = 16
 }
 
 public sealed record RecordedSimulationCommand
@@ -102,6 +103,9 @@ public sealed record RecordedSimulationCommand
 
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public ConveyorBuildRequest ConveyorRequest { get; init; }
+
+    public ConveyorRoutingPreference RoutingPreference { get; init; }
+    public uint RoutingRevision { get; init; }
 
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public DeveloperCommandPayload? DeveloperPayload { get; init; }
@@ -464,6 +468,13 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case ConveyorRoutingCommand command:
+                recorded = Base(ReplayCommandKind.ConveyorRouting) with
+                { Issuer = command.Issuer, SubmittedAtTick = command.SubmittedAtTick.Value,
+                  TargetEntity = command.Target, RoutingPreference = command.Preference,
+                  RoutingRevision = command.ExpectedRevision };
+                return true;
+
             case ConveyorConstructionCommand command:
                 recorded = Base(ReplayCommandKind.ConveyorConstruction) with
                 { Issuer = command.Issuer, SubmittedAtTick = command.SubmittedAtTick.Value,
@@ -620,6 +631,10 @@ public static class ReplayCommandCodec
                 DecodeLogistics(
                     command,
                     submittedAtTick),
+
+            ReplayCommandKind.ConveyorRouting =>
+                new ConveyorRoutingCommand(command.Issuer, command.TargetEntity,
+                    command.RoutingPreference, command.RoutingRevision, submittedAtTick),
 
             ReplayCommandKind.ConveyorConstruction =>
                 new ConveyorConstructionCommand(scenario.Services.Conveyors, command.Issuer,

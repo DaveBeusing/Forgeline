@@ -39,13 +39,23 @@ public static class ConveyorNetworkOverlay
             if (row.Piece.Owner != experience.Player || row.Status == ConveyorLinkStatus.Destroyed ||
                 (!showAllPorts && !focus[..count].Contains(row.Entity)) ||
                 !OperationsWorldOverlay.CanFocus(snapshot, row.Entity)) continue;
+            int outputSlot = 0;
             foreach (var socket in row.Piece.Placement.Sockets)
             {
+                int physicalOutput = socket.Input ? -1 : outputSlot++;
                 if (beltPorts == MaximumBeltPorts) break;
                 if (!Finite(socket.Position) || !Finite(socket.Facing) ||
                     socket.Facing.LengthSquared() < .5f ||
                     viewProjection.HasValue && !InView(socket.Position, viewProjection.Value)) continue;
-                DrawSocket(draw, socket.Position, socket.Facing, socket.Input);
+                string? label = null;
+                if (!socket.Input && row.Piece.Placement.Module == ConveyorModule.Splitter)
+                {
+                    var preference = row.Routing?.Preference ?? ConveyorRoutingPreference.Balanced;
+                    bool preferred = preference == (physicalOutput == 0 ? ConveyorRoutingPreference.OutputA : ConveyorRoutingPreference.OutputB);
+                    label = (physicalOutput == 0 ? "OUT A" : "OUT B") +
+                        (preference == ConveyorRoutingPreference.Balanced ? " / FAIR" : preferred ? " / 3" : " / 1");
+                }
+                DrawSocket(draw, socket.Position, socket.Facing, socket.Input, label);
                 beltPorts++;
             }
             if (beltPorts == MaximumBeltPorts) break;

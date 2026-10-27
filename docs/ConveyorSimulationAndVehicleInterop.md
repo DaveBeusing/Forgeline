@@ -155,8 +155,9 @@ conveyor facts for all match participants for offline diagnosis.
 
 ## Persistence and reconstruction
 
-Authoritative state schema is 5; save/replay payload schema is 6 inside envelope
-format 1. This qualification introduces no stored state or schema change. Buffer inventory IDs,
+The historical reliability qualification used authoritative state schema 5 and payload 6.
+Current captures use authoritative schema 11, payload 9 and envelope 1 for the
+routing policy below. That qualification did not introduce a schema change. Buffer inventory IDs,
 stock/reservations, cursors, active time, measured state and attachments are included
 in the existing authoritative ECS/inventory snapshot and hash. Existing recorded
 ConveyorConstruction commands rebuild that state through deterministic replay;
@@ -413,3 +414,88 @@ Operations bounds, flowing/stalled clips, state materials, LODs, reduced motion,
 terrain contact and camera readability. Headless movement, save/replay identity and
 hosted WARP are separate evidence; none establishes native visual quality or reference
 hardware performance.
+
+## Bounded player priority routing
+
+The new routing change starts from master `c2ac8dcde03c3b06c553fd7bf4518fb7f88c712a`,
+after core-progression PR #381. It extends the existing flow arbitration; it adds
+no transport graph, currency, recipe, fluid support or resource authority.
+
+One owned, living Splitter has three choices: Balanced (the unchanged default),
+prefer Output A, or prefer Output B. Prefer A/B requires the player's real Logistics
+Coordination capability. The Logistics category of the selected object's action
+ring offers these choices, marks the configured one SET and submits one typed
+ConveyorRoutingCommand. The existing shortcut uses the same selection. Before
+unlock, either preference is disabled with the authoritative
+LOGISTICS COORDINATION REQUIRED reason. Balanced/reset is unrestricted by research.
+
+A and B are physical socket ordinals, not the compact index of currently connected
+links. In local splitter space, A is the output at (-4, 5.8, 4), B at (4, 5.8, 4);
+the placed orientation rotates both. Existing owned/focused socket markers label
+OUT A/OUT B with FAIR or the configured 3/1 weight. Disconnection of A cannot rename B.
+
+### Arbitration and starvation bound
+
+Balanced retains the original successful-transfer round robin. An explicit
+preference uses a four-turn cycle [preferred, preferred, preferred, other].
+At most one ordinary quantum transfers on a turn. The cursor advances only after
+InventoryStore.Transfer succeeds and is retained across ticks and idle periods.
+An ineligible/unoffered output is skipped within the same bounded four-slot scan;
+unused slots accumulate no credit. If only the other branch is eligible, it can
+use all otherwise available source capacity.
+
+When both branches remain eligible and offered, the lower-weight branch receives
+one service turn in each four successful transfers. This is a local service bound,
+not a guarantee of end-to-end timing or a fixed volume ratio through differently
+damaged, powered, full or resource-constrained receivers. Existing receiver/input
+arbitration, per-resource rotation and all physical constraints still apply.
+
+All inventories, stock retention, committed truck quantities, reservation exclusion,
+power/health scaling, one-hop tick snapshots, throughput and finite buffers remain
+authoritative. Preference cannot make a blocked destination accept stock, create
+goods or reserve resources for future ticks. Topology remains derived.
+
+### Commands, snapshots and recovery
+
+ConveyorRoutingState stores the enum, monotonically increasing uint policy revision
+and modulo-four successful-service cursor on the full splitter EntityId.
+Commands carry issuer, complete target identity, preference, expected revision and
+observed tick through the existing session-bound player gateway. Execution checks
+running match, owner, actual Splitter, living health, capability and revision.
+Revision exhaustion fails without wrapping. Repair keeps the policy/cursor;
+replacement/removal destroys it with the original entity. Reused entity indices
+inherit no policy. The effective flow falls back to fair if the capability is absent.
+
+The completed snapshot copies configured preference, revision, physical output
+identities and per-choice failure values. Ring item keys include full target
+identity and policy revision; a stale displayed choice cannot silently become a
+different selection. Presentation issues requests and never writes ECS.
+
+ReplayCommandKind.ConveyorRouting records the target, typed preference and expected
+revision with normal ordering/source/tick metadata, including commands later rejected.
+Payload 9 adds those command fields. Authoritative schema 11 includes policy and
+cursor and rejects schema 10 and earlier before reconstruction. No migration invents
+a prior preference or rewrites historical hashes. Envelope 1 and registered scenario
+content identity are unchanged. See [the routing ADR](adr/BoundedConveyorPriorityRouting.md).
+
+### Acceptance still required
+
+No tests were created, changed, built or manually executed for this implementation.
+No smoke, benchmark, headless/native qualification, workflow dispatch or CI rerun
+was started. Existing automatically triggered repository CI is separate evidence.
+The previous reliability measurements above qualify their named historical sources,
+not this routing change; no new timing or allocation improvement is claimed.
+
+Product compilation remains open: the local source mirror does not contain the
+current master tree, and the connected content API provides no compiler. The product
+projects to compile are Game and Presentation with their product dependencies.
+No older checkout or test-project build is substituted for that result.
+
+For manual review, use finite stock and a paid splitter with two compatible sinks:
+observe default fairness, verify locked choices, complete paid Logistics Coordination,
+apply A/B preference and inspect actual output rates/material conservation. Block,
+disconnect, damage or unpower the preferred branch and verify the other can flow;
+restore both and inspect the persistent service ordering. Check partial stock,
+reservations, different resources, truck commitments, rotated A/B markers, ownership,
+stale revision, repair/replacement and active save/load/replay followed by more ticks.
+These are manual scenarios, not executed evidence or changed gates.
