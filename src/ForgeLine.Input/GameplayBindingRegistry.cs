@@ -10,6 +10,12 @@ public readonly record struct GameplayBindingOverride(GameplayAction Action, Pla
 public sealed record GameplayBindings
 {
     public IReadOnlyList<GameplayBindingOverride> Overrides { get; init; } = Array.Empty<GameplayBindingOverride>();
+    public GameplayBindings WithoutRetiredFunctionKeys()
+    {
+        ArgumentNullException.ThrowIfNull(Overrides);
+        var retained = Overrides.Where(x => !GameplayBindingRegistry.IsRetiredFunctionKey(x.Key)).ToArray();
+        return retained.Length == Overrides.Count ? this : this with { Overrides = retained };
+    }
     public GameplayBindings With(GameplayAction action, PlatformKey key) => new()
     {
         Overrides = Overrides.Where(x => x.Action != action).Append(new(action, key)).ToArray()
@@ -19,20 +25,18 @@ public sealed record GameplayBindings
 /// <summary>One immutable mapping and prompt catalog; dock keys intentionally replace camera keys while the dock owns focus.</summary>
 public sealed class GameplayBindingRegistry
 {
-    public const PlatformKey HelpKey = PlatformKey.F1;
-    public const PlatformKey HelpAlias = PlatformKey.F12;
     public const PlatformKey CancelKey = PlatformKey.Escape;
     public static IReadOnlyList<string> FixedBindings { get; } = Array.AsReadOnly(new[]
     {
         "ESC PAUSE / CONTROLS", "ESC CANCEL / PAUSE", "LEFT SELECT / DOUBLE LEFT VISIBLE SAME TYPE",
         "SHIFT + LEFT EXTEND SELECTION / SHIFT + RIGHT APPEND",
         "RIGHT MOVE / TARGET / CTRL + RIGHT PATROL (SHIFT EXTENDS)", "CTRL + DIGIT ASSIGN / DIGIT RECALL / DOUBLE DIGIT FOCUS",
-        "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD", "SHIFT + F1 METRICS",
+        "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD",
         "SHIFT + F12 GUIDE", "R RESTART TERMINAL MATCH",
         "DELETE DEMOLISH SELECTED BUILDINGS (40% MATERIAL REFUND)"
     });
     private static readonly IReadOnlyList<string> DeveloperFixedBindings = Array.AsReadOnly(FixedBindings.Concat(new[]
-        { "F2 WORLD DEBUG / SHIFT + F2 RENDERING / SHIFT + F4-F9 DEBUG CATEGORIES", "PAUSE / DEVELOPER TOOLS" }).ToArray());
+        { "F1 DEVELOPER CHECKBOX MENU / F2 WORLD DEBUG", "PAUSE / DEVELOPER TOOLS" }).ToArray());
     public static IReadOnlyList<string> FixedBindingsFor(bool developerCapability) => developerCapability ? DeveloperFixedBindings : FixedBindings;
     private static readonly GameplayBindingDefinition[] DefinitionsArray =
     [
@@ -51,16 +55,16 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.Activate, PlatformKey.Enter, "ACTIVATE", GameplayBindingScope.Dock),
         new(GameplayAction.CancelJob, PlatformKey.C, "CANCEL JOB", GameplayBindingScope.Dock),
         new(GameplayAction.FocusBase, PlatformKey.Home, "BASE FOCUS", GameplayBindingScope.Global),
-        new(GameplayAction.Formation, PlatformKey.F3, "FORMATION", GameplayBindingScope.Global),
+        new(GameplayAction.Formation, PlatformKey.Unknown, "FORMATION", GameplayBindingScope.Global),
         new(GameplayAction.Overlay, PlatformKey.F10, "STRATEGIC LAYER", GameplayBindingScope.Global),
         new(GameplayAction.Minimap, PlatformKey.F11, "MINIMAP", GameplayBindingScope.Global),
         new(GameplayAction.Pause, PlatformKey.Space, "PAUSE", GameplayBindingScope.Global),
-        new(GameplayAction.CorePlacement, PlatformKey.F4, "PLACE CORE", GameplayBindingScope.Global),
-        new(GameplayAction.PowerPlacement, PlatformKey.F5, "PLACE POWER", GameplayBindingScope.Global),
-        new(GameplayAction.ExtractorPlacement, PlatformKey.F6, "PLACE EXTRACTOR", GameplayBindingScope.Global),
-        new(GameplayAction.StoragePlacement, PlatformKey.F7, "PLACE STORAGE / CTRL TEMPLATE", GameplayBindingScope.Global),
-        new(GameplayAction.SmelterPlacement, PlatformKey.F8, "PLACE SMELTER / CTRL TEMPLATE", GameplayBindingScope.Global),
-        new(GameplayAction.RotatePlacement, PlatformKey.F9, "ROTATE BUILDING", GameplayBindingScope.Global),
+        new(GameplayAction.CorePlacement, PlatformKey.Unknown, "PLACE CORE", GameplayBindingScope.Global),
+        new(GameplayAction.PowerPlacement, PlatformKey.Unknown, "PLACE POWER", GameplayBindingScope.Global),
+        new(GameplayAction.ExtractorPlacement, PlatformKey.Unknown, "PLACE EXTRACTOR", GameplayBindingScope.Global),
+        new(GameplayAction.StoragePlacement, PlatformKey.Unknown, "PLACE STORAGE / CTRL TEMPLATE", GameplayBindingScope.Global),
+        new(GameplayAction.SmelterPlacement, PlatformKey.Unknown, "PLACE SMELTER / CTRL TEMPLATE", GameplayBindingScope.Global),
+        new(GameplayAction.RotatePlacement, PlatformKey.Unknown, "ROTATE BUILDING", GameplayBindingScope.Global),
         new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
@@ -82,7 +86,7 @@ public sealed class GameplayBindingRegistry
         foreach (var item in bindings.Overrides)
         {
             if (!Enum.IsDefined(item.Action) || !seen.Add(item.Action)) throw new InvalidDataException("Unknown or duplicate gameplay action.");
-            if (!IsAssignable(item.Key)) throw new InvalidDataException("Unknown, modifier, group, help or developer key is reserved.");
+            if (!IsAssignable(item.Key)) throw new InvalidDataException("Unknown, modifier, group, retired F3-F9 or developer key is reserved.");
             if (DefinitionsArray[(int)item.Action].Scope == GameplayBindingScope.Global && UsesCamera(camera, item.Key))
                 throw new InvalidDataException("Gameplay binding conflicts with a saved camera key; change the gameplay key.");
             _keys[(int)item.Action] = item.Key;
@@ -90,7 +94,7 @@ public sealed class GameplayBindingRegistry
         for (int i = 0; i < _keys.Length; i++)
         {
             for (int j = 0; j < i; j++)
-                if (_keys[i] == _keys[j]) throw new InvalidDataException($"{DefinitionsArray[i].Label} conflicts with {DefinitionsArray[j].Label}.");
+                if (_keys[i] != PlatformKey.Unknown && _keys[i] == _keys[j]) throw new InvalidDataException($"{DefinitionsArray[i].Label} conflicts with {DefinitionsArray[j].Label}.");
             // Legacy camera mappings win over conflicting default global shortcuts without rewriting the saved camera.
             bool blocked = DefinitionsArray[i].Scope == GameplayBindingScope.Global && UsesCamera(camera, _keys[i]);
             _prompts[i] = blocked ? "CAMERA KEY" : KeyLabel(_keys[i]);
@@ -98,7 +102,7 @@ public sealed class GameplayBindingRegistry
         }
         var substitutions = new Dictionary<string, string>(StringComparer.Ordinal);
         for (int i = 0; i < DefinitionsArray.Length; i++)
-            if (DefinitionsArray[i].Action is not (GameplayAction.Decrease or GameplayAction.Increase or GameplayAction.PrimarySetting or GameplayAction.SecondarySetting or GameplayAction.CancelJob))
+            if (DefinitionsArray[i].DefaultKey != PlatformKey.Unknown && DefinitionsArray[i].Action is not (GameplayAction.Decrease or GameplayAction.Increase or GameplayAction.PrimarySetting or GameplayAction.SecondarySetting or GameplayAction.CancelJob))
                 substitutions.Add(KeyLabel(DefinitionsArray[i].DefaultKey), _prompts[i]);
         string pattern = @"\b(?:" + string.Join("|", substitutions.Keys.Select(Regex.Escape)) + @")\b";
         foreach (string template in GameplayPromptCatalog.English)
@@ -110,7 +114,8 @@ public sealed class GameplayBindingRegistry
     }
     public PlatformKey Key(GameplayAction action) => _keys[(int)action];
     public string Prompt(GameplayAction action) => _prompts[(int)action];
-    public static bool IsAssignable(PlatformKey key) => Enum.IsDefined(key) && key != PlatformKey.Unknown &&
+    public static bool IsRetiredFunctionKey(PlatformKey key) => key is >= PlatformKey.F3 and <= PlatformKey.F9;
+    public static bool IsAssignable(PlatformKey key) => !IsRetiredFunctionKey(key) && Enum.IsDefined(key) && key != PlatformKey.Unknown &&
         key is not (PlatformKey.LeftShift or PlatformKey.RightShift or PlatformKey.LeftControl or PlatformKey.RightControl or
         PlatformKey.F1 or PlatformKey.F2 or PlatformKey.F12 or PlatformKey.Escape) && key is not (>= PlatformKey.D0 and <= PlatformKey.D9);
     public static string KeyLabel(PlatformKey key) => key switch

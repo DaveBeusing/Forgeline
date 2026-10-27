@@ -49,7 +49,7 @@ public static class NavigationDiagnosticsViewModel
     public static IReadOnlyList<string> Lines(PresentationSnapshot? snapshot, in NavigationDiagnosticsView view)
     {
         if (!view.Visible) return Array.Empty<string>();
-        var lines = new List<string> { "NAVIGATION DIAGNOSTICS", "Shift+F10 close | F10/Ctrl+F10 scroll | Shift+F12 export" };
+        var lines = new List<string> { "NAVIGATION DIAGNOSTICS", "F1 developer menu: checkboxes, details and report export" };
         if (!TryGetVehicle(snapshot, view, out var vehicle))
         {
             lines.Add("Current observation unavailable. Select one visible owned Cargo / Supply Truck.");
@@ -73,8 +73,8 @@ public static class NavigationDiagnosticsViewModel
         };
         lines.Add($"Session {source.Session.Value} | tick {source.Tick.Value} | geometry {source.Revision.Geometry.Value}");
         lines.Add($"Vehicle {f.Entity} | {(f.Unit == UnitIds.CargoTruck ? "Cargo Truck" : "Supply Truck")} | {Status(f)}");
-        lines.Add("F11 select layer | Shift+F11 toggle | Ctrl+F11 all off");
-        lines.Add($"Layers {view.EnabledLayers} | selected {(NavigationDiagnosticLayers)(1 << view.FocusedLayer)} | Ctrl+F11 all off");
+        lines.Add("Select diagnostic layers with the F1 menu checkboxes");
+        lines.Add($"Layers {view.EnabledLayers} | selected {(NavigationDiagnosticLayers)(1 << view.FocusedLayer)}");
         lines.Add($"Traffic {f.Traffic.Availability}: {Value(f.TrafficAction)} / {Value(f.BlockReason)}");
         lines.Add($"Root request {Value(f.RequestId)} | generation {Value(f.CommandGeneration)}");
         lines.Add(f.OriginalOrder is { } root ? $"Original target {Format(root.WorldTarget)}" : "Original target unavailable (no active order)");

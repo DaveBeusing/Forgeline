@@ -438,7 +438,7 @@ internal sealed class ClientApplication
             new RtsMinimapInteractionController();
         var debugOverlay =
             new DebugOverlayController();
-        var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperNavigationDiagnostics && DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled);
+        var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled);
         var gameplayDraw =
             new DebugDraw();
         var debugDraw =
@@ -538,14 +538,7 @@ internal sealed class ClientApplication
         PlayerCommandSubmissionReceipt? lastCommandReceipt = null;
         PlayerCommandResultReadModel? lastCommandResult = null;
         bool overlayEnabled = false;
-        bool overlayToggleHeld = false;
         bool debugMasterToggleHeld = false;
-        bool debugNavigationToggleHeld = false;
-        bool debugWorldToggleHeld = false;
-        bool debugLogisticsToggleHeld = false;
-        bool debugSensorsToggleHeld = false;
-        bool debugCombatToggleHeld = false;
-        bool debugEntitiesToggleHeld = false;
         bool formationToggleHeld = false;
         bool strategicOverlayToggleHeld = false;
         bool minimapToggleHeld = false;
@@ -567,7 +560,25 @@ internal sealed class ClientApplication
                 settings.Validate();
                 _pendingRestart = ClientSessionRequest.Restart(settings);
                 return true;
-            }) ?? defaultDeveloperBackend));
+            }) ?? defaultDeveloperBackend,
+            visualizationSwitches:
+            [
+                new("PERFORMANCE METRICS", () => overlayEnabled, () => overlayEnabled = !overlayEnabled),
+                new("NAVIGATION DIAGNOSTICS", () => navigationDiagnostics.Open, navigationDiagnostics.ToggleOpen),
+                .. Enum.GetValues<NavigationDiagnosticLayers>()
+                    .Where(layer => layer is not (NavigationDiagnosticLayers.None or NavigationDiagnosticLayers.All))
+                    .Select(layer => new DeveloperVisualizationSwitch("NAV / " + layer,
+                        () => (navigationDiagnostics.EnabledLayers & layer) != 0,
+                        () => navigationDiagnostics.ToggleLayer(layer), () => navigationDiagnostics.Open))
+            ],
+            visualizationCommands:
+            [
+                new("EXPORT NAVIGATION REPORT", () => navigationDiagnostics.ExportReport(snapshotBuffer, simulationHost.SessionId,
+                    selectionController.Selection.Entities, LocalPlayer, scenario.Battlefield.Metadata.Key, scenario.RuntimeSettings.Seed),
+                    () => navigationDiagnostics.Open),
+                new("NAVIGATION DETAILS UP", () => navigationDiagnostics.ScrollDetails(-1), () => navigationDiagnostics.Open),
+                new("NAVIGATION DETAILS DOWN", () => navigationDiagnostics.ScrollDetails(1), () => navigationDiagnostics.Open)
+            ]));
 #endif
         bool developerSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
         var pauseMenu = new PauseMenuModel(developerSessionActive);
@@ -681,10 +692,12 @@ internal sealed class ClientApplication
             if (nextDeveloperSessionActive != developerSessionActive)
             {
                 developerSessionActive = nextDeveloperSessionActive;
-                navigationDiagnostics = new(DeveloperNavigationDiagnostics && developerSessionActive);
+                navigationDiagnostics = new(developerSessionActive);
+                overlayEnabled = false;
                 debugOverlay.SetEnabled(false);
                 inputState.SuppressHeldInput();
             }
+            navigationDiagnostics.BindSession(simulationHost.SessionId);
             pauseMenu.SetDeveloperToolsAvailable(developerSessionActive);
             bool wasShellBlocking = pauseMenuActive;
             var guidanceLayout = GameplayHudLayout.Create(window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
@@ -713,20 +726,21 @@ internal sealed class ClientApplication
                 if (inputState.WasKeyPressed(PlatformKey.Down) || inputState.WheelDelta < 0) controlsScroll++;
                 if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
             }
-            bool modalFrame = wasShellBlocking || guidanceInteraction.ShortcutConsumedThisFrame;
-            UpdateMetricsOverlay(inputState, modalFrame, ref overlayEnabled, ref overlayToggleHeld);
+            bool developerMenuShortcut = false;
+#if FORGELINE_DEVELOPER_TOOLS
+            developerMenuShortcut = developerSessionActive && window.IsFocused && !window.IsMinimized &&
+                !pauseSettings.Visible && !pauseControlsVisible && !operationsController.View.Open &&
+                inputState.WasKeyPressed(PlatformKey.F1) &&
+                !inputState.IsKeyDown(PlatformKey.LeftShift) && !inputState.IsKeyDown(PlatformKey.RightShift) &&
+                !inputState.IsKeyDown(PlatformKey.LeftControl) && !inputState.IsKeyDown(PlatformKey.RightControl);
+#endif
+            bool modalFrame = wasShellBlocking || guidanceInteraction.ShortcutConsumedThisFrame || developerMenuShortcut;
             if (!modalFrame)
             {
-                if (developerSessionActive) UpdateDebugOverlayToggles(
-                    inputState,
-                    debugOverlay,
-                    ref debugMasterToggleHeld,
-                    ref debugNavigationToggleHeld,
-                    ref debugWorldToggleHeld,
-                    ref debugLogisticsToggleHeld,
-                    ref debugSensorsToggleHeld,
-                    ref debugCombatToggleHeld,
-                    ref debugEntitiesToggleHeld);
+                if (developerSessionActive &&
+                    ConsumeKeyPress(inputState, PlatformKey.F2, ref debugMasterToggleHeld) &&
+                    !inputState.IsKeyDown(PlatformKey.LeftShift) && !inputState.IsKeyDown(PlatformKey.RightShift))
+                    debugOverlay.ToggleMaster();
                 UpdateFormationSelection(
                     inputState,
                     ref formationToggleHeld,
@@ -735,9 +749,7 @@ internal sealed class ClientApplication
                 if (ConsumeKeyPress(
                         inputState,
                         _gameplayBindings.Key(GameplayAction.Overlay),
-                        ref strategicOverlayToggleHeld) &&
-                    !navigationDiagnostics.OwnsShortcut(_gameplayBindings.Key(GameplayAction.Overlay),
-                        inputState.WasKeyPressedWithShift(PlatformKey.F10)))
+                        ref strategicOverlayToggleHeld))
                 {
                     informationLayer.CycleOverlay();
                 }
@@ -745,9 +757,7 @@ internal sealed class ClientApplication
                 if (ConsumeKeyPress(
                         inputState,
                         _gameplayBindings.Key(GameplayAction.Minimap),
-                        ref minimapToggleHeld) &&
-                    !navigationDiagnostics.OwnsShortcut(_gameplayBindings.Key(GameplayAction.Minimap),
-                        inputState.WasKeyPressedWithShift(PlatformKey.F10)))
+                        ref minimapToggleHeld))
                 {
                     informationLayer.ToggleMinimap();
                 }
@@ -760,6 +770,12 @@ internal sealed class ClientApplication
             developerMenu.Model.Refresh(DeveloperTools.Capability.BindSession(simulationHost.SessionId, DeveloperSessionToolsEnabled),
                 renderWorld.CurrentSnapshot, selectionController.Selection, scenario.RuntimeSettings.Participants,
                 simulationHost.IsPaused, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
+            if (developerMenuShortcut)
+            {
+                if (developerMenu.Visible) { developerMenu.Model.Close(); inputState.SuppressHeldInput(); }
+                else if (developerMenu.Open(inputState, DeveloperMenuSection.Visualization))
+                { pauseMenuActive = true; pauseControlsVisible = false; }
+            }
             developerMenu.Update(inputState, modalLayout, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
             developerOwnedFrame |= developerMenu.Visible;
 #endif
@@ -1017,17 +1033,10 @@ internal sealed class ClientApplication
                 pauseHeld = false;
                 returnHeld = false;
                 restartHeld = false;
-                overlayToggleHeld = false;
                 formationToggleHeld = false;
                 strategicOverlayToggleHeld = false;
                 minimapToggleHeld = false;
                 debugMasterToggleHeld = false;
-                debugNavigationToggleHeld = false;
-                debugWorldToggleHeld = false;
-                debugLogisticsToggleHeld = false;
-                debugSensorsToggleHeld = false;
-                debugCombatToggleHeld = false;
-                debugEntitiesToggleHeld = false;
                 selectionController.CancelPointerInteraction();
                 minimapInteraction.Reset();
                 combatGroupInput.Reset();
@@ -1720,16 +1729,9 @@ internal sealed class ClientApplication
 
             NavigationDiagnosticsView navigationView = navigationDiagnostics.Update(
                 developerSessionActive && window.IsFocused && !window.IsMinimized && !simulationPaused && !modalFrame && !operationsController.View.Open,
-                inputState.WasKeyPressedWithShift(PlatformKey.F10),
-                inputState.WasKeyPressedWithShift(PlatformKey.F11),
-                inputState.WasKeyPressedWithShift(PlatformKey.F12),
+                false, false, false,
                 snapshotBuffer, simulationHost.SessionId, selectionController.Selection.Entities, LocalPlayer,
-                scenario.Battlefield.Metadata.Key, scenario.RuntimeSettings.Seed,
-                nextLayer: inputState.WasKeyPressed(PlatformKey.F11) && !inputState.WasKeyPressedWithShift(PlatformKey.F11),
-                clearLayers: inputState.WasKeyPressed(PlatformKey.F11) &&
-                    (inputState.IsKeyDown(PlatformKey.LeftControl) || inputState.IsKeyDown(PlatformKey.RightControl)),
-                scrollDelta: inputState.WasKeyPressed(PlatformKey.F10) && !inputState.WasKeyPressedWithShift(PlatformKey.F10)
-                    ? inputState.IsKeyDown(PlatformKey.LeftControl) || inputState.IsKeyDown(PlatformKey.RightControl) ? -1 : 1 : 0);
+                scenario.Battlefield.Metadata.Key, scenario.RuntimeSettings.Seed);
             presentationInteraction.SetNavigationDiagnosticsOpen(navigationView.Visible);
 
             RtsCameraState publicationCamera = camera.CaptureState();
@@ -2879,111 +2881,6 @@ internal sealed class ClientApplication
         }
 
         held = down;
-    }
-
-    private static void UpdateDebugOverlayToggles(
-        InputState inputState,
-        DebugOverlayController overlay,
-        ref bool masterHeld,
-        ref bool navigationHeld,
-        ref bool worldHeld,
-        ref bool logisticsHeld,
-        ref bool sensorsHeld,
-        ref bool combatHeld,
-        ref bool entitiesHeld)
-    {
-        bool shiftDown =
-            inputState.IsKeyDown(
-                PlatformKey.LeftShift) ||
-            inputState.IsKeyDown(
-                PlatformKey.RightShift);
-
-        if (ConsumeKeyPress(
-                inputState,
-                PlatformKey.F2,
-                ref masterHeld))
-        {
-            if (shiftDown)
-            {
-                overlay.ToggleCategory(
-                    DebugOverlayCategory.Rendering);
-            }
-            else
-            {
-                overlay.ToggleMaster();
-            }
-        }
-
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F4,
-            DebugOverlayCategory.Navigation,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref navigationHeld);
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F5,
-            DebugOverlayCategory.World,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref worldHeld);
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F6,
-            DebugOverlayCategory.Logistics,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref logisticsHeld);
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F7,
-            DebugOverlayCategory.Sensors,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref sensorsHeld);
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F8,
-            DebugOverlayCategory.Combat,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref combatHeld);
-        ToggleDebugCategory(
-            inputState,
-            PlatformKey.F9,
-            DebugOverlayCategory.Entities,
-            overlay,
-            modifierActive:
-                shiftDown,
-            ref entitiesHeld);
-    }
-
-    private static void ToggleDebugCategory(
-        InputState inputState,
-        PlatformKey key,
-        DebugOverlayCategory category,
-        DebugOverlayController overlay,
-        bool modifierActive,
-        ref bool held)
-    {
-        bool pressed =
-            ConsumeKeyPress(
-                inputState,
-                key,
-                ref held);
-
-        if (pressed &&
-            modifierActive)
-        {
-            overlay.ToggleCategory(
-                category);
-        }
     }
 
     private static FormationTemplate NextFormation(FormationTemplate formation) => formation switch

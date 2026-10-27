@@ -165,10 +165,10 @@ internal sealed record ClientUserSettings
             bindings.PitchDown
         ];
 
-        if (keys.Any(static key => key == PlatformKey.Unknown))
+        if (keys.Any(static key => key == PlatformKey.Unknown || GameplayBindingRegistry.IsRetiredFunctionKey(key)))
         {
             throw new InvalidDataException(
-                "Camera bindings cannot use the Unknown key.");
+                "Camera bindings cannot use Unknown or retired F3-F9 keys.");
         }
 
         if (bindings.DragPanButton == PlatformMouseButton.None)
@@ -291,6 +291,10 @@ internal sealed class ClientSettingsStore
             bool legacyGraphics = settings.SchemaVersion is 1 or 2;
             bool migrated = settings.SchemaVersion is 1 or 2 or 3;
             if (migrated) settings = settings with { SchemaVersion = ClientUserSettings.CurrentSchemaVersion };
+            ArgumentNullException.ThrowIfNull(settings.CameraBindings);
+            var normalizedCamera = settings.CameraBindings.WithoutRetiredFunctionKeys();
+            migrated |= !ReferenceEquals(normalizedCamera, settings.CameraBindings);
+            settings = settings with { CameraBindings = normalizedCamera };
             settings.Validate();
             string? graphicsRecovery = null;
             if (graphicsProperty is not null)
@@ -339,6 +343,9 @@ internal sealed class ClientSettingsStore
                 try
                 {
                     GameplayBindings parsed = gameplay?.Deserialize<GameplayBindings>(JsonOptions) ?? throw new InvalidDataException("Gameplay bindings are missing.");
+                    var normalizedBindings = parsed.WithoutRetiredFunctionKeys();
+                    migrated |= !ReferenceEquals(normalizedBindings, parsed);
+                    parsed = normalizedBindings;
                     _ = new GameplayBindingRegistry(parsed, settings.CameraBindings);
                     settings = settings with { GameplayBindings = parsed };
                 }
