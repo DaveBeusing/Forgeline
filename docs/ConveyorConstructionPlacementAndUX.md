@@ -335,3 +335,22 @@ assertion, reference hash, material cost or resource rule is relaxed.
    entity-ID reuse. Replay the recording and compare authoritative hashes, costs,
    piece order, attachments and navigation. These are required manual checks,
    not validated results reported by this implementation.
+
+## Connections in paid construction templates
+
+The Build menu's two small paid templates share this construction authority.
+Their immutable relation is first building OUT to second building IN, with two
+cardinally rotated buildings 48m apart. Completed-tick design capture reuses the
+bounded automatic route proposals, terrain fitting, support, road, existing
+socket, build-area, obstruction and stock checks without creating temporary ECS
+entities. It additionally checks the proposed buildings and their truck lanes.
+The future endpoint proposal cannot accept work or bypass real ports.
+
+After the two correlated building acceptances and their actual completion, one
+ordinary directed route is submitted with full source/destination identities.
+That command revalidates the current real ports and pays its complete route
+normally. A rejected link leaves accepted buildings intact and is never retried.
+A preview is not a stock reservation; actual route cost can change before
+submission. No template connection bypasses inventory, topology or transport.
+See [paid construction templates](BuildingPlacementAndConstruction.md#paid-construction-templates)
+for controls, combined costs, partial results, interruption and persistence.
