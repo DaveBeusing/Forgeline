@@ -721,6 +721,7 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
             return;
         }
 
+        foreach (var unit in accepted) TacticalCommandUtilities.RemoveIfPresent<QueuedUnitOrders>(context, unit);
         FireMissionCommand command =
             Operation ==
             PlayerTacticalActionOperation.FireMissionContact

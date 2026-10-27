@@ -653,6 +653,7 @@ public sealed class MatchRuntime : IDisposable
             operationsRules,
             opponents,
             tacticalOpponent,
+            new QueuedOrderSystem(intelligence, weapons, artilleryWeapons),
             tacticalPreparation,
             suppression,
             automaticResupply,
