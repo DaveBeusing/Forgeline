@@ -509,6 +509,24 @@ public sealed class CombatExecutionSystem : ISimulationSystem
             }
         }
 
+        // Bridges are combat geometry only; registering them as spatial obstacles
+        // would obstruct an operational crossing.
+        foreach (EntityId candidate in entities.Query<BridgeCombat, WorldTransform>(
+                     QueryIterationOrder.StableByEntityIndex))
+        {
+            if (!IsEligibleProjectileTarget(entities, projectile, state, candidate))
+                continue;
+            AxisAlignedBounds bounds = ExpandBounds(
+                CreateTargetBounds(entities, candidate,
+                    entities.GetComponent<WorldTransform>(candidate)), state.RadiusMeters);
+            if (TryIntersectSegment(start, end, bounds, out float t) &&
+                (t < bestT || (t == bestT && (!bestTarget.IsValid || candidate < bestTarget))))
+            {
+                bestT = t;
+                bestTarget = candidate;
+            }
+        }
+
         return CompleteHit(
             start,
             end,

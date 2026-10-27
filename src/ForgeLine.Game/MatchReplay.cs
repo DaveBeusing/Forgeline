@@ -24,7 +24,8 @@ public enum ReplayCommandKind : byte
     OperationsRule = 13,
     ConveyorConstruction = 14,
     DeveloperAction = 15,
-    ConveyorRouting = 16
+    ConveyorRouting = 16,
+    BridgeRepair = 17
 }
 
 public sealed record RecordedSimulationCommand
@@ -103,6 +104,9 @@ public sealed record RecordedSimulationCommand
 
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public ConveyorBuildRequest ConveyorRequest { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public uint InfrastructureRevision { get; init; }
 
     public ConveyorRoutingPreference RoutingPreference { get; init; }
     public uint RoutingRevision { get; init; }
@@ -468,6 +472,13 @@ public static class ReplayCommandCodec
                     };
                 return true;
 
+            case RepairBridgeCommand command:
+                recorded = Base(ReplayCommandKind.BridgeRepair) with
+                { Issuer = command.Issuer, SubmittedAtTick = command.SubmittedAtTick.Value,
+                  Entities = [command.Engineer], TargetEntity = command.Bridge,
+                  SecondaryEntity = command.MaterialSource, InfrastructureRevision = command.ExpectedRevision };
+                return true;
+
             case ConveyorRoutingCommand command:
                 recorded = Base(ReplayCommandKind.ConveyorRouting) with
                 { Issuer = command.Issuer, SubmittedAtTick = command.SubmittedAtTick.Value,
@@ -631,6 +642,11 @@ public static class ReplayCommandCodec
                 DecodeLogistics(
                     command,
                     submittedAtTick),
+
+            ReplayCommandKind.BridgeRepair =>
+                new RepairBridgeCommand(scenario.Services.StrategicInfrastructure, command.Issuer,
+                    command.Entities.Length == 1 ? command.Entities[0] : EntityId.Invalid,
+                    command.TargetEntity, command.SecondaryEntity, command.InfrastructureRevision, submittedAtTick),
 
             ReplayCommandKind.ConveyorRouting =>
                 new ConveyorRoutingCommand(command.Issuer, command.TargetEntity,

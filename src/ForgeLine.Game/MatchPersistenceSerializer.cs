@@ -9,7 +9,7 @@ namespace ForgeLine.Game;
 public static class MatchPersistenceSerializer
 {
     public const int CurrentFormatVersion = 1;
-    public const int CurrentSchemaVersion = 9;
+    public const int CurrentSchemaVersion = 10;
     public const string Magic = "FORGELINE_MATCH";
 
     public const long MaximumDocumentBytes =

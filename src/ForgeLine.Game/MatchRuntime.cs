@@ -428,6 +428,8 @@ public sealed class MatchRuntime : IDisposable
                 battlefieldRuntime,
                 matchConfiguration,
                 settings.StartingStock);
+        BridgeCombatInitialization.Initialize(simulation.Entities, logistics,
+            battlefieldRuntime.CrossingEntities.Values, matchConfiguration.Participants.Select(participant => participant.Faction));
         AxisAlignedBounds[] entityObstacles =
             CollectStaticNavigationObstacles(
                 simulation);
@@ -474,6 +476,7 @@ public sealed class MatchRuntime : IDisposable
                 battlefield.StaticNavigationObstacles,
                 gridSettings,
                 sectorSettings);
+        strategicInfrastructure.BindBridgeRepairs(simulation, inventories, intelligence);
 
         var conveyors = new ConveyorConstructionService(simulation, terrain, spatialIndex, inventories, battlefield)
         { NavigationChanged = strategicInfrastructure.RefreshConveyorNavigation };
@@ -535,7 +538,8 @@ public sealed class MatchRuntime : IDisposable
                 spatialIndex,
                 buildingDestruction,
                 strategicInfrastructure.RefreshRemovedStaticEntities,
-                inventories);
+                inventories,
+                strategicInfrastructure.DisableBridgeFromCombat);
         var suppression =
             new SuppressionSystem
             {
@@ -736,6 +740,7 @@ public sealed class MatchRuntime : IDisposable
                 combatDebugSnapshots,
                 registeredSystemTypes);
 
+        services.StrategicInfrastructure = strategicInfrastructure;
         services.Conveyors = conveyors;
         services.ConveyorFlow = conveyorFlow;
 

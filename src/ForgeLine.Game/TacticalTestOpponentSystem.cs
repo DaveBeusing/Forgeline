@@ -230,7 +230,7 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
         identifiedTarget = EntityId.Invalid;
 
         FactionIntelligenceSnapshot snapshot =
-            _intelligence.Capture(faction);
+            _intelligence.Capture(faction, excludedIdentityKey: BridgeCombat.IdentityKey);
 
         bool found = false;
         int bestStateRank = int.MinValue;
@@ -340,7 +340,7 @@ public sealed class TacticalTestOpponentSystem : ISimulationSystem
         float distanceMeters)
     {
         FactionIntelligenceSnapshot snapshot =
-            _intelligence.Capture(faction);
+            _intelligence.Capture(faction, excludedIdentityKey: BridgeCombat.IdentityKey);
 
         Vector3 threatCentroid = Vector3.Zero;
         int threatCount = 0;

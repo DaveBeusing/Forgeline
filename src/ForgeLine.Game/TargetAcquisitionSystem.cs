@@ -416,6 +416,9 @@ public sealed class TargetAcquisitionSystem : ISimulationSystem
             return false;
         }
 
+        // Shared crossing destruction is an explicit order, never automatic target acquisition.
+        if (requireTargetable && context.Entities.HasComponent<BridgeCombat>(candidate)) return false;
+
         bool hasTargetClass =
             context.Entities.TryGetComponent(
                 candidate,

@@ -96,6 +96,8 @@ public sealed class MatchRuntimeServices
 
     public SpatialGridIndex SpatialIndex { get; }
 
+    public StrategicInfrastructureSystem StrategicInfrastructure { get; internal set; } = null!;
+
     public ConveyorSimulationSystem ConveyorFlow { get; internal set; } = null!;
 
     public ConveyorConstructionService Conveyors { get; internal set; } = null!;
