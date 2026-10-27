@@ -1,10 +1,41 @@
 using System.Numerics;
+using ForgeLine.Core;
+using ForgeLine.Game;
+using ForgeLine.Simulation;
+using ForgeLine.World;
 using Xunit;
+using static ForgeLine.Presentation.Tests.SelectionOverlayRenderingTests;
 
 namespace ForgeLine.Presentation.Tests;
 
 public sealed class TacticalDisplaySettingsTests
 {
+    [Theory]
+    [InlineData(TacticalTeamPalette.BlueOrange)]
+    [InlineData(TacticalTeamPalette.Grayscale)]
+    public void DenseOwnedMinimapKeepsEveryAlternateTeamGlyphWithinExistingCapacity(TacticalTeamPalette palette)
+    {
+        const int count = 4096;
+        var settings = new TacticalDisplaySettings { TeamPalette = palette };
+        var army = Enumerable.Range(1, count).Select(i => new RenderInstance(new((uint)i, 1),
+            new(new Vector3(i % 64 - 32, 0, i / 64 - 32), Quaternion.Identity, Vector3.One),
+            new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
+            Selectable: new(new PlayerId(1), ControllableEntityCategory.Unit),
+            UnitFeature: new(UnitIds.MainBattleTank, default))).ToArray();
+        var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(1) };
+        var snapshot = new PresentationSnapshot(new SimulationTick(1), TimeSpan.FromMilliseconds(50), count, army,
+            playerExperience: experience);
+        using var graphics = new RecordingDevice();
+        using var renderer = new RtsInformationOverlayRenderer(graphics);
+        renderer.ConfigureDisplay(settings);
+        renderer.Render(new RecordingContext(), new RtsCamera(), snapshot,
+            new AxisAlignedBounds(new(-100), new(100)), RtsInformationLayerView.Empty,
+            CombatGroupOverviewView.Empty, 96);
+        var teamColor = settings.TeamColor(false, Vector4.One);
+        Assert.Equal(count * 30, graphics.Buffers.SelectMany(buffer => buffer.Vertices).Count(vertex => vertex.Color == teamColor));
+        Assert.InRange(renderer.LastRenderedVertexCount, count * 30, 262_144);
+    }
+
     [Fact]
     public void PalettePreservesOpacityAndKeepsTeamValuesDistinctInGrayscale()
     {

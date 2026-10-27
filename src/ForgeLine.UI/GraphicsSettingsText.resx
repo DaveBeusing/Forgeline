@@ -69,4 +69,11 @@
   <data name="TeamPaletteHelp" xml:space="preserve"><value>Standard, blue/orange or grayscale. Friendly, enemy and detected-contact glyphs retain distinct shapes.</value></data>
   <data name="ResetAccessibility" xml:space="preserve"><value>RESET READABILITY</value></data>
   <data name="ResetAccessibilityHelp" xml:space="preserve"><value>Reset UI scale, contrast, team colors, motion and tooltips in this draft. Other settings remain. APPLY saves; BACK discards.</value></data>
+  <data name="StandardPreset" xml:space="preserve"><value>STANDARD</value></data>
+  <data name="ReadablePreset" xml:space="preserve"><value>READABLE</value></data>
+  <data name="HighContrastPreset" xml:space="preserve"><value>HIGH CONTRAST</value></data>
+  <data name="CustomPreset" xml:space="preserve"><value>CUSTOM</value></data>
+  <data name="StandardPalette" xml:space="preserve"><value>STANDARD</value></data>
+  <data name="BlueOrangePalette" xml:space="preserve"><value>BLUE / ORANGE</value></data>
+  <data name="GrayscalePalette" xml:space="preserve"><value>GRAYSCALE</value></data>
 </root>

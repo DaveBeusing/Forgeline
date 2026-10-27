@@ -2197,18 +2197,23 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     continue;
                 }
 
+                int run = 1;
+                if (alternateTeam)
+                    while (column + run < 5 && pattern[row * 5 + column + run] == '1') run++;
+
                 EmitQuad(
                     x +
                     column *
                         pixel,
                     y +
                     row *
-                        pixel,
+                        pixel * run,
                     pixel,
                     pixel,
                     color,
                     width,
                     height);
+                column += run - 1;
             }
         }
     }

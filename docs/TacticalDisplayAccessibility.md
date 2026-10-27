@@ -62,6 +62,13 @@ grayscale team values and contrast-pipeline atlas/buffer lifetime. Existing
 motion, selection, F1/developer controls, minimap intelligence and gameplay UI
 fixture suites remain required. These fixtures do not certify physical displays.
 
+`ForgeLine.Client.exe --tactical-display-capture <empty-output> <compiled-runtime-root>`
+reuses the native battlefield harness for paired normal/contrast,
+blue/orange/grayscale captures at 1280×720 and 1920×1080, 96 layout DPI and
+100/125/150% scale. Mixed, supply and production states use copied authored facts;
+each capture must repeat exactly and contain complete native text. This inspection
+does not drive live commands, real monitor transitions or action-ring input.
+
 Native acceptance remains required: compare normal/outlined text, occupied and
 hovered/disabled rings, minimap symbols and critical supply/power feedback over
 bright terrain and dark vegetation; inspect 100/125/150% scale, compact/ultrawide

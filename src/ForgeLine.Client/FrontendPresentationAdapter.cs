@@ -225,9 +225,9 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("AmbienceSoundVolume"), $"{settings.WorldAudio.Ambience * 100:0}%", IsFocused: focused == FrontendSettingsField.AmbienceSoundVolume, CanDecrease: settings.WorldAudio.Ambience > 0, CanIncrease: settings.WorldAudio.Ambience < 1),
                 new(GraphicsSettingsText.Get("TooltipDelay"), $"{settings.Tooltips.DelayMilliseconds} MS", IsFocused: focused == FrontendSettingsField.TooltipDelay, CanDecrease: settings.Tooltips.DelayMilliseconds > 0, CanIncrease: settings.Tooltips.DelayMilliseconds < 1000),
                 new(GraphicsSettingsText.Get("TooltipTextSize"), GraphicsSettingsText.Get(settings.Tooltips.TextSize.ToString() + "TooltipText"), IsFocused: focused == FrontendSettingsField.TooltipTextSize, CanDecrease: true, CanIncrease: true),
-                new(GraphicsSettingsText.Get("DisplayPreset"), model.DisplayPreset.ToString().ToUpperInvariant(), IsFocused: focused == FrontendSettingsField.DisplayPreset, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("DisplayPreset"), GraphicsSettingsText.Get((model.DisplayPreset?.ToString() ?? "Custom") + "Preset"), IsFocused: focused == FrontendSettingsField.DisplayPreset, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("HighContrast"), settings.TacticalDisplay.HighContrast ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.HighContrast, CanDecrease: true, CanIncrease: true),
-                new(GraphicsSettingsText.Get("TeamPalette"), settings.TacticalDisplay.TeamPalette.ToString().ToUpperInvariant(), IsFocused: focused == FrontendSettingsField.TeamPalette, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("TeamPalette"), GraphicsSettingsText.Get(settings.TacticalDisplay.TeamPalette + "Palette"), IsFocused: focused == FrontendSettingsField.TeamPalette, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("ResetAccessibility"), "RESET DRAFT", IsFocused: focused == FrontendSettingsField.ResetAccessibility, CanDecrease: true, CanIncrease: true)
             };
         interaction ??= new SettingsInteractionModel();

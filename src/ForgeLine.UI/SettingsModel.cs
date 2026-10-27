@@ -50,9 +50,14 @@ public sealed class SettingsModel
         Settings = Settings with { TacticalDisplay = settings };
     }
 
-    public AccessibilityPreset DisplayPreset => Settings.TacticalDisplay.HighContrast
-        ? AccessibilityPreset.HighContrast : Settings.UiScale >= 1.25f
-        ? AccessibilityPreset.Readable : AccessibilityPreset.Standard;
+    public AccessibilityPreset? DisplayPreset => (Settings.UiScale, Settings.FeedbackSettings.ReducedMotion,
+        Settings.TacticalDisplay.HighContrast, Settings.TacticalDisplay.TeamPalette) switch
+    {
+        (1f, false, false, TacticalTeamPalette.Standard) => AccessibilityPreset.Standard,
+        (1.25f, true, false, TacticalTeamPalette.Standard) => AccessibilityPreset.Readable,
+        (1.25f, true, true, TacticalTeamPalette.BlueOrange) => AccessibilityPreset.HighContrast,
+        _ => null
+    };
 
     public void ApplyAccessibilityPreset(AccessibilityPreset preset)
     {

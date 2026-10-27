@@ -219,7 +219,7 @@ public sealed class SettingsInteractionModel
             case FrontendSettingsField.ReducedUiMotion:
                 model.SetUiFeedback(settings.FeedbackSettings with { ReducedMotion = !settings.FeedbackSettings.ReducedMotion }); break;
             case FrontendSettingsField.DisplayPreset:
-                model.ApplyAccessibilityPreset((AccessibilityPreset)(((int)model.DisplayPreset + Math.Sign(direction) + 3) % 3)); break;
+                model.ApplyAccessibilityPreset((AccessibilityPreset)(((int)(model.DisplayPreset ?? AccessibilityPreset.Standard) + Math.Sign(direction) + 3) % 3)); break;
             case FrontendSettingsField.HighContrast:
                 model.SetTacticalDisplay(settings.TacticalDisplay with { HighContrast = !settings.TacticalDisplay.HighContrast }); break;
             case FrontendSettingsField.TeamPalette:
