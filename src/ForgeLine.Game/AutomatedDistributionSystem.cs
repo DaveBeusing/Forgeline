@@ -414,6 +414,7 @@ public sealed class AutomatedDistributionSystem
     private void DispatchPendingRequests(SimulationContext context)
     {
         _dispatchCandidates.Clear();
+        var incoming = CaptureInboundCapacity(context.Entities);
         _committedDispatchCountThisTick = 0;
         _committedDispatchQuantityThisTick = 0;
 
@@ -458,13 +459,15 @@ public sealed class AutomatedDistributionSystem
         {
             TryDispatch(
                 context,
-                _dispatchCandidates[index]);
+                _dispatchCandidates[index],
+                incoming);
         }
     }
 
     private void TryDispatch(
         SimulationContext context,
-        RequestState request)
+        RequestState request,
+        CargoInboundCapacity incoming)
     {
         // One feasibility attempt per eligible pending request per tick.
         // RetryPending requests retain their place without reserving anything.
@@ -486,7 +489,8 @@ public sealed class AutomatedDistributionSystem
         }
 
         double destinationCapacity =
-            _inventories.GetAddableQuantity(
+            incoming.GetAddable(
+                _inventories,
                 destinationInventory,
                 request.ResourceId,
                 request.RequestedQuantity);
@@ -587,6 +591,7 @@ public sealed class AutomatedDistributionSystem
             return;
         }
 
+        incoming.Add(destinationInventory, request.ResourceId, selection.Quantity);
         request.Origin = selection.SourceNode.Id;
         request.AssignedTruck = selection.TruckEntity;
         request.ReservedSourceInventory = selection.SourceInventory;
@@ -987,6 +992,30 @@ public sealed class AutomatedDistributionSystem
         }
 
         return retainedTarget;
+    }
+
+    /// <summary>Rebuilt at each owner phase; full live order identities determine committed storage.</summary>
+    internal CargoInboundCapacity CaptureInboundCapacity(EntityRegistry entities)
+    {
+        var incoming = new CargoInboundCapacity();
+        foreach (var entity in entities.Query<CargoTransportOrder>(QueryIterationOrder.StableByEntityIndex))
+        {
+            if (!entities.TryGetComponent(entity, out CargoTransport transport) ||
+                !entities.TryGetComponent(entity, out CargoTransportRuntimeState state) ||
+                state.Lifecycle is CargoTransportLifecycleState.Idle or CargoTransportLifecycleState.Failed)
+                continue;
+            var order = entities.GetComponent<CargoTransportOrder>(entity);
+            if (!_network.TryGetNode(order.Destination, out var destination) ||
+                !TryResolveDestinationInventory(entities, destination, out var inventory)) continue;
+            bool carrying = state.LoadedQuantity > QuantityEpsilon ||
+                state.Lifecycle is CargoTransportLifecycleState.ToDestination or CargoTransportLifecycleState.Unloading;
+            double quantity = carrying
+                ? _inventories.Contains(transport.CargoInventory)
+                    ? _inventories.GetQuantity(transport.CargoInventory, order.ResourceId) : 0
+                : Math.Min(order.RequestedQuantity, transport.Capacity);
+            incoming.Add(inventory, order.ResourceId, quantity);
+        }
+        return incoming;
     }
 
     /// <summary>Only physically committed trucks reserve destination demand against local conveyor delivery.</summary>

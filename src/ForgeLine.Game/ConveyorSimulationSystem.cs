@@ -168,6 +168,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
         }
+        var incomingCapacity = _distribution.CaptureInboundCapacity(entities);
         var limits=new Dictionary<(EntityId,ResourceId),double>();
         foreach(var node in nodes)
         {
@@ -379,7 +380,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         double Room(Node node, ResourceId resource)
         {
             if (node.Port is not { Input: true }) return double.PositiveInfinity;
-            return Math.Max(0, limits[(node.Entity,resource)] - _stock.GetQuantity(node.Inventory, resource));
+            double policyRoom = Math.Max(0, limits[(node.Entity,resource)] - _stock.GetQuantity(node.Inventory, resource));
+            return incomingCapacity.GetAddable(_stock, node.Inventory, resource, Math.Min(policyRoom, node.InRemaining));
         }
     }
 
