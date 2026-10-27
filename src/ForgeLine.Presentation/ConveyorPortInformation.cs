@@ -7,6 +7,24 @@ public readonly record struct ConveyorPortInformation(EntityId Building, bool In
 
 internal static class ConveyorPortText
 {
+    public static string Flow(ConveyorModule module, BuildingOrientation orientation, bool xFirst)
+    {
+        if (module is ConveyorModule.Support or ConveyorModule.RaisedSupport)
+            return "STRUCTURAL SUPPORT / NO MATERIAL PORTS";
+        if (module == ConveyorModule.Endcap) return "ENDCAP / SEALED SOCKET / NO THROUGH FLOW";
+        if (module == ConveyorModule.Route) return $"FLOW OUT -> IN / {(xFirst ? "X FIRST" : "Z FIRST")}";
+        var rotation = BuildingFootprint.GetRotation(orientation);
+        string flow = string.Empty;
+        int count = 0;
+        foreach (var socket in ConveyorGeometry.Sockets(module))
+        {
+            if (count++ == 4) break;
+            flow += (flow.Length > 0 ? "; " : "FLOW ") + (socket.Input ? "IN " : "OUT ") +
+                Direction(System.Numerics.Vector3.Transform(socket.Facing, rotation), socket.Input);
+        }
+        return flow;
+    }
+
     public static string Direction(System.Numerics.Vector3 facing, bool input)
     {
         var flow = input ? -facing : facing;

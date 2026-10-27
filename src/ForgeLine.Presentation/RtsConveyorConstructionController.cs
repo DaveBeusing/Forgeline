@@ -214,9 +214,10 @@ public sealed class RtsConveyorConstructionController
             experience.Tick == snapshot.Tick;
         if (Edit == ConveyorEdit.Build && factsCurrent)
         {
-            portInformation = Module == ConveyorModule.Route ? $"FLOW OUT -> IN / {(XFirst ? "X FIRST" : "Z FIRST")}" : $"FLOW {Orientation.ToString().ToUpperInvariant()} / OUT -> IN";
-            portInformation = $"CARRIES {snapshot!.Conveyors!.BeltMaterials} / {portInformation}";
-            if (_snappedEndpoint is { } socket && _endpointTick == snapshot.Tick)
+            portInformation = ConveyorPortText.Flow(Module, Orientation, XFirst);
+            if (Module is not (ConveyorModule.Support or ConveyorModule.RaisedSupport or ConveyorModule.Endcap))
+                portInformation = $"CARRIES {snapshot!.Conveyors!.BeltMaterials} / {portInformation}";
+            if (_snappedEndpoint is { } socket && _endpointTick == snapshot!.Tick)
                 portInformation = $"{(socket.Input ? "IN ACCEPTS" : "OUT CARRIES")} {socket.Materials} / FLOW {ConveyorPortText.Direction(socket.Facing, socket.Input)}";
         }
         if(!_anchor.HasValue && Module==ConveyorModule.Route && Edit==ConveyorEdit.Build && !_awaiting)
