@@ -91,6 +91,10 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Procedural terrain diagnostic export contracts
+        shell: pwsh
+        run: ./build/Test-ProceduralTerrain.ps1
+
       - name: Fair opponent profiles and legal counterplay
         shell: pwsh
         run: |
