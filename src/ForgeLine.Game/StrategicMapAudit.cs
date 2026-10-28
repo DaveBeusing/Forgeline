@@ -37,6 +37,9 @@ public sealed record StrategicMapOpening(
     string Movement, ulong Player, uint Resource, string? Deposit,
     float? AccessibleDistanceMeters, double Quantity, double ExtractionPerSecond);
 
+public sealed record StrategicMapExpansionChoice(string Movement, ulong Player, uint Resource,
+    int ReachableDepositCount, string? NearestDeposit, float? AccessibleDistanceMeters);
+
 public sealed record StrategicMapBuildArea(string Movement, ulong Player, double ReachablePermittedSquareMeters);
 public sealed record StrategicMapRoadCapacity(string State, ulong FromPlayer, ulong ToPlayer,
     string? FromNode, string? ToNode, double WidestPathCapacityPerSecond);
@@ -46,6 +49,7 @@ public sealed record StrategicMapAuditReport(
     float NavigationCellMeters, int SectorSizeCells, int RouteQueryCount,
     IReadOnlyList<StrategicMapRoute> Routes, IReadOnlyList<StrategicMapOpening> Openings,
     IReadOnlyList<StrategicMapBuildArea> BuildAreas, IReadOnlyList<StrategicMapRoadCapacity> RoadCapacities,
+    IReadOnlyList<StrategicMapExpansionChoice> ExpansionChoices,
     IReadOnlyList<StrategicMapDiagnostic> Diagnostics)
 {
     public int ErrorCount => Diagnostics.Count(d => d.Severity == "Error");
@@ -87,6 +91,7 @@ public static class StrategicMapAudit
         var openings = new List<StrategicMapOpening>();
         var areas = new List<StrategicMapBuildArea>();
         var capacities = new List<StrategicMapRoadCapacity>();
+        var expansionChoices = new List<StrategicMapExpansionChoice>();
         var diagnostics = new List<StrategicMapDiagnostic>();
         var starts = map.Starts.OrderBy(s => s.Player.Value).ToArray();
         var resources = map.Resources.OrderBy(r => r.Key, StringComparer.Ordinal).ToArray();
@@ -155,7 +160,7 @@ public static class StrategicMapAudit
                     foreach (var site in map.Sites.OrderBy(s => s.Key, StringComparer.Ordinal))
                     {
                         var route = Route("Site", site.Key, site.Position);
-                        if (route.AccessibleDistanceMeters is null)
+                        if (state.Key == "Baseline" && route.AccessibleDistanceMeters is null)
                             Diagnose("Warning", "UnreachableSite", state.Key, movementName, start.Player.Value,
                                 site.Key, site.Position, "Expansion/staging site has no route in this state.");
                     }
@@ -166,7 +171,7 @@ public static class StrategicMapAudit
                         bool approachFound = TryApproach(grid, reachable, resource, out Vector3 approach);
                         var route = Route("Resource", resource.Key, approachFound ? approach : resource.Center, approachFound);
                         resourceRoutes.Add(resource.Key, route);
-                        if (route.AccessibleDistanceMeters is null)
+                        if (state.Key == "Baseline" && route.AccessibleDistanceMeters is null)
                             Diagnose("Warning", "UnreachableResource", state.Key, movementName, start.Player.Value,
                                 resource.Key, resource.Center, "No measured route to a reachable resource approach in this crossing state.");
                     }
@@ -187,6 +192,17 @@ public static class StrategicMapAudit
                             Diagnose("Error", "MissingVitalOpening", state.Key, movementName, start.Player.Value,
                                 $"resource:{resourceId.Value}", start.Position,
                                 "No reachable non-contested vital reserve within the configured route-distance limit.");
+                    }
+                    foreach (var resourceId in resources.Where(r => r.Contested).Select(r => r.ResourceId).Distinct().OrderBy(r => r.Value))
+                    {
+                        var choices = resources.Where(r => r.Contested && r.ResourceId == resourceId &&
+                            resourceRoutes[r.Key].AccessibleDistanceMeters is not null)
+                            .OrderBy(r => resourceRoutes[r.Key].AccessibleDistanceMeters).ThenBy(r => r.Key, StringComparer.Ordinal).ToArray();
+                        expansionChoices.Add(new(movementName, start.Player.Value, resourceId.Value, choices.Length,
+                            choices.Length > 0 ? choices[0].Key : null, choices.Length > 0 ? resourceRoutes[choices[0].Key].AccessibleDistanceMeters : null));
+                        if (choices.Length == 0)
+                            Diagnose("Warning", "NoExpansionChoice", state.Key, movementName, start.Player.Value,
+                                $"resource:{resourceId.Value}", start.Position, "No contested deposit of this resource is reachable.");
                     }
                     var query = new BattlefieldBuildableAreaQuery(map);
                     int permitted = 0;
@@ -228,10 +244,20 @@ public static class StrategicMapAudit
                 Compare("OpeningExtraction", name, $"resource:{resourceId.Value}", values.Select(o => (double?)o.ExtractionPerSecond));
             }
             Compare("OpeningBuildArea", name, "yards", areas.Where(a => a.Movement == name).Select(a => (double?)a.ReachablePermittedSquareMeters));
-            foreach (var target in routes.Where(r => r.State == "Baseline" && r.Movement == name &&
-                         (r.TargetKind == "Site" || resources.Any(d => d.Key == r.Target && d.Contested)))
-                         .GroupBy(r => r.Target, StringComparer.Ordinal).OrderBy(g => g.Key, StringComparer.Ordinal))
-                Compare("ContestedAccess", name, target.Key, target.Select(r => (double?)r.AccessibleDistanceMeters));
+            foreach (var resourceId in expansionChoices.Select(c => c.Resource).Distinct().Order())
+            {
+                var choices = expansionChoices.Where(c => c.Movement == name && c.Resource == resourceId).ToArray();
+                Compare("ExpansionDistance", name, $"resource:{resourceId}", choices.Select(c => (double?)c.AccessibleDistanceMeters));
+                Compare("ExpansionChoiceCount", name, $"resource:{resourceId}", choices.Select(c => (double?)c.ReachableDepositCount));
+            }
+            foreach (var kind in map.Sites.Select(s => s.Kind).Distinct().Order())
+            {
+                var keys = map.Sites.Where(s => s.Kind == kind).Select(s => s.Key).ToHashSet(StringComparer.Ordinal);
+                var nearest = starts.Select(s => routes.Where(r => r.State == "Baseline" && r.Movement == name &&
+                    r.Player == s.Player.Value && r.TargetKind == "Site" && keys.Contains(r.Target) &&
+                    r.AccessibleDistanceMeters is not null).Select(r => (double?)r.AccessibleDistanceMeters).Min());
+                Compare("SiteChoiceDistance", name, kind.ToString(), nearest);
+            }
         }
 
         void Compare(string code, string movement, string target, IEnumerable<double?> observations)
@@ -257,7 +283,7 @@ public static class StrategicMapAudit
             }
         }
         return new(1, map.Metadata.Key, map.MapRevision, rules, 16, 8, queryCount,
-            routes.AsReadOnly(), openings.AsReadOnly(), areas.AsReadOnly(), capacities.AsReadOnly(), diagnostics.AsReadOnly());
+            routes.AsReadOnly(), openings.AsReadOnly(), areas.AsReadOnly(), capacities.AsReadOnly(), expansionChoices.AsReadOnly(), diagnostics.AsReadOnly());
     }
 
     private static bool Contains(AxisAlignedBounds area, Vector3 point) =>

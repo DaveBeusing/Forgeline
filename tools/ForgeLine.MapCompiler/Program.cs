@@ -18,6 +18,8 @@ internal static class Program
     {
         try
         {
+            if (args.Contains("--audit-all", StringComparer.Ordinal)) return StrategicMapAuditCommand.Run(args);
+
             CompilerOptions options =
                 CompilerOptions.Parse(args);
 
@@ -54,13 +56,15 @@ internal static class Program
                     gridSettings,
                     sectorSettings);
 
+            StrategicMapAuditReport balance = StrategicMapAudit.Analyze(definition, terrain);
+
             WriteBytes(
                 options.OutputPath,
                 payload);
             File.WriteAllText(options.OutputPath + ".sha256", Convert.ToHexStringLower(SHA256.HashData(payload)) + "\n");
 
 
-            if (options.PreviewOutputPath is not null) BattlefieldMapPreview.Write(options.PreviewOutputPath, definition, terrain);
+            if (options.PreviewOutputPath is not null) BattlefieldMapPreview.Write(options.PreviewOutputPath, definition, terrain, balance);
             using var terrainHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
             var sample = new byte[4];
             foreach (var chunk in terrain.Chunks)
@@ -71,7 +75,7 @@ internal static class Program
                         terrainHash.AppendData(sample);
                     }
             string terrainDigest = Convert.ToHexStringLower(terrainHash.GetHashAndReset());
-            WriteQualification(options.QualificationOutputPath, qualification, definition, terrain, digest, terrainDigest);
+            WriteQualification(options.QualificationOutputPath, qualification, definition, terrain, digest, terrainDigest, balance);
             Console.WriteLine($"Map SHA-256: {digest}; terrain SHA-256: {terrainDigest}.");
             Console.WriteLine(
                 $"Compiled map '{definition.Metadata.DisplayName}' ({definition.Metadata.Key}) to '{options.OutputPath}'.");
@@ -81,7 +85,8 @@ internal static class Program
                 $"alternate-road={qualification.AlternateRoadChecks}; " +
                 $"elevation-range={qualification.TerrainElevationRangeMeters:F1}m.");
 
-            return 0;
+            Console.WriteLine($"Strategic audit: {balance.Verdict}; errors={balance.ErrorCount}, warnings={balance.WarningCount}.");
+            return balance.ErrorCount > 0 ? 1 : 0;
         }
         catch (Exception exception)
         {
@@ -112,7 +117,7 @@ internal static class Program
 
     private static void WriteQualification(
         string path,
-        BattlefieldOperationalGeographyReport report, BattlefieldDefinition map, TerrainWorld terrain, string mapDigest, string terrainDigest)
+        BattlefieldOperationalGeographyReport report, BattlefieldDefinition map, TerrainWorld terrain, string mapDigest, string terrainDigest, StrategicMapAuditReport balance)
     {
         string? directory =
             Path.GetDirectoryName(
@@ -144,6 +149,9 @@ internal static class Program
             }
         }
         document["Routes"] = JsonSerializer.SerializeToNode(routes);
+        document["StrategicBalance"] = JsonSerializer.SerializeToNode(balance, QualificationSerializerOptions);
+        var evidence = StrategicMapAuditCommand.Evidence(map.Metadata.Key, mapDigest, ScenarioRegistry.CentralDivideContentSha256, BattlefieldTerrainRecipe.CurrentVersion, terrain, balance);
+        StrategicMapAuditCommand.Write(Path.ChangeExtension(path, ".md"), StrategicMapAuditCommand.Markdown([evidence]));
         File.WriteAllText(path, document.ToJsonString(QualificationSerializerOptions));
     }
 

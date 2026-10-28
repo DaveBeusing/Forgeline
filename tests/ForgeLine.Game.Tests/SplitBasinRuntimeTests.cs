@@ -96,12 +96,13 @@ public sealed class SplitBasinRuntimeTests
         Assert.DoesNotContain(alternate.Route.Segments, x => x.EdgeId == edge);
         var restore = new RestoreStrategicInfrastructureCommand(bridge, runtime.Simulation.CurrentTick);
         runtime.Simulation.SubmitCommand(restore, runtime.Simulation.CurrentTick.Next());
-        runtime.Simulation.AdvanceOneTick(); Assert.True(restore.Accepted);
-        Until(() => runtime.Simulation.Entities.GetComponent<StrategicInfrastructureState>(bridge).State == StrategicInfrastructureOperationalState.Operational, 100);
-        Assert.True(runtime.Logistics.TryGetEdge(edge, out var recovered)); Assert.True(recovered.Enabled);
-        var originalRoute = runtime.Logistics.FindRoute(runtime.BattlefieldRuntime.RoadNodes["west.start"], runtime.BattlefieldRuntime.RoadNodes["east.start"]);
-        Assert.True(originalRoute.Succeeded);
-        Assert.Contains(originalRoute.Route!.Segments, x => x.EdgeId == edge);
+        runtime.Simulation.AdvanceOneTick();
+        // Combat bridges now require an identified crossing, nearby engineer and
+        // physical repair kit. The legacy host command must not restore one free.
+        Assert.False(restore.Accepted);
+        Assert.Equal(StrategicInfrastructureOperationalState.Disabled,
+            runtime.Simulation.Entities.GetComponent<StrategicInfrastructureState>(bridge).State);
+        Assert.True(runtime.Logistics.TryGetEdge(edge, out var stillDisabled)); Assert.False(stillDisabled.Enabled);
         // Existing host infrastructure commands deliberately remain outside the player replay codec.
         Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.CaptureSave(runtime));
 

@@ -8,7 +8,7 @@ namespace ForgeLine.MapCompiler;
 internal static class BattlefieldMapPreview
 {
     // Offline documentation view of the same loaded geometry used in qualification.
-    internal static void Write(string path, BattlefieldDefinition map, TerrainWorld terrain)
+    internal static void Write(string path, BattlefieldDefinition map, TerrainWorld terrain, StrategicMapAuditReport? audit = null)
     {
         var svg = new StringBuilder();
         string N(float value) => value.ToString("0.###", CultureInfo.InvariantCulture);
@@ -43,6 +43,14 @@ internal static class BattlefieldMapPreview
         }
         foreach (var crossing in map.Crossings)
             svg.Append(CultureInfo.InvariantCulture, $"<text x='{N(crossing.Position.X)}' y='{N(crossing.Position.Z - 35)}' text-anchor='middle' font-family='sans-serif' font-size='36' fill='white'>{E(crossing.DisplayName)}</text>");
+        if (audit is not null)
+        {
+            foreach (var diagnostic in audit.Diagnostics.Where(d => d.State == "Baseline" && d.Player != 0))
+            {
+                svg.Append(CultureInfo.InvariantCulture, $"<g><path d='M {N(diagnostic.X)} {N(diagnostic.Z - 30)} l 27 50 h -54 Z' fill='#17202a' stroke='white' stroke-width='5'/><text x='{N(diagnostic.X)}' y='{N(diagnostic.Z + 10)}' text-anchor='middle' font-family='sans-serif' font-size='34' fill='white'>!</text><title>{E(diagnostic.Id)}: {E(diagnostic.Message)}</title></g>");
+            }
+            svg.Append(CultureInfo.InvariantCulture, $"<text x='35' y='55' font-family='sans-serif' font-size='32' fill='white' stroke='#17202a' stroke-width='1'>{E(map.Metadata.Key)} rev {map.MapRevision} | {E(audit.Verdict)} | E:{audit.ErrorCount} W:{audit.WarningCount} | grid {N(audit.NavigationCellMeters)}m</text>");
+        }
         svg.Append(CultureInfo.InvariantCulture, $"<rect y='{N(map.Metadata.HeightMeters)}' width='{N(map.Metadata.WidthMeters)}' height='160' fill='#17202a'/><text x='35' y='{N(map.Metadata.HeightMeters + 60)}' font-family='sans-serif' font-size='38' fill='white'>{E(map.Metadata.DisplayName)} | {N(map.Metadata.WidthMeters)} x {N(map.Metadata.HeightMeters)} m | North at top</text><text x='35' y='{N(map.Metadata.HeightMeters + 115)}' font-family='sans-serif' font-size='28' fill='white'>Core: blue/red | Resources: ore silver, volatiles amber, silicates cyan | Roads: cream | Blockers: amber outlines</text></svg>");
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
         File.WriteAllText(path, svg.ToString());
