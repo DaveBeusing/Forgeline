@@ -1374,11 +1374,13 @@ internal sealed class ClientApplication
                 if (alertResult.NotificationDetails) operationsController.OpenNotifications(inputSnapshot.SessionId, presentationInteraction);
                 else operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
             }
-            bool logisticsCaptured = logisticsCapacityInteraction.Update(inputState, inputSnapshot, camera, interactionLayout,
+            GameplayHudLayout logisticsLayout = interactionLayout with
+            { Minimap = minimapInteraction.DisplayedBounds.IsEmpty ? interactionLayout.Minimap : minimapInteraction.DisplayedBounds };
+            bool logisticsCaptured = logisticsCapacityInteraction.Update(inputState, inputSnapshot, camera, logisticsLayout,
                 informationLayer.OverlayMode, modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                 buildingPlacementController.IsActive || tacticalTargetingController.IsActive || hudInteraction.PointerCaptured ||
                 actionPanel.HasKeyboardFocus || operationsController.ContainsSurface(inputState.PointerPosition, interactionLayout) ||
-                HudInteractionContext.CapturesWorldPointer(inputState, interactionLayout, informationLayer.MinimapEnabled,
+                HudInteractionContext.CapturesWorldPointer(inputState, logisticsLayout, informationLayer.MinimapEnabled,
                     actionPanel.DockExpanded, guidanceVisible: false, includeActionDock: true,
                     onboarding: guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions), out var logisticsTarget);
             hudInteraction.CapturePointer(logisticsCaptured);
