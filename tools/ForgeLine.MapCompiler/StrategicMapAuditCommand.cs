@@ -117,6 +117,16 @@ internal static class StrategicMapAuditCommand
             foreach (var area in audit.BuildAreas)
                 text.AppendLine(System.FormattableString.Invariant($"| {area.Movement} | {area.Player} | {area.ReachablePermittedSquareMeters:0} |"));
             text.AppendLine();
+            text.AppendLine();
+            text.AppendLine("| Movement | Player | Expansion resource | Reachable deposits | Nearest deposit | Route m |");
+            text.AppendLine("|---|---:|---:|---:|---|---:|");
+            foreach (var choice in audit.ExpansionChoices)
+                text.AppendLine(System.FormattableString.Invariant($"| {choice.Movement} | {choice.Player} | {choice.Resource} | {choice.ReachableDepositCount} | {choice.NearestDeposit ?? "unavailable"} | {choice.AccessibleDistanceMeters?.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) ?? "unreachable"} |"));
+            text.AppendLine();
+            text.AppendLine("| Crossing state | Movement | Player | Reached targets | All targets |");
+            text.AppendLine("|---|---|---:|---:|---:|");
+            foreach (var group in audit.Routes.GroupBy(r => (r.State, r.Movement, r.Player)))
+                text.AppendLine(System.FormattableString.Invariant($"| {group.Key.State} | {group.Key.Movement} | {group.Key.Player} | {group.Count(r => r.AccessibleDistanceMeters is not null)} | {group.Count()} |"));
             text.AppendLine("| Crossing state | From | To | Widest road-path capacity/s |");
             text.AppendLine("|---|---:|---:|---:|");
             foreach (var capacity in audit.RoadCapacities)
