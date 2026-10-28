@@ -111,10 +111,14 @@ public sealed class SkirmishRaidPlannerTests
         Assert.Equal(group, fixture.State.Group);
     }
 
-    [Fact]
-    public void HiddenTargetMovementCannotUpdateSearchPointOrKeepDirectAttack()
+    [Theory]
+    [InlineData(OpponentDifficultyId.Easy)]
+    [InlineData(OpponentDifficultyId.Standard)]
+    [InlineData(OpponentDifficultyId.Hard)]
+    public void HiddenTargetMovementCannotUpdateSearchPointOrKeepDirectAttack(OpponentDifficultyId difficulty)
     {
-        var fixture = new Fixture();
+        var policy = OpponentDifficultyProfiles.Get(difficulty).Configuration;
+        var fixture = new Fixture(configuration: policy);
         fixture.Step();
         var remembered = fixture.State.LastKnownPosition;
         foreach (EntityId unit in fixture.Raiders())
@@ -125,7 +129,7 @@ public sealed class SkirmishRaidPlannerTests
         Assert.Equal(SkirmishRaidPhase.Searching, fixture.State.Phase);
         Assert.Equal(remembered, fixture.State.LastKnownPosition);
         Assert.Equal(remembered, fixture.Entities.GetComponent<CombatOrderState>(fixture.State.First).Destination);
-        fixture.Step(81);
+        fixture.Step(checked((int)policy.Raids.SearchTicks + 1));
         Assert.Equal(SkirmishRaidPhase.Returning, fixture.State.Phase);
         Assert.Equal(SkirmishRaidReason.ContactLost, fixture.State.Reason);
     }
