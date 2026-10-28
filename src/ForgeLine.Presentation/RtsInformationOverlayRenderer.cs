@@ -23,6 +23,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         new OverlayVertex[MaxVertices];
     private readonly RuntimeUiIconPalette? _runtimePalette;
     private readonly RtsMinimapScratch _minimapScratch = new();
+    private readonly BattlefieldStatusOverlay _battlefieldStatus = new();
+    internal int LastBattlefieldStatusMarkers { get; private set; }
 
     private GameplayBindingRegistry _bindings = GameplayBindingRegistry.Default;
     private int _vertexCount;
@@ -90,6 +92,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
         LastWorldLabels = 0;
+        LastBattlefieldStatusMarkers = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -118,6 +121,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         if (preAlphaUx.Mode == PreAlphaUxMode.None)
         {
             EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
+            EmitBattlefieldStatus(camera, snapshot, view, layout, context.Width, context.Height);
             EmitGameplayLabels(camera, gameplayOverlay, layout, context.Width, context.Height);
         }
         if (view.MinimapEnabled)
@@ -305,6 +309,32 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         EmitOrderArtwork(camera, view.TacticalFeedback, scale, width, height);
         _skin.IconClip(new(0,0,width,height));
         _skin.PanelClip(new(0,0,width,height));
+    }
+
+    private void EmitBattlefieldStatus(RtsCamera camera, PresentationSnapshot snapshot, in RtsInformationLayerView view,
+        in GameplayHudLayout layout, int width, int height)
+    {
+        var clip = new HudRect(layout.SafeArea.X, layout.TopStatusBar.Bottom, layout.SafeArea.Width,
+            MathF.Max(0, layout.Minimap.Y - layout.TopStatusBar.Bottom));
+        float scale = layout.Scale;
+        _battlefieldStatus.Update(snapshot, camera, view, clip, scale, width, height);
+        LastBattlefieldStatusMarkers = _battlefieldStatus.Count;
+        _text.Clip = clip;
+        foreach (ref readonly var marker in _battlefieldStatus.Markers)
+        {
+            Vector4 color = marker.Critical ? ForgeLineUiPalette.Critical : ForgeLineUiPalette.Warning;
+            float x = marker.Position.X, y = marker.Position.Y;
+            // Backing and stable letter/shape semantics survive dark terrain, VFX and label-density limits.
+            EmitQuad(x - 7 * scale, y - 8 * scale, 14 * scale, 16 * scale, new(.025f, .03f, .04f, .95f), width, height);
+            EmitQuad(x - scale, y - 5 * scale, 2 * scale, 6 * scale, color, width, height);
+            EmitQuad(x - scale, y + 3 * scale, 2 * scale, 2 * scale, color, width, height);
+            if (marker.Label.Length == 0) continue;
+            EmitQuad(marker.Bounds.X, y + 10 * scale, marker.Bounds.Width, 17 * scale,
+                new(.025f, .03f, .04f, .95f), width, height);
+            EmitText(marker.Label, marker.Bounds.X + 3 * scale, y + 11 * scale,
+                marker.Bounds.Right - 3 * scale, new(1, 1, 1, 1), .85f * scale, width, height);
+        }
+        _text.Clip = null;
     }
 
     private void EmitOrderArtwork(RtsCamera camera, in RtsCommandMarkerView marker, float scale, int width, int height)

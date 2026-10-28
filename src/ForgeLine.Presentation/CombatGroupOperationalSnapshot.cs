@@ -29,7 +29,10 @@ public readonly record struct CombatGroupMemberReadModel(
     bool HasFirePolicy = false,
     FirePolicy FirePolicy = FirePolicy.FireAtWill,
     bool HasMovementIntent = false,
-    bool Patrolling = false);
+    bool Patrolling = false)
+{
+    public PlayerBattlefieldStatus BattlefieldStatus { get; init; }
+}
 
 public sealed class CombatGroupOperationalSnapshot
 {
@@ -624,7 +627,8 @@ internal static class CombatGroupOperationalSnapshotFactory
                     entities.TryGetComponent(entity, out FirePolicyState policy) ? policy.Policy : FirePolicy.FireAtWill,
                     entities.HasComponent<MovementOrder>(entity) || entities.HasComponent<MovementGroupMember>(entity) ||
                         entities.HasComponent<NavigationRouteState>(entity),
-                    entities.TryGetComponent(entity, out QueuedUnitOrders queue) && queue.Repeating));
+                    entities.TryGetComponent(entity, out QueuedUnitOrders queue) && queue.Repeating)
+                { BattlefieldStatus = PlayerBattlefieldStatusCapture.Capture(entities, entity, player) });
         }
 
         var snapshot = CombatGroupOperationalSnapshot.CaptureOwned(context.Tick, sessionId, members, previous);
