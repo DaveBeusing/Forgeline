@@ -311,7 +311,26 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
     {
         if (!marker.Visible) return;
         var point = camera.WorldToScreen(marker.Position,width,height);
-        if (point.IsVisible) _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        if (!point.IsVisible) return;
+        if (marker.State == RtsCommandMarkerState.Pending)
+        {
+            float x = point.Position.X - 9 * scale, y = point.Position.Y - 9 * scale;
+            Vector4 pending = new(1, .72f, .18f, 1);
+            EmitQuad(x, y, 18 * scale, 2 * scale, pending, width, height);
+            EmitQuad(x, y + 16 * scale, 18 * scale, 2 * scale, pending, width, height);
+            EmitQuad(x, y + 2 * scale, 2 * scale, 14 * scale, pending, width, height);
+            EmitQuad(x + 16 * scale, y + 2 * scale, 2 * scale, 14 * scale, pending, width, height);
+        }
+        else _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        string label = marker.State switch
+        {
+            RtsCommandMarkerState.Pending => "PENDING",
+            RtsCommandMarkerState.Partial => "PARTIAL",
+            RtsCommandMarkerState.Rejected => "REJECTED",
+            _ => "ACCEPTED"
+        };
+        _text.AddCentered(label, new(point.Position.X-60*scale, point.Position.Y+14*scale,120*scale,18*scale),
+            12*scale, Vector4.One, width, height);
     }
 
     private void EmitMinimap(

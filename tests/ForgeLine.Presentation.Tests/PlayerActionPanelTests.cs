@@ -1540,6 +1540,81 @@ public sealed class PlayerActionPanelTests
         Assert.False(action.Paused);
     }
 
+    [Theory]
+    [InlineData(1, GameplayAction.AttackMove)]
+    [InlineData(2, GameplayAction.Stop)]
+    [InlineData(3, GameplayAction.Hold)]
+    [InlineData(4, GameplayAction.Retreat)]
+    public void DirectTacticalBindingMatchesMenuAndConsumesShortTapOnce(int index, GameplayAction action)
+    {
+        var selected = new EntityId(101, 1);
+        var tactical = new PlayerTacticalActionReadModel([selected], 1, 1, 0, 0, 0, false, false, default, default, [], []);
+        var snapshot = CreateSnapshot(tactical: tactical);
+        var menu = new PlayerActionPanelController();
+        var menuInput = new InputState();
+        menu.Update(menuInput, snapshot, 1600, 900);
+        Tap(PlatformKey.K);
+        for (int i = 0; i < index; i++) Tap(PlatformKey.Tab);
+        Tap(PlatformKey.Enter);
+        Assert.True(menu.TryTakeRequest(out var expected));
+
+        var bindings = new GameplayBindingRegistry(new GameplayBindings().With(action, PlatformKey.J));
+        var controller = new PlayerActionPanelController(bindings);
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.J); Release(input, PlatformKey.J);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out var actual));
+        Assert.Equal(expected.Kind, actual.Kind);
+        Assert.Equal(expected.TacticalEntities, actual.TacticalEntities);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Equal("J", bindings.TacticalShortcut(index));
+
+        void Tap(PlatformKey key)
+        {
+            menuInput.BeginFrame(); Press(menuInput, key); menu.Update(menuInput, snapshot, 1600, 900);
+            menuInput.BeginFrame(); Release(menuInput, key); menu.Update(menuInput, snapshot, 1600, 900);
+        }
+    }
+
+    [Fact]
+    public void BlockedTacticalShortcutRequiresReleaseAndFreshPress()
+    {
+        var selected = new EntityId(101, 1);
+        var snapshot = CreateSnapshot(tactical: new PlayerTacticalActionReadModel([selected], 1, 1, 0, 0, 0, false, false, default, default, [], []));
+        var controller = new PlayerActionPanelController(new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Stop, PlatformKey.J)));
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.J);
+        controller.Update(input, snapshot, 1600, 900, globalShortcutsBlocked: true);
+        input.BeginFrame();
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+        Release(input, PlatformKey.J); controller.Update(input, snapshot, 1600, 900);
+        Press(input, PlatformKey.J); controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out _));
+    }
+
+    [Theory]
+    [InlineData(PlatformKey.LeftShift)]
+    [InlineData(PlatformKey.LeftControl)]
+    public void ReleasedModifierStillBlocksBriefTacticalChord(PlatformKey modifier)
+    {
+        var selected = new EntityId(101, 1);
+        var snapshot = CreateSnapshot(tactical: new PlayerTacticalActionReadModel([selected], 1, 1, 0, 0, 0, false, false, default, default, [], []));
+        var controller = new PlayerActionPanelController(new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Stop, PlatformKey.J)));
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Press(input, modifier); Press(input, PlatformKey.J);
+        Release(input, PlatformKey.J); Release(input, modifier);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.False(controller.TryTakeRequest(out _));
+        input.BeginFrame(); Press(input, PlatformKey.J);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out _));
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>
