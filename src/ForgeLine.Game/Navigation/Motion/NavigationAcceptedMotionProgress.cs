@@ -64,10 +64,12 @@ internal static class NavigationAcceptedMotionProgress
         double dz = (double)last.Z - first.Z;
         double squared = dx * dx + dz * dz;
         if (!double.IsFinite(squared)) return false;
-        if (squared <= 0) return true;
+        // Height-only or repeated waypoints still provide a valid horizontal
+        // anchor. They cannot advance ownership, but must not veto checked motion
+        // toward the final point merely because this segment has zero length.
         double px = (double)point.X - first.X;
         double pz = (double)point.Z - first.Z;
-        double fraction = Math.Clamp((px * dx + pz * dz) / squared, 0, 1);
+        double fraction = squared == 0 ? 0 : Math.Clamp((px * dx + pz * dz) / squared, 0, 1);
         double errorX = px - dx * fraction;
         double errorZ = pz - dz * fraction;
         double distance = errorX * errorX + errorZ * errorZ;

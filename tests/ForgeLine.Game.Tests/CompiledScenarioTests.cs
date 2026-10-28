@@ -8,12 +8,12 @@ namespace ForgeLine.Game.Tests;
 public sealed class CompiledScenarioTests
 {
     [Fact]
-    public void ProductiveCompiledStartHasSchemaNineCheckpointsAndUnchangedGeography()
+    public void ProductiveCompiledStartHasCurrentCheckpointsAndUnchangedGeography()
     {
         using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         Assert.Equal(ScenarioRegistry.CentralDivideDescriptor.Identity, runtime.RuntimeSettings.Composition.Identity);
         BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create()).ValidateMatches(runtime.Battlefield);
-        Assert.Equal(9, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        Assert.Equal(18, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
         using var independent = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         string initial = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         Assert.Equal(initial, MatchAuthoritativeSnapshot.Capture(independent).ComputeSha256());
@@ -21,8 +21,8 @@ public sealed class CompiledScenarioTests
         independent.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
         string afterTwenty = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         Assert.Equal(afterTwenty, MatchAuthoritativeSnapshot.Capture(independent).ComputeSha256());
-        Assert.Equal("D17801D6414BD8CDD521DD640A95FA31BADBBBC14BD782B3926E13D8973089A1", initial);
-        Assert.Equal("BBE06AEF61EBDF3E6798DDDA9EF0EB19AEAEC227E83DBA943DDDAC2EC4C1F29C", afterTwenty);
+        Assert.Equal("E8A27383CE21EFE848672254CAA4D2E1F7ECD9912E59F174C6762E9884E0324C", initial);
+        Assert.Equal("14D58A81A68CC2437CA714001BB323859E04A9F4D759D77BBF16F614A2606E99", afterTwenty);
         var report = BattlefieldOperationalGeographyValidator.Validate(runtime.Battlefield, runtime.Terrain,
             new NavigationGridSettings { CellSizeMeters = 16, StaticObstacleClearanceMeters = 0.5f },
             new NavigationSectorSettings { SectorSizeCells = 8 });
