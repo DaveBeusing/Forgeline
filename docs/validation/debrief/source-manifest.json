@@ -12,7 +12,7 @@
     },
     {
       "Path": "build/Test-MatchDebrief.ps1",
-      "Sha256": "81d4bcc3735b37ae7377d1a4883aa09c3b14db56721522b345c266c58ff04af7"
+      "Sha256": "1e1aed25f1bfdaa7fb146ef943596831bdc7fb363912b3e1dbbca84f62c9050f"
     },
     {
       "Path": "docs/AfterActionStrategicDebrief.md",

@@ -11,6 +11,9 @@ $headless = Join-Path $repoRoot "src/ForgeLine.Headless/ForgeLine.Headless.cspro
 function Invoke-DebriefContract([string[]]$Arguments, [int]$Expected = 0) {
     & dotnet run --project $headless --configuration $Configuration --no-build -- @Arguments
     if ($LASTEXITCODE -ne $Expected) { throw "Unexpected CLI result: $LASTEXITCODE, expected $Expected." }
+    # An asserted negative case succeeded as a contract; do not leak its process code
+    # to callers such as the Actions PowerShell wrapper. Unexpected codes throw above.
+    $global:LASTEXITCODE = 0
 }
 $first = Join-Path $destination "first.json"
 $repeat = Join-Path $destination "repeat.json"
