@@ -69,6 +69,7 @@ def main():
             mesh.from_pydata([game_to_blender(v) for v in attrs['POSITION']],[],
                              [indices[i:i+3] for i in range(0,len(indices),3)])
             mesh.update()
+            for polygon in mesh.polygons:polygon.use_smooth=True
             uv=mesh.uv_layers.new(name='UVMap')
             for loop in mesh.loops:uv.data[loop.index].uv=attrs['TEXCOORD_0'][loop.vertex_index]
             mesh.normals_split_custom_set_from_vertices([game_to_blender(v) for v in attrs['NORMAL']])
