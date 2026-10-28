@@ -143,6 +143,20 @@ Any protection configuration must be verified by GitHub readback after it is app
 
 ### Enforcement Status
 
+Restored and read back on **2026-10-28** at master
+`201af6aad7ace07df21608c1d058d23b0828b070` after #307 recorded a regression
+in the required-check field. Current protection again requires Actions
+`build-test` (App `15368`) with strict up-to-date enforcement. Existing PR,
+administrator, no-force-push and no-deletion controls were preserved.
+An isolated branch with the identical policy rejected a content-identical
+child ref update with HTTP 422: required pull-request integration and expected
+`build-test`. Its head remained unchanged; only the temporary protection/ref
+were removed. Master was never a write-test target. See
+[the current evidence](validation/Issue410RecoveryAndCi.md).
+This administrative repair does not establish successful gameplay CI.
+
+The following records the earlier setup; its date is historical evidence:
+
 Configured and read back on **2026-10-25**, at `master` commit
 `65bb7e704232857c8d550be54d0e1feddaf98c19`:
 
