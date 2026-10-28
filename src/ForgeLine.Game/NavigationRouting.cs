@@ -542,7 +542,7 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem, ID
             if (route.BoundSearch is { } bound)
             {
                 // A projected endpoint is never permission for an unchecked tail.
-                // Only the existing precise queue owner can take over its exact pose.
+                // Precise queue ownership and ordinary transit tails have separate gates.
                 if (bound.Search.TargetSemantics == NavigationTargetSemantics.DockAccess &&
                     NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, bound.Search.Vehicle.ClearanceMeters, out var observation) &&
                     NavigationPrecisionOwnership.Matches(observation, bound.Binding) &&
@@ -551,6 +551,21 @@ public sealed partial class HierarchicalNavigationSystem : ISimulationSystem, ID
                 {
                     context.Entities.AddComponent(entity, serviceApproach);
                     SupplyRescueTravel.RedirectOwnedOrder(context, entity, route.OriginalOrder, serviceApproach);
+                }
+                else if (bound.Search.TargetSemantics == NavigationTargetSemantics.Transit &&
+                    route.Path.Waypoints.Count > 0 &&
+                    Vector3.DistanceSquared(route.Path.Waypoints[^1], route.OriginalOrder.WorldTarget) > .0001f &&
+                    NavigationReadAdapter.TryCaptureVehicle(context.Entities, entity, bound.Search.Vehicle.ClearanceMeters, out var transit) &&
+                    transit.Owner == route.OriginalOrder.Issuer && transit.Profile == bound.Search.Vehicle &&
+                    transit.QueueEntry is null && transit.DockVisit is null &&
+                    NavigationPrecisionOwnership.Matches(transit, bound.Binding))
+                {
+                    // Projection is not arrival: continue the original intent through
+                    // the collision-checked local owner. It grants no dock/service
+                    // authority and every actual pose still passes the exact sweep.
+                    var tail = route.OriginalOrder with { Kind = MovementOrderKind.LocalApproach, AcceptedAtTick = context.Tick };
+                    context.Entities.AddComponent(entity, tail);
+                    SupplyRescueTravel.RedirectOwnedOrder(context, entity, route.OriginalOrder, tail);
                 }
                 return;
             }

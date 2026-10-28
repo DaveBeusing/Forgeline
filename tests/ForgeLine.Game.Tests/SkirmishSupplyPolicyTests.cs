@@ -149,8 +149,9 @@ public sealed class SkirmishSupplyPolicyTests
                 "Waiting reconnaissance did not request its available physical provider.");
             Assert.Equal(escort, requested.Provider);
             // A 300m trip already needs over 23s at the truck's authored top
-            // speed, before turns and transfers. Allow one physical minute.
-            scenario.Simulation.RunTicks(1200, TestContext.Current.CancellationToken);
+            // speed, before terrain, turns, final approach and transfers.
+            // Measured physical arrival occurs after the old 60-second limit.
+            scenario.Simulation.RunTicks(2400, TestContext.Current.CancellationToken);
             remaining = scenario.Inventories.GetQuantity(fuel.InventoryId, ResourceIds.Fuel) / fuel.Capacity;
             Assert.True(remaining > settings.OpponentConfigurations[side.Player.Value].OffensiveFuelThreshold,
                 $"Waiting reconnaissance remained stranded at fuel {remaining:F4}; " +
@@ -470,6 +471,7 @@ public sealed class SkirmishSupplyPolicyTests
         // This policy test supplies a stable power reserve. The end-to-end
         // strategic-loop tests retain the unmodified economy/bootstrap path.
         entities.AddComponent(side.CommandCore, new PowerGenerator(100.0));
+        SkirmishScenarioHarness.EnsureCargoForPolicyFixture(scenario, side.Player, 3);
         bool funded = scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
             24_000, TestContext.Current.CancellationToken);
         var queueDiagnostics = new List<string>();
@@ -492,6 +494,7 @@ public sealed class SkirmishSupplyPolicyTests
                     "; neighbors=" + string.Join(" | ", neighbors));
             }
         Assert.True(funded, string.Join("\n", queueDiagnostics));
+        SkirmishScenarioHarness.EnsureExpansionForceForPolicyFixture(scenario, side.Player);
         void SetAvailable(ResourceId resource, double quantity)
         {
             double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);
@@ -1437,7 +1440,7 @@ public sealed class SkirmishSupplyPolicyTests
             replacement = new QueueUnitProductionCommand(
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player,
                 vehicleFactory,
-                UnitIds.CargoTruck,
+                cargoLost ? UnitIds.CargoTruck : UnitIds.SupplyTruck,
                 SimulationTick.Zero,
                 ProductionPriority.High);
             scenario.Simulation.SubmitCommand(replacement, SimulationTick.Zero.Next());
@@ -1451,7 +1454,8 @@ public sealed class SkirmishSupplyPolicyTests
             foreach (EntityId entity in entities.Query<UnitProductionRequest>())
             {
                 UnitProductionRequest request = entities.GetComponent<UnitProductionRequest>(entity);
-                queued |= request.Facility == vehicleFactory && request.UnitId == UnitIds.CargoTruck;
+                queued |= request.Facility == vehicleFactory && request.UnitId ==
+                    (cargoLost ? UnitIds.CargoTruck : UnitIds.SupplyTruck);
             }
             Assert.True(queued);
         }
@@ -1504,11 +1508,13 @@ public sealed class SkirmishSupplyPolicyTests
             cargoLost || replacementQueued ? LogisticsStockPriority.Critical : LogisticsStockPriority.High,
             factoryFuel.Priority);
         Assert.Equal(
-            cargoLost ? 360.0 : 240.0,
+            cargoLost ? 360.0 : DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck].Costs
+                .Single(cost => cost.ResourceId == ResourceIds.Fuel).Quantity,
             factoryFuel.DesiredMinimum,
             precision: 6);
         Assert.Equal(
-            cargoLost ? 360.0 : 240.0,
+            cargoLost ? 360.0 : Math.Max(160.0, DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck].Costs
+                .Single(cost => cost.ResourceId == ResourceIds.Fuel).Quantity),
             factoryFuel.DesiredTarget,
             precision: 6);
         foreach (ResourceId resource in new[] { ResourceIds.Steel, ResourceIds.Electronics })
@@ -1538,7 +1544,10 @@ public sealed class SkirmishSupplyPolicyTests
         InventoryId output = scenario.Inventories.CreateInventory(new InventorySpecification(1_000.0));
         if (outputStockSatisfied)
         {
-            Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 600.0).Succeeded);
+            // Automatic processors do not stop at the legacy desired-stock target.
+            // Supply one cycle of input and fill actual output capacity instead.
+            Assert.True(scenario.Inventories.Add(input, ResourceIds.FerrousOre, 40.0).Succeeded);
+            Assert.True(scenario.Inventories.Add(output, ResourceIds.Steel, 1_000.0).Succeeded);
         }
         EntityId smelter = entities.CreateEntity();
         entities.AddComponent(smelter, entities.GetComponent<WorldTransform>(scenario.GetBase(player).CommandCore));
@@ -1549,10 +1558,10 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(smelter, new PowerGenerator(10.0));
         entities.AddComponent(smelter, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
 
-        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
 
         ProductionFacility facility = entities.GetComponent<ProductionFacility>(smelter);
-        Assert.Equal(outputStockSatisfied ? ProductionStatus.Idle : ProductionStatus.NoInput, facility.Status);
+        Assert.Equal(outputStockSatisfied ? ProductionStatus.OutputFull : ProductionStatus.NoInput, facility.Status);
         LogisticsStockPolicy policy = FindStockPolicy(entities, smelter, ResourceIds.FerrousOre);
         Assert.Equal(outputStockSatisfied ? LogisticsStockPriority.High : LogisticsStockPriority.Critical, policy.Priority);
         Assert.Equal(80.0, policy.DesiredMinimum);

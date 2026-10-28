@@ -248,14 +248,14 @@ public sealed partial class VehicleDockingService
     {
         var entities = context.Entities;
         Vector3 position = entities.GetComponent<WorldTransform>(truck).Position;
-        var forward = new Vector3(MathF.Sin(lane.Heading), 0, MathF.Cos(lane.Heading));
-        var side = new Vector3(forward.Z, 0, -forward.X);
         var vehicle = entities.GetComponent<WorldTransform>(truck);
         var movement = entities.GetComponent<GroundMovement>(truck);
         float localRange = vehicle.Scale.Z * 2 + movement.SeparationRadius;
-        bool local = VehicleDockPose.HorizontalDistanceSquared(position, target) <= 16 ||
-            MathF.Abs(Vector3.Dot(position - target, side)) <= 4 &&
-            VehicleDockPose.HorizontalDistanceSquared(position, target) <= localRange * localRange;
+        // A coarse route may stop beside the queue pose after endpoint projection.
+        // Hand nearby off-axis arrivals to the checked local controller as well;
+        // requiring lane alignment here can repeatedly resubmit the same coarse
+        // route without ever reaching the FIFO admission pose.
+        bool local = VehicleDockPose.HorizontalDistanceSquared(position, target) <= localRange * localRange;
         if (TacticalCommandUtilities.TryGetMovementIntent(context, truck, out MovementOrder currentIntent) &&
             currentIntent.WorldTarget == target && currentIntent.TargetHeadingRadians.HasValue) local = true;
         if (TacticalCommandUtilities.TryGetMovementIntent(context, truck, out MovementOrder intent) &&

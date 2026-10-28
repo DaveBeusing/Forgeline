@@ -1077,6 +1077,10 @@ public sealed class PlayerCommandBoundaryTests
             IntelligenceState.Detected,
             scenario.Simulation.CurrentTick);
 
+        Assert.True(scenario.Intelligence.TryGetContact(westFaction,
+            IntelligenceContactKey.FromEntity(target), out var storedContact));
+        storedPosition = storedContact.LastKnownPosition;
+
         scenario.Simulation.Entities.SetComponent(
             target,
             targetTransform with
