@@ -66,3 +66,7 @@ The separately named strategic-overlay status strip is not present in the curren
 ## Focused bottleneck readmodel
 
 The separate [Operations Diagnosis](OperationsDiagnosis.md) provides an immutable, selected-entity economic bottleneck projection derived from copied player actions. It complements the existing Operations facility overview without adding panels or changing resource, order, vehicle or supply authority. Each observation is tied to one session and completed tick and uses explicit evidence rather than inferring links to unseen facilities.
+
+## Global unit queues
+
+Choose QUEUES in the open Operations header for the collapsible factory overview. It shares existing unit-production requests, stock reservations, priorities and rally commands. See [Global production overview](GlobalProductionOverview.md) for filters, material scope, input ownership and qualification.

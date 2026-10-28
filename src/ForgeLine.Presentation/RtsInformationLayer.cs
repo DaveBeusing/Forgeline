@@ -251,7 +251,7 @@ public static class RtsCursorResolver
                 TacticalTargetingMode.Attack => RtsCursorKind.Attack,
                 TacticalTargetingMode.AttackMove => RtsCursorKind.AttackMove,
                 TacticalTargetingMode.FireMission => RtsCursorKind.Attack,
-                TacticalTargetingMode.Retreat => RtsCursorKind.Move,
+                TacticalTargetingMode.Retreat or TacticalTargetingMode.Rally => RtsCursorKind.Move,
                 _ => RtsCursorKind.Default
             };
         }

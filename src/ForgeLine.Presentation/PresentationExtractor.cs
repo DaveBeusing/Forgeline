@@ -277,7 +277,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                     context, _extraction, interaction.HoveredEntity),
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction, instances,
-                    interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default) : null,
+                    interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default, interaction.SelectedEntities) : null,
                 _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet).WithCauses(operationsCauses) : null) { Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses,
                     NavigationDiagnosis = interaction.NavigationDiagnosticsOpen ? CaptureNavigationDiagnostics(context, instances) : null,
                     ConstructionTemplate = _extraction is null ? null : ConstructionTemplatePreviewFactory.Capture(context, _extraction),

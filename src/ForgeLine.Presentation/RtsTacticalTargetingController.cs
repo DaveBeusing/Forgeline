@@ -15,7 +15,8 @@ public enum TacticalTargetingMode : byte
     Attack = 1,
     AttackMove = 2,
     Retreat = 3,
-    FireMission = 4
+    FireMission = 4,
+    Rally = 5
 }
 
 public readonly record struct TacticalTargetingView(
@@ -37,6 +38,17 @@ public readonly record struct TacticalTargetingView(
 
 public sealed class RtsTacticalTargetingController
 {
+    private RallyPointPlacement? _pendingRally;
+    private (int Width, int Height) _rallyViewport;
+    public void BeginRally(EntityId factory, SimulationSessionId session)
+    {
+        Cancel();
+        if (!factory.IsValid || !session.IsSpecified) return;
+        _entities = [factory]; _sessionId = session; Mode = TacticalTargetingMode.Rally;
+        _rallyViewport = default;
+    }
+    public bool TryTakeRallyPoint(out RallyPointPlacement request)
+    { request = _pendingRally ?? default; bool found = _pendingRally.HasValue; _pendingRally = null; return found; }
     private const float TargetPickRadiusPixels = 22.0f;
     private const int DefaultFireMissionRounds = 3;
 
@@ -114,6 +126,7 @@ public sealed class RtsTacticalTargetingController
         SynchronizeSession(
             snapshot?.SessionId ??
             SimulationSessionId.None);
+        if (Mode == TacticalTargetingMode.Rally && (snapshot is null || !snapshot.SessionId.IsSpecified)) Cancel();
 
         if (snapshot?.PlayerExperience?.IsMatchComplete ==
             true)
@@ -121,7 +134,16 @@ public sealed class RtsTacticalTargetingController
             Cancel();
         }
 
-        if (IsActive && snapshot?.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
+        if (Mode == TacticalTargetingMode.Rally && snapshot is { } rallySnapshot)
+        {
+            if (_rallyViewport != default && _rallyViewport != (viewportWidth, viewportHeight)) Cancel();
+            _rallyViewport = (viewportWidth, viewportHeight);
+            if (_entities.Length != 1 || !OperationsWorldOverlay.CanFocus(rallySnapshot, _entities[0]) ||
+                rallySnapshot.PlayerExperience is { Selection.Count: 1 } experience &&
+                experience.Selection.PrimaryEntity == _entities[0] &&
+                rallySnapshot.PlayerActions?.UnitProduction?.Entity != _entities[0]) Cancel();
+        }
+        if (IsActive && Mode != TacticalTargetingMode.Rally && snapshot?.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
             actions.Tick == snapshot.Tick && actions.Tactical is { } tactical)
         {
             if (tactical.SelectedEntities.Count != _entities.Length) Cancel();
@@ -241,6 +263,7 @@ public sealed class RtsTacticalTargetingController
 
     public void Cancel()
     {
+        _pendingRally = null;
         _pendingRequest = null;
         CommandFeedback.Clear();
         Mode =
@@ -280,6 +303,9 @@ public sealed class RtsTacticalTargetingController
                         viewportWidth,
                         viewportHeight,
                         out _),
+                TacticalTargetingMode.Rally => _hasPointerTarget && pointer.X >= 0 && pointer.Y >= 0 &&
+                    pointer.X < viewportWidth && pointer.Y < viewportHeight &&
+                    float.IsFinite(_pointerWorldTarget.X) && float.IsFinite(_pointerWorldTarget.Y) && float.IsFinite(_pointerWorldTarget.Z),
                 TacticalTargetingMode.AttackMove or
                 TacticalTargetingMode.Retreat =>
                     _hasPointerTarget,
@@ -315,6 +341,16 @@ public sealed class RtsTacticalTargetingController
     {
         switch (Mode)
         {
+            case TacticalTargetingMode.Rally:
+                if (_entities.Length == 1 && pointer.X >= 0 && pointer.Y >= 0 && pointer.X < viewportWidth && pointer.Y < viewportHeight &&
+                    TryResolveTerrainTarget(camera, terrain, pointer,
+                    viewportWidth, viewportHeight, out var rallyTarget) &&
+                    float.IsFinite(rallyTarget.X) && float.IsFinite(rallyTarget.Y) && float.IsFinite(rallyTarget.Z))
+                {
+                    _pendingRally = new(_entities[0], rallyTarget, _sessionId);
+                    Complete();
+                }
+                break;
             case TacticalTargetingMode.Attack:
                 if (TryPickAttackTarget(
                         camera,
@@ -607,3 +643,5 @@ public sealed class RtsTacticalTargetingController
         Cancel();
     }
 }
+
+public readonly record struct RallyPointPlacement(EntityId Factory, Vector3 Target, SimulationSessionId Session);

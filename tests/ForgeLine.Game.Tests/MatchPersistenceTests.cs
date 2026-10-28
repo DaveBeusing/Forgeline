@@ -12,6 +12,42 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class MatchPersistenceTests
 {
+    [Fact]
+    public void FactoryRallyAndQueuePriorityRoundTripThroughExistingSaveAndReplayCommands()
+    {
+        var settings=CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation,7527);
+        var basis=settings.Composition; EntityId facility=default, request=default;
+        var composition=basis with {Key="global-queue-rally-persistence",CreateStartingBase=(entities,inventories,factory,terrain,start,content,stock)=>
+        {
+            var result=basis.CreateStartingBase(entities,inventories,factory,terrain,start,content,stock);
+            if(start.Player==new PlayerId(1))
+            {
+                var inventory=inventories.CreateInventory(new InventorySpecification(1000));
+                facility=entities.CreateEntity();
+                entities.AddComponent(facility,new UnitProductionFacility(inventory,UnitProductionCapability.Vehicle,start.Player,Vector3.Zero,SimulationTick.Zero));
+                request=entities.CreateEntity();
+                entities.AddComponent(request,new UnitProductionRequest(facility,UnitIds.ScoutVehicle,ProductionPriority.Normal,SimulationTick.Zero));
+            }
+            return result;
+        }};
+        settings=settings with {Composition=composition,Participants=CentralDivideScenario.CreateDefaultParticipants(false,false)};
+        using var original=MatchRuntime.Create(settings,TestContext.Current.CancellationToken);
+        var target=new Vector3(80,0,120);
+        original.Simulation.SubmitCommand(PlayerUnitProductionActionCommand.SetRallyPoint(new(1),facility,target,original.Simulation.CurrentTick),original.Simulation.CurrentTick.Next());
+        original.Simulation.SubmitCommand(PlayerUnitProductionActionCommand.SetPriority(new(1),request,ProductionPriority.High,original.Simulation.CurrentTick),original.Simulation.CurrentTick.Next());
+        original.Simulation.AdvanceOneTick();
+        MatchComposition Resolve(string key)=>key==composition.Key?composition:throw new InvalidOperationException(key);
+        var save=MatchPersistenceService.CaptureSave(original);
+        using var restored=MatchPersistenceService.Restore(MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(save)),Resolve);
+        using var replay=MatchPersistenceService.PlayReplay(MatchPersistenceSerializer.DeserializeReplay(MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(original))),Resolve);
+        foreach(var runtime in new[]{original,restored,replay})
+        {
+            Assert.Equal(target,runtime.Simulation.Entities.GetComponent<UnitProductionRallyPoint>(facility).WorldPosition);
+            Assert.Equal(ProductionPriority.High,runtime.Simulation.Entities.GetComponent<UnitProductionRequest>(request).Priority);
+            Assert.Equal(save.StateSha256,MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
+        }
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

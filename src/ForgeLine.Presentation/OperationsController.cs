@@ -15,9 +15,11 @@ public readonly record struct OperationsView(bool Open, OperationsCategory Filte
     public bool RuleEntryFocused { get; init; }
     public int MeasurementPage { get; init; }
     public bool MeasurementFocused { get; init; }
+    public GlobalProductionView? Production { get; init; }
+    public bool QueueEntryFocused { get; init; }
 }
 public readonly record struct OperationsInteraction(bool Captured, EntityId Navigate = default,
-    PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed);
+    PlayerActionPanelMode Controls = PlayerActionPanelMode.Closed, bool BeginRally = false);
 
 public static class OperationsLayout
 {
@@ -40,6 +42,7 @@ public static class OperationsLayout
         if (s <= 0) return default;
         return index switch
         {
+            16 => new(p.X + 6 * x, p.Y + 6 * s, 120 * x, 22 * s),
             14 => new(p.X + 132 * x, p.Y + 6 * s, 84 * x, 22 * s),
             12 => new(p.X + 222 * x, p.Y + 6 * s, 138 * x, 22 * s),
             0 => new(p.X + 366 * x, p.Y + 6 * s, 78 * x, 22 * s),
@@ -96,12 +99,16 @@ public sealed class OperationsController
     private readonly GameplayBindingRegistry _bindings;
     private readonly OperationsRulePanelController _rules;
     private readonly PolicyTemplatePanelController _templates;
+    private readonly GlobalProductionController _production;
     private bool _templateSubmission;
     private readonly ulong[] _keys = new ulong[Enum.GetValues<PlatformKey>().Length];
     private int _overviewFocus = 13;
     public OperationsController(GameplayBindingRegistry? bindings = null, TimeProvider? timeProvider = null)
-    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); _templates = new(_bindings); }
-    public bool HasKeyboardFocus => View.Open && !View.Suppressed && !View.Notifications;
+    { _bindings = bindings ?? GameplayBindingRegistry.Default; _rules = new(_bindings, timeProvider: timeProvider); _templates = new(_bindings); _production = new(_bindings); }
+    public bool HasKeyboardFocus => View.Open && !View.Suppressed && !View.Notifications && View.Production is not { Collapsed: true };
+    public bool TryTakeProductionCommand(out GlobalProductionCommand command) => _production.TryTakeCommand(out command);
+    public void ProductionSubmitted(bool accepted, ulong sequence)
+    { _production.Submitted(accepted, sequence); if (View.Production.HasValue) View = View with { Production = _production.View }; }
     public bool TryTakeRuleRequest(out PlayerActionRequest request)
     {
         if (_templates.TryTakeRequest(out request)) { _templateSubmission = true; return true; }
@@ -113,9 +120,9 @@ public sealed class OperationsController
     public void RuleSubmissionFailed()
     { if (_templateSubmission) _templates.SubmissionFailed(); else _rules.SubmissionFailed(); }
     public void ObserveRuleSubmission(ulong sequence, PlayerCommandSubmissionReceipt? receipt)
-    { _rules.ObserveSubmission(sequence, receipt); _templates.ObserveSubmission(sequence, receipt); }
+    { _rules.ObserveSubmission(sequence, receipt); _templates.ObserveSubmission(sequence, receipt); _production.ObserveSubmission(sequence, receipt); }
     public void ObserveRuleResult(in PlayerCommandResultReadModel result)
-    { _rules.ObserveResult(result); _templates.ObserveResult(result); }
+    { _rules.ObserveResult(result); _templates.ObserveResult(result); _production.ObserveResult(result); }
     private ulong _press;
     private bool _armed;
     private ulong _armedPress;
@@ -131,18 +138,21 @@ public sealed class OperationsController
     private bool _consumeLeftGesture;
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; _rules.Close(); _templates.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); _templates.Close(); _production.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
     public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
-        View.Open && !View.Suppressed && OperationsLayout.Panel(layout).Contains(point);
+        View.Open && !View.Suppressed && SurfaceBounds(layout).Contains(point);
+    private HudRect SurfaceBounds(in GameplayHudLayout layout) => View.Production is { } production
+        ? GlobalProductionLayout.Panel(layout, production.Collapsed) : OperationsLayout.Panel(layout);
     public void Close(InputState input, PresentationInteractionState interaction)
     {
-        _rules.Close(); _templates.Close(); View = default; _lastRouteFocus = default;
+        _rules.Close(); _templates.Close(); _production.Close(); View = default; _lastRouteFocus = default;
         CancelInput(input); interaction.SetOperationsOpen(false);
     }
     public void OpenNotifications(SimulationSessionId session, PresentationInteractionState interaction)
-    { _armed = false; _rules.Close(); _templates.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
+    { _armed = false; _rules.Close(); _templates.Close(); _production.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input)
     {
+        _production.CancelInput();
         _rules.CancelInput(input); _templates.CancelInput(input);
         SynchronizeKeys(input);
         _consumeLeftGesture |= _armed && input.IsMouseButtonDown(PlatformMouseButton.Left);
@@ -157,8 +167,8 @@ public sealed class OperationsController
         if (fresh && input.TryGetMousePressPosition(PlatformMouseButton.Left, out var capturedOrigin))
         {
             _consumeLeftGesture = View.Open
-                ? OperationsLayout.Panel(layout).Contains(capturedOrigin) ||
-                    _initialized && OperationsLayout.Panel(_layout).Contains(capturedOrigin)
+                ? SurfaceBounds(layout).Contains(capturedOrigin) ||
+                    _initialized && SurfaceBounds(_layout).Contains(capturedOrigin)
                 : layout.TopStatusBar.Contains(capturedOrigin);
             consumedGesture |= _consumeLeftGesture;
         }
@@ -168,12 +178,13 @@ public sealed class OperationsController
         _initialized = true; _layout = layout; _session = snapshot?.SessionId ?? default;
         if (newSession || snapshot?.PlayerExperience?.IsMatchComplete == true)
         {
-            _rules.Close(); _templates.Close(); _templates.Reset(_session); View = default; _lastRouteFocus = default; _armed = false;
+            _rules.Close(); _templates.Close(); _production.Close(); _templates.Reset(_session); View = default; _lastRouteFocus = default; _armed = false;
             interaction.SetOperationsOpen(false);
         }
         View = View with { Suppressed = blocked || input.FocusLostThisFrame };
         if (View.Suppressed)
         {
+            _production.CancelInput();
             _armed = false;
             if (View.TemplateControls.HasValue)
             { _templates.Update(input, snapshot, layout, true, selection); View = View with { TemplateControls = _templates.View }; }
@@ -184,6 +195,16 @@ public sealed class OperationsController
             return new(consumedGesture);
         }
         interaction.SetOperationsOpen(View.Open);
+        if (View.Open && View.Production.HasValue)
+        {
+            var result = _production.Update(input, snapshot, layout, selection?.Entities,
+                inputCaptured || transition || snapshot?.PlayerExperience is null);
+            View = View with { Production = _production.View };
+            if (result.Close) Close(input, interaction);
+            else if (result.Back) { _production.Close(); View = View with { Production = null }; input.SuppressHeldInput(); }
+            return new(result.Captured || consumedGesture, result.Navigate,
+                result.Controls ? PlayerActionPanelMode.UnitProduction : PlayerActionPanelMode.Closed, result.Rally);
+        }
         var panel = OperationsLayout.Panel(layout);
         bool captured = consumedGesture || input.HasPointerPosition && View.Open && panel.Contains(input.PointerPosition);
         if (View.Open && View.TemplateControls.HasValue)
@@ -209,13 +230,14 @@ public sealed class OperationsController
         }
         if (View.Open && !View.Notifications && !panel.IsEmpty)
         {
-            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 15 : _overviewFocus == 15 ? 0 : _overviewFocus == 0 ? 14 : 13;
-            View = View with { RuleEntryFocused = _overviewFocus == 13, TemplateEntryFocused = _overviewFocus == 15, MeasurementFocused = _overviewFocus == 14 };
+            if (Pressed(input, GameplayAction.NextItem)) _overviewFocus = _overviewFocus == 13 ? 15 : _overviewFocus == 15 ? 0 : _overviewFocus == 0 ? 14 : _overviewFocus == 14 ? 16 : 13;
+            View = View with { RuleEntryFocused = _overviewFocus == 13, TemplateEntryFocused = _overviewFocus == 15, MeasurementFocused = _overviewFocus == 14, QueueEntryFocused = _overviewFocus == 16 };
             if (Pressed(input, GameplayAction.Activate))
             {
                 if (_overviewFocus == 0) Close(input, interaction);
                 else if (_overviewFocus == 14) NextMeasurement();
                 else if (_overviewFocus == 15) OpenTemplates(input, snapshot, layout, selection);
+                else if (_overviewFocus == 16) OpenProduction(input);
                 else OpenRules(input, snapshot, layout, selection);
                 return new(true);
             }
@@ -290,6 +312,8 @@ public sealed class OperationsController
         { OpenTemplates(input, snapshot, layout, selection); return new(true); }
         if (OperationsLayout.Control(layout, 14).Contains(origin) && OperationsLayout.Control(layout, 14).Contains(release))
         { NextMeasurement(); return new(true); }
+        if (OperationsLayout.Control(layout, 16).Contains(origin) && OperationsLayout.Control(layout, 16).Contains(release))
+        { OpenProduction(input); return new(true); }
         if (OperationsSnapshot.Resolve(snapshot) is not { } data) return new(true);
         for (int index = 1; index <= 11; index++)
         {
@@ -356,6 +380,8 @@ public sealed class OperationsController
         return default;
     }
     private void NextMeasurement() => View = View with { MeasurementPage = View.MeasurementPage == int.MaxValue ? 0 : View.MeasurementPage + 1 };
+    private void OpenProduction(InputState input)
+    { _armed = false; _rules.Close(); _templates.Close(); _production.Open(); View = View with { Production = _production.View }; input.SuppressHeldInput(); }
     private void OpenTemplates(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
     {
         _armed = false; _rules.Close();

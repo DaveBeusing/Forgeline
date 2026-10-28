@@ -42,6 +42,7 @@ public sealed class OperationsSnapshot
     public IReadOnlyList<OperationsRoute> Routes { get; }
     public int FacilityCount { get; }
     public int RouteCount { get; }
+    public GlobalProductionSnapshot? Production { get; init; }
     public static OperationsSnapshot? Resolve(PresentationSnapshot? snapshot) => snapshot is { } s &&
         s.SessionId.IsSpecified && s.Operations is { } o && o.Session == s.SessionId && o.Tick == s.Tick &&
         s.PlayerExperience is { } experience && experience.Tick == s.Tick && experience.Player == o.Player &&
@@ -53,7 +54,7 @@ public readonly record struct OperationsRoute(EntityId Source, EntityId Destinat
 
 internal static class OperationsSnapshotFactory
 {
-    public static OperationsSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, RenderInstance[]? visibleInstances = null, EntityId focused = default)
+    public static OperationsSnapshot Capture(SimulationContext context, PresentationExtractionContext extraction, RenderInstance[]? visibleInstances = null, EntityId focused = default, IReadOnlyCollection<EntityId>? selected = null)
     {
         var entities = context.Entities;
         var visible = new HashSet<EntityId>();
@@ -211,7 +212,8 @@ internal static class OperationsSnapshotFactory
         }
         rows.Sort(static (a, b) =>
         { int priority = (a.Cause.Length == 0).CompareTo(b.Cause.Length == 0); return priority != 0 ? priority : a.Entity.CompareTo(b.Entity); });
-        return new(scenario.Simulation.SessionId, context.Tick, extraction.Player, rows, resources, routes, count, routeCount);
+        return new(scenario.Simulation.SessionId, context.Tick, extraction.Player, rows, resources, routes, count, routeCount)
+        { Production = GlobalProductionCapture.Capture(context, extraction, selected ?? Array.Empty<EntityId>()) };
         void Count(EntityId entity) { if (Owned(entity)) queues[entity] = queues.GetValueOrDefault(entity) + 1; }
         bool Owned(EntityId entity) => entities.TryGetComponent(entity, out ControllableEntity owner) &&
             owner.Owner == extraction.Player && owner.IsControllable &&

@@ -38,6 +38,7 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
     internal float LastPanelOpacity => _panelOpacity;
     private float _minimumTextScale;
     private bool _panelText;
+    internal HudRect LastVisiblePanelBounds { get; private set; }
     public void Render(in GameplayHudRenderContext context)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -57,7 +58,7 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
         var view = context.Operations;
         if (_panelOpacity > 0 && !panelVisible)
         {
-            HudRect departing = OperationsLayout.Panel(context.Layout);
+            HudRect departing = LastVisiblePanelBounds.IsEmpty ? OperationsLayout.Panel(context.Layout) : LastVisiblePanelBounds;
             if (!departing.IsEmpty)
             {
                 if (!_skin.Panel(departing, "panel.primary", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
@@ -70,14 +71,16 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
             _scale = OperationsLayout.Scale(context.Layout);
             _panelText = true;
             LastPanelTextSize = MathF.Max(14 * _minimumTextScale, 14 * _scale);
-            _bounds = OperationsLayout.Panel(context.Layout); _line = 0;
+            _bounds = view.Production is { } queueView ? GlobalProductionLayout.Panel(context.Layout, queueView.Collapsed) : OperationsLayout.Panel(context.Layout); _line = 0;
+            LastVisiblePanelBounds = _bounds;
             if (_scale > 0)
             {
                 if (_panelOpacity > 0 &&
                     !_skin.Panel(_bounds, "panel.primary", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
                     Quad(_bounds, GameplayHudVisualStyle.PanelBackground with
                         { W = OperationsPanelVisuals.BackgroundOpacity * _panelOpacity });
-                if (view.TemplateControls is { } templates) RenderTemplates(context, templates);
+                if (view.Production is { } production) RenderProduction(context, production);
+                else if (view.TemplateControls is { } templates) RenderTemplates(context, templates);
                 else if (view.RuleControls is { } rules) RenderRules(context, rules);
                 else if (view.Notifications) RenderNotificationDetails(context);
                 else
@@ -88,7 +91,8 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
                     Quad(header, GameplayHudVisualStyle.PanelHeader with
                         { W = OperationsPanelVisuals.BackgroundOpacity * _panelOpacity });
                 Quad(new HudRect(_bounds.X, _bounds.Y, 3 * _scale, _bounds.Height), GameplayHudVisualStyle.Focus);
-                Line("OPERATIONS", true);
+                Line(" ", true);
+                Control(context.Layout, 16, "QUEUES >", selected: view.QueueEntryFocused);
                 Control(context.Layout, 0, "CLOSE");
                 Control(context.Layout, 14, "FLOW >", selected: view.MeasurementFocused);
                 Control(context.Layout, 12, view.Notifications ? "FACILITIES" : "NOTIFICATIONS");
@@ -377,10 +381,10 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
         _ => RtsUiIcon.StatusAlert
     };
     private void Control(in GameplayHudLayout layout, int index, ReadOnlySpan<char> label, bool selected = false, bool blocked = false,
-        bool enabled = true, RtsUiIcon? icon = null)
+        bool enabled = true, RtsUiIcon? icon = null, HudRect? bounds = null)
     {
         var previous = _bounds; int line = _line;
-        _bounds = OperationsLayout.Control(layout, index); _line = 0;
+        _bounds = bounds ?? OperationsLayout.Control(layout, index); _line = 0;
         if (_skin.Ready && label.IsEmpty) { _bounds = previous; _line = line; return; }
         if (!_skin.Panel(_bounds, "control.button_compact", OperationsPanelVisuals.BackgroundOpacity * _panelOpacity))
             Quad(_bounds, (selected ? GameplayHudVisualStyle.PanelSelected : GameplayHudVisualStyle.PanelRaised)
