@@ -16,6 +16,7 @@ internal static class Program
 
     public static void Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "--policy-templates") { PolicyTemplateBenchmark.Run(args[1..]); return; }
         if (args.Length is < 1 or > 2) throw new ArgumentException("Usage: <report.json> [samples, 16..65536]");
         int samples = args.Length == 2 ? int.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 128;
         var results = new List<object>();
