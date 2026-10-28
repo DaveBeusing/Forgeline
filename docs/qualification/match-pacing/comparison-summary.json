@@ -1,0 +1,32 @@
+[
+  {
+    "Fixture": "central-gameplay",
+    "Matches": 2,
+    "RequestedTicks": 600,
+    "ExactRunMeasurementsEqual": true,
+    "AllNumericDeltasZero": true,
+    "Compatibility": "Comparable",
+    "Series": 27,
+    "GameAssemblySha256": "FB97ADBA509BA33757F55E0F2EB2019EA244CC46207406425A2DF7F5D2E9C436"
+  },
+  {
+    "Fixture": "split-gameplay",
+    "Matches": 2,
+    "RequestedTicks": 600,
+    "ExactRunMeasurementsEqual": true,
+    "AllNumericDeltasZero": true,
+    "Compatibility": "Comparable",
+    "Series": 27,
+    "GameAssemblySha256": "FB97ADBA509BA33757F55E0F2EB2019EA244CC46207406425A2DF7F5D2E9C436"
+  },
+  {
+    "Fixture": "central-validation-control",
+    "Matches": 1,
+    "RequestedTicks": 600,
+    "ExactRunMeasurementsEqual": true,
+    "AllNumericDeltasZero": true,
+    "Compatibility": "Comparable",
+    "Series": 27,
+    "GameAssemblySha256": "FB97ADBA509BA33757F55E0F2EB2019EA244CC46207406425A2DF7F5D2E9C436"
+  }
+]

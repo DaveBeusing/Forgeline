@@ -189,6 +189,7 @@ internal static class Program
 #else
         MatchScenarioSettings settings = CentralDivideScenario.CreateSettings(options.Profile);
 #endif
+        var pacingThresholds = PacingBenchmarkReport.ReadThresholds(options.PacingThresholdsInput);
         var reports =
             new List<MatchExecutionReport>(
                 options.MatchCount);
@@ -233,7 +234,7 @@ internal static class Program
             GameplayTelemetryCollector? telemetry =
                 options.TelemetryOutput is not null
                     ? new GameplayTelemetryCollector(
-                        scenario)
+                        scenario, captureDecisionBenchmarks: true)
                     : null;
             SkirmishProgressionDiagnostics? progression = null;
             if (options.DiagnosticsOutput is not null)
@@ -256,7 +257,18 @@ internal static class Program
                    !cancellationToken.IsCancellationRequested &&
                    !scenario.GetMatchState().HasResult)
             {
-                scenario.Simulation.AdvanceOneTick();
+                try { scenario.Simulation.AdvanceOneTick(); }
+                catch (Exception error) when (error is KeyNotFoundException or InvalidOperationException or ArgumentException)
+                {
+                    if (options.TelemetryOutput is { } output)
+                    {
+                        try { PacingBenchmarkReport.WriteFailure(output + ".failure.json", options, matchSeed,
+                            telemetry?.CaptureDecisionObservation(), error); }
+                        catch (Exception writeError) when (writeError is IOException or UnauthorizedAccessException)
+                        { Console.Error.WriteLine($"Pacing failure report could not be written: {writeError.Message}"); }
+                    }
+                    throw new InvalidOperationException("Headless simulation failed: " + error.Message, error);
+                }
                 executedTicks++;
                 telemetry?.Observe();
             }
@@ -383,7 +395,7 @@ internal static class Program
             GameplayTelemetryBatchReport telemetryReport =
                 GameplayTelemetryBatchReport.Create(
                     options,
-                    telemetryMatches);
+                    telemetryMatches, pacingThresholds, cancellationToken.IsCancellationRequested);
             telemetryReport.Write(
                 options.TelemetryOutput);
             Console.WriteLine(
@@ -691,6 +703,7 @@ internal static class Program
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
         writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
         writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
+        writer.WriteLine("  --pacing-thresholds <json>  Advisory logical-time pacing limits; requires telemetry output.");
         writer.WriteLine("  --save-output <path>         Write a versioned match save after one match.");
         writer.WriteLine("  --replay-output <path>       Write a deterministic command replay after one match.");
         writer.WriteLine("  --load-input <path>          Validate and reconstruct a saved match, then exit.");
