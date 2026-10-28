@@ -44,8 +44,10 @@ public sealed class MixedDockExitPassageClearanceTests
         var coordinator = Assert.IsType<LogisticsNavigationCoordinator>(field!.GetValue(scene.Services.GroundMovement));
         var passage = new NavigationTrafficPassage(7, new(new(outward ? 2622 : 2618, 9.348057f, 1558), Quaternion.Identity), new(6.0235925f, 1, 6.0235925f));
         coordinator.RestoreState(new(1, 0, [], new(3, [], [new(passage, coarse, 1, 1, 0, 0, true)])));
+        // Slow clearance is capped at 1m/s; the observed complete detour needs
+        // more than 20 simulated seconds before the occupied lease clears.
         bool sawForwardClearance = false;
-        for (int tick = 0; tick < 400; tick++)
+        for (int tick = 0; tick < (outward ? 800 : 400); tick++)
         {
             scene.Simulation.AdvanceOneTick();
             sawForwardClearance |= entities.GetComponent<WorldTransform>(coarse).Position.X < stopped.Position.X - .1f;
@@ -60,7 +62,10 @@ public sealed class MixedDockExitPassageClearanceTests
         Assert.Equal(root, Assert.Single(scene.Services.GroundMovement.CaptureNavigationState().Actors, actor => actor.Entity == coarse).OriginalOrder.WorldTarget);
         if (!outward)
         {
-            Assert.Equal(stopped, entities.GetComponent<WorldTransform>(coarse));
+            // The owned coarse route may make its initial checked approach, but
+            // an inward blocked crossing must never be released as an escape.
+            Assert.InRange(Vector3.Distance(stopped.Position, entities.GetComponent<WorldTransform>(coarse).Position), 0, 1);
+            Assert.Equal(Vector3.Zero, entities.GetComponent<GroundMovementState>(coarse).Velocity);
             Assert.Equal(exiting, entities.GetComponent<WorldTransform>(precise));
             Assert.True(entities.HasComponent<VehicleDockVisit>(precise));
             Assert.True(entities.HasComponent<VehicleDockSlot>(bay));

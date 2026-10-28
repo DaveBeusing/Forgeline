@@ -11,6 +11,32 @@ namespace ForgeLine.Game.Tests;
 public sealed class SkirmishProductionPolicyTests
 {
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MechanizedResearchFundingCompetesWithFactoryBuffersAfterScoutAndSupplyAreEstablished(bool groundEstablished)
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings);
+        var owner = new PlayerId(1);
+        var entities = scenario.Simulation.Entities;
+        EntityId core = scenario.GetBase(owner).CommandCore;
+        entities.AddComponent(core, new PowerGenerator(1000));
+        EntityId foundation = entities.CreateEntity();
+        entities.AddComponent(foundation, new CompletedTechnology(owner, TechnologyIds.IndustrialStandardization, SimulationTick.Zero));
+        var units = DirectorateContent.CreateUnitCatalog();
+        Vector3 home = entities.GetComponent<WorldTransform>(core).Position;
+        scenario.UnitFactory.Create(units[UnitIds.ScoutVehicle], home + Vector3.UnitZ * 100, owner);
+        for (int i = 0; i < settings.OpponentConfigurations[owner.Value].MinimumSupplyTrucks; i++)
+            scenario.UnitFactory.Create(units[UnitIds.SupplyTruck], home + Vector3.UnitZ * (120 + i * 20), owner);
+        for (int i = 0; groundEstablished && i < settings.OpponentConfigurations[owner.Value].MinimumObjectivePressureUnits; i++)
+            scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], home + Vector3.UnitZ * (140 + i * 20), owner);
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, core, ResourceIds.Steel).Priority);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, core, ResourceIds.Electronics).Priority);
+        Assert.False(TechnologyStateQueries.IsCompleted(entities, owner, TechnologyIds.MechanizedSystems));
+    }
+
+    [Theory]
     [InlineData(false, 1, 2, LogisticsStockPriority.High)]
     [InlineData(true, 1, 2, LogisticsStockPriority.Critical)]
     [InlineData(true, 2, 3, LogisticsStockPriority.Critical)]
@@ -63,8 +89,10 @@ public sealed class SkirmishProductionPolicyTests
         EntityId core = scenario.GetBase(owner).CommandCore;
         if (bootstrapComplete)
         {
+            SkirmishScenarioHarness.EnsureCargoForPolicyFixture(scenario, owner, 3);
             Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, owner),
                 24_000, TestContext.Current.CancellationToken));
+            SkirmishScenarioHarness.EnsureExpansionForceForPolicyFixture(scenario, owner);
             ulong nextDecision = scenario.GetOpponentState(owner).LastDecisionTick.Value + settings.OpponentConfigurations[owner.Value].ReactionCadenceTicks;
             while (scenario.Simulation.CurrentTick.Value + 1 < nextDecision) scenario.Simulation.AdvanceOneTick();
         }
@@ -820,13 +848,14 @@ public sealed class SkirmishProductionPolicyTests
     }
 
     [Theory]
-    [InlineData(false, false, true, 3, false)]
-    [InlineData(true, false, false, 3, false)]
-    [InlineData(true, true, true, 3, false)]
-    [InlineData(false, false, false, 0, true)]
-    [InlineData(false, false, true, 3, true)]
+    [InlineData(false, false, true, 3, false, false)]
+    [InlineData(true, false, false, 3, false, false)]
+    [InlineData(true, true, false, 3, false, false)]
+    [InlineData(false, false, false, 0, true, false)]
+    [InlineData(false, false, true, 3, true, false)]
+    [InlineData(true, true, false, 0, false, true)]
     public void ExpandedSupplyNetworkQueuesAdditionalCargoRecovery(
-        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery, int additionalDepots, bool industryOnly)
+        bool fullIndustry, bool assaultFleetEstablished, bool expectedCargoRecovery, int additionalDepots, bool industryOnly, bool artilleryPending)
     {
         MatchRuntime scenario =
             CentralDivideScenario.Create(
@@ -868,8 +897,8 @@ public sealed class SkirmishProductionPolicyTests
                 MatchScenarioProfile.Validation).OpponentConfigurations[owner.Value];
             var targets = new Dictionary<UnitId, int> {
                 [UnitIds.ScoutVehicle] = 1,
-                [UnitIds.MainBattleTank] = configuration.MinimumObjectivePressureUnits,
-                [UnitIds.MobileArtillery] = 1,
+                [UnitIds.MainBattleTank] = artilleryPending ? 0 : configuration.MinimumObjectivePressureUnits,
+                [UnitIds.MobileArtillery] = artilleryPending ? 0 : 1,
                 [UnitIds.SupplyTruck] = configuration.ResolveMatureSupplyTruckTarget(4)
             };
             UnitDefinitionCatalog units = DirectorateContent.CreateUnitCatalog();
@@ -892,7 +921,7 @@ public sealed class SkirmishProductionPolicyTests
             foreach (EntityId unit in entities.Query<ControllableEntity, UnitIdentity>())
                 if (entities.GetComponent<ControllableEntity>(unit).Owner == owner &&
                     entities.GetComponent<UnitIdentity>(unit).UnitId == UnitIds.CargoTruck) cargoCount++;
-            while (cargoCount++ < 4)
+            while (cargoCount++ < (artilleryPending ? 2 : 4))
                 scenario.UnitFactory.Create(units[UnitIds.CargoTruck], coreTransform.Position, owner);
 
             foreach (var (building, capability) in new[] {
@@ -974,6 +1003,7 @@ public sealed class SkirmishProductionPolicyTests
 
         bool queuedRecoveryCargo = false;
         bool queuedFirstSupply = false;
+        bool queuedOptionalCargo = false;
         foreach (EntityId requestEntity in
                  entities.Query<UnitProductionRequest>(
                      QueryIterationOrder.StableByEntityIndex))
@@ -982,6 +1012,8 @@ public sealed class SkirmishProductionPolicyTests
                 entities.GetComponent<UnitProductionRequest>(
                     requestEntity);
 
+            if (request.Facility == factory && request.UnitId == UnitIds.CargoTruck && request.Priority == ProductionPriority.Normal)
+                queuedOptionalCargo = true;
             if (request.Facility == factory && request.UnitId == UnitIds.SupplyTruck && request.Priority == ProductionPriority.High)
                 queuedFirstSupply = true;
             if (request.Facility == factory &&
@@ -994,6 +1026,23 @@ public sealed class SkirmishProductionPolicyTests
         }
 
         Assert.Equal(expectedCargoRecovery, queuedRecoveryCargo);
+        if (fullIndustry && assaultFleetEstablished) Assert.True(queuedOptionalCargo);
+        if (artilleryPending)
+        {
+            Assert.False(TechnologyStateQueries.IsCapabilityUnlocked(entities, new PlayerId(1),
+                TechnologyCapabilityIds.MechanizedSystems));
+            // A queued truck cannot haul yet. Later decisions must not cancel
+            // its unpaid request in favor of the tank it is meant to fund.
+            scenario.Simulation.RunTicks(21, TestContext.Current.CancellationToken);
+            bool retainedCargo = false;
+            foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            {
+                var request = entities.GetComponent<UnitProductionRequest>(entity);
+                retainedCargo |= request.Facility == factory && request.UnitId == UnitIds.CargoTruck &&
+                    !entities.HasComponent<UnitProductionCancellationRequest>(entity);
+            }
+            Assert.True(retainedCargo);
+        }
         if (industryOnly && additionalDepots == 0)
         {
             Assert.True(queuedFirstSupply);
@@ -1129,6 +1178,10 @@ public sealed class SkirmishProductionPolicyTests
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
             tankCount++;
         }
+
+        // Routine artillery is optional only after its live core role is filled.
+        scenario.UnitFactory.Create(units[UnitIds.MobileArtillery], stagingPosition,
+            scenario.GetBase(new PlayerId(1)).Player);
 
         InventoryId input =
             scenario.Inventories.CreateInventory(
@@ -1671,6 +1724,12 @@ public sealed class SkirmishProductionPolicyTests
                 stagingPosition,
                 scenario.GetBase(new ForgeLine.Game.PlayerId(1)).Player);
         }
+
+        // Isolate missing hauling from technology and other missing core roles.
+        SkirmishScenarioHarness.CompleteResearchForPolicyFixture(scenario, new PlayerId(1));
+        for (int i = 0; i < validation.OpponentConfigurations[1].MinimumObjectivePressureUnits; i++)
+            scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], stagingPosition, new PlayerId(1));
+        scenario.UnitFactory.Create(units[UnitIds.MobileArtillery], stagingPosition, new PlayerId(1));
 
         InventoryId input =
             scenario.Inventories.CreateInventory(

@@ -71,7 +71,7 @@ internal sealed class VehicleSearchState
 /// </summary>
 public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutingCheckpoint>
 {
-    public const int AlgorithmRevision = 2;
+    public const int AlgorithmRevision = 3;
     private readonly long _reservedWorkspaceBytes;
     public VehicleRoutingKernel(long reservedWorkspaceBytes = 0)
     {
@@ -240,8 +240,7 @@ public sealed class VehicleRoutingKernel : INavigationSearchKernel<VehicleRoutin
                 case VehicleSearchStage.EndConnection:
                     if (!InspectClearance(out bool endDone))
                     {
-                        float tolerance = Request.TargetSemantics == NavigationTargetSemantics.DockAccess
-                            ? Request.Goal.MaximumProjectionDistance : Request.Goal.PositionTolerance;
+                        float tolerance = Request.Goal.MaximumProjectionDistance;
                         if (_state.ExactEnd && HorizontalDistance(_state.CandidatePosition, Request.OriginalDestination) <= tolerance)
                         {
                             _state.ExactEnd = false; _state.Destination = _state.CandidatePosition;

@@ -835,12 +835,13 @@ public sealed class SkirmishOpponentTests
                     HasPowerAndExtraction(
                         current,
                         current.East.Player) &&
-                    current.CountBuildings(
-                        current.West.Player,
-                        BuildingIds.LogisticsHub) >= 2 &&
-                    current.CountBuildings(
-                        current.East.Player,
-                        BuildingIds.LogisticsHub) >= 2 &&
+                    // The asymmetrical opponents need not expand in lockstep:
+                    // the losing side can be defeated before its second hub.
+                    // Require an actual offensive from forward industry instead.
+                    ((current.CountBuildings(current.West.Player, BuildingIds.LogisticsHub) >= 2 &&
+                      current.GetOpponentState(current.West.Player).StrategicState == SkirmishStrategicState.Attacking) ||
+                     (current.CountBuildings(current.East.Player, BuildingIds.LogisticsHub) >= 2 &&
+                      current.GetOpponentState(current.East.Player).StrategicState == SkirmishStrategicState.Attacking)) &&
                     HasIntegratedIndustry(
                         current,
                         current.West.Player) &&

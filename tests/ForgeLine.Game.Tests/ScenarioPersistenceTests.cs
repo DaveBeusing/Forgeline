@@ -11,7 +11,7 @@ public sealed class ScenarioPersistenceTests
         source.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
         var save = MatchPersistenceSerializer.DeserializeSave(MatchPersistenceSerializer.SerializeSave(MatchPersistenceService.CaptureSave(source)));
         var replay = MatchPersistenceSerializer.DeserializeReplay(MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(source)));
-        Assert.Equal(8, save.SchemaVersion);
+        Assert.Equal(MatchPersistenceSerializer.CurrentSchemaVersion, save.SchemaVersion);
         Assert.Equal(source.RuntimeSettings.Composition.Identity, save.Configuration.Identity);
         Assert.Equal(save.Configuration.Identity, replay.Configuration.Identity);
         using var restored = MatchPersistenceService.Restore(save);
@@ -38,7 +38,7 @@ public sealed class ScenarioPersistenceTests
         var error = Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(save, _ => wrong));
         Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion, error.Reason);
         Assert.False(allocated);
-        var changed = save with { Configuration = save.Configuration with { Identity = save.Configuration.Identity! with { MapRevision = 2 } } };
+        var changed = save with { Configuration = save.Configuration with { Identity = save.Configuration.Identity! with { MapRevision = save.Configuration.Identity!.MapRevision + 1 } } };
         Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,
             Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(changed)).Reason);
         Assert.Equal(MatchPersistenceFailureReason.IncompatibleVersion,

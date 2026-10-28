@@ -134,10 +134,12 @@ public sealed class OperationsChainDiagnosisTests
         interaction.SetSelection([ammunition]); interaction.SetOperationsOpen(true);
         runtime.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var idleSource));
-        Assert.DoesNotContain(idleSource.Diagnosis!.Rows, row => row.Entity == electronics && row.Subject == OperationsDiagnosisSubject.ProductionInput);
+        // Automatic electronics processing knows its recipe before any manual
+        // queue command; report the actual missing silicate input immediately.
         if (!truncated)
-            Assert.Contains(idleSource.Diagnosis.Rows, row => row.Entity == electronics && row.PrimaryReason == OperationsDiagnosisReason.Unknown);
-        Submit(runtime, PlayerProductionActionCommand.Queue(Player, electronics, RecipeIds.Electronics, runtime.Simulation.CurrentTick));
+            Assert.Contains(idleSource.Diagnosis!.Rows, row => row.Entity == electronics &&
+                row.Subject == OperationsDiagnosisSubject.ProductionInput && row.Resource == ResourceIds.Silicates &&
+                row.PrimaryReason == OperationsDiagnosisReason.NoInput);
         runtime.Simulation.AdvanceOneTick();
         Assert.True(buffer.TryReadLatest(out var stopped));
         var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(stopped.Diagnosis);

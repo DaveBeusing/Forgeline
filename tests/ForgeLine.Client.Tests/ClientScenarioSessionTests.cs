@@ -62,7 +62,7 @@ public sealed class ClientScenarioSessionTests
     public void OwnedNewAndRestartRejectTheWrongResolvedIdentity()
     {
         var settings = CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 9);
-        var wrong = settings.Composition with { Identity = settings.Composition.Identity! with { MapRevision = 2 } };
+        var wrong = settings.Composition with { Identity = settings.Composition.Identity! with { MapRevision = settings.Composition.Identity.MapRevision + 1 } };
         Assert.Throws<InvalidOperationException>(() => ClientSessionFactory.CreateOwned(
             ClientSessionRequest.NewGame(settings), _ => { }, TestContext.Current.CancellationToken, _ => wrong));
         Assert.Throws<InvalidOperationException>(() => ClientSessionFactory.CreateOwned(
