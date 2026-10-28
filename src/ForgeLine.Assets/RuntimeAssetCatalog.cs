@@ -66,6 +66,7 @@ public sealed class RuntimeAssetCatalog
             cancellationToken.ThrowIfCancellationRequested();
             if (record.AnimationReferences is null || record.AnimationReferences.Any(reference => !AssetId.TryParse(reference, out _)))
                 throw new InvalidDataException("Runtime animation references require an array of valid stable IDs.");
+            ScatterAssetValidation.Validate(record.Scatter, record.Type, record.Bounds);
             MechanicalMeshValidation.Validate(record.MechanicalParts, record.Sockets);
             var id = AssetId.Parse(record.Id);
             if (!records.TryAdd(id, record))
@@ -78,6 +79,14 @@ public sealed class RuntimeAssetCatalog
 
         foreach (RuntimeAssetRecord record in manifest.Assets)
         {
+            if (record.Scatter is { } placement)
+                foreach (var lod in record.Lods)
+                    if (records.TryGetValue(AssetId.Parse(lod.AssetId), out var reduced))
+                        ScatterAssetValidation.Validate(placement, reduced.Type, reduced.Bounds);
+            if (record.Scatter is { } scatter &&
+                (!records.TryGetValue(AssetId.Parse(scatter.FamilyId), out var family) ||
+                 family.Type != RuntimeAssetType.Mesh || family.Scatter?.FamilyId != family.Id))
+                throw new InvalidDataException("Scatter family must resolve to a self-identifying mesh family.");
             if (manifest.IntegrityVersion != 0)
             {
                 ValidateReferences(record.MaterialReferences, RuntimeAssetType.Material);

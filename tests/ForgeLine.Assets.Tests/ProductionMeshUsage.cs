@@ -21,6 +21,7 @@ internal sealed class ProductionMeshUsage
         id.StartsWith("building.directorate.", StringComparison.Ordinal) ||
         id.StartsWith("infrastructure.directorate.", StringComparison.Ordinal) ||
         id.StartsWith("mesh.world.prop.", StringComparison.Ordinal) ||
+        id.StartsWith("mesh.world.environment.", StringComparison.Ordinal) ||
         id.StartsWith("mesh.world.resource.", StringComparison.Ordinal) ||
         id.StartsWith("mesh.world.vegetation.", StringComparison.Ordinal);
 
