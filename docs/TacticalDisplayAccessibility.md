@@ -74,5 +74,22 @@ hovered/disabled rings, minimap symbols and critical supply/power feedback over
 bright terrain and dark vegetation; inspect 100/125/150% scale, compact/ultrawide
 windows, long English/German strings and heavy overlays. Exercise save/reload,
 reset/cancel, real monitor DPI changes, fullscreen, selection and F1 development
-controls. Record original native captures and actual device/DPI/mode. No new
-native screenshot or human accessibility approval is claimed by this document.
+controls. Record original native captures and actual device/DPI/mode. The automated
+series below covers authored facts at fixed layout DPI. Physical-monitor and human
+acceptance remain open.
+
+## Executed inspection — 28 October 2026
+
+The [qualification record](evidence/tactical-display/README.md) contains unchanged
+native image pairs and hashes for 54 repeated hardware cases. Canonical Release
+build, 276 focused existing/new cases, runtime asset qualification and the
+repository Windowed/Borderless smoke passed. Two stale settings-test expectations
+were aligned with the actual last General row and the schema already present on
+master; their 21-case regression rerun passed.
+
+The complete suites are not green: final Client is 537 passed / 4 failed / 2
+opt-in skipped; Presentation is 1,888 passed / 4 failed / 66 opt-in skipped.
+Remaining paths and the required CI Game failures are recorded separately in the
+qualification record. No assertion, budget or opt-in policy was weakened. Physical
+monitor transitions, live F1/selection/reset journeys and human readability
+acceptance remain open. The images are inspection evidence, not approved goldens.
