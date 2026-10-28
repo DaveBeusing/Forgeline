@@ -77,7 +77,12 @@ internal sealed class PolicyTemplatePanelController
     internal void Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout,
         bool blocked, SelectionSet? selection)
     {
-        if (_session != snapshot?.SessionId) Reset(snapshot?.SessionId ?? default);
+        if (_session != snapshot?.SessionId)
+        {
+            Reset(snapshot?.SessionId ?? default);
+            SynchronizeKeys(input);
+            _press = input.MousePressSequence(PlatformMouseButton.Left);
+        }
         var actions = PlayerActionDockHudModel.ResolveActions(snapshot);
         _data = actions?.PolicyTemplates is { } data && data.Session == _session && data.Tick == snapshot?.Tick &&
             (selection is null || selection.Count == data.Targets.Count + data.Omitted &&
@@ -118,7 +123,7 @@ internal sealed class PolicyTemplatePanelController
     private bool Pressed(InputState input, GameplayAction action)
     {
         var key = _bindings.Key(action); ulong sequence = input.KeyPressSequence(key);
-        bool edge = sequence != _keys[(int)key] && input.IsKeyDown(key); _keys[(int)key] = sequence; return edge;
+        bool edge = sequence != _keys[(int)key] && input.WasKeyPressed(key); _keys[(int)key] = sequence; return edge;
     }
     private void SynchronizeKeys(InputState input)
     { for (int i = 0; i < _keys.Length; i++) _keys[i] = input.KeyPressSequence((PlatformKey)i); }

@@ -8,6 +8,12 @@ namespace ForgeLine.Game;
 // This preflight creates no runtime and does not resolve custom content.
 internal static class MatchPersistenceValidation
 {
+    // Recovery is a bounded client operation. One million initial slots already
+    // reserve about 9 MiB in the allocator, before component stores and terrain.
+    // Runtime-only hosts may choose larger capacities; persisted declarations must
+    // remain within this supported recovery budget, without silently clamping.
+    internal const int MaximumRecoveryEntityCapacity = 1_048_576;
+
     internal static void Configuration(PersistedMatchConfiguration? configuration)
     {
         Require(configuration is not null, "Missing match configuration.");
@@ -20,7 +26,8 @@ internal static class MatchPersistenceValidation
                 !string.IsNullOrWhiteSpace(identity.ContentKey) && Hash(identity.ContentSha256) &&
                 !string.IsNullOrWhiteSpace(identity.StartRule) && !string.IsNullOrWhiteSpace(identity.ObjectiveRule),
                 "Invalid saved scenario identity.");
-        Require(value.InitialEntityCapacity > 0, "Invalid initial entity capacity.");
+        Require(value.InitialEntityCapacity is > 0 and <= MaximumRecoveryEntityCapacity,
+            $"Initial entity capacity must be between 1 and {MaximumRecoveryEntityCapacity} for recovery.");
         Require(value.Participants!.Count >= 2 && value.Participants.All(p => p is not null), "Invalid participants.");
         Require(value.Participants.Select(p => p.Player.Value).Distinct().Count() == value.Participants.Count &&
             value.Participants.All(p => p.Player.Value != 0), "Invalid participant identity.");
