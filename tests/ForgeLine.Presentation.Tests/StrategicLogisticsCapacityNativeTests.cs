@@ -31,7 +31,7 @@ public sealed class StrategicLogisticsCapacityNativeTests
                 var row=StrategicLogisticsCapacityTests.Row(new((uint)(network*10+i+1),1),start) with
                 {Network=(StrategicLogisticsNetwork)network,State=i==0?StrategicLogisticsState.Disconnected:i==1?StrategicLogisticsState.Congested:StrategicLogisticsState.Unknown,
                     OutputPerSecond=network==0?i*4:null,CapacityPerSecond=network<2?100:null,BufferedQuantity=network==0?i*8:null,BufferCapacity=network==0?200:null,
-                    ScheduledUtilization=network==1?i*.2:null,ConveyorReason=network==0&&i==0?ConveyorBlockReason.DisconnectedPort:null};
+                    ScheduledUtilization=network==1?(i==1?1:i*.2):null,ConveyorReason=network==0&&i==0?ConveyorBlockReason.DisconnectedPort:null};
                 rows.Add(row);
                 if(i>0)rows.Add(row with{Destination=new((uint)(network*10+i),1),End=start-new Vector3(22,0,0)});
             }
