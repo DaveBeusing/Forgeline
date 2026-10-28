@@ -62,11 +62,15 @@ public sealed class SkirmishRaidPlannerTests
 
 
     [Theory]
-    [InlineData(false, IntelligenceState.Identified)]
-    [InlineData(true, IntelligenceState.Detected)]
-    public void MissingOrDetectedOnlyContactsCannotStartTargetedRaids(bool observe, IntelligenceState state)
+    [InlineData(false, IntelligenceState.Identified, OpponentDifficultyId.Easy)]
+    [InlineData(false, IntelligenceState.Identified, OpponentDifficultyId.Standard)]
+    [InlineData(false, IntelligenceState.Identified, OpponentDifficultyId.Hard)]
+    [InlineData(true, IntelligenceState.Detected, OpponentDifficultyId.Easy)]
+    [InlineData(true, IntelligenceState.Detected, OpponentDifficultyId.Standard)]
+    [InlineData(true, IntelligenceState.Detected, OpponentDifficultyId.Hard)]
+    public void MissingOrDetectedOnlyContactsCannotStartTargetedRaids(bool observe, IntelligenceState state, OpponentDifficultyId difficulty)
     {
-        var fixture = new Fixture { Observe = observe, Observation = state };
+        var fixture = new Fixture(configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration) { Observe = observe, Observation = state };
         fixture.Step();
         Assert.False(fixture.State.IsActive);
         Assert.All(fixture.Units, unit => Assert.False(fixture.Entities.HasComponent<CombatOrderState>(unit)));
@@ -107,10 +111,14 @@ public sealed class SkirmishRaidPlannerTests
         Assert.Equal(group, fixture.State.Group);
     }
 
-    [Fact]
-    public void HiddenTargetMovementCannotUpdateSearchPointOrKeepDirectAttack()
+    [Theory]
+    [InlineData(OpponentDifficultyId.Easy)]
+    [InlineData(OpponentDifficultyId.Standard)]
+    [InlineData(OpponentDifficultyId.Hard)]
+    public void HiddenTargetMovementCannotUpdateSearchPointOrKeepDirectAttack(OpponentDifficultyId difficulty)
     {
-        var fixture = new Fixture();
+        var policy = OpponentDifficultyProfiles.Get(difficulty).Configuration;
+        var fixture = new Fixture(configuration: policy);
         fixture.Step();
         var remembered = fixture.State.LastKnownPosition;
         foreach (EntityId unit in fixture.Raiders())
@@ -121,22 +129,25 @@ public sealed class SkirmishRaidPlannerTests
         Assert.Equal(SkirmishRaidPhase.Searching, fixture.State.Phase);
         Assert.Equal(remembered, fixture.State.LastKnownPosition);
         Assert.Equal(remembered, fixture.Entities.GetComponent<CombatOrderState>(fixture.State.First).Destination);
-        fixture.Step(81);
+        fixture.Step(checked((int)policy.Raids.SearchTicks + 1));
         Assert.Equal(SkirmishRaidPhase.Returning, fixture.State.Phase);
         Assert.Equal(SkirmishRaidReason.ContactLost, fixture.State.Reason);
     }
 
-    [Fact]
-    public void GuardedOrReroutedTruckProvidesCounterplay()
+    [Theory]
+    [InlineData(OpponentDifficultyId.Easy)]
+    [InlineData(OpponentDifficultyId.Standard)]
+    [InlineData(OpponentDifficultyId.Hard)]
+    public void GuardedOrReroutedTruckProvidesCounterplay(OpponentDifficultyId difficulty)
     {
-        var fixture = new Fixture();
+        var fixture = new Fixture(configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration);
         fixture.Step();
         fixture.Guard = fixture.CreateUnit(UnitIds.MainBattleTank, new(610, 0, 128), new PlayerId(2));
         fixture.Step();
         Assert.Equal(SkirmishRaidPhase.Returning, fixture.State.Phase);
         Assert.Equal(SkirmishRaidReason.KnownDefense, fixture.State.Reason);
 
-        var reroute = new Fixture();
+        var reroute = new Fixture(configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration);
         reroute.Step();
         reroute.Entities.SetComponent(reroute.Truck, new WorldTransform(new(750, 0, 128), Quaternion.Identity, Vector3.One));
         reroute.Step();
@@ -144,10 +155,13 @@ public sealed class SkirmishRaidPlannerTests
         Assert.Equal(SkirmishRaidReason.TargetEscaped, reroute.State.Reason);
     }
 
-    [Fact]
-    public void SupplyAndUnknownRoutesFailClosed()
+    [Theory]
+    [InlineData(OpponentDifficultyId.Easy)]
+    [InlineData(OpponentDifficultyId.Standard)]
+    [InlineData(OpponentDifficultyId.Hard)]
+    public void SupplyAndUnknownRoutesFailClosed(OpponentDifficultyId difficulty)
     {
-        var fuel = new Fixture(UnitIds.MainBattleTank, ownCount: 7);
+        var fuel = new Fixture(UnitIds.MainBattleTank, ownCount: 7, configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration);
         foreach (EntityId unit in fuel.Units)
         {
             var tank = fuel.Entities.GetComponent<UnitFuelState>(unit);
@@ -158,7 +172,7 @@ public sealed class SkirmishRaidPlannerTests
         Assert.False(fuel.State.IsActive);
         Assert.Equal(SkirmishRaidReason.FuelReserve, fuel.Diagnostic.AdmissionReason);
 
-        var ammunition = new Fixture();
+        var ammunition = new Fixture(configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration);
         foreach (EntityId unit in ammunition.Units)
         {
             var ammo = ammunition.Entities.GetComponent<AmmunitionState>(unit);
@@ -168,7 +182,7 @@ public sealed class SkirmishRaidPlannerTests
         ammunition.Step();
         Assert.False(ammunition.State.IsActive);
 
-        var route = new Fixture();
+        var route = new Fixture(configuration: OpponentDifficultyProfiles.Get(difficulty).Configuration);
         route.BlockRoute(); route.Step();
         Assert.False(route.State.IsActive);
         Assert.Equal(SkirmishRaidReason.UnknownRoute, route.Diagnostic.AdmissionReason);

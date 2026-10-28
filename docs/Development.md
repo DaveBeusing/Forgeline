@@ -240,6 +240,10 @@ See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability
 request/result, parameter, preset and provider contracts and ownership handoffs.
 No menu or mutating tool is implied by these contracts.
 
+## Fair opponent qualification
+
+The early CI fair-opponent step runs named-policy, legal-intelligence, raid-counterplay and blocked-factory recovery cases. Opt-in normal-stock seeded cohorts retain fixed tick bounds and explicitly distinguish completed matches from censored results. See [Fair opponent difficulty](FairOpponentDifficulty.md) for selection and commands; the canonical terminal gate and shared pacing runner are unchanged.
+
 ## Strategic logistics capacity
 
 The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).

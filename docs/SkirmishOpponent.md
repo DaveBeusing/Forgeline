@@ -376,3 +376,7 @@ cargo job in the transport history and distinguish drive Fuel, docking/queue
 ownership, navigation failure, source shortage and destination capacity. No
 cargo-motion change or guaranteed natural victory is claimed by this scheduling
 correction. User acceptance remains pending.
+
+## Named fair difficulty policies
+
+Easy, Standard and Hard are optional validated policies over the existing strategic/raid configuration. Standard preserves the Gameplay default; all levels retain real costs, physical supply, legal faction intelligence and current target identification. Game hosts select them without changing the shared runner or player UI. Optional copied decision causes appear in existing headless qualification diagnostics. See [profile values, counterplay and reproduction](FairOpponentDifficulty.md) and [executed qualification](OpponentDifficultyQualification.md).

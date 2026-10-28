@@ -1,0 +1,58 @@
+{
+  "SchemaVersion": 1,
+  "Seed": 831,
+  "WestProfile": "Easy",
+  "EastProfile": "Hard",
+  "Profile": "Gameplay",
+  "MaximumTicks": 80000,
+  "Tick": 80000,
+  "Terminal": false,
+  "Outcome": "None",
+  "Winner": 0,
+  "Availability": "CensoredAtTickLimit",
+  "ElapsedMilliseconds": 660130.669,
+  "FinalStateSha256": "0DDB3F81E8B299F5C92561D35937DF43CED993B58D49AB1C0513F4FBEC1AD7A9",
+  "Work": {
+    "Executions": 80000,
+    "OwnedStateCaptures": 160000,
+    "IntelligenceCaptures": 160000,
+    "EconomyAssessments": 160000,
+    "ForceAssessments": 160000,
+    "DecisionEvaluations": 10000,
+    "NonDecisionEvaluations": 150000,
+    "ScratchStatesCreated": 2,
+    "ScratchStatesReleased": 0
+  },
+  "Decisions": [
+    {
+      "Player": 1,
+      "ProfileKey": "skirmish.easy.v1",
+      "ObservedTick": 80000,
+      "LastDecisionTick": 79961,
+      "NextDecisionTick": 80001,
+      "DecisionsTaken": 2000,
+      "Cause": "CadenceWait",
+      "Goal": "PrepareOffensive",
+      "OffensiveAdmission": 4,
+      "SupplyRequirement": 0,
+      "RaidAdmission": 1,
+      "ContactBudget": 8
+    },
+    {
+      "Player": 2,
+      "ProfileKey": "skirmish.hard.v1",
+      "ObservedTick": 80000,
+      "LastDecisionTick": 79991,
+      "NextDecisionTick": 80001,
+      "DecisionsTaken": 8000,
+      "Cause": "CadenceWait",
+      "Goal": "PrepareOffensive",
+      "OffensiveAdmission": 2,
+      "SupplyRequirement": 1,
+      "RaidAdmission": 1,
+      "ContactBudget": 32
+    }
+  ],
+  "CompletedCargoOrders": 202,
+  "FailedRoutes": 0
+}

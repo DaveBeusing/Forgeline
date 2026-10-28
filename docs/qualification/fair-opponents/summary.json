@@ -1,0 +1,83 @@
+{
+  "SchemaVersion": 1,
+  "Source": "04eb27ee13ee46a3577863f5d07296aacd90b05f",
+  "BaseMaster": "8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
+  "Seeds": [
+    17,
+    831,
+    2026
+  ],
+  "DistinctStartAssignments": 6,
+  "TotalObservedTicks": 480000,
+  "CompletedMatches": 0,
+  "CensoredMatches": 6,
+  "HardWins": 0,
+  "EasyWins": 0,
+  "Draws": 0,
+  "HardWinRate": null,
+  "WinRateAvailability": "NoCompletedMatches",
+  "MaximumScratchOwners": 2,
+  "MaximumRouteFailures": 0,
+  "Results": [
+    {
+      "Seed": 17,
+      "WestProfile": "Easy",
+      "EastProfile": "Hard",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 202,
+      "ElapsedMilliseconds": 660696.9139,
+      "FinalStateSha256": "CD90A2975BDCA92984D0846BE858A04B8A1C1A9823F1A354B70A165AD08FED92"
+    },
+    {
+      "Seed": 17,
+      "WestProfile": "Hard",
+      "EastProfile": "Easy",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 218,
+      "ElapsedMilliseconds": 652860.0882,
+      "FinalStateSha256": "939600D8AB90F5DF271EEA4DB67866653A529374601FFCC16BE190E57CB6020B"
+    },
+    {
+      "Seed": 2026,
+      "WestProfile": "Easy",
+      "EastProfile": "Hard",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 202,
+      "ElapsedMilliseconds": 673949.1297,
+      "FinalStateSha256": "E6373B7A91B0015CDCB0A8DDFC65409FC5FB7A98D10CEB3D30F001510317763D"
+    },
+    {
+      "Seed": 2026,
+      "WestProfile": "Hard",
+      "EastProfile": "Easy",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 218,
+      "ElapsedMilliseconds": 659804.5656,
+      "FinalStateSha256": "39C813B11CCB1F736D6E3B4CCF00D2E2E0024C61AC2C81CC190B02A1E5B65073"
+    },
+    {
+      "Seed": 831,
+      "WestProfile": "Easy",
+      "EastProfile": "Hard",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 202,
+      "ElapsedMilliseconds": 660130.669,
+      "FinalStateSha256": "0DDB3F81E8B299F5C92561D35937DF43CED993B58D49AB1C0513F4FBEC1AD7A9"
+    },
+    {
+      "Seed": 831,
+      "WestProfile": "Hard",
+      "EastProfile": "Easy",
+      "Tick": 80000,
+      "Availability": "CensoredAtTickLimit",
+      "CompletedCargoOrders": 218,
+      "ElapsedMilliseconds": 495353.8522,
+      "FinalStateSha256": "D9EB0AC8F92262BEEC47F437BE5BACC7B6FA1AD0DDD5AE4C345F1652E451F4AF"
+    }
+  ]
+}
