@@ -1,0 +1,36 @@
+{
+  "generatorVersion": 1,
+  "familyId": "mesh.world.prop.rock",
+  "groundAnchor": {
+    "x": 0,
+    "y": -0.5,
+    "z": 0
+  },
+  "naturalSizeMeters": {
+    "x": 6,
+    "y": 3,
+    "z": 5
+  },
+  "uniformScale": {
+    "min": 0.8,
+    "max": 1.2
+  },
+  "tintMultiplier": {
+    "min": 0.9,
+    "max": 1.08
+  },
+  "yawDegrees": {
+    "min": 0,
+    "max": 360
+  },
+  "slopeDegrees": {
+    "min": 0,
+    "max": 30
+  },
+  "minimumSpacingMeters": 6,
+  "biomeAffinities": [
+    "biome.dry",
+    "biome.temperate"
+  ],
+  "interaction": "presentationOnly"
+}
