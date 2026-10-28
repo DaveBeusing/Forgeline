@@ -217,6 +217,11 @@ versioned seed recipe, global integer sample lattice, independent domain sequenc
 canonical gameplay/decoration identities and headless result boundary. These contracts
 do not generate or replace the existing authored terrain recipes or compiled maps.
 
+[Biome and ecology fields](BiomeAndEcologyFields.md) adds static, seed-controlled
+temperature, moisture, soil suitability and softly weighted biome queries over the
+unchanged ITerrainQuery. Immutable packed rasters expose headless distribution
+diagnostics and bounded caching; rendering/scatter integration remains separate.
+
 The opt-in [seeded landform factory](ProceduralTerrain.md) implements a separate
 versioned height evaluator, flat/drainage masks and headless diagnostics on those
 contracts. Existing authored maps continue to use their original recipes.
