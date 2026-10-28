@@ -20,11 +20,16 @@ public sealed class SelectedCombatGroup
     public bool MixedPolicy { get; private set; }
     public FirePolicy FirePolicy { get; private set; }
     public int OrderCount { get; private set; }
+    public int MovingCount { get; private set; }
+    public int PatrollingCount { get; private set; }
     public bool MixedOrder { get; private set; }
     public CombatOrderKind Order { get; private set; }
     public string PolicyLabel => PolicyCount == 0 ? "ENGAGEMENT N/A" : MixedPolicy ? "ENGAGEMENT MIXED" : FirePolicy switch
     { FirePolicy.HoldFire => "ENGAGEMENT HOLD FIRE", FirePolicy.ReturnFire => "ENGAGEMENT RETURN FIRE", _ => "ENGAGEMENT FIRE AT WILL" };
-    public string ObjectiveLabel => OrderCount == 0 ? "OBJECTIVE NONE" : MixedOrder || OrderCount < CombatCount ? "OBJECTIVE MIXED" : Order switch
+    public string ObjectiveLabel => OrderCount == 0
+        ? PatrollingCount > 0 ? PatrollingCount == LiveCount ? "OBJECTIVE PATROL" : "OBJECTIVE MIXED"
+            : MovingCount > 0 ? MovingCount == LiveCount ? "OBJECTIVE MOVE" : "OBJECTIVE MIXED" : "OBJECTIVE NONE"
+        : MixedOrder || OrderCount < CombatCount ? "OBJECTIVE MIXED" : Order switch
     { CombatOrderKind.Attack => "OBJECTIVE ATTACK", CombatOrderKind.AttackMove => "OBJECTIVE ATTACK MOVE",
       CombatOrderKind.HoldPosition => "OBJECTIVE HOLD", CombatOrderKind.Stop => "OBJECTIVE STOP", _ => "OBJECTIVE RETREAT" };
     public double Health { get; private set; }
@@ -71,7 +76,10 @@ public sealed class SelectedCombatGroup
                 if (result.PolicyCount++ == 0) result.FirePolicy = member.FirePolicy;
                 else if (result.FirePolicy != member.FirePolicy) result.MixedPolicy = true;
             }
-            if (member.CombatEligible && member.HasOrder)
+            if (member.HasMovementIntent) result.MovingCount++;
+            if (member.Patrolling) result.PatrollingCount++;
+            if (member.CombatEligible && member.HasOrder &&
+                (!member.HasOrderStatus || member.OrderStatus is not (CombatOrderStatus.Complete or CombatOrderStatus.Cancelled)))
             {
                 if (result.OrderCount++ == 0) result.Order = member.Order;
                 else if (result.Order != member.Order) result.MixedOrder = true;

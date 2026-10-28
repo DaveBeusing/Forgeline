@@ -71,6 +71,22 @@ public sealed class EngagementGroupTests
     }
 
     [Fact]
+    public void MovementPatrolAndCompletedOrdersHaveHonestObjectives()
+    {
+        EntityId unit = new(5, 1);
+        var selection = new SelectionSet();selection.Replace([unit]);
+        var member = new CombatGroupMemberReadModel(unit, ControllableEntityCategory.Unit,
+            false, 0, false, default, 0, 0, false, 0, 0, false, default, true,
+            CombatOrderKind.AttackMove, true, CombatOrderStatus.Complete,
+            CombatEligible:true,HasMovementIntent:true);
+        SelectedCombatGroup Summarize(CombatGroupMemberReadModel fact) =>
+            SelectedCombatGroup.Create(new(new(2),[fact]),selection);
+        Assert.Equal("OBJECTIVE MOVE", Summarize(member).ObjectiveLabel);
+        Assert.Equal("OBJECTIVE PATROL", Summarize(member with { Patrolling=true }).ObjectiveLabel);
+        Assert.Equal("OBJECTIVE NONE", Summarize(member with { HasMovementIntent=false }).ObjectiveLabel);
+    }
+
+    [Fact]
     public void ExistingCombatRingExposesPolicyItemsWithExplicitUnarmedRejection()
     {
         PlayerActionSnapshot Actions(int eligible) => new(new(1), new(2), [], 0, null, null,

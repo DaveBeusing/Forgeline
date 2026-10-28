@@ -23,3 +23,5 @@ Its three native D3D12 HUD fixtures use the production controller to page the ex
 See [the architectural decision](adr/ExplicitEngagementPoliciesAndSavedControlGroups.md).
 
 Compact ring labels are Hold fire, Retaliate (Return Fire) and Free fire (Fire At Will); full action titles retain the policy names. The ring reports the actual eligible direct-weapon count for policy actions, and selections above 1,024 are refused without scheduling.
+
+The objective also recognizes owned ordinary movement and recurring patrol. Completed/cancelled combat orders do not remain active objectives; differing active intent or only some moving members reports MIXED.
