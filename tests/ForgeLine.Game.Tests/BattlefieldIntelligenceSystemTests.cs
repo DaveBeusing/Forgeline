@@ -9,6 +9,7 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class BattlefieldIntelligenceSystemTests
 {
+    private static readonly System.Text.Json.JsonSerializerOptions SnapshotJsonOptions = new() { IncludeFields = true };
     private static readonly FactionId BlueFaction = new(1);
     private static readonly FactionId RedFaction = new(2);
 
@@ -362,6 +363,68 @@ public sealed class BattlefieldIntelligenceSystemTests
         Assert.Equal(
             2UL,
             intelligence.Metrics.TotalSensorScans);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void IndexFreeOcclusionBudgetEventuallyIdentifiesEveryCandidate(bool radar)
+    {
+        string expected = Run(false);
+        Assert.Equal(expected, Run(false));
+        Assert.Equal(expected, Run(true));
+
+        string Run(bool indexed)
+        {
+            var simulation = new SimulationCoordinator();
+            var spatial = indexed ? new ForgeLine.World.SpatialGridIndex() : null;
+            var timeline = new List<string>();
+            var store = new FactionIntelligenceStore();
+            simulation.RegisterSystem(new BattlefieldIntelligenceSystem(store, spatial,
+                visualOcclusion: new VisualOcclusionPolicy(new FlatTerrain(), ForgeLine.World.TacticalAreaSet.Empty)));
+            var sensor = CreateSensorEntity(simulation, BlueFaction, new Vector3(10, 0, 10));
+            if (radar) simulation.Entities.AddComponent(sensor,
+                new RadarSensorState(BlueFaction, 100, 100, updateIntervalTicks: 1));
+            else simulation.Entities.AddComponent(sensor, new VisualSensorState(BlueFaction, 100, updateIntervalTicks: 1));
+            var targets = Enumerable.Range(0, BattlefieldIntelligenceSystem.MaximumVisualTracesPerSensor + 1)
+                .Select(i => CreateSignatureEntity(simulation, RedFaction, new Vector3(20, 0, 10), (uint)i + 1)).ToArray();
+            foreach (var entity in targets.Prepend(sensor)) Index(entity);
+            var identified = new HashSet<EntityId>();
+            for (int tick = 0; tick < 3; tick++)
+            {
+                simulation.AdvanceOneTick();
+                foreach (var target in targets)
+                    if (store.IsEntityCurrentlyIdentified(BlueFaction, target)) identified.Add(target);
+                if (tick == 0) Assert.Equal(BattlefieldIntelligenceSystem.MaximumVisualTracesPerSensor, identified.Count);
+                timeline.Add(Snapshot());
+            }
+            Assert.Equal(targets.Length, identified.Count);
+            var removed = targets[^1]; spatial?.Remove(removed); Assert.True(simulation.Entities.DestroyEntity(removed));
+            var replacement = CreateSignatureEntity(simulation, RedFaction, new Vector3(20, 0, 10), 999);
+            Index(replacement);
+            Assert.Equal(removed.Index, replacement.Index); Assert.NotEqual(removed, replacement);
+            simulation.RunTicks(3, TestContext.Current.CancellationToken);
+            Assert.True(store.TryGetContact(BlueFaction, IntelligenceContactKey.FromEntity(replacement), out var contact));
+            Assert.Equal(999u, contact.IdentityKey);
+            timeline.Add(Snapshot());
+            return string.Join("|", timeline);
+    
+            string Snapshot() => System.Text.Json.JsonSerializer.Serialize(store.Capture(BlueFaction),
+                SnapshotJsonOptions);
+            void Index(EntityId entity)
+            {
+                spatial?.Insert(new SpatialPresence(Vector3.One,
+                    new ForgeLine.World.SpatialEntryMetadata(1, 1, ForgeLine.World.SpatialMobility.Static))
+                    .CreateEntry(entity, simulation.Entities.GetComponent<WorldTransform>(entity)));
+            }
+            }
+    }
+
+    private sealed class FlatTerrain : ForgeLine.World.ITerrainQuery
+    {
+        public ForgeLine.World.AxisAlignedBounds WorldBounds => new(Vector3.Zero, new Vector3(256, 20, 256));
+        public bool TrySampleHeight(float x, float z, out float height) { height = 0; return true; }
+        public bool TrySampleNormal(float x, float z, out Vector3 normal) { normal = Vector3.UnitY; return true; }
     }
 
     private static EntityId CreateSensorEntity(
