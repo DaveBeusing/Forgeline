@@ -123,10 +123,11 @@ public sealed class StrategicLogisticsCapacityTests
     }
 
     [Theory]
-    [InlineData(false)] [InlineData(true)]
-    public void MarkerGestureOpensExistingOperationsAndRejectsChangedTargets(bool stale)
+    [InlineData(false, StrategicOverlayMode.Logistics)] [InlineData(true, StrategicOverlayMode.Logistics)]
+    [InlineData(false, StrategicOverlayMode.All)]
+    public void MarkerGestureOpensExistingOperationsAndRejectsChangedTargets(bool stale, StrategicOverlayMode mode)
     {
-        var mode=StrategicOverlayMode.Logistics;var row=Row(new(1,1),Vector3.Zero);var snapshot=Snapshot([row],mode);
+        var row=Row(new(1,1),Vector3.Zero);var snapshot=Snapshot([row],mode);
         var camera=SameTypeSelectionTests.Camera();var layout=GameplayHudLayout.Create(1600,900,96);var overlay=new StrategicLogisticsCapacityOverlay();overlay.Build(snapshot,camera,layout,mode);
         var point=Assert.Single(overlay.Items.ToArray()).Marker;var input=new InputState();var controller=new StrategicLogisticsCapacityInteraction();
         input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,PlatformMouseButton.Left,(int)point.X,(int)point.Y));

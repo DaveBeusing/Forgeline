@@ -90,6 +90,7 @@ public sealed partial class RtsInformationOverlayRenderer : IDisposable
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
         LastWorldLabels = 0;
+        LastLogisticsCapacityItems = LastLogisticsCapacityOmitted = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)

@@ -105,7 +105,7 @@ public sealed class StrategicLogisticsCapacityInteraction
         ulong press = input.MousePressSequence(PlatformMouseButton.Left);
         bool fresh = press != _press; _press = press;
         bool captured = _owned;
-        if (blocked || input.FocusLostThisFrame || !StrategicLogisticsCapacityFilters.IsLogistics(mode) ||
+        if (blocked || input.FocusLostThisFrame || (!StrategicLogisticsCapacityFilters.IsLogistics(mode) && mode != StrategicOverlayMode.All) ||
             snapshot is null || _armed && (_session != snapshot.SessionId || _mode != mode || _layout != layout))
         { _armed = false; if (!input.IsMouseButtonDown(PlatformMouseButton.Left)) _owned = false; return captured; }
         _overlay.Build(snapshot, camera, layout, mode);
