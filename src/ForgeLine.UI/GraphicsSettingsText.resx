@@ -76,4 +76,6 @@
   <data name="StandardPalette" xml:space="preserve"><value>STANDARD</value></data>
   <data name="BlueOrangePalette" xml:space="preserve"><value>BLUE / ORANGE</value></data>
   <data name="GrayscalePalette" xml:space="preserve"><value>GRAYSCALE</value></data>
+  <data name="NotificationMode" xml:space="preserve"><value>NOTIFICATIONS</value></data>
+  <data name="InformationalAlerts" xml:space="preserve"><value>INFORMATIONAL ALERTS</value></data>
 </root>

@@ -16,7 +16,9 @@ public enum PlayerAlertState : byte
     SupplyCritical = 1 << 2,
     CommandCoreDamaged = 1 << 3,
     CommandCoreDestroyed = 1 << 4,
-    CargoFleetShortage = 1 << 5
+    CargoFleetShortage = 1 << 5,
+    CommandCoreUnderAttack = 1 << 6,
+    WorkCompleted = 1 << 7
 }
 
 public enum PlayerCommandFeedbackKind : byte

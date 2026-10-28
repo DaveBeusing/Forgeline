@@ -56,7 +56,7 @@ internal static class ResourcePowerHudModel
         PlayerAlertState alert) =>
         alert switch
         {
-            PlayerAlertState.CommandCoreDestroyed =>
+            PlayerAlertState.CommandCoreDestroyed or PlayerAlertState.CommandCoreUnderAttack =>
                 HudAlertSeverity.Critical,
             PlayerAlertState.CommandCoreDamaged =>
                 HudAlertSeverity.Critical,
@@ -119,6 +119,8 @@ internal static class ResourcePowerHudModel
             count++;
         }
 
+        if (HasAlert(alerts, PlayerAlertState.CommandCoreUnderAttack)) count++;
+        if (HasAlert(alerts, PlayerAlertState.WorkCompleted)) count++;
         return count;
     }
 

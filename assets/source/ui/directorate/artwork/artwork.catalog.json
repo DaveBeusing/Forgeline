@@ -31702,6 +31702,26 @@
       "member": "RetreatToRecovery",
       "role": "command.retreat",
       "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "NextAlert",
+      "role": "utility.next_item",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "NotificationMode",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "InformationalAlerts",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
     }
   ],
   "referenceOnly": [

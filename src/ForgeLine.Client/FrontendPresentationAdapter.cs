@@ -228,7 +228,9 @@ internal static class FrontendPresentationAdapter
                 new(GraphicsSettingsText.Get("DisplayPreset"), GraphicsSettingsText.Get((model.DisplayPreset?.ToString() ?? "Custom") + "Preset"), IsFocused: focused == FrontendSettingsField.DisplayPreset, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("HighContrast"), settings.TacticalDisplay.HighContrast ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.HighContrast, CanDecrease: true, CanIncrease: true),
                 new(GraphicsSettingsText.Get("TeamPalette"), GraphicsSettingsText.Get(settings.TacticalDisplay.TeamPalette + "Palette"), IsFocused: focused == FrontendSettingsField.TeamPalette, CanDecrease: true, CanIncrease: true),
-                new(GraphicsSettingsText.Get("ResetAccessibility"), "RESET DRAFT", IsFocused: focused == FrontendSettingsField.ResetAccessibility, CanDecrease: true, CanIncrease: true)
+                new(GraphicsSettingsText.Get("ResetAccessibility"), "RESET DRAFT", IsFocused: focused == FrontendSettingsField.ResetAccessibility, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("NotificationMode"), settings.Notifications.Mode.ToString().ToUpperInvariant(), IsFocused: focused == FrontendSettingsField.NotificationMode, CanDecrease: true, CanIncrease: true),
+                new(GraphicsSettingsText.Get("InformationalAlerts"), settings.Notifications.ShowInformational ? "ON" : "OFF", IsFocused: focused == FrontendSettingsField.InformationalAlerts, CanDecrease: true, CanIncrease: true),
             };
         interaction ??= new SettingsInteractionModel();
         foreach (var settingField in Enum.GetValues<FrontendSettingsField>())
@@ -237,7 +239,7 @@ internal static class FrontendPresentationAdapter
             {
                 FrontendSettingsField.BorderlessFullscreen or FrontendSettingsField.EdgeScroll or FrontendSettingsField.Onboarding or
                 FrontendSettingsField.HighContrast or FrontendSettingsField.WorldSoundEnabled or FrontendSettingsField.ReducedUiMotion or FrontendSettingsField.UiSoundEnabled or FrontendSettingsField.SurfaceDetail or
-                FrontendSettingsField.VegetationMotion => FrontendValueKind.Toggle,
+                FrontendSettingsField.VegetationMotion or FrontendSettingsField.InformationalAlerts => FrontendValueKind.Toggle,
                 FrontendSettingsField.TooltipDelay or FrontendSettingsField.UiScale or FrontendSettingsField.CameraSpeed or FrontendSettingsField.UiSoundVolume or
                 FrontendSettingsField.MasterSoundVolume or FrontendSettingsField.WorldSoundVolume or FrontendSettingsField.AlertSoundVolume or FrontendSettingsField.AmbienceSoundVolume or FrontendSettingsField.ResolutionScale => FrontendValueKind.Slider,
                 FrontendSettingsField.BindingKey => FrontendValueKind.Binding,
@@ -247,6 +249,7 @@ internal static class FrontendPresentationAdapter
             {
                 FrontendSettingsField.BorderlessFullscreen => settings.BorderlessFullscreen,
                 FrontendSettingsField.EdgeScroll => settings.EdgeScrollEnabled,
+                FrontendSettingsField.InformationalAlerts => settings.Notifications.ShowInformational,
                 FrontendSettingsField.Onboarding => settings.ShowOnboarding,
                 FrontendSettingsField.ReducedUiMotion => settings.FeedbackSettings.ReducedMotion,
                 FrontendSettingsField.HighContrast => settings.TacticalDisplay.HighContrast,

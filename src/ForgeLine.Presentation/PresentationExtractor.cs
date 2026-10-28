@@ -253,6 +253,14 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 playerActions, instances, interaction.OperationsOpen && playerExperience is { IsMatchComplete: false });
         var operationsCauses = _extraction is not null && playerExperience is { IsMatchComplete: false }
             ? OperationsCauseCapture.Capture(context, _extraction, instances) : null;
+        var actionableAlerts = _extraction is not null && playerExperience is { } alertExperience
+            ? _alerts.Capture(context, _extraction, alertExperience, cargoFleet, interaction.Notifications).WithCauses(operationsCauses) : null;
+        if (playerExperience is { } currentExperience && actionableAlerts is not null)
+        {
+            PlayerAlertState currentAlerts = PlayerAlertState.None;
+            foreach (var alert in actionableAlerts.Alerts) currentAlerts |= alert.Identity.Kind;
+            playerExperience = currentExperience with { Alerts = currentAlerts };
+        }
         _buffer.Publish(
             new PresentationSnapshot(
                 instances,
@@ -278,7 +286,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction, instances,
                     interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default) : null,
-                _extraction is not null && playerExperience is { } experience ? _alerts.Capture(context, _extraction, experience, cargoFleet).WithCauses(operationsCauses) : null) { Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses,
+                actionableAlerts) { Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses,
                     NavigationDiagnosis = interaction.NavigationDiagnosticsOpen ? CaptureNavigationDiagnostics(context, instances) : null,
                     ConstructionTemplate = _extraction is null ? null : ConstructionTemplatePreviewFactory.Capture(context, _extraction),
                     Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),

@@ -348,6 +348,7 @@ internal sealed class ClientApplication
 
         var presentationInteraction =
             new PresentationInteractionState();
+        presentationInteraction.SetNotificationPreferences(_settings.Notifications);
         var commandGateway =
             new PlayerCommandGateway(
                 simulation,
@@ -788,6 +789,7 @@ internal sealed class ClientApplication
                 if (applied is not null)
                 {
                     _settings = PausedSettingsController.LiveSettings(_settings, applied);
+                    presentationInteraction.SetNotificationPreferences(_settings.Notifications);
                     camera.ConfigureControls(_settings.EdgeScrollEnabled, _settings.CameraPanSpeedMultiplier);
                 }
             }
@@ -1351,7 +1353,8 @@ internal sealed class ClientApplication
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
                 localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
-                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low);
+                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low,
+                bindings: _gameplayBindings);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
             {

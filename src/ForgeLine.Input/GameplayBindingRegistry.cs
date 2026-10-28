@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
-public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish, Attack, AttackMove, Stop, Hold, Retreat, FireMission, CancelFireMission, RetreatToRecovery }
+public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish, Attack, AttackMove, Stop, Hold, Retreat, FireMission, CancelFireMission, RetreatToRecovery, NextAlert }
 public enum GameplayBindingScope : byte { Global, Dock }
 public readonly record struct GameplayBindingDefinition(GameplayAction Action, PlatformKey DefaultKey, string Label, GameplayBindingScope Scope);
 public readonly record struct GameplayBindingOverride(GameplayAction Action, PlatformKey Key);
@@ -77,7 +77,8 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.Retreat, PlatformKey.Unknown, "RETREAT", GameplayBindingScope.Global),
         new(GameplayAction.FireMission, PlatformKey.Unknown, "FIRE MISSION", GameplayBindingScope.Global),
         new(GameplayAction.CancelFireMission, PlatformKey.Unknown, "CANCEL FIRE MISSION", GameplayBindingScope.Global),
-        new(GameplayAction.RetreatToRecovery, PlatformKey.Unknown, "RETREAT TO RECOVERY", GameplayBindingScope.Global)
+        new(GameplayAction.RetreatToRecovery, PlatformKey.Unknown, "RETREAT TO RECOVERY", GameplayBindingScope.Global),
+        new(GameplayAction.NextAlert, PlatformKey.Unknown, "NEXT ALERT", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
     public static GameplayBindingRegistry Default { get; } = new(new());

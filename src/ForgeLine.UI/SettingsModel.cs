@@ -19,6 +19,7 @@ public readonly record struct FrontendSettingsSnapshot(
     FrontendRenderQuality RenderQuality = FrontendRenderQuality.Medium, RenderQualitySettings? GraphicsSettings = null, UiFeedbackSettings FeedbackSettings = default)
 {
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
+    public NotificationPreferences Notifications { get; init; } = NotificationPreferences.Default;
     public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
     public TacticalDisplaySettings TacticalDisplay { get; init; } = new();
 }
@@ -42,6 +43,12 @@ public sealed class SettingsModel
     {
         settings.Validate();
         Settings = Settings with { FeedbackSettings = settings };
+    }
+
+    public void SetNotifications(NotificationPreferences preferences)
+    {
+        ArgumentNullException.ThrowIfNull(preferences); preferences.Validate();
+        Settings = Settings with { Notifications = preferences };
     }
 
     public void SetTacticalDisplay(TacticalDisplaySettings settings)
