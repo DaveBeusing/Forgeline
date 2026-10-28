@@ -1623,8 +1623,11 @@ public sealed class SkirmishProductionPolicyTests
     }
 
 
-    [Fact]
-    public void MissingCargoTruckPreemptsBlockedCombatProduction()
+    [Theory]
+    [InlineData(OpponentDifficultyId.Easy)]
+    [InlineData(OpponentDifficultyId.Standard)]
+    [InlineData(OpponentDifficultyId.Hard)]
+    public void MissingCargoTruckPreemptsBlockedCombatProduction(OpponentDifficultyId difficulty)
     {
         MatchScenarioSettings validation =
             CentralDivideScenario.CreateSettings(
@@ -1636,7 +1639,7 @@ public sealed class SkirmishProductionPolicyTests
                     OpponentConfigurations = new Dictionary<ulong, SkirmishOpponentConfiguration>(validation.OpponentConfigurations)
                     {
                         [1] =
-                        validation.OpponentConfigurations[1] with
+                        OpponentDifficultyProfiles.Get(difficulty).Configuration with
                         {
                             MinimumCargoTrucks = 2,
                             MinimumSupplyTrucks = 1

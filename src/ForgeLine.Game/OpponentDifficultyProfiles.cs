@@ -66,6 +66,7 @@ public static class OpponentDifficultyProfiles
     }
 }
 
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<OpponentDecisionCause>))]
 public enum OpponentDecisionCause : byte
 {
     CadenceWait, EconomyRecovery, Bootstrap, CurrentThreat, Expansion,
@@ -75,7 +76,9 @@ public enum OpponentDecisionCause : byte
 // Optional qualification projection. No hostile identities/coordinates, hidden inventory or gameplay authority.
 public sealed record OpponentDecisionDiagnostic(
     ulong Player, string ProfileKey, ulong ObservedTick, ulong LastDecisionTick, ulong NextDecisionTick,
-    int DecisionsTaken, OpponentDecisionCause Cause, SkirmishStrategicGoal Goal,
+    int DecisionsTaken, OpponentDecisionCause Cause,
+    [property: System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SkirmishStrategicGoal>))]
+    SkirmishStrategicGoal Goal,
     SkirmishOffensiveAdmissionReason OffensiveAdmission, SkirmishSupplyRequirement SupplyRequirement,
     SkirmishRaidReason RaidAdmission, int ContactBudget)
 {
