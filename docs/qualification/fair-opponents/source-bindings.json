@@ -1,0 +1,41 @@
+{
+  "SchemaVersion": 1,
+  "FinalSource": "69b0c0aba15d1d37e4fde340a27fd148deafa8c7",
+  "BaseMaster": "08e8cf2f2e2632b3239229dc6840928d957c364c",
+  "Version": "0.1.506",
+  "Binaries": {
+    "src/ForgeLine.Game/bin/Release/net10.0/ForgeLine.Game.dll": "4ad4aa134258a770e99d085b97c142fcee3e9a3e3575d3be0813b65804e1ff8e",
+    "src/ForgeLine.Headless/bin/Release/net10.0/ForgeLine.Headless.dll": "4dcd8fbfe2bc79ce7a063fea92b4df1c2ec825a5a3c0df1a5a6ef60371505b09",
+    "tests/ForgeLine.Game.Tests/bin/Release/net10.0/ForgeLine.Game.Tests.dll": "597c8c1530beff30278c140187ca5ca48b69d77852bdf28cb453f3123929c282"
+  },
+  "RawReports": {
+    "seed-17-swap-False.json": "e5399a00673a149c58c38dc3543fe89c62d56aa3ecfdd1f3f3376e887b2ed168",
+    "seed-17-swap-True.json": "3eb807641b01982608757f1754031a5066af038e59685cd55dcfb22ba9c9601c",
+    "seed-2026-swap-False.json": "9a402c386a48c53df8b50066242f7d6375d99b4075566a29582642b8d07a94e3",
+    "seed-2026-swap-True.json": "2eb4d280a4a8f6e4588f96424965af9bf5ffcd42d79e39177a3a3773aec67288",
+    "seed-831-swap-False.json": "000d4b6f97c652346e4605924ddcee02f9f4e8920c98d011622ff0a77b558122",
+    "seed-831-swap-True.json": "36cb24c81502a0c531ffcad61a07b443a0ccdc18565e222431e06ca3dc91bf0c"
+  },
+  "HistoricalCohortProducers": {
+    "Source": "04eb27ee13ee46a3577863f5d07296aacd90b05f",
+    "BaseMaster": "8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
+    "Version": "0.1.505",
+    "FirstCase": {
+      "Case": "seed-831-swap-True",
+      "GameSha256": "b96c1441cb9dd1ce8468433f7ca998347756ad1eb5d85ed40f4be1759300ec76",
+      "HeadlessSha256": "279b3f2af2b41bb9dd8df863b89c85ba51a1dc03d67a100b83bd0f6aab5b76c8"
+    },
+    "RemainingFive": {
+      "GameSha256": "b5c191f8c8eb18c8f1fca2473ff882952088162e838f156ea4bfebbe72597ccf",
+      "HeadlessSha256": "fec1ddd08f5b8223acc7ceffcd7ac814bef3a5144cbb768e57507a9baa3b770d",
+      "TestFixtureRevision": "8913401e6fa60b8124de174055b02c2793160cc7 (queue expectation only; product and cohort fixture unchanged)"
+    }
+  },
+  "PostSyncControl": {
+    "Source": "69b0c0aba15d1d37e4fde340a27fd148deafa8c7",
+    "Report": "post-sync-control.json",
+    "ReportSha256": "92fb39061a928288e4c44aef97adb0bdb862fe390ff9e5007a0524a68a817f11",
+    "SameFinalStateAsHistorical": true,
+    "FinalStateSha256": "D9EB0AC8F92262BEEC47F437BE5BACC7B6FA1AD0DDD5AE4C345F1652E451F4AF"
+  }
+}
