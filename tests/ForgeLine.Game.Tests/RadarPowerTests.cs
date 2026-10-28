@@ -83,7 +83,8 @@ public sealed class RadarPowerTests
         Assert.Equal(scansAtOutage + 1, test.Intelligence.Metrics.TotalSensorScans);
         Assert.True(Contact(test, target).IsCurrent);
         Assert.True(Contact(test, newcomer).IsCurrent);
-        Assert.Equal(ContactPosition + new Vector3(50.0f, 0.0f, 0.0f),
+        // Detection retains the coarse 32m report, never the exact hidden pose.
+        Assert.Equal(new Vector3(352, 0, 64),
             Contact(test, target).LastKnownPosition);
         Assert.False(test.Store.IsEntityCurrentlyIdentified(BlueFaction, target));
     }

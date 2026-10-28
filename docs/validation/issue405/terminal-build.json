@@ -1,0 +1,15 @@
+{
+  "qualification": "Local combined remediation build before final research-funding timing adjustment",
+  "P1BranchHeadAtBuild": "ffe1c64baeba5088de8be409e3e1086ed3d8da91",
+  "capacityBranchHead": "2e9474b65f73fe6495ee21ba5f03aa8beff7f726",
+  "fallbackSensingBranchHead": "99ee89f30cd8346953647370bb54bd79b2dab190",
+  "seed": 2026,
+  "profile": "validation",
+  "maximumTicks": 80000,
+  "requireTerminal": true,
+  "assemblies": {
+    "ForgeLine.Headless.dll": "d22f85ed7e3566fe561900da639091b575a6bc1ed7f9526d27aa91cc04d753b7",
+    "ForgeLine.Game.dll": "327b78378afd353aca1a995c8b5c5a92d42ee54fdd6f8eddd8613c08c2064af2",
+    "ForgeLine.Navigation.dll": "a7112be810548f4f0991c10cd730b2226d92da4bfa6ef95e94a0f82fbc4946a4"
+  }
+}
