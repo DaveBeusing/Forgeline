@@ -107,7 +107,7 @@ internal sealed record ClientUserSettings
         WorldAudio.Validate();
         ArgumentNullException.ThrowIfNull(Tooltips);
         Tooltips.Validate();
-        ArgumentNullException.ThrowIfNull(Notifications);
+        if (Notifications is null) throw new InvalidDataException("Notification preferences are missing.");
         Notifications.Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
