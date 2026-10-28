@@ -3254,8 +3254,18 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 nextConstruction = _buildings[BuildingIds.LogisticsHub];
         }
 
+        bool mechanizedResearchFunding = _research is not null &&
+            GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
+            GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
+            TechnologyStateQueries.IsCompleted(context.Entities, controller.Player, TechnologyIds.IndustrialStandardization) &&
+            !TechnologyStateQueries.IsCompleted(context.Entities, controller.Player, TechnologyIds.MechanizedSystems);
+
         LogisticsStockPriority ConstructionPriority(ResourceId resource)
         {
+            // Research pays from real storage. Routine factory/munition buffers
+            // must not indefinitely outrank the core that funds the artillery unlock.
+            if (mechanizedResearchFunding && (resource == ResourceIds.Steel || resource == ResourceIds.Electronics))
+                return LogisticsStockPriority.Critical;
             if (nextConstruction is null || !context.Entities.TryGetComponent(controller.PreferredConstructionSource, out InventoryStorage storage))
                 return LogisticsStockPriority.High;
             foreach (BuildingResourceCost cost in nextConstruction.Costs)
@@ -4340,7 +4350,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             candidate = UnitIds.ScoutVehicle;
         }
         else if (GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits)
+        {
+            if (facility.Supports(UnitProductionCapability.Logistics) &&
+                GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
+                GetUnitCount(owned, UnitIds.CargoTruck) <
+                    ResolveCargoFleetTarget(owned, configuration))
+                return false;
             candidate = UnitIds.MainBattleTank;
+        }
         else if (GetUnitCount(owned, UnitIds.MobileArtillery) < 1 &&
             TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner,
                 TechnologyCapabilityIds.MechanizedSystems))
@@ -4641,10 +4658,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         return (int)Math.Min(int.MaxValue, required);
     }
 
-    private static bool HasLiveCoreAssaultForce(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
+    private static bool HasLiveCoreGroundForce(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
         GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
-        GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits &&
-        GetUnitCount(owned, UnitIds.MobileArtillery) >= 1;
+        GetUnitCount(owned, UnitIds.MainBattleTank) >= configuration.MinimumObjectivePressureUnits;
+
+    private static bool HasLiveCoreAssaultForce(OwnedState owned, SkirmishOpponentConfiguration configuration) =>
+        HasLiveCoreGroundForce(owned, configuration) && GetUnitCount(owned, UnitIds.MobileArtillery) >= 1;
 
     private UnitId SelectUnitProductionGoal(
         SimulationContext context,
@@ -4665,6 +4684,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             {
                 return UnitIds.ScoutVehicle;
             }
+
+            // Existing industry needs hauling before its first expensive tank,
+            // while the first scout and live mobile-supply minimum remain ahead.
+            if (facility.Supports(UnitProductionCapability.Logistics) &&
+                GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
+                GetUnitCount(owned, UnitIds.CargoTruck) + GetPendingUnitCount(owned, UnitIds.CargoTruck) <
+                    ResolveCargoFleetTarget(owned, configuration))
+                return UnitIds.CargoTruck;
 
             if (GetUnitCount(
                     owned,
@@ -4731,7 +4758,12 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 [UnitIds.ScoutVehicle] = HasLiveCoreAssaultForce(owned, configuration) ? 2 : 1,
                 [UnitIds.CargoTruck] = HasLiveCoreAssaultForce(owned, configuration)
                     ? ResolveCargoFleetTarget(owned, configuration, reserveForExpansion: true)
-                    : ResolveEssentialCargoFleetTarget(owned, configuration),
+                    // The industrial hauling needed to fund Mechanized Systems
+                    // cannot depend on already owning its paid artillery unit.
+                    : HasLiveCoreGroundForce(owned, configuration) &&
+                      GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks
+                        ? ResolveCargoFleetTarget(owned, configuration)
+                        : ResolveEssentialCargoFleetTarget(owned, configuration),
                 [UnitIds.SupplyTruck] = HasLiveCoreAssaultForce(owned, configuration)
                     ? configuration.ResolveMatureSupplyTruckTarget(owned.SupplyDepots.Count)
                     : configuration.MinimumSupplyTrucks,

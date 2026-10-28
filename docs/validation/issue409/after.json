@@ -1,0 +1,1049 @@
+{
+  "SchemaVersion": 1,
+  "CapturedUtc": "2026-10-27T23:31:29.054929+00:00",
+  "Backend": "Windows CPU; actual selected policy-template capture",
+  "Runtime": ".NET 10.0.13",
+  "OS": "Microsoft Windows 10.0.26300",
+  "Architecture": "X64",
+  "ProcessorCount": 24,
+  "Processor": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+  "CpuModel": null,
+  "Revision": null,
+  "HardwareReference": null,
+  "DriverMetadata": null,
+  "ClockAndPowerSettings": null,
+  "Assemblies": [
+    {
+      "Name": "ForgeLine.Game.dll",
+      "Sha256": "BEBFF9071B0F3EBCFCDEC79267D2DF249C9708373D1191F53FDC17F2C1E3B8B2"
+    },
+    {
+      "Name": "ForgeLine.Presentation.dll",
+      "Sha256": "DBD9840D897CCC8CCF4400544D5C794EFB3AF5E0E2740B9FEBFE7F80B926C442"
+    },
+    {
+      "Name": "ForgeLine.Logistics.Benchmarks.dll",
+      "Sha256": "8D29187091B80B5828F7E7B82EEA842F388D32E82EE9CD66ABBCFC908EDC2CA9"
+    }
+  ],
+  "Policy": "Timing and memory trends are advisory; null metadata is unqualified, never inferred. Process private bytes are not GPU committed memory; working set is not GPU residency.",
+  "Results": [
+    {
+      "Selected": 1,
+      "GlobalPolicies": 256,
+      "GlobalRequests": 256,
+      "Facilities": 256,
+      "FactsSha256": "C51366D773A151D3C1795286A75B272BB0DF30CEF30D5C5299AD1E2F3E144A6F",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 0.4126,
+          "P95Milliseconds": 0.5763,
+          "P99Milliseconds": 0.63,
+          "MaximumMilliseconds": 0.63,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 0
+        },
+        "AllocatedBytesPerOperation": 11880,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 45.0967,
+        "RawMilliseconds": [
+          0.5763,
+          0.3994,
+          0.4101,
+          0.3615,
+          0.3593,
+          0.3832,
+          0.3533,
+          0.3484,
+          0.5388,
+          0.4077,
+          0.381,
+          0.3597,
+          0.3822,
+          0.4811,
+          0.3595,
+          0.4126,
+          0.5323,
+          0.4306,
+          0.4105,
+          0.4161,
+          0.4255,
+          0.4297,
+          0.4209,
+          0.4074,
+          0.5136,
+          0.4413,
+          0.4095,
+          0.63,
+          0.4781,
+          0.4385,
+          0.4153,
+          0.4606
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 40718336,
+            "WorkingSet64": 73355264,
+            "ManagedBytes": 22175392,
+            "HeapSizeBytes": 23470808,
+            "FragmentedBytes": 1315824,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 39727104,
+            "WorkingSet64": 72441856,
+            "ManagedBytes": 22273824,
+            "HeapSizeBytes": 23470808,
+            "FragmentedBytes": 1315824,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 39858176,
+            "WorkingSet64": 72536064,
+            "ManagedBytes": 22372000,
+            "HeapSizeBytes": 23470808,
+            "FragmentedBytes": 1315824,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 39923712,
+            "WorkingSet64": 72638464,
+            "ManagedBytes": 22470432,
+            "HeapSizeBytes": 23470808,
+            "FragmentedBytes": 1315824,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 40054784,
+            "WorkingSet64": 72732672,
+            "ManagedBytes": 22568608,
+            "HeapSizeBytes": 23470808,
+            "FragmentedBytes": 1315824,
+            "Counters": null
+          }
+        ],
+        "LastResult": 1,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 8,
+      "GlobalPolicies": 256,
+      "GlobalRequests": 256,
+      "Facilities": 256,
+      "FactsSha256": "B8A21D5380FAE0395CB5099F1FE69608FA9854DE0CF9567F8956AB7503903E07",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 0.8096,
+          "P95Milliseconds": 72.6012,
+          "P99Milliseconds": 130.0159,
+          "MaximumMilliseconds": 130.0159,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 1
+        },
+        "AllocatedBytesPerOperation": 86096,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 276.2572,
+        "RawMilliseconds": [
+          1.1807,
+          0.9458,
+          3.9179,
+          7.8441,
+          0.9664,
+          1.4525,
+          1.5353,
+          22.7283,
+          1.1383,
+          0.8985,
+          0.9144,
+          0.7982,
+          1.2343,
+          1.0472,
+          130.0159,
+          0.8096,
+          0.8962,
+          0.7365,
+          0.7393,
+          0.733,
+          0.7,
+          0.6508,
+          0.6371,
+          0.63,
+          0.7028,
+          0.6397,
+          72.6012,
+          0.7661,
+          0.629,
+          0.5824,
+          0.6228,
+          0.6035
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 40501248,
+            "WorkingSet64": 73469952,
+            "ManagedBytes": 22174296,
+            "HeapSizeBytes": 24029376,
+            "FragmentedBytes": 1871528,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 40501248,
+            "WorkingSet64": 73469952,
+            "ManagedBytes": 22865048,
+            "HeapSizeBytes": 24029376,
+            "FragmentedBytes": 1871528,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 40501248,
+            "WorkingSet64": 73510912,
+            "ManagedBytes": 23564088,
+            "HeapSizeBytes": 24029376,
+            "FragmentedBytes": 1871528,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 40501248,
+            "WorkingSet64": 73515008,
+            "ManagedBytes": 24254904,
+            "HeapSizeBytes": 24029376,
+            "FragmentedBytes": 1871528,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 40525824,
+            "WorkingSet64": 73580544,
+            "ManagedBytes": 24953944,
+            "HeapSizeBytes": 24029376,
+            "FragmentedBytes": 1871528,
+            "Counters": null
+          }
+        ],
+        "LastResult": 8,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 32,
+      "GlobalPolicies": 256,
+      "GlobalRequests": 256,
+      "Facilities": 256,
+      "FactsSha256": "5C6736C46224AB44BEF9CA9EB5AB34C33D5B3092B7537891EBEE71446E54C2FB",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 1.7383,
+          "P95Milliseconds": 35.133,
+          "P99Milliseconds": 36.4818,
+          "MaximumMilliseconds": 36.4818,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 0
+        },
+        "AllocatedBytesPerOperation": 336480,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 199.0643,
+        "RawMilliseconds": [
+          2.209,
+          1.7383,
+          1.8426,
+          1.7004,
+          1.6292,
+          36.4818,
+          1.5439,
+          1.5152,
+          2.286,
+          1.5115,
+          1.4996,
+          1.5011,
+          1.5299,
+          32.0399,
+          1.6035,
+          1.5174,
+          1.687,
+          1.6103,
+          1.8953,
+          1.9035,
+          32.9974,
+          1.8463,
+          1.7924,
+          1.766,
+          1.8005,
+          1.4137,
+          1.6897,
+          1.6905,
+          35.133,
+          1.8621,
+          1.8165,
+          1.8423
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 49025024,
+            "WorkingSet64": 82350080,
+            "ManagedBytes": 22372336,
+            "HeapSizeBytes": 22545664,
+            "FragmentedBytes": 189776,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 49025024,
+            "WorkingSet64": 82444288,
+            "ManagedBytes": 25078032,
+            "HeapSizeBytes": 22545664,
+            "FragmentedBytes": 189776,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 49025024,
+            "WorkingSet64": 82526208,
+            "ManagedBytes": 27775416,
+            "HeapSizeBytes": 22545664,
+            "FragmentedBytes": 189776,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 51044352,
+            "WorkingSet64": 84606976,
+            "ManagedBytes": 30478264,
+            "HeapSizeBytes": 22545664,
+            "FragmentedBytes": 189776,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 53338112,
+            "WorkingSet64": 86945792,
+            "ManagedBytes": 33181336,
+            "HeapSizeBytes": 22545664,
+            "FragmentedBytes": 189776,
+            "Counters": null
+          }
+        ],
+        "LastResult": 32,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 1,
+      "GlobalPolicies": 2048,
+      "GlobalRequests": 2048,
+      "Facilities": 256,
+      "FactsSha256": "4115955D08DAF5CA33DA01659631C8B28D66BE75E9666A1DE7AE292EA457482F",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 0.9288,
+          "P95Milliseconds": 82.0457,
+          "P99Milliseconds": 103.632,
+          "MaximumMilliseconds": 103.632,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 1
+        },
+        "AllocatedBytesPerOperation": 12160,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 334.3351,
+        "RawMilliseconds": [
+          4.8777,
+          12.8594,
+          103.632,
+          13.5109,
+          1.4824,
+          1.3021,
+          2.6288,
+          1.2845,
+          1.3341,
+          1.3007,
+          82.0457,
+          0.9766,
+          1.0976,
+          0.9317,
+          0.8975,
+          1.0591,
+          0.9864,
+          0.9288,
+          0.8636,
+          0.8914,
+          0.8735,
+          0.8949,
+          0.8722,
+          0.8806,
+          0.6757,
+          0.5104,
+          0.5113,
+          0.51,
+          0.4911,
+          0.4876,
+          0.4826,
+          0.4983
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 74522624,
+            "WorkingSet64": 100237312,
+            "ManagedBytes": 42206120,
+            "HeapSizeBytes": 43424256,
+            "FragmentedBytes": 1234584,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 74518528,
+            "WorkingSet64": 100298752,
+            "ManagedBytes": 42304808,
+            "HeapSizeBytes": 43424256,
+            "FragmentedBytes": 1234584,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 74522624,
+            "WorkingSet64": 100347904,
+            "ManagedBytes": 42411720,
+            "HeapSizeBytes": 43424256,
+            "FragmentedBytes": 1234584,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 74522624,
+            "WorkingSet64": 100454400,
+            "ManagedBytes": 42510408,
+            "HeapSizeBytes": 43424256,
+            "FragmentedBytes": 1234584,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 74522624,
+            "WorkingSet64": 100462592,
+            "ManagedBytes": 42609096,
+            "HeapSizeBytes": 43424256,
+            "FragmentedBytes": 1234584,
+            "Counters": null
+          }
+        ],
+        "LastResult": 1,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 8,
+      "GlobalPolicies": 2048,
+      "GlobalRequests": 2048,
+      "Facilities": 256,
+      "FactsSha256": "180F11B6AE5026B77F6C2F05F16C5D3A6F48369773CA6E5254F673F6F899E492",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 0.7343,
+          "P95Milliseconds": 1.337,
+          "P99Milliseconds": 65.7623,
+          "MaximumMilliseconds": 65.7623,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 0
+        },
+        "AllocatedBytesPerOperation": 88336,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 302.3645,
+        "RawMilliseconds": [
+          0.9463,
+          0.8061,
+          0.7725,
+          0.7582,
+          0.765,
+          0.7415,
+          0.7442,
+          0.7258,
+          0.7743,
+          0.7076,
+          0.7235,
+          0.6983,
+          0.7343,
+          0.7342,
+          0.7097,
+          0.7036,
+          1.1374,
+          0.7039,
+          0.6802,
+          0.7041,
+          0.8736,
+          0.6988,
+          0.6684,
+          0.7855,
+          0.7912,
+          0.7374,
+          0.707,
+          65.7623,
+          1.337,
+          0.7802,
+          0.7023,
+          0.7212
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 72323072,
+            "WorkingSet64": 98320384,
+            "ManagedBytes": 42207368,
+            "HeapSizeBytes": 44016456,
+            "FragmentedBytes": 1825536,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 72323072,
+            "WorkingSet64": 98320384,
+            "ManagedBytes": 42922792,
+            "HeapSizeBytes": 44016456,
+            "FragmentedBytes": 1825536,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 72323072,
+            "WorkingSet64": 98377728,
+            "ManagedBytes": 43630056,
+            "HeapSizeBytes": 44016456,
+            "FragmentedBytes": 1825536,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 72323072,
+            "WorkingSet64": 98385920,
+            "ManagedBytes": 44345544,
+            "HeapSizeBytes": 44016456,
+            "FragmentedBytes": 1825536,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 72327168,
+            "WorkingSet64": 98426880,
+            "ManagedBytes": 45052808,
+            "HeapSizeBytes": 44016456,
+            "FragmentedBytes": 1825536,
+            "Counters": null
+          }
+        ],
+        "LastResult": 8,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 32,
+      "GlobalPolicies": 2048,
+      "GlobalRequests": 2048,
+      "Facilities": 256,
+      "FactsSha256": "877187B34A83FC153EE456359280C50B702AE5C586C52A67B92697B32AF932DB",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 0.8976,
+          "P95Milliseconds": 2.4841,
+          "P99Milliseconds": 69.4386,
+          "MaximumMilliseconds": 69.4386,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 0
+        },
+        "AllocatedBytesPerOperation": 345440,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 262.2256,
+        "RawMilliseconds": [
+          1.0453,
+          0.8838,
+          0.8976,
+          0.8671,
+          0.8674,
+          0.8818,
+          0.8564,
+          0.8743,
+          1.0931,
+          0.947,
+          0.9132,
+          0.9265,
+          0.9094,
+          0.92,
+          0.9194,
+          1.0669,
+          1.3301,
+          0.9592,
+          0.927,
+          69.4386,
+          2.4841,
+          0.7391,
+          0.711,
+          0.7067,
+          0.7971,
+          0.7293,
+          0.7516,
+          0.7319,
+          0.7091,
+          0.7141,
+          1.1209,
+          1.2125
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 78295040,
+            "WorkingSet64": 104394752,
+            "ManagedBytes": 42470952,
+            "HeapSizeBytes": 42702552,
+            "FragmentedBytes": 248048,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 80596992,
+            "WorkingSet64": 106754048,
+            "ManagedBytes": 45242024,
+            "HeapSizeBytes": 42702552,
+            "FragmentedBytes": 248048,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 80596992,
+            "WorkingSet64": 106770432,
+            "ManagedBytes": 48020640,
+            "HeapSizeBytes": 42702552,
+            "FragmentedBytes": 248048,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 80596992,
+            "WorkingSet64": 106795008,
+            "ManagedBytes": 50792128,
+            "HeapSizeBytes": 42702552,
+            "FragmentedBytes": 248048,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 81186816,
+            "WorkingSet64": 107429888,
+            "ManagedBytes": 53572768,
+            "HeapSizeBytes": 42702552,
+            "FragmentedBytes": 248048,
+            "Counters": null
+          }
+        ],
+        "LastResult": 32,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 1,
+      "GlobalPolicies": 8192,
+      "GlobalRequests": 8192,
+      "Facilities": 256,
+      "FactsSha256": "C65C6A385229955973FB49E0AA9267094E1FA89A8B59A9B81F8B14069930A5BC",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 1.0589,
+          "P95Milliseconds": 68.029,
+          "P99Milliseconds": 110.2381,
+          "MaximumMilliseconds": 110.2381,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 1
+        },
+        "AllocatedBytesPerOperation": 13120,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 550.3869,
+        "RawMilliseconds": [
+          0.9701,
+          68.029,
+          1.0085,
+          1.017,
+          0.9943,
+          1.0182,
+          1.3738,
+          1.1636,
+          1.0095,
+          1.0137,
+          0.9847,
+          0.9981,
+          56.0332,
+          1.2089,
+          1.2079,
+          1.1721,
+          1.2248,
+          1.1998,
+          1.1843,
+          1.1949,
+          1.1681,
+          1.1853,
+          110.2381,
+          2.4713,
+          1.0722,
+          1.0284,
+          1.0272,
+          1.0171,
+          0.9835,
+          0.9944,
+          1.0589,
+          1.0304
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 97730560,
+            "WorkingSet64": 115331072,
+            "ManagedBytes": 42889688,
+            "HeapSizeBytes": 54168752,
+            "FragmentedBytes": 11295512,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 97730560,
+            "WorkingSet64": 115298304,
+            "ManagedBytes": 42995904,
+            "HeapSizeBytes": 54168752,
+            "FragmentedBytes": 11295512,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 97730560,
+            "WorkingSet64": 115322880,
+            "ManagedBytes": 43102816,
+            "HeapSizeBytes": 54168752,
+            "FragmentedBytes": 11295512,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 97996800,
+            "WorkingSet64": 115752960,
+            "ManagedBytes": 43217952,
+            "HeapSizeBytes": 54168752,
+            "FragmentedBytes": 11295512,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 97996800,
+            "WorkingSet64": 115752960,
+            "ManagedBytes": 43324864,
+            "HeapSizeBytes": 54168752,
+            "FragmentedBytes": 11295512,
+            "Counters": null
+          }
+        ],
+        "LastResult": 1,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 8,
+      "GlobalPolicies": 8192,
+      "GlobalRequests": 8192,
+      "Facilities": 256,
+      "FactsSha256": "913BD858970F5A879DF087362FE9614EF4DB170BD5DAE47DEAB8CE80EE8A2B74",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 1.257,
+          "P95Milliseconds": 1.8985,
+          "P99Milliseconds": 88.0586,
+          "MaximumMilliseconds": 88.0586,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 0
+        },
+        "AllocatedBytesPerOperation": 96016,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 139.6248,
+        "RawMilliseconds": [
+          1.1418,
+          1.077,
+          1.0608,
+          88.0586,
+          1.0872,
+          1.1112,
+          1.1319,
+          1.1183,
+          1.8985,
+          1.2912,
+          1.2859,
+          1.257,
+          1.2661,
+          1.2974,
+          1.2691,
+          1.2781,
+          1.2629,
+          1.2705,
+          1.2383,
+          1.2513,
+          1.2676,
+          1.2736,
+          1.2875,
+          1.2639,
+          1.2782,
+          1.2413,
+          1.2518,
+          1.2536,
+          1.2355,
+          1.2523,
+          1.2508,
+          1.292
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 98013184,
+            "WorkingSet64": 115785728,
+            "ManagedBytes": 42890936,
+            "HeapSizeBytes": 54794904,
+            "FragmentedBytes": 11920416,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 98013184,
+            "WorkingSet64": 115785728,
+            "ManagedBytes": 43663928,
+            "HeapSizeBytes": 54794904,
+            "FragmentedBytes": 11920416,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 98013184,
+            "WorkingSet64": 115785728,
+            "ManagedBytes": 44436984,
+            "HeapSizeBytes": 54794904,
+            "FragmentedBytes": 11920416,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 98013184,
+            "WorkingSet64": 115785728,
+            "ManagedBytes": 45210040,
+            "HeapSizeBytes": 54794904,
+            "FragmentedBytes": 11920416,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 98013184,
+            "WorkingSet64": 115785728,
+            "ManagedBytes": 45983096,
+            "HeapSizeBytes": 54794904,
+            "FragmentedBytes": 11920416,
+            "Counters": null
+          }
+        ],
+        "LastResult": 8,
+        "Counters": null
+      }
+    },
+    {
+      "Selected": 32,
+      "GlobalPolicies": 8192,
+      "GlobalRequests": 8192,
+      "Facilities": 256,
+      "FactsSha256": "A1590080821094518A8B650EA8B5243249ECACB5C766A209D85358030EB55273",
+      "Measurement": {
+        "Name": "policy-template-selection",
+        "Scope": "Actual PolicyTemplateSelectionCapture with stable completed-tick context; no renderer or GPU work",
+        "Samples": 32,
+        "Warmup": 16,
+        "BudgetMilliseconds": null,
+        "Timing": {
+          "P50Milliseconds": 1.5828,
+          "P95Milliseconds": 131.9054,
+          "P99Milliseconds": 181.1725,
+          "MaximumMilliseconds": 181.1725,
+          "OverBudget": null,
+          "HitchesOver100Milliseconds": 4
+        },
+        "AllocatedBytesPerOperation": 376160,
+        "GenCollections": [
+          0,
+          0,
+          0
+        ],
+        "AllocationScope": "All process threads during action; excludes prepare, observation and report capture. GC includes entire sampling loop.",
+        "SamplingWallMilliseconds": 604.0442,
+        "RawMilliseconds": [
+          1.9391,
+          1.8615,
+          1.821,
+          115.3617,
+          1.693,
+          1.5983,
+          1.5482,
+          1.5267,
+          1.5877,
+          1.5481,
+          1.5391,
+          181.1725,
+          1.7027,
+          1.5928,
+          1.548,
+          1.5315,
+          2.6641,
+          1.6369,
+          1.5756,
+          131.9054,
+          1.5721,
+          1.5552,
+          1.5413,
+          1.5354,
+          1.5909,
+          1.5828,
+          116.3382,
+          1.5949,
+          1.5307,
+          1.5615,
+          1.54,
+          1.5433
+        ],
+        "Memory": [
+          {
+            "CompletedSamples": 0,
+            "PrivateMemorySize64": 93913088,
+            "WorkingSet64": 112111616,
+            "ManagedBytes": 43416632,
+            "HeapSizeBytes": 54164312,
+            "FragmentedBytes": 10764128,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 8,
+            "PrivateMemorySize64": 93913088,
+            "WorkingSet64": 112111616,
+            "ManagedBytes": 46434424,
+            "HeapSizeBytes": 54164312,
+            "FragmentedBytes": 10764128,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 16,
+            "PrivateMemorySize64": 93945856,
+            "WorkingSet64": 112447488,
+            "ManagedBytes": 49459632,
+            "HeapSizeBytes": 54164312,
+            "FragmentedBytes": 10764128,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 24,
+            "PrivateMemorySize64": 93945856,
+            "WorkingSet64": 112590848,
+            "ManagedBytes": 52484872,
+            "HeapSizeBytes": 54164312,
+            "FragmentedBytes": 10764128,
+            "Counters": null
+          },
+          {
+            "CompletedSamples": 32,
+            "PrivateMemorySize64": 93945856,
+            "WorkingSet64": 112635904,
+            "ManagedBytes": 55503080,
+            "HeapSizeBytes": 54164312,
+            "FragmentedBytes": 10764128,
+            "Counters": null
+          }
+        ],
+        "LastResult": 32,
+        "Counters": null
+      }
+    }
+  ]
+}

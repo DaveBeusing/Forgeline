@@ -243,7 +243,7 @@ public sealed partial class PlayerActionPanelController
         }
 
         if (Pressed(input, _bindings.Key(GameplayAction.Process)) && !globalShortcutsBlocked &&
-            actions?.Production is { IsAutomatic: false })
+            actions?.Production is not { IsAutomatic: true })
         {
             ToggleMode(
                 PlayerActionPanelMode.Production);

@@ -268,6 +268,29 @@ public sealed class ObjectActionRingTests
     }
 
     [Fact]
+    public void AutomaticProcessorDoesNotOpenAManualProductionQueueFromTheGlobalShortcut()
+    {
+        var source = Snapshot(PlayerActionPanelMode.Production, "Ready");
+        var a = source.PlayerActions!; var production = a.Production!;
+        var automatic = new PlayerProductionFacilityActionReadModel(production.Entity, production.ActiveRequest,
+            production.ActiveRecipe, production.Status, production.BlockReason, production.Progress,
+            production.Recipes, production.Requests, isAutomatic: true);
+        var actions = new PlayerActionSnapshot(a.SessionId, a.Tick, a.Construction, a.PendingCommandCount,
+            automatic, a.UnitProduction, a.Logistics, a.Supply, a.Tactical, a.Technology);
+        var snapshot = new PresentationSnapshot(source.Tick, source.TickDuration, source.SimulationEntityCount,
+            source.Instances, sessionId: source.SessionId, playerExperience: source.PlayerExperience, playerActions: actions);
+        var input = new InputState(); var selection = new SelectionSet(); selection.SetSingle(Entity);
+        var controller = new PlayerActionPanelController();
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        controller.SynchronizeObjectRing(input, snapshot, World(snapshot), selection, false);
+        input.BeginFrame(); input.Apply(PlatformInputEvent.PointerMoved(650, 440));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.P));
+        controller.Update(input, snapshot, 1920, 1080, currentSelection: selection);
+        Assert.Equal(PlayerActionPanelMode.Closed, controller.Mode);
+        Assert.False(controller.TryTakeRequest(out _));
+    }
+
+    [Fact]
     public void RemappedGlobalConstructionShortcutUsesRegistryRatherThanHardcodedLetter()
     {
         var source = Snapshot(PlayerActionPanelMode.Construction, "Ready");
