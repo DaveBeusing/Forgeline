@@ -39,3 +39,5 @@ Set-Content -LiteralPath $recipe -Value '{"Generation":{"TerrainProfileId":"terr
 Invoke-TerrainCompiler -Options @('--recipe-input', $recipe) -ShouldSucceed $false
 Invoke-TerrainCompiler -Options @('--unknown-option') -ShouldSucceed $false
 Write-Host 'Procedural terrain export and rejection contracts passed.'
+# Expected native failures above have already been checked; do not leak their exit code to the CI wrapper.
+exit 0

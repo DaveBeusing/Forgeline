@@ -542,6 +542,7 @@ jobs:
           path: |
             artifacts/*.json
             artifacts/maps/*.json
+            artifacts/procedural-terrain/**
             artifacts/pacing-quick/**
             artifacts/pacing-contracts/**
             artifacts/visual-reference-warp/**
