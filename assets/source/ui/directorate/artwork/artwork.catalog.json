@@ -30847,6 +30847,12 @@
     },
     {
       "domain": "PlayerActionRequestKind",
+      "member": "RepairBridge",
+      "role": "command.repair",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
       "member": "RequestResupply",
       "role": "command.supply",
       "availability": "runtime_required"
