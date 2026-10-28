@@ -1,3 +1,4 @@
+using System.Numerics;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Intelligence;
@@ -26,6 +27,16 @@ internal sealed class SkirmishScenarioHarness
                     new TechnologyCapabilityUnlock(player, capability, id, scenario.Simulation.CurrentTick));
             }
         }
+    }
+
+    internal static void EnsureCargoForPolicyFixture(MatchRuntime scenario, PlayerId player, int minimum)
+    {
+        // These fixtures isolate construction policy. Paid fleet growth remains
+        // covered by the unmodified strategic-loop and terminal-match gates.
+        Vector3 home = scenario.Simulation.Entities.GetComponent<WorldTransform>(scenario.GetBase(player).CommandCore).Position;
+        for (int count = scenario.CountUnits(player, UnitIds.CargoTruck); count < minimum; count++)
+            scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[UnitIds.CargoTruck],
+                home + new Vector3(0, 0, 100 + count * 20), player);
     }
 
     internal static bool HasExpansionFundingPrerequisites(MatchRuntime scenario, PlayerId player)

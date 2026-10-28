@@ -87,6 +87,7 @@ public sealed class SkirmishProductionPolicyTests
         EntityId core = scenario.GetBase(owner).CommandCore;
         if (bootstrapComplete)
         {
+            SkirmishScenarioHarness.EnsureCargoForPolicyFixture(scenario, owner, 3);
             Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, owner),
                 24_000, TestContext.Current.CancellationToken));
             ulong nextDecision = scenario.GetOpponentState(owner).LastDecisionTick.Value + settings.OpponentConfigurations[owner.Value].ReactionCadenceTicks;
@@ -1024,8 +1025,21 @@ public sealed class SkirmishProductionPolicyTests
         Assert.Equal(expectedCargoRecovery, queuedRecoveryCargo);
         if (fullIndustry && assaultFleetEstablished) Assert.True(queuedOptionalCargo);
         if (artilleryPending)
+        {
             Assert.False(TechnologyStateQueries.IsCapabilityUnlocked(entities, new PlayerId(1),
                 TechnologyCapabilityIds.MechanizedSystems));
+            // A queued truck cannot haul yet. Later decisions must not cancel
+            // its unpaid request in favor of the tank it is meant to fund.
+            scenario.Simulation.RunTicks(21, TestContext.Current.CancellationToken);
+            bool retainedCargo = false;
+            foreach (EntityId entity in entities.Query<UnitProductionRequest>())
+            {
+                var request = entities.GetComponent<UnitProductionRequest>(entity);
+                retainedCargo |= request.Facility == factory && request.UnitId == UnitIds.CargoTruck &&
+                    !entities.HasComponent<UnitProductionCancellationRequest>(entity);
+            }
+            Assert.True(retainedCargo);
+        }
         if (industryOnly && additionalDepots == 0)
         {
             Assert.True(queuedFirstSupply);

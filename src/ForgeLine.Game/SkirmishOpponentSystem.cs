@@ -4350,7 +4350,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
             candidate = UnitIds.ScoutVehicle;
         }
         else if (GetUnitCount(owned, UnitIds.MainBattleTank) < configuration.MinimumObjectivePressureUnits)
+        {
+            if (facility.Supports(UnitProductionCapability.Logistics) &&
+                GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
+                GetUnitCount(owned, UnitIds.CargoTruck) <
+                    ResolveCargoFleetTarget(owned, configuration))
+                return false;
             candidate = UnitIds.MainBattleTank;
+        }
         else if (GetUnitCount(owned, UnitIds.MobileArtillery) < 1 &&
             TechnologyStateQueries.IsCapabilityUnlocked(context.Entities, facility.Owner,
                 TechnologyCapabilityIds.MechanizedSystems))

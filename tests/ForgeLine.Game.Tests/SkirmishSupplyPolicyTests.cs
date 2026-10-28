@@ -471,6 +471,7 @@ public sealed class SkirmishSupplyPolicyTests
         // This policy test supplies a stable power reserve. The end-to-end
         // strategic-loop tests retain the unmodified economy/bootstrap path.
         entities.AddComponent(side.CommandCore, new PowerGenerator(100.0));
+        SkirmishScenarioHarness.EnsureCargoForPolicyFixture(scenario, side.Player, 3);
         bool funded = scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, side.Player),
             24_000, TestContext.Current.CancellationToken);
         var queueDiagnostics = new List<string>();
