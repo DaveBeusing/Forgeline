@@ -10,7 +10,7 @@ internal sealed partial class OperationsHudSurface
         var panel = _bounds;
         var selection = context.InformationLayer.SelectedEntities;
         var data = GlobalProductionSnapshot.Resolve(context.Snapshot);
-        ProductionControl(layout, view, 26, "< OPS");
+        ProductionControl(layout, view, 26, "OPS");
         ProductionControl(layout, view, 3, view.Collapsed ? "OPEN" : "FOLD");
         ProductionControl(layout, view, 0, "CLOSE");
         Span<char> text = stackalloc char[192];
@@ -26,8 +26,8 @@ internal sealed partial class OperationsHudSurface
         ProductionLine(panel, 32, b.Written, true);
         if (view.Collapsed) return;
         ProductionControl(layout, view, 1, FilterLabel(view.Filter));
-        ProductionControl(layout, view, 2, "PAGE >");
-        ProductionControl(layout, view, 4, "INFO >");
+        ProductionControl(layout, view, 2, "PAGE");
+        ProductionControl(layout, view, 4, "INFO");
         for (int i = 0; i < GlobalProductionLayout.PageSize; i++)
         {
             var factory = data is null ? null : GlobalProductionLayout.Row(data, view, i, selection);
@@ -84,9 +84,9 @@ internal sealed partial class OperationsHudSurface
         bool visible = selected is not null && OperationsWorldOverlay.CanFocus(context.Snapshot, selected.Entity);
         ProductionControl(layout, view, 20, "FOCUS", visible);
         ProductionControl(layout, view, 21, "SELECT", visible);
-        ProductionControl(layout, view, 22, "ORDER >", selected?.Orders.Count > 1);
+        ProductionControl(layout, view, 22, "NEXT", selected?.Orders.Count > 1);
         ProductionControl(layout, view, 23, "CANCEL", order is not null);
-        ProductionControl(layout, view, 24, "PRIO >", order is not null);
+        ProductionControl(layout, view, 24, "PRIO", order is not null);
         ProductionControl(layout, view, 25, "RALLY", visible);
         _bounds = panel;
     }

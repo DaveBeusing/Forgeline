@@ -178,8 +178,8 @@ internal static class BattlefieldHudCapture
                 new GlobalProductionOrder(new(900,1),UnitIds.MainBattleTank,"Main Battle Tank",ProductionPriority.High,false,true,true,[new(ResourceIds.Steel,"Steel",80),new(ResourceIds.Electronics,"Electronics",20)]),
                 new GlobalProductionOrder(new(901,1),UnitIds.ScoutVehicle,"Scout Vehicle",ProductionPriority.Normal,false,false,false,[new(ResourceIds.Steel,"Steel",40)]) };
             var factories = Enumerable.Range(0,7).Select(i=>new GlobalProductionFactory(i==0?owned:new EntityId((uint)(800+i),1),i==0?"Vehicle Factory":"Infantry Factory",
-                i==0?UnitProductionCapability.Vehicle:UnitProductionCapability.Infantry,i==0?UnitProductionStatus.NoInput:UnitProductionStatus.Running,
-                i==0?UnitProductionBlockReason.NoInput:UnitProductionBlockReason.None,new(900,1),.42,2,0,new System.Numerics.Vector3(80,0,120),orders)).ToArray();
+                i==0?UnitProductionCapability.Vehicle:UnitProductionCapability.Infantry,i==0?UnitProductionStatus.NoPower:UnitProductionStatus.Running,
+                i==0?UnitProductionBlockReason.NoPower:UnitProductionBlockReason.None,new(900,1),.42,2,0,new System.Numerics.Vector3(80,0,120),i==0?orders:[orders[0] with {Unit=UnitIds.RifleSquad,Name="Rifle Squad"},orders[1] with {Unit=UnitIds.RifleSquad,Name="Rifle Squad"}])).ToArray();
             operations=new OperationsSnapshot(operations.Session,operations.Tick,operations.Player,operations.Facilities,operations.Resources,operations.Routes,operations.FacilityCount,operations.RouteCount) {Production=new(source.SessionId,source.Tick,experience.Player,factories,
                 [new(new(1),true,[new(ResourceIds.Steel,"Steel",200,80),new(ResourceIds.Electronics,"Electronics",45,20)])],7,14)};
         }

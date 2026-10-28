@@ -26,9 +26,9 @@ public static class GlobalProductionLayout
         if (s <= 0 || x <= 0) return default;
         return index switch
         {
-            0 => new(p.X + 366*x, p.Y + 6*s, 78*x, 22*s),
-            26 => new(p.X + 6*x, p.Y + 6*s, 108*x, 22*s),
-            3 => new(p.X + 264*x, p.Y + 6*s, 96*x, 22*s),
+            0 => new(p.X + 302*x, p.Y + 6*s, 142*x, 22*s),
+            26 => new(p.X + 6*x, p.Y + 6*s, 142*x, 22*s),
+            3 => new(p.X + 154*x, p.Y + 6*s, 142*x, 22*s),
             1 => new(p.X + 6*x, p.Y + 58*s, 210*x, 22*s),
             2 => new(p.X + 222*x, p.Y + 58*s, 108*x, 22*s),
             4 => new(p.X + 336*x, p.Y + 58*s, 108*x, 22*s),
