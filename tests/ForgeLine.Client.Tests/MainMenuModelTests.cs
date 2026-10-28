@@ -74,12 +74,14 @@ public sealed class MainMenuModelTests
                 new RtsCameraBindings());
 
         Assert.Equal("CONTROLS", view.Title);
-        Assert.Equal((DeveloperToolsCapability.Current.IsCompiled ? 31 : 27) + GameplayBindingRegistry.Definitions.Count, view.DetailLines.Count);
-        foreach (string label in new[] { "WORLD DEBUG", "RENDER DEBUG", "DEBUG CATEGORIES", "DEVELOPER TOOLS" })
+        Assert.Equal((DeveloperToolsCapability.Current.IsCompiled ? 30 : 27) + GameplayBindingRegistry.Definitions.Count, view.DetailLines.Count);
+        foreach (string label in new[] { "WORLD DEBUG", "DIAGNOSTIC CHECKBOXES", "DEVELOPER TOOLS" })
             Assert.Equal(DeveloperToolsCapability.Current.IsCompiled, view.DetailLines.Any(line => line.Label == label));
         Assert.Contains(view.DetailLines, line => line.Label == "PLACE TURN LEFT" && line.Value == "Q (WHILE PLACING)");
         Assert.Contains(view.DetailLines, line => line.Label == "PLACE TURN RIGHT" &&
-            line.Value == "E / " + GameplayBindingRegistry.Default.Prompt(GameplayAction.RotatePlacement) + " (WHILE PLACING)");
+            line.Value == (GameplayBindingRegistry.Default.Key(GameplayAction.RotatePlacement) == ForgeLine.Platform.PlatformKey.Unknown
+                ? "E (WHILE PLACING)"
+                : "E / " + GameplayBindingRegistry.Default.Prompt(GameplayAction.RotatePlacement) + " (WHILE PLACING)" ));
         Assert.Contains(view.DetailLines, line => line.Label == "RING PAGE PREV" && line.Value == "Q (PAGED SUBMENU)");
         Assert.Contains(view.DetailLines, line => line.Label == "RING PAGE NEXT" && line.Value == "E (PAGED SUBMENU)");
         Assert.Equal(view.DetailLines.Count, view.DetailLines.Select(line => line.Label).Distinct().Count());
