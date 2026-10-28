@@ -6,6 +6,12 @@ FORGELINE persists match recovery data from authoritative simulation state and d
 
 The current format is intentionally versioned for the current product stage. Unsupported older or newer formats fail explicitly rather than being guessed or partially applied.
 
+## Guided practice compatibility
+
+Current captures use envelope 1, payload 12 and authoritative schema 18. Payload 12 adds optional PracticeProgress for the three registered guided practice compositions. Practice saves require matching lesson/version/player/tick and bounded completion timestamps; ordinary skirmish saves reject practice metadata. Practice replay requires payload 12. The existing authoritative compatibility rules for ordinary historical saves remain in force.
+
+The loader reconstructs the normal commands and deterministic paid setup, then verifies derived objective status, failure and timestamps before returning the candidate. Practice snapshots are observations rather than a second authoritative checkpoint; their session identity is regenerated. Hints and reading state are local UI state and cannot certify saved completion. See [guided practice](GuidedStrategyPractice.md) and [the bounded observer contract](adr/BoundedGuidedPractice.md).
+
 ## Recovery Model
 
 A save contains two complementary forms of evidence:

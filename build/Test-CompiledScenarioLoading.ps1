@@ -11,14 +11,14 @@ function Invoke-Headless([string[]]$Arguments) {
     & dotnet run --project $project --configuration $Configuration --no-build -- @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Compiled scenario command failed: $Arguments" }
 }
-foreach ($key in @('central-divide.directorate.v1', 'split-basin.directorate.v1')) {
+foreach ($key in @('central-divide.directorate.v1', 'split-basin.directorate.v1', 'practice.command-recon.v1', 'practice.build-production.v1', 'practice.supply-recovery.v1')) {
     $save = Join-Path $output "$key.save.json"
     $replay = Join-Path $output "$key.replay.json"
     Invoke-Headless @('--scenario', $key, '--profile', 'validation', '--ticks', '20', '--seed', '2026', '--save-output', $save, '--replay-output', $replay)
     Invoke-Headless @('--load-input', $save)
     Invoke-Headless @('--replay-input', $replay)
     $savedPayload = (Get-Content -LiteralPath $save -Raw | ConvertFrom-Json).Payload | ConvertFrom-Json
-    if ($savedPayload.SchemaVersion -ne 11 -or $savedPayload.Configuration.CompositionKey -ne $key -or
+    if ($savedPayload.SchemaVersion -ne 12 -or $savedPayload.Configuration.CompositionKey -ne $key -or
         $savedPayload.Configuration.Identity.MapSha256.Length -ne 64 -or $savedPayload.Configuration.Identity.ContentSha256.Length -ne 64) {
         throw 'The headless save did not preserve the complete registered scenario identity.'
     }

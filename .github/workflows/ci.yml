@@ -139,11 +139,11 @@ jobs:
       - name: Gameplay progress and optional guidance contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.GameplayPacingProgressTests ForgeLine.Game.Tests.GameplayProgressJournalTests ForgeLine.Game.Tests.GameplayTelemetryTests ForgeLine.Game.Tests.PlayerConstructionProductionFlowTests ForgeLine.Game.Tests.ConveyorPersistenceTests --parallel none
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.PracticeScenarioTests ForgeLine.Game.Tests.GameplayPacingProgressTests ForgeLine.Game.Tests.GameplayProgressJournalTests ForgeLine.Game.Tests.GameplayTelemetryTests ForgeLine.Game.Tests.PlayerConstructionProductionFlowTests ForgeLine.Game.Tests.ConveyorPersistenceTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EarlyGameGuidanceTests ForgeLine.Presentation.Tests.GuidanceLessonTests --parallel none
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.PracticeGuidanceTests ForgeLine.Presentation.Tests.EarlyGameGuidanceTests ForgeLine.Presentation.Tests.GuidanceLessonTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.GameplayGuidanceInteractionTests --parallel none
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.PracticeEntryTests ForgeLine.Client.Tests.GameplayGuidanceInteractionTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile gameplay --ticks 64 --seed 17 --telemetry-output artifacts/gameplay-observation-smoke.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

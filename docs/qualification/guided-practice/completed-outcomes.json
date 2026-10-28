@@ -1,0 +1,73 @@
+{
+  "baseRevision": "8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
+  "scope": "Deterministic command walkthroughs, seed 17. Ticks include scripted waits; these are outcome evidence, not human completion-time benchmarks.",
+  "walkthroughs": [
+    {
+      "LessonKey": "practice.command-recon.v1",
+      "DefinitionVersion": 1,
+      "Player": {
+        "Value": 1,
+        "IsSpecified": true
+      },
+      "Session": {
+        "Value": 10,
+        "IsSpecified": true
+      },
+      "Tick": {
+        "Value": 675
+      },
+      "Status": 1,
+      "CompletedAtTicks": [
+        44,
+        407,
+        675
+      ],
+      "Failure": ""
+    },
+    {
+      "LessonKey": "practice.supply-recovery.v1",
+      "DefinitionVersion": 1,
+      "Player": {
+        "Value": 1,
+        "IsSpecified": true
+      },
+      "Session": {
+        "Value": 13,
+        "IsSpecified": true
+      },
+      "Tick": {
+        "Value": 1563
+      },
+      "Status": 1,
+      "CompletedAtTicks": [
+        823,
+        864,
+        1101,
+        1523
+      ],
+      "Failure": ""
+    },
+    {
+      "LessonKey": "practice.build-production.v1",
+      "DefinitionVersion": 1,
+      "Player": {
+        "Value": 1,
+        "IsSpecified": true
+      },
+      "Session": {
+        "Value": 20,
+        "IsSpecified": true
+      },
+      "Tick": {
+        "Value": 1831
+      },
+      "Status": 1,
+      "CompletedAtTicks": [
+        900,
+        1020,
+        1831
+      ],
+      "Failure": ""
+    }
+  ]
+}
