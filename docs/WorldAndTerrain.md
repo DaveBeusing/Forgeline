@@ -216,3 +216,7 @@ Terrain GPU resources use compiled runtime materials and resident per-chunk geom
 versioned seed recipe, global integer sample lattice, independent domain sequences,
 canonical gameplay/decoration identities and headless result boundary. These contracts
 do not generate or replace the existing authored terrain recipes or compiled maps.
+
+The opt-in [seeded landform factory](ProceduralTerrain.md) implements a separate
+versioned height evaluator, flat/drainage masks and headless diagnostics on those
+contracts. Existing authored maps continue to use their original recipes.
