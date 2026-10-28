@@ -267,7 +267,11 @@ public static class StrategicMapAudit
             double minimum = values.Min() ?? 0;
             double maximum = values.Max() ?? 0;
             if (maximum <= 0 || maximum <= minimum * rules.AsymmetryWarningRatio) return;
-            Diagnose("Warning", code, "Baseline", movement, 0, target, Vector3.Zero,
+            Vector3 location = resources.Where(r => target == $"resource:{r.ResourceId.Value}")
+                .OrderByDescending(r => r.Contested).ThenBy(r => r.Key, StringComparer.Ordinal)
+                .Select(r => r.Center).FirstOrDefault();
+            if (target == "yards") location = starts[0].Position;
+            Diagnose("Warning", code, "Baseline", movement, 0, target, location,
                 FormattableString.Invariant($"Across starts: minimum={minimum:0.###}, maximum={maximum:0.###}; exceeds ratio {rules.AsymmetryWarningRatio:0.###}. Review deliberate asymmetry; this is not a fairness certificate."));
         }
 

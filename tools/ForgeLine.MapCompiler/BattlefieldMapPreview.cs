@@ -45,7 +45,8 @@ internal static class BattlefieldMapPreview
             svg.Append(CultureInfo.InvariantCulture, $"<text x='{N(crossing.Position.X)}' y='{N(crossing.Position.Z - 35)}' text-anchor='middle' font-family='sans-serif' font-size='36' fill='white'>{E(crossing.DisplayName)}</text>");
         if (audit is not null)
         {
-            foreach (var diagnostic in audit.Diagnostics.Where(d => d.State == "Baseline" && d.Player != 0))
+            foreach (var diagnostic in audit.Diagnostics.Where(d => d.State == "Baseline" && (d.X != 0 || d.Z != 0))
+                .GroupBy(d => (d.X, d.Z, d.Code, d.Target)).Select(g => g.First()))
             {
                 svg.Append(CultureInfo.InvariantCulture, $"<g><path d='M {N(diagnostic.X)} {N(diagnostic.Z - 30)} l 27 50 h -54 Z' fill='#17202a' stroke='white' stroke-width='5'/><text x='{N(diagnostic.X)}' y='{N(diagnostic.Z + 10)}' text-anchor='middle' font-family='sans-serif' font-size='34' fill='white'>!</text><title>{E(diagnostic.Id)}: {E(diagnostic.Message)}</title></g>");
             }

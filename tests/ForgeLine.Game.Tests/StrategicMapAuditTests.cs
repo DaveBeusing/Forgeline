@@ -26,6 +26,9 @@ public sealed class StrategicMapAuditTests
         Assert.Contains(first.Routes, r => r.State == "Baseline" && r.TargetKind == "Resource" && r.AccessibleDistanceMeters > 0);
         Assert.Contains(first.Routes, r => r.State == "AllCrossingsClosed" && r.TargetKind == "Start" && r.AccessibleDistanceMeters is null);
         Assert.NotEqual("Fair", first.Verdict);
+        Assert.All(first.Diagnostics.Where(d => d.State == "Baseline" && d.Code == "ExpansionDistance"),
+            diagnostic => Assert.Contains(composition.Battlefield.Resources, r => r.Contested &&
+                r.Center.X == diagnostic.X && r.Center.Z == diagnostic.Z));
     }
 
     [Fact]
