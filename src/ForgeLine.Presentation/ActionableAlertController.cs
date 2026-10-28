@@ -64,7 +64,7 @@ public sealed class ActionableAlertController
     {
         if (_session.IsSpecified && snapshot?.SessionId is { IsSpecified: true } incoming &&
             (incoming.Value < _session.Value || incoming == _session && snapshot.Tick.Value < _tick.Value))
-        { CancelInput(input); ResetTransient(); return default; }
+        { CancelInput(input); _keyPress = input.KeyPressSequence((bindings ?? GameplayBindingRegistry.Default).Key(GameplayAction.NextAlert)); ResetTransient(); return default; }
         _feedbackSeconds = Math.Max(0, _feedbackSeconds - Math.Max(0, seconds));
         if (_feedbackSeconds == 0) Feedback = string.Empty;
         PlatformKey key = (bindings ?? GameplayBindingRegistry.Default).Key(GameplayAction.NextAlert);

@@ -121,6 +121,10 @@ public sealed class OperationalAlertLifecycleTests
         Tap(); Assert.Equal(new EntityId(12, 1), controller.Update(input, snapshot, layout, bindings: registry).Target);
         Tap(); controller.Update(input, snapshot, layout, blocked: true, bindings: registry);
         Assert.False(controller.Update(input, snapshot, layout, bindings: registry).Target.IsValid);
+        Tap();
+        var older = new PresentationSnapshot(new(3), TimeSpan.FromMilliseconds(50), 0, [], sessionId: new(1), playerExperience: experience with { Tick = new(3) }, alerts: alerts);
+        controller.Update(input, older, layout, bindings: registry);
+        Assert.False(controller.Update(input, snapshot, layout, bindings: registry).Target.IsValid);
         void Tap() { input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.N)); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.N)); }
     }
     [Theory]
