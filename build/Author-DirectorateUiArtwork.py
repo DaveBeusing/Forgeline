@@ -342,7 +342,7 @@ def main():
         bindings.extend({'domain':domain,'member':member,'role':role,'availability':'runtime_required'} for member,role in mapping.items())
     for domain,path,mapping in [
         ('MainMenuCommand','src/ForgeLine.UI/MainMenuModel.cs',{'Continue':'utility.play','NewGame':'utility.new_game','LoadGame':'utility.load','Settings':'utility.settings','Credits':'utility.credits','Exit':'utility.exit','Controls':'utility.controls'}),
-        ('PauseMenuCommand','src/ForgeLine.UI/PauseMenuModel.cs',{'Resume':'utility.play','SaveGame':'utility.save','SaveAndReturnToMenu':'utility.save_return','ReturnToMenu':'utility.return_menu','Controls':'utility.controls','Settings':'utility.settings'}),
+        ('PauseMenuCommand','src/ForgeLine.UI/PauseMenuModel.cs',{'Resume':'utility.play','SaveGame':'utility.save','SaveAndReturnToMenu':'utility.save_return','ReturnToMenu':'utility.return_menu','Controls':'utility.controls','Settings':'utility.settings','RetryPractice':'utility.play'}),
         ('StrategicOverlayMode','src/ForgeLine.Presentation/RtsInformationLayer.cs',{'Logistics':'unit_role.logistics','Supply':'command.supply','Sensors':'unit_role.reconnaissance','Navigation':'utility.overlay','Power':'building_role.power','All':'utility.overlay'}),
         ('FrontendSettingsSection','src/ForgeLine.UI/FrontendInteraction.cs',{'General':'utility.general','Graphics':'utility.display','Audio':'utility.audio','Bindings':'utility.bindings'}),
         ('TacticalTargetingMode','src/ForgeLine.Presentation/RtsTacticalTargetingController.cs',{'Attack':'command.attack','AttackMove':'command.attack_move','Retreat':'command.retreat','FireMission':'command.fire_mission'}),
