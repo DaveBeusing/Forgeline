@@ -48,6 +48,13 @@ internal static class MatchPersistenceValidation
             Require(Enum.IsDefined(command!.Kind) && command.Entities is not null,
                 "Invalid command kind or entity collection.");
             Require(command.Entities!.All(entity => entity.IsValid), "Invalid command entity identity.");
+            if (command.Kind == ReplayCommandKind.Tactical)
+            {
+                Require(Enum.IsDefined(command.TacticalOperation), "Invalid tactical operation.");
+                if (command.TacticalOperation >= PlayerTacticalActionOperation.HoldFire)
+                    Require(payloadSchema >= 12 && command.Issuer.IsSpecified && command.Entities.Length is > 0 and <= 1024,
+                        "Invalid engagement policy command or payload version.");
+            }
             if (command.Kind == ReplayCommandKind.QueuedOrders)
                 Require(payloadSchema >= 11 && command.Issuer.IsSpecified && command.Entities.Length is > 0 and <= QueuedUnitOrders.MaximumUnits &&
                     Enum.IsDefined(command.QueueEdit) && Enum.IsDefined(command.QueueKind) && Enum.IsDefined(command.Formation) &&

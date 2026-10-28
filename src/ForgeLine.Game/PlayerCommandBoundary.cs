@@ -911,6 +911,15 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 _artilleryWeapons!));
     }
 
+    public PlayerCommandSubmissionReceipt SubmitFirePolicy(PlayerId issuer, ReadOnlySpan<EntityId> units,
+        ForgeLine.Combat.FirePolicy policy, SimulationTick observedTick)
+    {
+        RequireTacticalServices();
+        return SubmitTacticalAction(PlayerCommandKind.Tactical, issuer, observedTick,
+            PlayerTacticalActionCommand.SetFirePolicy(issuer, units, policy, observedTick,
+                _intelligence!, _weapons!, _artilleryWeapons!));
+    }
+
     public PlayerCommandSubmissionReceipt SubmitHoldPosition(
         PlayerId issuer,
         ReadOnlySpan<EntityId> units,
