@@ -1624,10 +1624,10 @@ public sealed class SkirmishProductionPolicyTests
 
 
     [Theory]
-    [InlineData(OpponentDifficultyId.Easy)]
-    [InlineData(OpponentDifficultyId.Standard)]
-    [InlineData(OpponentDifficultyId.Hard)]
-    public void MissingCargoTruckPreemptsBlockedCombatProduction(OpponentDifficultyId difficulty)
+    [InlineData(OpponentDifficultyId.Easy, 0)]
+    [InlineData(OpponentDifficultyId.Standard, 1)]
+    [InlineData(OpponentDifficultyId.Hard, 1)]
+    public void MissingCargoTruckPreemptsBlockedCombatProduction(OpponentDifficultyId difficulty, int expectedPendingTanks)
     {
         MatchScenarioSettings validation =
             CentralDivideScenario.CreateSettings(
@@ -1854,11 +1854,9 @@ public sealed class SkirmishProductionPolicyTests
                     UnitIds.CargoTruck &&
                 request.Priority ==
                     ProductionPriority.High);
-        Assert.Single(
-            live,
-            request =>
-                request.UnitId ==
-                    UnitIds.MainBattleTank);
+        // Easy has one paid queue slot: recovery owns it. Deeper profiles retain one pending tank.
+        Assert.Equal(expectedPendingTanks, live.Count(request => request.UnitId == UnitIds.MainBattleTank));
+        Assert.InRange(live.Count, 1, OpponentDifficultyProfiles.Get(difficulty).Configuration.MaximumQueuedUnitsPerFacility);
     }
 
 
