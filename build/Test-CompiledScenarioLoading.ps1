@@ -18,7 +18,7 @@ foreach ($key in @('central-divide.directorate.v1', 'split-basin.directorate.v1'
     Invoke-Headless @('--load-input', $save)
     Invoke-Headless @('--replay-input', $replay)
     $savedPayload = (Get-Content -LiteralPath $save -Raw | ConvertFrom-Json).Payload | ConvertFrom-Json
-    if ($savedPayload.SchemaVersion -ne 8 -or $savedPayload.Configuration.CompositionKey -ne $key -or
+    if ($savedPayload.SchemaVersion -ne 11 -or $savedPayload.Configuration.CompositionKey -ne $key -or
         $savedPayload.Configuration.Identity.MapSha256.Length -ne 64 -or $savedPayload.Configuration.Identity.ContentSha256.Length -ne 64) {
         throw 'The headless save did not preserve the complete registered scenario identity.'
     }
