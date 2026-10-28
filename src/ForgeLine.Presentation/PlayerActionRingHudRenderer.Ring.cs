@@ -207,6 +207,16 @@ internal sealed partial class PlayerActionRingHudRenderer
                 }
                 else value.Append(" / IDLE");
             }
+            else if (item && panel.Mode == PlayerActionPanelMode.Tactical)
+            {
+                var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, target.ItemIndex, actions,
+                    panel.ContextualPending && panel.ContextualActivationTick == actions?.Tick);
+                value.Append(state.CanActivate
+                    ? (target.ItemIndex < 8
+                        ? (panel.Bindings ?? GameplayBindingRegistry.Default).TacticalShortcut(target.ItemIndex)
+                        : (panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(GameplayAction.Activate))
+                    : state.DisabledReason);
+            }
             else if (item)
             {
                 var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, target.ItemIndex, actions,

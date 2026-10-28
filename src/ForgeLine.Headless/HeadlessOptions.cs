@@ -29,6 +29,7 @@ internal readonly record struct HeadlessOptions(
 {
     public string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
     public string? ScenarioRoot { get; init; }
+    public string? PacingThresholdsInput { get; init; }
     public string? DeveloperPresetInput { get; init; }
     public string? ReproductionId { get; init; }
     public string? ReproductionOutput { get; init; }
@@ -63,6 +64,7 @@ internal readonly record struct HeadlessOptions(
         string? replayInput = null;
         bool showHelp = false;
         string? scenarioRoot = null;
+        string? pacingThresholdsInput = null;
         string scenarioKey = CentralDivideScenario.CompositionKey;
         string? developerPresetInput = null;
         string? reproductionId = null;
@@ -81,6 +83,10 @@ internal readonly record struct HeadlessOptions(
                     scenario = ParseScenario(selected);
                     scenarioKey = selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
                         ? SplitBasinBattlefield.CompositionKey : CentralDivideScenario.CompositionKey;
+                    break;
+
+                case "--pacing-thresholds":
+                    pacingThresholdsInput = GetValue(args, ref index, argument);
                     break;
 
                 case "--scenario-root":
@@ -236,6 +242,13 @@ internal readonly record struct HeadlessOptions(
 
         if (!showHelp)
         {
+            if (pacingThresholdsInput is not null && telemetryOutput is not null &&
+                string.Equals(Path.GetFullPath(pacingThresholdsInput), Path.GetFullPath(telemetryOutput), StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Pacing thresholds and telemetry output must use different paths.");
+            if (pacingThresholdsInput is not null && telemetryOutput is null)
+                throw new ArgumentException("--pacing-thresholds requires --telemetry-output.");
+            if (telemetryOutput is not null && matchCount > 128)
+                throw new ArgumentException("Telemetry benchmark batches support at most 128 matches.");
             if (scenarioRoot is not null && scenario != HeadlessScenarioKind.Match)
                 throw new ArgumentException("--scenario-root requires a registered match scenario.");
             ValidateCombination(
@@ -273,7 +286,7 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey,
+            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey, PacingThresholdsInput = pacingThresholdsInput,
                 DeveloperPresetInput = developerPresetInput, ReproductionId = reproductionId, ReproductionOutput = reproductionOutput,
                 ScenarioWasSpecified = scenarioWasSpecified, ProfileWasSpecified = profileWasSpecified, SeedWasSpecified = seedWasSpecified };
     }
