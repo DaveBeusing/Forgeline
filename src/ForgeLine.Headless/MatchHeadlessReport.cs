@@ -103,6 +103,9 @@ internal sealed record MatchExecutionReport(
     double TotalArtilleryAmmunitionConsumed,
     IReadOnlyList<MatchParticipantReport> Participants)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<OpponentDecisionDiagnostic>? OpponentDecisions { get; init; }
+
     public IReadOnlyList<ConveyorOwnedPiece> Conveyors { get; init; } = Array.Empty<ConveyorOwnedPiece>();
     public static MatchExecutionReport Capture(
         int matchIndex,
@@ -160,6 +163,7 @@ internal sealed record MatchExecutionReport(
             scenario.MatchConfiguration.Participants.Select(participant =>
                 CaptureSide(scenario, scenario.GetBase(participant.Player))).ToArray())
         {
+            OpponentDecisions = scenario.Opponents.DebugCaptureEnabled ? scenario.Opponents.CaptureQualificationDecisions() : null,
             Conveyors=scenario.MatchConfiguration.Participants.OrderBy(p=>p.Player.Value).SelectMany(p=>
                 ConveyorConstructionService.Capture(scenario.Simulation.Entities,p.Player,scenario.Inventories)).ToArray()
         };

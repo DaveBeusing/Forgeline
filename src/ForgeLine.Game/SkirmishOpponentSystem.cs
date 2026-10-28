@@ -56,6 +56,8 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     private readonly SkirmishRaidPlanner? _raids;
     private readonly SkirmishResearchPlanner? _research;
 
+    private SimulationTick _qualificationTick;
+
     private long _executions;
     private long _ownedStateCaptures;
     private long _intelligenceCaptures;
@@ -117,6 +119,11 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     public IReadOnlyList<SkirmishOpponentDebugReadModel> DebugSnapshot =>
         _debug;
 
+    public IReadOnlyList<OpponentDecisionDiagnostic> CaptureQualificationDecisions() =>
+        !DebugCaptureEnabled ? Array.Empty<OpponentDecisionDiagnostic>() :
+        Array.AsReadOnly(_debug.OrderBy(d => d.Player.Value).Take(16)
+            .Select(d => OpponentDecisionDiagnostic.From(d, ResolveConfiguration(d.Player), _qualificationTick)).ToArray());
+
     public SkirmishOpponentWorkMetrics WorkMetrics =>
         new(
             _executions,
@@ -133,6 +140,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        _qualificationTick = context.Tick;
         _executions++;
         _controllers.Clear();
         _debug.Clear();
