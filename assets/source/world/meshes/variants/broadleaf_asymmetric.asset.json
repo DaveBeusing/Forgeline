@@ -1,10 +1,10 @@
 {
   "collisionReference": "mesh.world.kit.collision_rooted",
   "collisionRequired": true,
-  "id": "mesh.world.vegetation.broadleaf_asymmetric",
+  "id": "mesh.world.environment.broadleaf_asymmetric",
   "lods": [
     {
-      "assetId": "mesh.world.vegetation.broadleaf_asymmetric_lod1",
+      "assetId": "mesh.world.environment.broadleaf_asymmetric_lod1",
       "level": 1,
       "maxDistance": 190
     }

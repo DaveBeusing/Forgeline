@@ -45,6 +45,10 @@ def run(source, output):
     for path in sorted(source.rglob('*.asset.json')):
         d = json.loads(path.read_text(encoding='utf-8-sig'))
         require(d['id'] not in definitions, 'Duplicate source ID')
+        sidecar=path.with_name(path.name.replace('.asset.json','.scatter.json'))
+        if sidecar.is_file():
+            require('scatter' not in d,'Duplicate scatter declaration')
+            d['scatter']=json.loads(sidecar.read_text())
         definitions[d['id']] = (path,d)
     report = []
     for variant in recipe['variants']:

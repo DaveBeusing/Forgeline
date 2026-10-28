@@ -7,7 +7,16 @@ Runtime lookup needs only the compiled catalog and containers.
 
 ## Families and form kit
 
-All four existing vegetation and 22 prop roots have recommendations. Original
+All four existing vegetation and 22 prop roots have adjacent *.scatter.json
+recommendations. Their original *.asset.json files remain byte-identical to
+the integration base so retained native-source signatures stay valid. The
+compiler admits one inline or adjacent scatter declaration, rejects orphan or
+duplicate sidecars, caps sidecars at 16 KiB and includes them in the source hash.
+Sidecar changes invalidate cached runtime metadata without touching originals.
+The original retained-prop/vegetation validators and lineage hashes are unchanged.
+The first PR head failed the strict retained-prop roster check; sidecars and the
+separate environment namespace correct that conflict without relaxing its gate.
+The physical PBR inventory explicitly includes the new environment namespace. Original
 mesh IDs, source bindings, materials, LOD distances and collision proxies remain
 unchanged. Three additional forms each provide High/Reduced source GLBs:
 
@@ -16,6 +25,9 @@ unchanged. Three additional forms each provide High/Reduced source GLBs:
 | conifer | conifer_swept | 80 / 48 |
 | broadleaf | broadleaf_asymmetric | 624 / 152 |
 | rock | rock_leaning | 16 / 12 |
+
+All six new IDs use mesh.world.environment.<variant>[_lod1], outside the
+sealed original vegetation/prop rosters.
 
 These are original deformations of the corresponding existing ForgeLine source
 geometry. `build/environment-variants/variants.json` is the editable recipe;

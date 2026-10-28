@@ -1,5 +1,5 @@
 {
-  "id": "mesh.world.vegetation.conifer_swept_lod1",
+  "id": "mesh.world.environment.conifer_swept_lod1",
   "materialReferences": [
     "material.world.vegetation"
   ],

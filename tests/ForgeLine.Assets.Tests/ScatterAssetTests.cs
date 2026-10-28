@@ -62,6 +62,7 @@ public sealed class ScatterAssetTests
                 meshes = new[] { new { primitives = new[] { new { attributes = new { POSITION = 0 } } } } },
             }));
             WriteDefinition(Metadata);
+            byte[] originalDefinition = File.ReadAllBytes(Path.Combine(source, "plant.asset.json"));
             var first = AssetPipelineCompiler.Compile(source, runtime, clean: true);
             Assert.True(first.Success, string.Join("; ", first.Diagnostics.Select(d => d.Message)));
             var catalog = RuntimeAssetCatalog.Load(runtime);
@@ -71,8 +72,14 @@ public sealed class ScatterAssetTests
             Assert.Equal(signature, RuntimeAssetCatalog.Load(runtime).Manifest.ContentSignature);
 
             WriteDefinition(Metadata with { MinimumSpacingMeters = 8 });
+            Assert.Equal(originalDefinition, File.ReadAllBytes(Path.Combine(source, "plant.asset.json")));
             Assert.True(AssetPipelineCompiler.Compile(source, runtime).Success);
             Assert.NotEqual(signature, RuntimeAssetCatalog.Load(runtime).Manifest.ContentSignature);
+            File.WriteAllText(Path.Combine(source, "orphan.scatter.json"), "{}");
+            var orphan = AssetPipelineCompiler.Compile(source, runtime);
+            Assert.False(orphan.Success);
+            Assert.Contains(orphan.Diagnostics, d => d.Code == "ASSET052");
+            File.Delete(Path.Combine(source, "orphan.scatter.json"));
             Directory.Delete(source, recursive: true);
             catalog = RuntimeAssetCatalog.LoadCancellable(runtime, CancellationToken.None, requireIntegrity: true);
             var record = catalog.Get(AssetId.Parse("mesh.test.plant"));
@@ -82,9 +89,14 @@ public sealed class ScatterAssetTests
             Assert.NotEmpty(catalog.Read(AssetId.Parse(record.Id)).Payload);
             Assert.True(RuntimeAssetQualification.Run(runtime, requireIntegrity: true).Success);
 
-            void WriteDefinition(ScatterAssetMetadata metadata) => File.WriteAllText(Path.Combine(source, "plant.asset.json"),
-                JsonSerializer.Serialize(new SourceAssetDefinition { Id = "mesh.test.plant", Type = RuntimeAssetType.Mesh,
-                    Source = "plant.gltf", Scatter = metadata }, RuntimeAssetCatalog.CreateJsonOptions()));
+            void WriteDefinition(ScatterAssetMetadata metadata)
+            {
+                File.WriteAllText(Path.Combine(source, "plant.asset.json"),
+                    JsonSerializer.Serialize(new SourceAssetDefinition { Id = "mesh.test.plant", Type = RuntimeAssetType.Mesh,
+                        Source = "plant.gltf" }, RuntimeAssetCatalog.CreateJsonOptions()));
+                File.WriteAllText(Path.Combine(source, "plant.scatter.json"),
+                    JsonSerializer.Serialize(metadata, RuntimeAssetCatalog.CreateJsonOptions()));
+            }
         }
         finally { Directory.Delete(root, recursive: true); }
     }

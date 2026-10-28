@@ -1,8 +1,8 @@
 {
-  "id": "mesh.world.prop.rock_leaning",
+  "id": "mesh.world.environment.rock_leaning",
   "lods": [
     {
-      "assetId": "mesh.world.prop.rock_leaning_lod1",
+      "assetId": "mesh.world.environment.rock_leaning_lod1",
       "level": 1,
       "maxDistance": 220
     }

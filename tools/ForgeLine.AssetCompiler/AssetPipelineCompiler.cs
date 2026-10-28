@@ -187,6 +187,9 @@ public static class AssetPipelineCompiler
         List<AssetCompilerDiagnostic> diagnostics)
     {
         var nodes = new Dictionary<AssetId, AssetNode>();
+        foreach (string sidecar in Directory.EnumerateFiles(sourceRoot, "*.scatter.json", SearchOption.AllDirectories).Order(StringComparer.Ordinal))
+            if (!File.Exists(sidecar[..^".scatter.json".Length] + ".asset.json"))
+                diagnostics.Add(new("ASSET052", AssetCompilerDiagnosticSeverity.Error, "Scatter sidecar has no owning asset definition.", SourcePath: ToRelativePath(sourceRoot, sidecar)));
 
         foreach (var definitionPath in Directory
                      .EnumerateFiles(sourceRoot, "*.asset.json", SearchOption.AllDirectories)
@@ -217,6 +220,23 @@ public static class AssetPipelineCompiler
                     "Asset definition is empty.",
                     SourcePath: ToRelativePath(sourceRoot, definitionPath)));
                 continue;
+            }
+
+            string scatterPath = definitionPath[..^".asset.json".Length] + ".scatter.json";
+            if (File.Exists(scatterPath))
+            {
+                try
+                {
+                    if (definition.Scatter is not null || new FileInfo(scatterPath).Length > 16384)
+                        throw new InvalidDataException("Use one scatter declaration per asset, at most 16 KiB.");
+                    definition = definition with { Scatter = JsonSerializer.Deserialize<ScatterAssetMetadata>(File.ReadAllText(scatterPath), JsonOptions)
+                        ?? throw new InvalidDataException("Scatter sidecar is null.") };
+                }
+                catch (Exception exception) when (exception is IOException or JsonException or InvalidDataException or UnauthorizedAccessException)
+                {
+                    diagnostics.Add(new("ASSET052", AssetCompilerDiagnosticSeverity.Error, exception.Message, definition.Id, ToRelativePath(sourceRoot, scatterPath)));
+                    continue;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(definition.Source))

@@ -1,5 +1,5 @@
 {
-  "id": "mesh.world.vegetation.broadleaf_asymmetric_lod1",
+  "id": "mesh.world.environment.broadleaf_asymmetric_lod1",
   "materialReferences": [
     "material.world.vegetation"
   ],

@@ -1,5 +1,5 @@
 {
-  "id": "mesh.world.prop.rock_leaning_lod1",
+  "id": "mesh.world.environment.rock_leaning_lod1",
   "materialReferences": [
     "material.world.prop.industrial"
   ],
