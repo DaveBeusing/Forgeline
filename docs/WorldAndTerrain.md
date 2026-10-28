@@ -209,3 +209,10 @@ The canonical definition can be captured as a versioned `BattlefieldMapArtifact`
 Central Divide now has a presentation layer above the simulation-owned chunked heightfield. Eight stable terrain material slots, nine reusable terrain texture sources, map-specific blend regions, reusable world objects, decals, and vegetation are defined without adding render material state to `TerrainWorld` or `TerrainChunk`.
 
 Terrain GPU resources use compiled runtime materials and resident per-chunk geometry/control textures. A visible chunk submits one indexed draw with a fixed 13-texture binding budget. Central Divide retains all 144 CPU chunks; production GPU residency covers required chunks within its configured bound. Eager mode retains all 144 control textures at 33×33 plus mips. Material textures remain shared through the runtime cache. Props and vegetation use compiled assets, shared mesh buffers, distance-selected LODs and batched indexed instances. See [World Asset Presentation](WorldAssetPresentation.md) for authoring and [World environment rendering](WorldEnvironmentRendering.md) for residency and vegetation admission.
+
+## Deterministic generation contracts
+
+[Deterministic world generation](DeterministicWorldGeneration.md) defines the separate
+versioned seed recipe, global integer sample lattice, independent domain sequences,
+canonical gameplay/decoration identities and headless result boundary. These contracts
+do not generate or replace the existing authored terrain recipes or compiled maps.
