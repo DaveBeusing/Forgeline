@@ -82,6 +82,9 @@ public sealed record RuntimeAssetRecord
 
     public IReadOnlyList<MechanicalMeshPart> MechanicalParts { get; init; } = [];
 
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ScatterAssetMetadata? Scatter { get; init; }
+
     public AssetBounds? Bounds { get; init; }
 }
 

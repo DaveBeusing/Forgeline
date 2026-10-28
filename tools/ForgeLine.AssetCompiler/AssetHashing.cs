@@ -15,6 +15,12 @@ internal static class AssetHashing
         if (inputBytes > maximumInputBytes) throw new InvalidDataException("Asset source exceeds bounded input size.");
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         AppendFile(hash, definitionPath);
+        string scatterPath = definitionPath[..^".asset.json".Length] + ".scatter.json";
+        if (File.Exists(scatterPath))
+        {
+            if (new FileInfo(scatterPath).Length > 16384) throw new InvalidDataException("Scatter sidecar exceeds 16 KiB.");
+            AppendFile(hash, scatterPath);
+        }
         AppendFile(hash, sourcePath);
 
         if (Path.GetExtension(sourcePath).Equals(".gltf", StringComparison.OrdinalIgnoreCase))

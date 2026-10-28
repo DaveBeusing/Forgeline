@@ -5,7 +5,7 @@ namespace ForgeLine.AssetCompiler;
 
 public static class AssetPipelineCompiler
 {
-    public const string CompilerVersion = "1.12.2";
+    public const string CompilerVersion = "1.13.0";
     public const int RuntimeVersion = RuntimeAssetIntegrity.SupportedRuntimeVersion;
 
     private static readonly JsonSerializerOptions JsonOptions = RuntimeAssetCatalog.CreateJsonOptions();
@@ -187,6 +187,9 @@ public static class AssetPipelineCompiler
         List<AssetCompilerDiagnostic> diagnostics)
     {
         var nodes = new Dictionary<AssetId, AssetNode>();
+        foreach (string sidecar in Directory.EnumerateFiles(sourceRoot, "*.scatter.json", SearchOption.AllDirectories).Order(StringComparer.Ordinal))
+            if (!File.Exists(sidecar[..^".scatter.json".Length] + ".asset.json"))
+                diagnostics.Add(new("ASSET052", AssetCompilerDiagnosticSeverity.Error, "Scatter sidecar has no owning asset definition.", SourcePath: ToRelativePath(sourceRoot, sidecar)));
 
         foreach (var definitionPath in Directory
                      .EnumerateFiles(sourceRoot, "*.asset.json", SearchOption.AllDirectories)
@@ -217,6 +220,23 @@ public static class AssetPipelineCompiler
                     "Asset definition is empty.",
                     SourcePath: ToRelativePath(sourceRoot, definitionPath)));
                 continue;
+            }
+
+            string scatterPath = definitionPath[..^".asset.json".Length] + ".scatter.json";
+            if (File.Exists(scatterPath))
+            {
+                try
+                {
+                    if (definition.Scatter is not null || new FileInfo(scatterPath).Length > 16384)
+                        throw new InvalidDataException("Use one scatter declaration per asset, at most 16 KiB.");
+                    definition = definition with { Scatter = JsonSerializer.Deserialize<ScatterAssetMetadata>(File.ReadAllText(scatterPath), JsonOptions)
+                        ?? throw new InvalidDataException("Scatter sidecar is null.") };
+                }
+                catch (Exception exception) when (exception is IOException or JsonException or InvalidDataException or UnauthorizedAccessException)
+                {
+                    diagnostics.Add(new("ASSET052", AssetCompilerDiagnosticSeverity.Error, exception.Message, definition.Id, ToRelativePath(sourceRoot, scatterPath)));
+                    continue;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(definition.Source))
@@ -322,6 +342,11 @@ public static class AssetPipelineCompiler
             definition.SkeletalAnimation && definition.Type != RuntimeAssetType.Animation || definition.AnimationClip is not null && definition.Type != RuntimeAssetType.Animation ||
             definition.Type != RuntimeAssetType.Skin && definition.SkinSockets.Count > 0)
             diagnostics.Add(new("ASSET051", AssetCompilerDiagnosticSeverity.Error, "Skin/clip metadata is null or attached to an incompatible asset type.", id.Value));
+        try { ScatterAssetValidation.Validate(definition.Scatter, definition.Type); }
+        catch (InvalidDataException exception)
+        {
+            diagnostics.Add(new("ASSET052", AssetCompilerDiagnosticSeverity.Error, exception.Message, id.Value));
+        }
         var extension = Path.GetExtension(sourcePath).ToLowerInvariant();
         var validExtension = definition.Type switch
         {
@@ -530,6 +555,8 @@ public static class AssetPipelineCompiler
         List<AssetCompilerDiagnostic> diagnostics)
     {
         var rawDependencies = new List<string>();
+        if (definition.Scatter is { } scatter && scatter.FamilyId != definition.Id && AssetId.TryParse(scatter.FamilyId, out _))
+            rawDependencies.Add(scatter.FamilyId);
         rawDependencies.AddRange(definition.Dependencies);
         if (definition.SkinReference is not null) rawDependencies.Add(definition.SkinReference);
         rawDependencies.AddRange(definition.AnimationReferences);
@@ -1033,6 +1060,7 @@ public static class AssetPipelineCompiler
             textureReferences = textureReferences.Concat(MaterialImporter.ReadDependencies(node.SourcePath));
         }
 
+        ScatterAssetValidation.Validate(node.Definition.Scatter, node.Definition.Type, bounds);
         return new RuntimeAssetRecord
         {
             Id = node.Id.Value,
@@ -1061,6 +1089,7 @@ public static class AssetPipelineCompiler
                 .OrderBy(static socket => socket.Name, StringComparer.Ordinal)
                 .ToArray(),
             Bounds = bounds,
+            Scatter = node.Definition.Scatter,
         };
     }
 

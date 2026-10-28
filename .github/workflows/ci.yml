@@ -359,6 +359,9 @@ jobs:
       - name: Production catalog and render usage contracts
         run: dotnet test --project tests/ForgeLine.Assets.Tests/ForgeLine.Assets.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Assets.Tests.ProductionAssetCatalogContractTests ForgeLine.Assets.Tests.ProductionMeshUsageTests ForgeLine.Assets.Tests.ProductionAssetMaterialCompletenessTests ForgeLine.Assets.Tests.DirectorateBuildingAssetAuthoringTests ForgeLine.Assets.Tests.DirectorateUnitAssetAuthoringTests ForgeLine.Assets.Tests.WorldAssetAuthoringTests ForgeLine.Assets.Tests.RtsUiAssetAuthoringTests ForgeLine.Assets.Tests.VfxAssetAuthoringTests --parallel none
 
+      - name: Environment variant source contracts
+        run: python -m unittest discover -s build/environment-variants -p 'test_*.py' -v
+
       - name: Runtime asset process contracts
         shell: pwsh
         run: ./build/Test-RuntimeAssetPipeline.ps1
