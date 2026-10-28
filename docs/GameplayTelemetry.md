@@ -209,3 +209,7 @@ force assessment. This avoids a previous Single() crash in telemetry-only runs.
 Normal Gameplay measurements use Standard starting stock and the unchanged
 Gameplay opponent/configuration values. Validation retains its separate stock,
 parameters and terminal gate. Neither profile's success substitutes for the other.
+
+## Bounded player after-action report
+
+The terminal client and explicit headless --debrief-output path share a player-scoped first/latest summary independent of offline all-player telemetry. The result remains authoritative; unavailable historical causes, battle/contact/territory evidence and safe map coordinates are stated explicitly. See [debrief controls, schema, privacy and qualification](AfterActionStrategicDebrief.md).
