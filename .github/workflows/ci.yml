@@ -64,6 +64,9 @@ jobs:
         shell: pwsh
         run: ./build/Validate-ProjectReferences.ps1
 
+      - name: Deterministic world generation contracts
+        run: dotnet test --project tests/ForgeLine.World.Tests/ForgeLine.World.Tests.csproj --configuration Release --no-restore
+
       - name: Validate bundled UI font resources
         shell: pwsh
         run: ./build/Validate-UiFonts.ps1
