@@ -51,6 +51,11 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
         _count = 0; _line = 0;
         _scale = OperationsLayout.Scale(context.Layout);
         _bounds = OperationsLayout.Panel(context.Layout);
+        if (context.PreAlphaUx.Debrief is { } debrief && debrief.IsCurrent(context.Snapshot))
+        {
+            _motion.Update(false, context.Snapshot.SessionId, context.Layout, context.PresentationTime, false);
+            RenderDebrief(context, debrief); Flush(context); return;
+        }
         bool panelVisible = context.Operations.Open && !context.Operations.Suppressed &&
             context.Operations.Session == context.Snapshot.SessionId;
         bool activePresentation = context.AnimateOperations && !context.PreAlphaUx.Placement.Visible;
@@ -247,6 +252,10 @@ internal sealed partial class OperationsHudSurface : IGameplayHudSurface
                 }
             }
         }
+        Flush(context);
+    }
+    private void Flush(in GameplayHudRenderContext context)
+    {
         if (_count == 0 && _skin.Vertices == 0 && _text.VertexCount == 0) return;
         IGraphicsBuffer? frameBuffer = null;
         if (_count > 0)

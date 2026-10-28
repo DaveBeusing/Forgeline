@@ -88,6 +88,17 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Bounded player debrief and resilient result controls
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.MatchDebriefTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MatchDebriefTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientDebriefStoreTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-MatchDebrief.ps1
+
       - name: Strategic logistics capacity and legal Operations drilldown
         shell: pwsh
         run: |

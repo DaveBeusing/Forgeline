@@ -316,3 +316,7 @@ The presentation alert view retains one bounded identity per session/player/cond
 ## Gameplay prompt discovery
 
 Settings exposes supported gameplay shortcuts with conflict feedback before APPLY. Active-session help, command cards and early-game guidance share the saved mapping; gameplay-binding changes restart the frontend session before starting a match. The guide stays advisory and continues to observe only authorized completed-tick progress. Fixed mouse/group/help controls remain available. See [gameplay binding behavior](GameplayInputAccessibilityAndQualification.md).
+
+## Bounded player after-action report
+
+The terminal client and explicit headless --debrief-output path share a player-scoped first/latest summary independent of offline all-player telemetry. The result remains authoritative; unavailable historical causes, battle/contact/territory evidence and safe map coordinates are stated explicitly. See [debrief controls, schema, privacy and qualification](AfterActionStrategicDebrief.md).

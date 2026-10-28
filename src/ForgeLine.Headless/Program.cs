@@ -231,6 +231,8 @@ internal static class Program
                 CentralDivideScenario.Create(
                     runtimeSettings,
                     cancellationToken);
+            if (options.DebriefOutput is not null && !scenario.MatchConfiguration.Participants.Any(p => p.Player.Value == options.DebriefPlayer))
+                throw new ArgumentException("The requested debrief player is not a configured participant.");
             GameplayTelemetryCollector? telemetry =
                 options.TelemetryOutput is not null
                     ? new GameplayTelemetryCollector(
@@ -291,6 +293,12 @@ internal static class Program
                     matchStopwatch.Elapsed,
                     scenario);
             reports.Add(report);
+
+            if (options.DebriefOutput is { } debriefOutput)
+            {
+                MatchDebriefSerializer.Write(debriefOutput, MatchDebriefCapture.Capture(scenario, scenario.MatchConfiguration.Participants.First(p => p.Player.Value == options.DebriefPlayer).Player));
+                Console.WriteLine("Player debrief: " + Path.GetFullPath(debriefOutput));
+            }
 
             if (telemetry is not null)
             {
@@ -701,6 +709,8 @@ internal static class Program
         writer.WriteLine("  --matches <count>            Fresh match matches to execute (default: 1).");
         writer.WriteLine("  --require-terminal           Fail if a match does not end within the tick budget.");
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
+        writer.WriteLine("  --debrief-output <path>      Write one bounded player-scoped first/latest match summary.");
+        writer.WriteLine("  --debrief-player <id>        Configured summary owner (default 1); requires --debrief-output.");
         writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
         writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
         writer.WriteLine("  --pacing-thresholds <json>  Advisory logical-time pacing limits; requires telemetry output.");

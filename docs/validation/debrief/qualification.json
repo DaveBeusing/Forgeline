@@ -1,0 +1,612 @@
+{
+  "Version": "0.1.507-dev\u002Bd1bb676d7d779bae4ef5d943a0305e3115b79e66",
+  "ClientSha256": "6466768245A53EA5A3E05F458728032F4A53B25627739718D79DD691AEF41D32",
+  "PresentationSha256": "816899610B6523E89E3F9CC387C1CEF7F6A6F2631818C139DACFAD215FAB3F0E",
+  "GameSha256": "4A172F37721F7E95690F6AEAF4B86874EA5EE4D4D090CEA10BE1795A173FA555",
+  "Fixture": "FEC403C8D79C176E2BA0956A71E7BCE7F93863A3B2C56A4307E61D78CEA9464F",
+  "Device": {
+    "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "DedicatedVideoMemoryBytes": 25309478912,
+    "IsSoftwareAdapter": false,
+    "FeatureLevel": "Level_12_1",
+    "DebugLayerEnabled": false,
+    "Advanced": {
+      "MeshShaderQuerySucceeded": true,
+      "MeshShadersSupported": true,
+      "RaytracingQuerySucceeded": true,
+      "RaytracingSupported": true
+    }
+  },
+  "WindowDpi": 240,
+  "Contract": "Authored player-owned bounded first/latest summaries over the native battlefield fixture. Not a natural match, approved golden, physical-input or monitor certification. Real result authority is covered by lifecycle integration tests.",
+  "Cases": [
+    {
+      "State": "Timeline",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Timeline-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "DE83EB22A40217EDE4F57E52389EA612DBB79EF5CADF9885319DEAFB2DD3E497",
+      "HudVertices": 61170,
+      "Text": {
+        "Glyphs": 681,
+        "Vertices": 4086,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130752,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Details",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Details-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "AE4F60A8DAD015C3A0B01243B619889752BBAA0B1ACBF6D8461E976F7F8F582B",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 678,
+        "Vertices": 4068,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130176,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Coverage",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Coverage-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "AC5CFA26BF9D0718C7A5A66E016D1EA1B0CE0900DAF3933F0F6724E1911B854C",
+      "HudVertices": 61194,
+      "Text": {
+        "Glyphs": 685,
+        "Vertices": 4110,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131520,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "EmptyForces",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "EmptyForces-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "12E6EB35402CA0D9A23DAFEAA8544BF98246B15A68F33AD9EC1FBC31E4496B7E",
+      "HudVertices": 60318,
+      "Text": {
+        "Glyphs": 539,
+        "Vertices": 3234,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 103488,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Missing",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Missing-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "F5EBE4E57E1C6EC8B6F170D8396DDDD20D5E617FBA53414D55605F9C6D9EC6B3",
+      "HudVertices": 60102,
+      "Text": {
+        "Glyphs": 503,
+        "Vertices": 3018,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 96576,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Corrupt",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Corrupt-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "F545FE8E242283883A44B2CB46050223B9C850554860097DE2E58431DA5304F4",
+      "HudVertices": 61182,
+      "Text": {
+        "Glyphs": 683,
+        "Vertices": 4098,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131136,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Saved",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Image": "Saved-1280x720-96dpi-1.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "27B20DA538559C6639F9CBE3B3251FB8496A3CDA68BF6D5727F44C090CE86554",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 679,
+        "Vertices": 4074,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130368,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Timeline",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Timeline-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "41CC707B8DCA2EE014DBB42992C7635AFB97F1AE72542FFF1C3EDA7C830C57A2",
+      "HudVertices": 61170,
+      "Text": {
+        "Glyphs": 681,
+        "Vertices": 4086,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130752,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Details",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Details-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "02BCCF3EFA2184B1BCF954E4F9E28C6744237F7EABD087032469107E733C8DC5",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 678,
+        "Vertices": 4068,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130176,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Coverage",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Coverage-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "0231FD24350358181734BD72416C25C9EFE6470BA7394CC4D626BA626A70B10F",
+      "HudVertices": 61194,
+      "Text": {
+        "Glyphs": 685,
+        "Vertices": 4110,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131520,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "EmptyForces",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "EmptyForces-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "D14CB5A83E7915082F727AA3A85437DC972486C80B451F699F70709BBC930ABF",
+      "HudVertices": 60318,
+      "Text": {
+        "Glyphs": 539,
+        "Vertices": 3234,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 103488,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Missing",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Missing-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "00C1134FF68FC06F7D891BD683BF03F0A72F1E6E770869C43EC53721E1F78536",
+      "HudVertices": 60102,
+      "Text": {
+        "Glyphs": 503,
+        "Vertices": 3018,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 96576,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Corrupt",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Corrupt-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "54FEF37980579C3048B005B7BFC4051E37D82D2EF097608F65495132C2FDB0CA",
+      "HudVertices": 61182,
+      "Text": {
+        "Glyphs": 683,
+        "Vertices": 4098,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131136,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Saved",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 192,
+      "UiScale": 2,
+      "Image": "Saved-1280x720-192dpi-2.00.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "9F41F117453EBAA8C81C2FED6D6D3A0A914FAD02546B96C877C9A3D54AA66D8E",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 679,
+        "Vertices": 4074,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130368,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Timeline",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Timeline-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "02380ADE25D00680B2E81CA374104A1A9CE35EE0DA115DF5BB8CCCB766E9E13C",
+      "HudVertices": 61170,
+      "Text": {
+        "Glyphs": 681,
+        "Vertices": 4086,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130752,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Details",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Details-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "2F6BEC7F3265CAC6E6243E7BE3F24729D2FA511A0F58818A157888246CBF4AD0",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 678,
+        "Vertices": 4068,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130176,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Coverage",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Coverage-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "D66E4A3D2A5A58A8B99B4D562AF372CAB2BFEE6198F973E69C178639AEA3B2C8",
+      "HudVertices": 61194,
+      "Text": {
+        "Glyphs": 685,
+        "Vertices": 4110,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131520,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "EmptyForces",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "EmptyForces-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "3A2B9EFA479F46DECED6FA18C73F8AA9C4EC464810BD8A76FF1D6326E2BA41EA",
+      "HudVertices": 60318,
+      "Text": {
+        "Glyphs": 539,
+        "Vertices": 3234,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 103488,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Missing",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Missing-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "8A9608610EC0F67006BBE71F04D1CB60A87D08A7AD2B381BDDD36D232AFB5F99",
+      "HudVertices": 60102,
+      "Text": {
+        "Glyphs": 503,
+        "Vertices": 3018,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 96576,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Corrupt",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Corrupt-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "D2718AA7BFBA06EF9FA6772EC352265D10525F1B02919FE5CEB678CBE3F8B2AF",
+      "HudVertices": 61182,
+      "Text": {
+        "Glyphs": 683,
+        "Vertices": 4098,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131136,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Saved",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 144,
+      "UiScale": 1.5,
+      "Image": "Saved-1920x1080-144dpi-1.50.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "FE79973FAFFFE24D5886D856A99BCD3812CCA6DA0BF22F76C8F0746C8F2DC28E",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 679,
+        "Vertices": 4074,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130368,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Timeline",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Timeline-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "7AB02B9C19B3AAC31E0EB3E791500AF161DC11FE763DF09456D2418F5A969C4C",
+      "HudVertices": 61170,
+      "Text": {
+        "Glyphs": 681,
+        "Vertices": 4086,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130752,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Details",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Details-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "8C84F23FFF62811790EE1482CDEEB59155F768EA0B4806F8541A331A3EE5DA15",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 678,
+        "Vertices": 4068,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130176,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Coverage",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Coverage-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "0A017E7004A192E7491A5BFBBAA7D39ED6E3E710C6C03C75542A6FE86DDCC0C8",
+      "HudVertices": 61194,
+      "Text": {
+        "Glyphs": 685,
+        "Vertices": 4110,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131520,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "EmptyForces",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "EmptyForces-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "EC181E5AD5AA3418441273332DDBFD26EADF8BF7498670D872C7C2A1BE8DB993",
+      "HudVertices": 60318,
+      "Text": {
+        "Glyphs": 539,
+        "Vertices": 3234,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 103488,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Missing",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Missing-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "EF7D12347F64792EE54B11A483121C4A889DCC037BD4476301A7F139C8E7C98D",
+      "HudVertices": 60102,
+      "Text": {
+        "Glyphs": 503,
+        "Vertices": 3018,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 96576,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Corrupt",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Corrupt-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "9DB2657C968F877B72E8E3AD282C2A66BE37A0635D9994DD3908CE427F352F89",
+      "HudVertices": 61182,
+      "Text": {
+        "Glyphs": 683,
+        "Vertices": 4098,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 131136,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    },
+    {
+      "State": "Saved",
+      "Width": 3440,
+      "Height": 1440,
+      "Dpi": 192,
+      "UiScale": 0.75,
+      "Image": "Saved-3440x1440-192dpi-0.75.png",
+      "Repeatable": true,
+      "ReturnAndRestart": true,
+      "PixelSha256": "09613BA4F3A1213550B44A22321A28A29956421D416EC92F7B3E4912D2C36A4A",
+      "HudVertices": 61158,
+      "Text": {
+        "Glyphs": 679,
+        "Vertices": 4074,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 130368,
+        "AtlasReady": true,
+        "FailureReason": null
+      }
+    }
+  ]
+}

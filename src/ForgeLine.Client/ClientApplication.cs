@@ -423,6 +423,9 @@ internal sealed class ClientApplication
         var combatGroupInput =
             new CombatGroupInputController();
         var operationsController = new OperationsController(_gameplayBindings);
+        var debriefController = new MatchDebriefController(_gameplayBindings);
+        var debriefStore = new ClientDebriefStore(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(_settingsPath))!, "last-match.debrief.json"), LocalPlayer.Value);
+
         var logisticsCapacityInteraction = new StrategicLogisticsCapacityInteraction();
         var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
@@ -836,6 +839,31 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            var debriefLayout = window.ClientSize.IsEmpty ? default : GameplayHudLayout.Create(
+                window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            var debriefInput = debriefController.Update(inputState, inputSnapshot, debriefLayout,
+                blocked: modalFrame || settingsOwnedFrame || !window.IsFocused || window.IsMinimized);
+            if (inputMatchTerminal)
+            {
+                actionPanel.Close(); operationsController.Close(inputState, presentationInteraction);
+                tacticalTargetingController.Cancel(); buildingPlacementController.Cancel(presentationInteraction);
+                if (debriefInput.Save)
+                {
+                    var currentReport = (debriefController.View with { SavedReport = null }).Resolve(inputSnapshot);
+                    debriefController.Feedback(debriefStore.TrySave(currentReport) ? "CURRENT REPORT SAVED" : "REPORT NOT SAVED / RESULT REMAINS AVAILABLE");
+                }
+                if (debriefInput.Load)
+                {
+                    bool debriefLoaded = debriefStore.TryLoad(out var savedReport, out var failure);
+                    debriefController.ShowSaved(debriefLoaded ? savedReport : null,
+                        debriefLoaded ? "SAVED REPORT LOADED / HISTORICAL EVIDENCE" : ClientDebriefStore.Explain(failure));
+                }
+            }
+            if (debriefInput.SuppressTerminalKeys) { restartPressed = false; returnPressed = false; }
+            restartPressed |= debriefInput.Restart; returnPressed |= debriefInput.Return;
+            hudInteraction.CapturePointer(debriefInput.Captured);
+            hudInteraction.CaptureKeyboard(inputMatchTerminal && debriefController.View.Open);
+
             bool menuEscape = transientMenus.ConsumeEscape(inputState, actionPanel, operationsController,
                 presentationInteraction, pauseMenuActive || wasShellBlocking || modalFrame || window.ClientSize.IsEmpty || !window.IsFocused);
             if (menuEscape) returnPressed = false;
@@ -1058,6 +1086,8 @@ internal sealed class ClientApplication
                     false,
                     _settings.ShowOnboarding &&
                     !smokeTest);
+
+            if (inputMatchTerminal) preAlphaUx = preAlphaUx with { Debrief = debriefController.View };
 
             if (inputExperience?.MatchStatus ==
                     PlayerMatchStatus.Ended &&
