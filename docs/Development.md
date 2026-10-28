@@ -1,5 +1,7 @@
 # Development
 
+The [rendering performance work packages](rendering/performance-work-packages/00_Implementation_Order.md) define parallel implementation ownership, dependencies and qualification for instancing, static geometry, interpolation and GPU benchmarks.
+
 The [UI review handbook](UiVisualReview.md) describes bounded native capture and
 resume. [Graphical interface qualification](GraphicalInterfaceQualification.md)
 records executed coverage, package identity and required gates still outstanding.
