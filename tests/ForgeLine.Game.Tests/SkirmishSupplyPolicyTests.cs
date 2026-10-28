@@ -1511,8 +1511,8 @@ public sealed class SkirmishSupplyPolicyTests
             factoryFuel.DesiredMinimum,
             precision: 6);
         Assert.Equal(
-            cargoLost ? 360.0 : DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck].Costs
-                .Single(cost => cost.ResourceId == ResourceIds.Fuel).Quantity,
+            cargoLost ? 360.0 : Math.Max(160.0, DirectorateContent.CreateUnitCatalog()[UnitIds.SupplyTruck].Costs
+                .Single(cost => cost.ResourceId == ResourceIds.Fuel).Quantity),
             factoryFuel.DesiredTarget,
             precision: 6);
         foreach (ResourceId resource in new[] { ResourceIds.Steel, ResourceIds.Electronics })
@@ -1556,7 +1556,7 @@ public sealed class SkirmishSupplyPolicyTests
         entities.AddComponent(smelter, new PowerGenerator(10.0));
         entities.AddComponent(smelter, new PowerConsumer(1.0, PowerPriority.Industrial, enabled: true));
 
-        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        scenario.Simulation.RunTicks(100, TestContext.Current.CancellationToken);
 
         ProductionFacility facility = entities.GetComponent<ProductionFacility>(smelter);
         Assert.Equal(outputStockSatisfied ? ProductionStatus.OutputFull : ProductionStatus.NoInput, facility.Status);

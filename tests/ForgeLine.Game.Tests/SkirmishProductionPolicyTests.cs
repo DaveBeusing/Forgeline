@@ -10,6 +10,30 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishProductionPolicyTests
 {
+    [Fact]
+    public void MechanizedResearchFundingCompetesWithFactoryBuffersAfterGroundSupplyIsEstablished()
+    {
+        var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
+        using var scenario = CentralDivideScenario.Create(settings);
+        var owner = new PlayerId(1);
+        var entities = scenario.Simulation.Entities;
+        EntityId core = scenario.GetBase(owner).CommandCore;
+        entities.AddComponent(core, new PowerGenerator(1000));
+        EntityId foundation = entities.CreateEntity();
+        entities.AddComponent(foundation, new CompletedTechnology(owner, TechnologyIds.IndustrialStandardization, SimulationTick.Zero));
+        var units = DirectorateContent.CreateUnitCatalog();
+        Vector3 home = entities.GetComponent<WorldTransform>(core).Position;
+        scenario.UnitFactory.Create(units[UnitIds.ScoutVehicle], home + Vector3.UnitZ * 100, owner);
+        for (int i = 0; i < settings.OpponentConfigurations[owner.Value].MinimumSupplyTrucks; i++)
+            scenario.UnitFactory.Create(units[UnitIds.SupplyTruck], home + Vector3.UnitZ * (120 + i * 20), owner);
+        for (int i = 0; i < settings.OpponentConfigurations[owner.Value].MinimumObjectivePressureUnits; i++)
+            scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], home + Vector3.UnitZ * (140 + i * 20), owner);
+        scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, core, ResourceIds.Steel).Priority);
+        Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, core, ResourceIds.Electronics).Priority);
+        Assert.False(TechnologyStateQueries.IsCompleted(entities, owner, TechnologyIds.MechanizedSystems));
+    }
+
     [Theory]
     [InlineData(false, 1, 2, LogisticsStockPriority.High)]
     [InlineData(true, 1, 2, LogisticsStockPriority.Critical)]
@@ -869,7 +893,7 @@ public sealed class SkirmishProductionPolicyTests
                 MatchScenarioProfile.Validation).OpponentConfigurations[owner.Value];
             var targets = new Dictionary<UnitId, int> {
                 [UnitIds.ScoutVehicle] = 1,
-                [UnitIds.MainBattleTank] = configuration.MinimumObjectivePressureUnits,
+                [UnitIds.MainBattleTank] = artilleryPending ? 0 : configuration.MinimumObjectivePressureUnits,
                 [UnitIds.MobileArtillery] = artilleryPending ? 0 : 1,
                 [UnitIds.SupplyTruck] = configuration.ResolveMatureSupplyTruckTarget(4)
             };

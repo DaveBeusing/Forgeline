@@ -4678,6 +4678,14 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
                 return UnitIds.ScoutVehicle;
             }
 
+            // Existing industry needs hauling before its first expensive tank,
+            // while the first scout and live mobile-supply minimum remain ahead.
+            if (facility.Supports(UnitProductionCapability.Logistics) &&
+                GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
+                GetUnitCount(owned, UnitIds.CargoTruck) + GetPendingUnitCount(owned, UnitIds.CargoTruck) <
+                    ResolveCargoFleetTarget(owned, configuration))
+                return UnitIds.CargoTruck;
+
             if (GetUnitCount(
                     owned,
                     UnitIds.MainBattleTank) +
