@@ -239,3 +239,7 @@ The public publisher forces false and verifies assembly variant metadata.
 See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
 request/result, parameter, preset and provider contracts and ownership handoffs.
 No menu or mutating tool is implied by these contracts.
+
+## Command replay qualification
+
+The early CI command-replay step preserves the existing journal, integrity and save-cancellation checks and adds cooperative replay cancellation plus optional intermediate diagnostic comparisons. See [Deterministic command replay](DeterministicCommandReplay.md) for CLI stop behavior, schema/visibility limits and API reproduction, and [executed qualification](CommandReplayQualification.md) for measured results.
