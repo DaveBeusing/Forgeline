@@ -215,7 +215,7 @@ When a tactical targeting mode is active, primary minimap clicks reuse the exist
 
 The minimap captures pointer interaction before world selection, placement, movement, or targeting handlers can consume the same gesture. Cursor state communicates pan, move, attack/attack-move, and invalid tactical targets explicitly. Session replacement clears pending minimap interaction state, and terminal match state disables gameplay interaction.
 
-The player-facing selector above the map provides direct access to None, Logistics, Supply, Sensors, Navigation, Power, and All while preserving the existing keyboard overlay cycle.
+The player-facing selector above the map provides direct access to None, Logistics, Supply, Sensors, Navigation, Power, and All. Repeated LOG selection cycles its Conveyor, Cargo and Field Logistics filters; the keyboard overlay cycle includes those filters.
 
 ## Fog of war
 
@@ -234,12 +234,12 @@ Pattern plus opacity is used so visibility state is not communicated by color al
 `RtsInformationLayerController` owns only presentation enablement. The current strategic overlay cycle is:
 
 ```text
-None -> Logistics -> Supply -> Sensors -> Navigation -> Power -> All -> None
+None -> Logistics (all) -> Conveyors -> Cargo -> Field Logistics -> Supply -> Sensors -> Navigation -> Power -> All -> None
 ```
 
 Production strategic overlays consume `StrategicOverlaySnapshot`, a dedicated immutable player-facing contract captured at the completed-tick presentation boundary. The current modes expose:
 
-- Logistics: authorized logistics nodes and logical transport links;
+- Logistics and its network filters: owned known conveyor connections, regional Cargo-road topology and accepted field-service relations, with current capacity facts and explicit unknown observations;
 - Supply: owned provider/depot/truck and unit supply state;
 - Sensors: owned visual/radar sensor ranges;
 - Navigation: canonical navigation sectors and portals;
@@ -346,3 +346,7 @@ Selection marquee and short-lived order markers follow the frame-owned interacti
 
 The information renderer rebuilds minimap symbols, selection/group membership and fog cells in render-owner scratch collections. Each update clears prior contents while retaining capacity, including across session replacement. Borrowed frame lists are consumed immediately by that renderer and never published. The public `RtsMinimapModelBuilder.Build` still returns an owned immutable copy for external callers; both paths use the same mapping rules. See [Interaction qualification](InteractionQualification.md) for state/display coverage and the warm allocation guard.
 
+
+## Strategic logistics capacity
+
+The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).

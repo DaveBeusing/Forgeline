@@ -66,3 +66,7 @@ The separately named strategic-overlay status strip is not present in the curren
 ## Focused bottleneck readmodel
 
 The separate [Operations Diagnosis](OperationsDiagnosis.md) provides an immutable, selected-entity economic bottleneck projection derived from copied player actions. It complements the existing Operations facility overview without adding panels or changing resource, order, vehicle or supply authority. Each observation is tied to one session and completed tick and uses explicit evidence rather than inferring links to unseen facilities.
+
+## Strategic logistics capacity
+
+The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
