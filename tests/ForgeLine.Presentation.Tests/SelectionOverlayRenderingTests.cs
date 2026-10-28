@@ -102,6 +102,14 @@ public sealed class SelectionOverlayRenderingTests
         draw.Clear();
         feedback.Show(Vector3.Zero, valid: true, attack: true);
         feedback.Draw(draw);
+        Assert.Equal(22, draw.Lines.Length); // Local intent has no accepted attack circle.
+        draw.Clear();
+        feedback.TrackSubmission(1, new(1));
+        feedback.ObserveSubmission(1, new PlayerCommandSubmissionReceipt(new(1), new(1), PlayerCommandKind.Tactical,
+            default, new(1), new(2), 1, true, default));
+        feedback.ObserveResult(new PlayerCommandResultReadModel(new(1), new(1), PlayerCommandKind.Tactical,
+            PlayerCommandFeedbackState.Accepted, 1, 0, default, default, new(2)));
+        feedback.Draw(draw);
         Assert.Equal(34, draw.Lines.Length);
         draw.Clear();
         feedback.Show(Vector3.Zero, valid: false);

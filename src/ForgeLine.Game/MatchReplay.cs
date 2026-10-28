@@ -912,6 +912,11 @@ public static class ReplayCommandCodec
         MatchRuntime scenario) =>
         command.TacticalOperation switch
         {
+            PlayerTacticalActionOperation.HoldFire or PlayerTacticalActionOperation.ReturnFire or PlayerTacticalActionOperation.FireAtWill =>
+                PlayerTacticalActionCommand.SetFirePolicy(command.Issuer, command.Entities,
+                    command.TacticalOperation switch { PlayerTacticalActionOperation.HoldFire => FirePolicy.HoldFire,
+                        PlayerTacticalActionOperation.ReturnFire => FirePolicy.ReturnFire, _ => FirePolicy.FireAtWill },
+                    submittedAtTick, scenario.Intelligence, scenario.Services.Weapons, scenario.Services.ArtilleryWeapons),
             PlayerTacticalActionOperation.Attack =>
                 PlayerTacticalActionCommand.Attack(
                     command.Issuer,

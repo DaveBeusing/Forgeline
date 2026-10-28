@@ -61,6 +61,31 @@ public sealed class GlobalProductionRallyTests
         Assert.False(controller.IsActive); Assert.False(controller.TryTakeRallyPoint(out _));
         Assert.Equal(new Vector3(10,0,20),GlobalProductionSnapshot.Resolve(snapshot)!.Factories[0].RallyPoint);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void MissingOrStaleProductionCannotReuseAPreviouslyValidRallyTarget(int change)
+    {
+        var snapshot = GlobalProductionTests.Snapshot();
+        var controller = new RtsTacticalTargetingController();
+        var input = new InputState();
+        controller.BeginRally(new(1, 1), snapshot.SessionId);
+        controller.Update(input, Camera(), new Terrain(), snapshot, 1600, 900, FormationTemplate.Compact);
+        var operations = change == 0 ? null : new OperationsSnapshot(
+            change == 2 ? new(2) : snapshot.SessionId, change == 1 ? new(3) : snapshot.Tick,
+            snapshot.PlayerExperience!.Value.Player, [], [], [], 0, 0) { Production = snapshot.Operations!.Production };
+        var stale = new PresentationSnapshot(snapshot.Tick, snapshot.TickDuration, snapshot.SimulationEntityCount,
+            snapshot.Instances, sessionId: snapshot.SessionId, playerExperience: snapshot.PlayerExperience, operations: operations);
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.PointerMoved(800, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        controller.Update(input, Camera(), new Terrain(), stale, 1600, 900, FormationTemplate.Compact);
+        Assert.False(controller.TryTakeRallyPoint(out _));
+        Assert.False(controller.IsActive);
+    }
+
     private static RtsCamera Camera()=>new(new RtsCameraSettings {EdgeScrollEnabled=false,InitialTarget=Vector3.Zero,InitialDistance=100});
     private sealed class Terrain(bool valid=true):ITerrainQuery
     {

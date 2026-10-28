@@ -48,6 +48,8 @@ public interface IGameplayHudSurface : IDisposable
     UiTextDiagnostics TextDiagnostics => default;
     GameplayHudSkinDiagnostics SkinDiagnostics => default;
 
+    void ConfigureDisplay(TacticalDisplaySettings settings) { }
+
     void Render(
         in GameplayHudRenderContext context);
 }

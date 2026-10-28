@@ -123,12 +123,14 @@ public sealed class GameplayHudRenderer : IDisposable
         TimeSpan presentationTime = default,
         bool animateNotifications = false,
         bool animateOperations = false,
-        NotificationExpansion notificationExpansion = default, NavigationDiagnosticsView navigationDiagnostics = default)
+        NotificationExpansion notificationExpansion = default, NavigationDiagnosticsView navigationDiagnostics = default,
+        TacticalDisplaySettings displaySettings = default)
     {
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(combatGroups);
+        foreach (var surface in _surfaces) surface.ConfigureDisplay(displaySettings);
 
         GameplayHudLayout layout =
             GameplayHudLayout.Create(

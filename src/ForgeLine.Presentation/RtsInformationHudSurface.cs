@@ -26,6 +26,7 @@ internal sealed class RtsInformationHudSurface : IGameplayHudSurface
     public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
     public int LastGuidanceVertexCount => _renderer.LastGuidanceVertexCount;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _renderer.ConfigureDisplay(settings);
 
     public void Render(
         in GameplayHudRenderContext context)

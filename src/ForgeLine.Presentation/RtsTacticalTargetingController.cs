@@ -55,7 +55,7 @@ public sealed class RtsTacticalTargetingController
     private EntityId[] _entities = [];
     private PlayerActionRequest? _pendingRequest;
     private SimulationSessionId _sessionId;
-    private bool _leftWasDown;
+    private ulong _leftPressSequence;
     private bool _escapeWasDown;
     private bool _pointerCaptured;
     private bool _hasPointerTarget;
@@ -74,7 +74,8 @@ public sealed class RtsTacticalTargetingController
 
     public void Begin(
         in PlayerActionRequest request,
-        SimulationSessionId sessionId)
+        SimulationSessionId sessionId,
+        InputState? initiatingInput = null)
     {
         TacticalTargetingMode mode =
             request.Kind switch
@@ -103,8 +104,10 @@ public sealed class RtsTacticalTargetingController
         _sessionId = sessionId;
         Mode = mode;
         _pendingRequest = null;
-        _leftWasDown = false;
-        _escapeWasDown = false;
+        CommandFeedback.Clear();
+        _leftPressSequence = initiatingInput?.MousePressSequence(PlatformMouseButton.Left) ?? 0;
+        _escapeWasDown = initiatingInput?.IsKeyDown(PlatformKey.Escape) == true;
+        ResetPreview();
     }
 
     public void Update(
@@ -139,17 +142,22 @@ public sealed class RtsTacticalTargetingController
             if (_rallyViewport != default && _rallyViewport != (viewportWidth, viewportHeight)) Cancel();
             _rallyViewport = (viewportWidth, viewportHeight);
             if (_entities.Length != 1 || !OperationsWorldOverlay.CanFocus(rallySnapshot, _entities[0]) ||
+                GlobalProductionSnapshot.Resolve(rallySnapshot)?.Find(_entities[0]) is null ||
                 rallySnapshot.PlayerExperience is { Selection.Count: 1 } experience &&
                 experience.Selection.PrimaryEntity == _entities[0] &&
                 rallySnapshot.PlayerActions?.UnitProduction?.Entity != _entities[0]) Cancel();
         }
-        if (IsActive && Mode != TacticalTargetingMode.Rally && snapshot?.PlayerActions is { } actions && actions.SessionId == snapshot.SessionId &&
-            actions.Tick == snapshot.Tick && actions.Tactical is { } tactical)
+        bool currentActions = Mode == TacticalTargetingMode.Rally
+            ? snapshot is not null && _entities.Length == 1 && GlobalProductionSnapshot.Resolve(snapshot)?.Find(_entities[0]) is not null
+            : snapshot?.PlayerActions is { } captured && captured.SessionId == snapshot.SessionId &&
+                captured.Tick == snapshot.Tick && captured.Tactical is not null;
+        if (IsActive && Mode != TacticalTargetingMode.Rally && currentActions)
         {
-            if (tactical.SelectedEntities.Count != _entities.Length) Cancel();
+            var selected = snapshot!.PlayerActions!.Tactical!.SelectedEntities;
+            if (selected.Count != _entities.Length) Cancel();
             else
                 for (int i = 0; i < _entities.Length; i++)
-                    if (tactical.SelectedEntities[i] != _entities[i]) { Cancel(); break; }
+                    if (selected[i] != _entities[i]) { Cancel(); break; }
         }
 
         _pointerCaptured =
@@ -157,6 +165,7 @@ public sealed class RtsTacticalTargetingController
 
         if (IsActive &&
             !pointerBlocked &&
+            currentActions &&
             input.HasPointerPosition)
         {
             UpdatePreview(
@@ -172,9 +181,9 @@ public sealed class RtsTacticalTargetingController
             ResetPreview();
         }
 
-        bool leftDown =
-            input.IsMouseButtonDown(
-                PlatformMouseButton.Left);
+        ulong pressSequence = input.MousePressSequence(PlatformMouseButton.Left);
+        bool freshPress = pressSequence != _leftPressSequence;
+        _leftPressSequence = pressSequence;
         bool escapeDown =
             input.IsKeyDown(
                 PlatformKey.Escape);
@@ -186,8 +195,7 @@ public sealed class RtsTacticalTargetingController
         }
 
         if (IsActive &&
-            escapeDown &&
-            !_escapeWasDown)
+            (escapeDown && !_escapeWasDown || input.WasKeyPressed(PlatformKey.Escape)))
         {
             Cancel();
         }
@@ -199,11 +207,12 @@ public sealed class RtsTacticalTargetingController
         }
 
         if (IsActive &&
+            currentActions &&
             !pointerBlocked &&
-            input.HasPointerPosition &&
-            (leftDown || input.TryGetMousePressPosition(PlatformMouseButton.Left, out _)) &&
-            !_leftWasDown)
+            freshPress &&
+            input.TryGetMousePressPosition(PlatformMouseButton.Left, out Vector2 pressedAt))
         {
+            UpdatePreview(camera, terrain, snapshot, pressedAt, viewportWidth, viewportHeight);
             if (_hasPointerTarget)
             {
                 CommandFeedback.Show(_pointerWorldTarget, _pointerTargetValid,
@@ -214,16 +223,15 @@ public sealed class RtsTacticalTargetingController
                 camera,
                 terrain,
                 snapshot,
-                input.PointerPosition,
+                pressedAt,
                 viewportWidth,
                 viewportHeight,
                 formation);
             if (_pendingRequest is { Kind: PlayerActionRequestKind.SubmitAttack or PlayerActionRequestKind.SubmitAttackMove } queued &&
-                (input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)))
+                input.WasMousePressedWithShift(PlatformMouseButton.Left))
                 _pendingRequest = queued with { AppendOrders = true };
         }
 
-        _leftWasDown = leftDown;
         _escapeWasDown = escapeDown;
     }
 
@@ -269,7 +277,6 @@ public sealed class RtsTacticalTargetingController
         Mode =
             TacticalTargetingMode.None;
         _entities = [];
-        _leftWasDown = false;
         _escapeWasDown = false;
         _pointerCaptured = false;
         ResetPreview();
@@ -624,7 +631,6 @@ public sealed class RtsTacticalTargetingController
         Mode =
             TacticalTargetingMode.None;
         _entities = [];
-        _leftWasDown = false;
         _escapeWasDown = false;
         ResetPreview();
     }

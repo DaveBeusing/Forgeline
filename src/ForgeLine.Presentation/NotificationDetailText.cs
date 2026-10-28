@@ -6,7 +6,7 @@ namespace ForgeLine.Presentation;
 /// <summary>One bounded detail cache owned by the existing Operations surface.</summary>
 internal sealed class NotificationDetailText
 {
-    private readonly string?[] _labels = new string?[6];
+    private readonly string?[] _labels = new string?[8];
     private CargoFleetCapacityObservation? _fleet;
     private readonly string[] _lines = new string[6];
     private string _content = "";
@@ -39,7 +39,7 @@ internal sealed class NotificationDetailText
                     currentFleet = alerts.Alerts[i].Fleet;
         changed |= currentFleet != _fleet;
         _fleet = currentFleet;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 8; i++)
         {
             string? label = alerts is not null && i < alerts.Alerts.Count ? alerts.Alerts[i].Label : null;
             changed |= _labels[i] != label; _labels[i] = label;
@@ -58,7 +58,7 @@ internal sealed class NotificationDetailText
                 {
                     string label = AlertLifecycleTracker.Label(item.Kind);
                     for (int a = 0; a < alerts.Alerts.Count; a++) if (alerts.Alerts[a].Identity.Kind == item.Kind) label = alerts.Alerts[a].Label;
-                    text.Append(ResourcePowerHudModel.ResolveAlertSeverity(item.Kind) == HudAlertSeverity.Critical ? "CRITICAL / " : "WARNING / ");
+                    text.Append(ResourcePowerHudModel.ResolveAlertSeverity(item.Kind) switch { HudAlertSeverity.Critical => "CRITICAL / ", HudAlertSeverity.Warning => "WARNING / ", _ => "INFO / " });
                     text.Append(label);
                     if (item.Kind == PlayerAlertState.CargoFleetShortage && _fleet is { } fleet)
                     {

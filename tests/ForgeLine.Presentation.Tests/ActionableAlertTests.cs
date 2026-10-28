@@ -20,7 +20,7 @@ public sealed class ActionableAlertTests
             Assert.Equal(first.Alerts[0].Identity, tracker.Capture(new(1), Experience(tick, PlayerAlertState.LowPower), []).Alerts[0].Identity);
         Assert.Empty(tracker.Capture(new(1), Experience(100), []).Alerts);
         var next = tracker.Capture(new(1), Experience(101, PlayerAlertState.LowPower), []);
-        Assert.NotEqual(first.Alerts[0].Identity, next.Alerts[0].Identity);
+        Assert.Equal(first.Alerts[0].Identity, next.Alerts[0].Identity); // Brief recovery is the same incident.
         Assert.Single(first.Alerts);
         Assert.Throws<NotSupportedException>(() => ((IList<ActionableAlert>)first.Alerts).Clear());
     }
@@ -42,7 +42,7 @@ public sealed class ActionableAlertTests
         Assert.Equal(5, alerts.Alerts.Count);
         Assert.All(alerts.Alerts.Take(3), row => Assert.Equal(AlertSeverity.Critical, row.Severity));
         Assert.All(alerts.Alerts.Skip(3), row => Assert.Equal(AlertSeverity.Warning, row.Severity));
-        Assert.Equal(6, new ActionableAlertSnapshot(new(1), new(4), new(1), Enumerable.Repeat(alerts.Alerts[0], 1000).ToArray()).Alerts.Count);
+        Assert.Equal(8, new ActionableAlertSnapshot(new(1), new(4), new(1), Enumerable.Repeat(alerts.Alerts[0], 1000).ToArray()).Alerts.Count);
     }
     [Fact]
     public void OwnedCoreDestinationIsRetainedAndDestroyedTargetIsUnavailable()
@@ -261,8 +261,8 @@ public sealed class ActionableAlertTests
         Assert.False(controller.Update(input, snapshot, layout).OpenOperations);
         if (resolved)
         {
-            tracker.Capture(new(1), Experience(5), []);
-            snapshot = Snapshot(tracker.Capture(new(1), Experience(6, PlayerAlertState.LowPower), []), tick: 6);
+            tracker.Capture(new(1), Experience(64), []);
+            snapshot = Snapshot(tracker.Capture(new(1), Experience(164, PlayerAlertState.LowPower), []), tick: 164);
         }
         input.BeginFrame(); input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, x, y));
         Assert.Equal(!resolved, controller.Update(input, snapshot, layout).OpenOperations);

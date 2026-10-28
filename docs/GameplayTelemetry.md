@@ -209,3 +209,7 @@ force assessment. This avoids a previous Single() crash in telemetry-only runs.
 Normal Gameplay measurements use Standard starting stock and the unchanged
 Gameplay opponent/configuration values. Validation retains its separate stock,
 parameters and terminal gate. Neither profile's success substitutes for the other.
+
+## Decision benchmark extension
+
+Headless telemetry output can also retain bounded decision observations and a schema-1 pacing benchmark block with nullable availability, cohort-safe comparisons and advisory thresholds. Existing client telemetry does not enable this extension. See [Match pacing benchmarks](MatchPacingBenchmarks.md).

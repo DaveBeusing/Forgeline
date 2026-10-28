@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
-public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish }
+public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish, Attack, AttackMove, Stop, Hold, Retreat, FireMission, CancelFireMission, RetreatToRecovery, NextAlert }
 public enum GameplayBindingScope : byte { Global, Dock }
 public readonly record struct GameplayBindingDefinition(GameplayAction Action, PlatformKey DefaultKey, string Label, GameplayBindingScope Scope);
 public readonly record struct GameplayBindingOverride(GameplayAction Action, PlatformKey Key);
@@ -16,6 +16,10 @@ public sealed record GameplayBindings
         var retained = Overrides.Where(x => !GameplayBindingRegistry.IsRetiredFunctionKey(x.Key)).ToArray();
         return retained.Length == Overrides.Count ? this : this with { Overrides = retained };
     }
+    public GameplayBindings Reset(GameplayAction action) => this with
+    {
+        Overrides = Overrides.Where(x => x.Action != action).ToArray()
+    };
     public GameplayBindings With(GameplayAction action, PlatformKey key) => new()
     {
         Overrides = Overrides.Where(x => x.Action != action).Append(new(action, key)).ToArray()
@@ -65,7 +69,16 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.StoragePlacement, PlatformKey.Unknown, "PLACE STORAGE / CTRL TEMPLATE", GameplayBindingScope.Global),
         new(GameplayAction.SmelterPlacement, PlatformKey.Unknown, "PLACE SMELTER / CTRL TEMPLATE", GameplayBindingScope.Global),
         new(GameplayAction.RotatePlacement, PlatformKey.Unknown, "ROTATE BUILDING", GameplayBindingScope.Global),
-        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
+        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global),
+        new(GameplayAction.Attack, PlatformKey.Unknown, "ATTACK", GameplayBindingScope.Global),
+        new(GameplayAction.AttackMove, PlatformKey.Unknown, "ATTACK MOVE", GameplayBindingScope.Global),
+        new(GameplayAction.Stop, PlatformKey.Unknown, "STOP", GameplayBindingScope.Global),
+        new(GameplayAction.Hold, PlatformKey.Unknown, "HOLD POSITION", GameplayBindingScope.Global),
+        new(GameplayAction.Retreat, PlatformKey.Unknown, "RETREAT", GameplayBindingScope.Global),
+        new(GameplayAction.FireMission, PlatformKey.Unknown, "FIRE MISSION", GameplayBindingScope.Global),
+        new(GameplayAction.CancelFireMission, PlatformKey.Unknown, "CANCEL FIRE MISSION", GameplayBindingScope.Global),
+        new(GameplayAction.RetreatToRecovery, PlatformKey.Unknown, "RETREAT TO RECOVERY", GameplayBindingScope.Global),
+        new(GameplayAction.NextAlert, PlatformKey.Unknown, "NEXT ALERT", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
     public static GameplayBindingRegistry Default { get; } = new(new());
@@ -112,6 +125,17 @@ public sealed class GameplayBindingRegistry
         TacticalPrompt = $"{Prompt(GameplayAction.Combat)} / {Prompt(GameplayAction.NextItem)} / {Prompt(GameplayAction.Activate)}";
         DockNavigationPrompt = $"{Prompt(GameplayAction.NextItem)} NEXT  {Prompt(GameplayAction.Activate)} ACT  {Prompt(GameplayAction.CancelJob)} CANCEL  {Prompt(GameplayAction.PrimarySetting)} PRIMARY  {Prompt(GameplayAction.SecondarySetting)} SECONDARY  {Prompt(GameplayAction.Decrease)}/{Prompt(GameplayAction.Increase)} ADJUST";
     }
+    // Item order is shared by the existing tactical ring and keyboard activation.
+    public static GameplayAction TacticalAction(int itemIndex) => itemIndex switch
+    {
+        0 => GameplayAction.Attack, 1 => GameplayAction.AttackMove,
+        2 => GameplayAction.Stop, 3 => GameplayAction.Hold,
+        4 => GameplayAction.Retreat, 5 => GameplayAction.FireMission,
+        6 => GameplayAction.CancelFireMission, 7 => GameplayAction.RetreatToRecovery,
+        _ => throw new ArgumentOutOfRangeException(nameof(itemIndex))
+    };
+    public string TacticalShortcut(int itemIndex) => Key(TacticalAction(itemIndex)) == PlatformKey.Unknown
+        ? TacticalPrompt : Prompt(TacticalAction(itemIndex));
     public PlatformKey Key(GameplayAction action) => _keys[(int)action];
     public string Prompt(GameplayAction action) => _prompts[(int)action];
     public static bool IsRetiredFunctionKey(PlatformKey key) => key is >= PlatformKey.F3 and <= PlatformKey.F9;

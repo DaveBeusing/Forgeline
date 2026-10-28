@@ -1,0 +1,152 @@
+{
+  "reviewHead": "754daa7e3e0214967eec3a08dbc1ba67324207fd",
+  "reviewTree": "57e538966cf473b16aa70278e2c6f881dca219df",
+  "localBase": "201af6aad7ace07df21608c1d058d23b0828b070",
+  "files": [
+    {
+      "path": "Directory.Build.props",
+      "blob": "64d052520c278badbe6fb7f9c5a15e9c95a8b79d",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/BattlefieldHudCapture.cs",
+      "blob": "6386bc4e2c4406cb88370485d7ef13a1e1230d53",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/ClientApplication.cs",
+      "blob": "e3c95b72821cb1514373a858a93e8743cc74abd1",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/ClientRenderHost.cs",
+      "blob": "8303401a20a66fcad0bd98de544ee59616109d0b",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/ClientSettingsFrontendAdapter.cs",
+      "blob": "009d6ecb2d96233365b1ae6d9aee6a89f70f1762",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/ClientUserSettings.cs",
+      "blob": "07b08ee9ff965a5ec6b906cf7e706de4ccb3db65",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/FrontendPresentationAdapter.cs",
+      "blob": "3efead3941fe6fd2a6f4039a7272c89fe4a5e64a",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Client/Program.cs",
+      "blob": "5958257d74fcccb8aef0d470b68f218aa10ee601",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/FrontendOverlayRenderer.cs",
+      "blob": "14e56188742dc4ce4bfc9c9aefdf0021d397242c",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/GameplayHudRenderer.cs",
+      "blob": "d057f3787df8211d201ab59044e5b1279db09458",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/GameplayHudSurface.cs",
+      "blob": "90630e7c0891045f61d1767c2a1cb65b3d15830c",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/OperationsHudSurface.cs",
+      "blob": "638ddb65def3e01318ebe15b297dd55667c5ece8",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/OperationsWorldOverlaySurface.cs",
+      "blob": "eac6f11d55071a97bcc2281406e9505f1a7a35e4",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/PlayerActionRingHudRenderer.Ring.cs",
+      "blob": "8fa48f18aaa517f5c81ed9957e2a2f865c6f1f7c",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/PlayerActionRingHudSurface.cs",
+      "blob": "5352bcd1ddb374691521ad56364bd2f81b6547fd",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/ResourcePowerHudSurface.cs",
+      "blob": "416ad025a0edd406e2f5313b8d845cefe1cba664",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/RtsInformationHudSurface.cs",
+      "blob": "6befe22551b2398f5e41dbe73a5999bbf6a0d6c1",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/RtsInformationOverlayRenderer.cs",
+      "blob": "0dc7f324a2ae196d5d8e5e2dc7e0ee07c52eb074",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/SelectedUnitOrderStatusSurface.cs",
+      "blob": "4c6564f9fc65c7a0e98c632fdbe5adadcf617e34",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/UiTextBatch.cs",
+      "blob": "334906f3e115a13285265dd268fbebef59c5d871",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/WorldHoverTooltipSurface.cs",
+      "blob": "b0b2146f0b658c3f2e27e5b82dce017a7b540bf8",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.UI/FrontendInteraction.cs",
+      "blob": "26562ac7fffa1ad7b94d57639a6c83ca6cc1632a",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.UI/GraphicsSettingsText.resx",
+      "blob": "89438100248147fa1ba5007211aff379dba4a209",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.UI/SettingsModel.cs",
+      "blob": "2623f11768e9b952becd026e28a4a2aace106b66",
+      "matches": true
+    },
+    {
+      "path": "tests/ForgeLine.Presentation.Tests/UiTextBatchTests.cs",
+      "blob": "8f6f5e0ab1ca3b208143ff0b7ad2f9352ea86cfc",
+      "matches": true
+    },
+    {
+      "path": "docs/TacticalDisplayAccessibility.md",
+      "blob": "57612f7b59ecddd3dea823c364f5ad8c2bad88ae",
+      "matches": true
+    },
+    {
+      "path": "src/ForgeLine.Presentation/TacticalDisplaySettings.cs",
+      "blob": "80ac7c9022fc35c354d918f7236c7bd8c7f889b9",
+      "matches": true
+    },
+    {
+      "path": "tests/ForgeLine.Client.Tests/TacticalDisplaySettingsTests.cs",
+      "blob": "2cbf6946478a4b9ed780ada773b1a8efbb187d2e",
+      "matches": true
+    },
+    {
+      "path": "tests/ForgeLine.Presentation.Tests/TacticalDisplaySettingsTests.cs",
+      "blob": "0110d9693f76b388556dbbde748c08fb916d73de",
+      "matches": true
+    }
+  ]
+}

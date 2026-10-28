@@ -277,7 +277,9 @@ public sealed class NonModalHudInteractionTests
                 new RenderMeshHandle(1), RenderMaterialHandle.Default, RenderVisibilityMask.World, 1,
                 new SelectablePresentationMetadata(new PlayerId(1), ControllableEntityCategory.Unit));
             Snapshot = new(new(1), TimeSpan.FromMilliseconds(50), 1, [instance], sessionId: new(session),
-                playerExperience: default(PlayerExperienceSnapshot));
+                playerExperience: default(PlayerExperienceSnapshot),
+                playerActions: new PlayerActionSnapshot(new(session), new(1), [], 0, null, null,
+                    tactical: new PlayerTacticalActionReadModel([Entity], 1, 1, 0, 0, 0, false, false, default, default, [], [])));
             var buffer = new PresentationSnapshotBuffer(); buffer.Publish(Snapshot); World.Update(buffer);
         }
         public void Open()

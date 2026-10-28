@@ -111,7 +111,7 @@ public sealed class PlayerActionDockHudTests
                 tactical: tactical);
 
         Assert.Equal(
-            8,
+            11,
             PlayerActionDockInteractionLayout.GetItemCount(
                 PlayerActionPanelMode.Tactical,
                 actions));
@@ -119,7 +119,7 @@ public sealed class PlayerActionDockHudTests
         string[] titles =
             Enumerable.Range(
                     0,
-                    8)
+                    11)
                 .Select(
                     index =>
                         PlayerActionDockHudModel.ResolveItemTitle(
@@ -152,6 +152,9 @@ public sealed class PlayerActionDockHudTests
         Assert.Contains(
             "RECOVERY",
             titles);
+        Assert.Contains("HOLD FIRE", titles);
+        Assert.Contains("RETURN FIRE", titles);
+        Assert.Contains("FIRE AT WILL", titles);
         Assert.DoesNotContain(
             "PATROL",
             titles);

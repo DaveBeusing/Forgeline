@@ -1,0 +1,23 @@
+{
+  "BaseCommit": "201af6aad7ace07df21608c1d058d23b0828b070",
+  "Version": "0.1.503",
+  "Command": "dotnet ForgeLine.Headless.dll --scenario central-divide --profile gameplay --ticks 12000 --seed 17",
+  "TelemetryEnabled": false,
+  "ExitCode": -532462766,
+  "Error": "System.Collections.Generic.KeyNotFoundException: Entity 80:1 does not have component MovementOrder.",
+  "Location": "src/ForgeLine.Game/GroundMovementSystem.cs:188 (BeginOwnedQueueApproaches)",
+  "RawLogSha256": "BC8CF3EB590BE3D1D3B71473CBD74B80034FB021EB8BF436F35D6B7D4FD10AB0",
+  "Assemblies": [
+    {
+      "Path": "src/ForgeLine.Game/bin/Release/net10.0/ForgeLine.Game.dll",
+      "Sha256": "350489C0285754675916FE5311B2D62988406BE6F097E0496EB9E6C6EC5061EA"
+    },
+    {
+      "Path": "src/ForgeLine.Headless/bin/Release/net10.0/ForgeLine.Headless.dll",
+      "Sha256": "9632AA89E994A2AD0856BA1673439F3349C0F2995AD09F3C98AECB413CEE834F"
+    }
+  ],
+  "HistoricalFaultProducerCommit": "e81bb1d0caca42b69a4778dad2d4aefe8dd9eb11",
+  "HistoricalFaultGameAssemblySha256": "583E8F13579D47DAA52E5067FDA8F14A8D30FF1F28E515E029B6CEC2C75F5868",
+  "Resolution": "Upstream PR #416 merged as 8749198f89ce1f1c90684c0bcb3f8a3398e28f45; synchronized 12000-tick run succeeds. Historical fault data is not a current baseline."
+}

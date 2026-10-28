@@ -1,0 +1,45 @@
+{
+  "SchemaVersion": 1,
+  "Description": "Existing default opponent policies. Duration targets are design aspirations, never completion assertions.",
+  "Fixtures": [
+    {
+      "Name": "central-gameplay",
+      "Scenario": "central-divide",
+      "Profile": "gameplay",
+      "Seed": 17,
+      "Matches": 2,
+      "QuickTicks": 600,
+      "ReferenceTicks": 108000,
+      "Thresholds": "standard-thresholds.json",
+      "DesignTargetMinutes": [
+        45,
+        90
+      ]
+    },
+    {
+      "Name": "split-gameplay",
+      "Scenario": "split-basin",
+      "Profile": "gameplay",
+      "Seed": 17,
+      "Matches": 2,
+      "QuickTicks": 600,
+      "ReferenceTicks": 48000,
+      "Thresholds": "small-thresholds.json",
+      "DesignTargetMinutes": [
+        25,
+        40
+      ]
+    },
+    {
+      "Name": "central-validation-control",
+      "Scenario": "central-divide",
+      "Profile": "validation",
+      "Seed": 2026,
+      "Matches": 1,
+      "QuickTicks": 600,
+      "ReferenceTicks": 80000,
+      "Thresholds": "standard-thresholds.json",
+      "DesignTargetMinutes": null
+    }
+  ]
+}

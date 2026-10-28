@@ -37,12 +37,13 @@ public static class ActionableAlertLayout
         bool expanded = false, ActionableAlertSnapshot? alerts = null, string localFeedback = "",
         NotificationExpansion expansion = default)
     {
+        var displayed = alerts?.Preferences.Apply(experience) ?? experience;
         localFeedback ??= "";
         var bounds = layout.NotificationBounds(expanded);
         float scale = Scale(layout), font = 14 * scale, padding = 4 * scale, gap = 4 * scale;
         float line = UiFontMetrics.Default.Description.LineHeight / UiFontMetrics.Default.Description.PixelSize * font;
         float summary = line + 2 * padding;
-        int total = ResourcePowerHudModel.ResolveNotificationCount(experience) + (localFeedback.Length > 0 ? 1 : 0);
+        int total = ResourcePowerHudModel.ResolveNotificationCount(displayed) + (localFeedback.Length > 0 ? 1 : 0);
         if (bounds.IsEmpty || total == 0 || bounds.Width < 64 || bounds.Height < summary) return new(bounds, font, 0);
         Span<NotificationCardLayout> cards = stackalloc NotificationCardLayout[4];
         cards.Clear();
@@ -63,8 +64,8 @@ public static class ActionableAlertLayout
         float detailBudget = MathF.Min(126 * scale, freeHeight);
         for (int i = 0; i < Math.Min(total, MaximumCards); i++)
         {
-            var item = i == ResourcePowerHudModel.ResolveNotificationCount(experience) ? new AlertNotification(default, Local: true) : Ordered(experience, i);
-            var value = NotificationText.Format(experience, alerts, item, text, localFeedback);
+            var item = i == ResourcePowerHudModel.ResolveNotificationCount(displayed) ? new AlertNotification(default, Local: true) : Ordered(displayed, i);
+            var value = NotificationText.Format(displayed, alerts, item, text, localFeedback);
             float height = summary;
             float rail = 5 * scale, icon = font, controlWidth = MathF.Min(86 * scale, MathF.Max(28 * scale, bounds.Width * .23f));
             float textStart = bounds.X + rail + padding + icon + gap;
@@ -112,13 +113,13 @@ public static class ActionableAlertLayout
         if (consumed < total && y + summary <= bounds.Bottom)
         {
             var rect = new HudRect(bounds.X, y, bounds.Width, summary);
-            var representative = consumed == ResourcePowerHudModel.ResolveNotificationCount(experience)
-                ? new AlertNotification(default, Local: true) : Ordered(experience, consumed);
+            var representative = consumed == ResourcePowerHudModel.ResolveNotificationCount(displayed)
+                ? new AlertNotification(default, Local: true) : Ordered(displayed, consumed);
             for (int i = consumed + 1; i < total; i++)
             {
-                var candidate = i == ResourcePowerHudModel.ResolveNotificationCount(experience)
-                    ? new AlertNotification(default, Local: true) : Ordered(experience, i);
-                if (NotificationText.Severity(experience, candidate) > NotificationText.Severity(experience, representative)) representative = candidate;
+                var candidate = i == ResourcePowerHudModel.ResolveNotificationCount(displayed)
+                    ? new AlertNotification(default, Local: true) : Ordered(displayed, i);
+                if (NotificationText.Severity(displayed, candidate) > NotificationText.Severity(displayed, representative)) representative = candidate;
             }
             cards[count++] = new(representative with { Hidden = total - consumed }, rect,
                 new(rect.X + 5 * scale + padding + font + gap, rect.Y + (rect.Height - line) * .5f,
@@ -129,13 +130,13 @@ public static class ActionableAlertLayout
     internal static AlertNotification Ordered(in PlayerExperienceSnapshot experience, int index)
     {
         int ordinal = 0;
-        for (int slot = 0; slot < 7; slot++)
+        for (int slot = 0; slot < 9; slot++)
         {
-            bool feedback = slot == 3;
+            bool feedback = slot == 4;
             // Important freight-capacity warnings precede low power, while
             // command feedback retains its established higher-priority slot.
             var kind = feedback ? default : AlertLifecycleTracker.Kind(
-                slot < 3 ? slot : slot == 5 ? 5 : slot == 6 ? 4 : 3);
+                slot switch { 0 => 0, 1 => 6, 2 => 1, 3 => 2, 5 => 3, 6 => 5, 7 => 4, _ => 7 });
             if (feedback ? !ResourcePowerHudModel.IsCommandFeedbackVisible(experience) : (experience.Alerts & kind) == 0) continue;
             if (ordinal++ == index) return new(kind, feedback);
         }
@@ -166,7 +167,8 @@ internal static class NotificationText
         }
         else
         {
-            b.Append(ResourcePowerHudModel.ResolveAlertSeverity(item.Kind) == HudAlertSeverity.Critical ? "CRITICAL / " : "WARNING / ");
+            b.Append(ResourcePowerHudModel.ResolveAlertSeverity(item.Kind) switch
+            { HudAlertSeverity.Critical => "CRITICAL / ", HudAlertSeverity.Warning => "WARNING / ", _ => "INFO / " });
             string label = AlertLifecycleTracker.Label(item.Kind);
             if (alerts is not null)
                 for (int i = 0; i < alerts.Alerts.Count; i++)

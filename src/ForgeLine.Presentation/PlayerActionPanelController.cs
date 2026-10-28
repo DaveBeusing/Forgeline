@@ -432,6 +432,7 @@ public sealed partial class PlayerActionPanelController
             _ = Pressed(input, _bindings.Key(GameplayAction.CancelJob));
         }
 
+        UpdateTacticalShortcuts(input, actions, globalShortcutsBlocked);
         _leftWasDown = leftDown;
     }
 
@@ -856,18 +857,41 @@ public sealed partial class PlayerActionPanelController
                 technology.SourceInventory);
     }
 
-    private void ActivateTactical(
-        PlayerTacticalActionReadModel? tactical)
+    private void UpdateTacticalShortcuts(InputState input, PlayerActionSnapshot? actions, bool blocked)
     {
+        int requested = -1;
+        for (int index = 0; index < 8; index++)
+        {
+            PlatformKey key = _bindings.Key(GameplayBindingRegistry.TacticalAction(index));
+            if (Pressed(input, key) && requested < 0 &&
+                !input.WasKeyPressedWithShift(key) && !input.WasKeyPressedWithControl(key)) requested = index;
+        }
+        if (requested < 0 || blocked || input.FocusLostThisFrame || _pendingRequest.HasValue ||
+            input.IsKeyDown(PlatformKey.LeftControl) || input.IsKeyDown(PlatformKey.RightControl) ||
+            input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)) return;
+        var state = PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, requested, actions);
+        if (!state.CanActivate)
+        {
+            Feedback = state.DisabledReason;
+            _feedbackRemaining = TimeSpan.FromSeconds(3);
+            return;
+        }
+        ActivateTactical(actions?.Tactical, requested);
+    }
+
+    private void ActivateTactical(
+        PlayerTacticalActionReadModel? tactical, int? itemIndex = null)
+    {
+        int index = itemIndex ?? SelectedIndex;
         if (tactical is null ||
-            SelectedIndex < 0 ||
-            SelectedIndex >= 8)
+            index < 0 ||
+            index >= 11)
         {
             return;
         }
 
         PlayerActionRequest request =
-            SelectedIndex switch
+            index switch
             {
                 0 =>
                     PlayerActionRequest.BeginAttackTargeting(
@@ -894,6 +918,9 @@ public sealed partial class PlayerActionPanelController
                     PlayerActionRequest.RetreatToRecovery(
                         tactical.SelectedEntities,
                         FormationTemplate.Column),
+                8 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.HoldFire),
+                9 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.ReturnFire),
+                10 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.FireAtWill),
                 _ =>
                     default
             };

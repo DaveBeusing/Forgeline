@@ -55,6 +55,7 @@ public sealed class GraphicsSettingsTests
             var migrated = store.Load();
             Assert.False(migrated.RecoveredInvalidSettings);
             Assert.Equal(ClientUserSettings.CurrentSchemaVersion, migrated.Settings.SchemaVersion);
+            Assert.Equal(NotificationPreferences.Default, migrated.Settings.Notifications);
             Assert.Equal(TextureDetailQuality.Full, migrated.Settings.RenderQuality.Textures);
             Assert.True(migrated.Settings.RenderQuality.VegetationMotion);
             Assert.Equal(ParticleQuality.High, migrated.Settings.RenderQuality.Particles);
