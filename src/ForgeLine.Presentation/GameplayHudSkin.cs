@@ -113,6 +113,13 @@ internal sealed class GameplayHudSkin : IDisposable
     internal void Target(HudRect r) => _symbols?.Draw("ui.artwork.directorate.world.target.p32", Rect(r), Vector4.One);
     internal void Order(HudRect r, in RtsCommandMarkerView marker)
     {
+        if (marker.State == RtsCommandMarkerState.Pending)
+        {
+            _panels?.Draw("ui.skin.directorate.overlay.pending", Rect(r), Vector4.One);
+            return;
+        }
+        if (marker.State == RtsCommandMarkerState.Partial)
+            _panels?.Draw("ui.skin.directorate.overlay.warning", Rect(r), Vector4.One);
         string id = !marker.Valid ? "ui.artwork.directorate.status.invalid.p32" : marker.Kind switch
         {
             RtsCommandMarkerKind.AttackMove => "ui.artwork.directorate.world.attack_move.p32",

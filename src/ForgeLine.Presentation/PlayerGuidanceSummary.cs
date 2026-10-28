@@ -25,7 +25,10 @@ public enum PlayerGuidanceMilestone : uint
 
 public readonly record struct PlayerGuidanceSummary(
     SimulationSessionId SessionId, SimulationTick Tick, PlayerId Player, PlayerGuidanceMilestone Observed,
-    IReadOnlyList<GameplayProgressEvent>? Evidence = null);
+    IReadOnlyList<GameplayProgressEvent>? Evidence = null)
+{
+    public PracticeSnapshot? Practice { get; init; }
+}
 
 internal static class PlayerGuidanceSummaryFactory
 {
@@ -106,6 +109,7 @@ internal static class PlayerGuidanceSummaryFactory
             for (int i = 0; i < intelligence.Contacts.Count; i++)
                 if (intelligence.Contacts[i].IsCurrent && intelligence.Contacts[i].State is IntelligenceState.Detected or IntelligenceState.Identified)
                 { observed |= PlayerGuidanceMilestone.OpponentContact; break; }
-        return new(extraction.Scenario.Simulation.SessionId, context.Tick, extraction.Player, observed, evidence);
+        return new(extraction.Scenario.Simulation.SessionId, context.Tick, extraction.Player, observed, evidence)
+            { Practice=extraction.Scenario.Practice?.Capture(extraction.Player,context.Tick) };
     }
 }

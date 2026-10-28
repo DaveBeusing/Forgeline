@@ -95,8 +95,8 @@ A branded native startup surface appears before settings and graphics initializa
 | Build / industrial production / unit production | B / P / U |
 | Logistics / supply / combat / technology | L / Y / K / H |
 | Strategic overlays | F10 |
-| Controls help | F1 or F12 |
-| Development metrics | Shift + F1 |
+| Controls help | Escape → Controls |
+| Developer tools (Developer build) | F1 |
 | Restart finished match / exit session | R / Escape |
 
 Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts block APPLY with an explanation; saved camera mappings retain priority. Mouse selection, control-group digits, help and Escape remain fixed. See [input binding rules](docs/GameplayInputAccessibilityAndQualification.md).
@@ -170,6 +170,10 @@ dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuratio
 ```
 
 The repository selects **Microsoft.Testing.Platform** through `global.json`. The complete CI `build-test` job also covers map/runtime asset qualification, native checks, packaging and a bounded terminal match. Follow [Development](docs/Development.md) for the canonical sequence and opt-in hardware checks; a local subset does not represent the full CI gate.
+
+### Optional strategy practice
+
+New Game offers three optional practice scenarios for command/recon, build/power/production and supply recovery. Normal skirmish remains the default. Goals require real simulation outcomes; Pause offers retry or skip. See [Guided strategy practice](docs/GuidedStrategyPractice.md).
 
 ### Headless simulation and recovery
 

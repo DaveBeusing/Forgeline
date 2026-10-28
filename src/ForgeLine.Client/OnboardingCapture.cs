@@ -16,7 +16,7 @@ namespace ForgeLine.Client;
 internal static class OnboardingCapture
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-    internal static int Run(string output, string runtimeRoot, bool lessons = false)
+    internal static int Run(string output, string runtimeRoot, bool lessons = false, bool practice = false)
     {
         try
         {
@@ -39,6 +39,57 @@ internal static class OnboardingCapture
             var world = new RenderWorld(); world.Update(publication);
             var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target, RtsReferenceZoom.NormalGameplay));
             var records = new List<object>();
+            if(practice)
+            {
+                foreach(var display in new[]{(1280,720,192u,2f),(1920,1080,96u,1f)})
+                {
+                    graphics.WaitForIdle();graphics.Resize(display.Item1,display.Item2);
+                    var layout=GameplayHudLayout.Create(display.Item1,display.Item2,display.Item3,display.Item4);
+                    foreach(var lesson in PracticeLessons.All)
+                    foreach(var status in new[]{PracticeStatus.Active,PracticeStatus.Complete,PracticeStatus.Failed})
+                    {
+                        var tick=new ForgeLine.Simulation.SimulationTick(400);
+                        var experience=snapshot.PlayerExperience!.Value with {Tick=tick};
+                        var times=Array.AsReadOnly(lesson.Objectives.Select(_=>status==PracticeStatus.Complete?(ulong?)100:null).ToArray());
+                        var facts=new PracticeSnapshot(lesson.Key,1,experience.Player,snapshot.SessionId,tick,status,times,
+                            status==PracticeStatus.Failed?"An owned practice unit was destroyed. Retry from Pause.":"");
+                        var view=new PresentationSnapshot(tick,snapshot.TickDuration,snapshot.SimulationEntityCount,snapshot.Instances,
+                            sessionId:snapshot.SessionId,playerExperience:experience,
+                            guidance:new PlayerGuidanceSummary(snapshot.SessionId,tick,experience.Player,default){Practice=facts});
+                        var guide=new EarlyGameGuidanceController();var card=guide.Update(view,true,layout:layout);
+                        int pages=card.PageCount;
+                        for(int page=0;page<pages;page++)
+                        {
+                            card=guide.Update(view,true,layout:layout);
+                            var state=OnboardingPresentation.Resolve(layout,0,detailed:true);
+                            var ux=default(PreAlphaUxView) with {ShowOnboarding=true,Guidance=card,Onboarding=state};
+                            ground.Prepare(camera,display.Item1,display.Item2);
+                            void Draw(IGraphicsCommandContext c)
+                            {
+                                ground.Render(c,camera);meshes.Render(c,camera,world,1);c.BeginPass(GraphicsFramePass.Overlay);
+                                hud.Render(c,camera,view,terrain.WorldBounds,RtsInformationLayerView.Empty,default,default,
+                                    FormationTemplate.Compact,CombatGroupOverviewView.Empty,ux,display.Item3,display.Item4);
+                            }
+                            graphics.RenderFrame(GraphicsColor.ForgeLineClear,Draw);
+                            var pixels=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,Draw);
+                            var repeated=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,Draw);
+                            if(!pixels.AsSpan().SequenceEqual(repeated)||hud.TextDiagnostics.MissingGlyphs!=0||hud.TextDiagnostics.DroppedGlyphs!=0||
+                                hud.SkinDiagnostics.MissingAssets!=0||hud.SkinDiagnostics.DroppedQuads!=0)throw new InvalidDataException("Practice guide capture lost content or changed on repeat.");
+                            string image=$"{display.Item1}x{display.Item2}-{lesson.Key}-{status}-page{page+1}.png";
+                            ReferenceCaptureImage.WritePng(Path.Combine(output,image),display.Item1,display.Item2,pixels);
+                            records.Add(new{Image=image,Lesson=lesson.Key,Status=status.ToString(),Page=page+1,Pages=pages,
+                                Body=card.Context,Text=hud.TextDiagnostics,Skin=hud.SkinDiagnostics,
+                                PixelSha256=Convert.ToHexString(SHA256.HashData(pixels))});
+                            guide.Navigate(GuidanceNavigation.NextPage);platform.PumpEvents();
+                        }
+                    }
+                }
+                File.WriteAllText(Path.Combine(output,"practice-guidance.json"),JsonSerializer.Serialize(new{
+                    Scope="Native authored practice-card states using the existing renderer and guide controller. Simulation completion is qualified separately.",
+                    Source=typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                    Captures=records,Diagnostics=graphics.Diagnostics},JsonOptions));
+                return 0;
+            }
             if (lessons)
             {
                 foreach (var display in new[] { (1280, 720, 192u, 2f), (1920, 1080, 96u, 1f) })

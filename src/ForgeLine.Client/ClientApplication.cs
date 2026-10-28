@@ -138,6 +138,8 @@ internal sealed class ClientApplication
         var newGame =
             new NewGameModel(InspectScenarios());
         if (scenario is "split-basin" or SplitBasinBattlefield.CompositionKey) newGame.MoveScenario(1);
+        else if(PracticeLessons.TryGet(scenario??"",out _))
+            for(int i=0;i<newGame.Scenarios.Count&&newGame.SelectedScenario.Key!=scenario;i++)newGame.MoveScenario(1);
         RuntimeAssetCatalog runtimeAssets;
         IReadOnlyList<LoadGameEntry> startupSaves;
         string? splashBypassReason = ClientStartupLoop.SplashBypassReason(
@@ -348,6 +350,7 @@ internal sealed class ClientApplication
 
         var presentationInteraction =
             new PresentationInteractionState();
+        presentationInteraction.SetNotificationPreferences(_settings.Notifications);
         var commandGateway =
             new PlayerCommandGateway(
                 simulation,
@@ -418,9 +421,14 @@ internal sealed class ClientApplication
                 ControllableEntityCategory.Logistics));
         var combatGroupRegistry =
             new CombatGroupRegistry();
+        var restoredControlGroups = ClientSaveCatalog.TakeControlGroups(scenario);
         var combatGroupInput =
             new CombatGroupInputController();
         var operationsController = new OperationsController(_gameplayBindings);
+        var debriefController = new MatchDebriefController(_gameplayBindings);
+        var debriefStore = new ClientDebriefStore(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(_settingsPath))!, "last-match.debrief.json"), LocalPlayer.Value);
+
+        var logisticsCapacityInteraction = new StrategicLogisticsCapacityInteraction();
         var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
@@ -582,6 +590,7 @@ internal sealed class ClientApplication
 #endif
         bool developerSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
         var pauseMenu = new PauseMenuModel(developerSessionActive);
+        pauseMenu.SetPracticeAvailable(scenario.Practice is not null);
         string saveDirectory =
             ResolveSaveDirectory();
         bool restartHeld = false;
@@ -675,7 +684,7 @@ internal sealed class ClientApplication
                 buildingPlacementController,
                 presentationInteraction,
                 ref pendingPlacementHostSequence,
-                operationsController);
+                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback, actionPanel);
 
             long now = _platform.Clock.GetTimestamp();
             TimeSpan frameElapsed = _platform.Clock.GetElapsedTime(previousFrameAt, now);
@@ -787,6 +796,7 @@ internal sealed class ClientApplication
                 if (applied is not null)
                 {
                     _settings = PausedSettingsController.LiveSettings(_settings, applied);
+                    presentationInteraction.SetNotificationPreferences(_settings.Notifications);
                     camera.ConfigureControls(_settings.EdgeScrollEnabled, _settings.CameraPanSpeedMultiplier);
                 }
             }
@@ -832,6 +842,31 @@ internal sealed class ClientApplication
                 inputExperience?.IsMatchComplete ==
                 true;
 
+            var debriefLayout = window.ClientSize.IsEmpty ? default : GameplayHudLayout.Create(
+                window.ClientSize.Width, window.ClientSize.Height, window.Dpi, _settings.UiScale);
+            var debriefInput = debriefController.Update(inputState, inputSnapshot, debriefLayout,
+                blocked: modalFrame || settingsOwnedFrame || !window.IsFocused || window.IsMinimized);
+            if (inputMatchTerminal)
+            {
+                actionPanel.Close(); operationsController.Close(inputState, presentationInteraction);
+                tacticalTargetingController.Cancel(); buildingPlacementController.Cancel(presentationInteraction);
+                if (debriefInput.Save)
+                {
+                    var currentReport = (debriefController.View with { SavedReport = null }).Resolve(inputSnapshot);
+                    debriefController.Feedback(debriefStore.TrySave(currentReport) ? "CURRENT REPORT SAVED" : "REPORT NOT SAVED / RESULT REMAINS AVAILABLE");
+                }
+                if (debriefInput.Load)
+                {
+                    bool debriefLoaded = debriefStore.TryLoad(out var savedReport, out var failure);
+                    debriefController.ShowSaved(debriefLoaded ? savedReport : null,
+                        debriefLoaded ? "SAVED REPORT LOADED / HISTORICAL EVIDENCE" : ClientDebriefStore.Explain(failure));
+                }
+            }
+            if (debriefInput.SuppressTerminalKeys) { restartPressed = false; returnPressed = false; }
+            restartPressed |= debriefInput.Restart; returnPressed |= debriefInput.Return;
+            hudInteraction.CapturePointer(debriefInput.Captured);
+            hudInteraction.CaptureKeyboard(inputMatchTerminal && debriefController.View.Open);
+
             bool menuEscape = transientMenus.ConsumeEscape(inputState, actionPanel, operationsController,
                 presentationInteraction, pauseMenuActive || wasShellBlocking || modalFrame || window.ClientSize.IsEmpty || !window.IsFocused);
             if (menuEscape) returnPressed = false;
@@ -840,6 +875,7 @@ internal sealed class ClientApplication
             {
                 buildingPlacementController.Cancel(presentationInteraction);
                 tacticalTargetingController.Cancel();
+                actionPanel.ShowDemolitionFeedback("CANCELLED - TARGETING / PLACEMENT");
                 inputState.SuppressKeyUntilRelease(PlatformKey.Escape);
                 returnPressed = false;
             }
@@ -1054,6 +1090,8 @@ internal sealed class ClientApplication
                     _settings.ShowOnboarding &&
                     !smokeTest);
 
+            if (inputMatchTerminal) preAlphaUx = preAlphaUx with { Debrief = debriefController.View };
+
             if (inputExperience?.MatchStatus ==
                     PlayerMatchStatus.Ended &&
                 terminalAcknowledgementRequested)
@@ -1110,6 +1148,11 @@ internal sealed class ClientApplication
                 throw new InvalidOperationException("Simulation pause ownership could not be updated.");
             if (!developerOwnsPause) simulationPaused = shouldPauseSimulation;
 
+            if(pauseMenuCommand==PauseMenuCommand.RetryPractice&&scenario.Practice is not null)
+            {
+                _pendingRestart=ClientSessionRequest.Restart(scenario.RuntimeSettings);
+                return RestartRequestedExitCode;
+            }
             if (pauseMenuCommand ==
                 PauseMenuCommand.ReturnToMenu)
             {
@@ -1131,6 +1174,7 @@ internal sealed class ClientApplication
                 else if (TrySaveCurrentMatch(
                              scenario,
                              saveDirectory,
+                             combatGroupRegistry,
                              out pauseMenuFeedback) &&
                          pauseMenuCommand ==
                              PauseMenuCommand.SaveAndReturnToMenu)
@@ -1278,6 +1322,7 @@ internal sealed class ClientApplication
                         preAlphaUx,
                         frontendSurface,
                         FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                        TacticalDisplay: _settings.TacticalDisplay,
                         MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized));
 
                 if (shouldPauseForWindow)
@@ -1333,7 +1378,7 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         inputSnapshot?.Tick ??
-                            SimulationTick.Zero);
+                            SimulationTick.Zero, inputState, actionPanel);
                 }
             }
 
@@ -1347,7 +1392,8 @@ internal sealed class ClientApplication
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
                     buildingPlacementController.IsActive || tacticalTargetingController.IsActive, seconds: frameElapsed.TotalSeconds, dockExpanded: actionPanel.DockExpanded,
                 localFeedback: buildingPlacementController.IsActive ? "" : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
-                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low);
+                animateDetails: !_settings.ReducedUiMotion && _settings.RenderQuality.Quality != RenderQuality.Low,
+                bindings: _gameplayBindings);
             hudInteraction.CapturePointer(alertResult.Captured);
             if (alertResult.Target.IsValid && inputSnapshot is not null)
             {
@@ -1373,12 +1419,34 @@ internal sealed class ClientApplication
                 if (alertResult.NotificationDetails) operationsController.OpenNotifications(inputSnapshot.SessionId, presentationInteraction);
                 else operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
             }
+            GameplayHudLayout logisticsLayout = interactionLayout with
+            { Minimap = minimapInteraction.DisplayedBounds.IsEmpty ? interactionLayout.Minimap : minimapInteraction.DisplayedBounds };
+            bool logisticsCaptured = logisticsCapacityInteraction.Update(inputState, inputSnapshot, camera, logisticsLayout,
+                informationLayer.OverlayMode, modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                buildingPlacementController.IsActive || tacticalTargetingController.IsActive || hudInteraction.PointerCaptured ||
+                actionPanel.HasKeyboardFocus || operationsController.ContainsSurface(inputState.PointerPosition, interactionLayout) ||
+                HudInteractionContext.CapturesWorldPointer(inputState, logisticsLayout, informationLayer.MinimapEnabled,
+                    actionPanel.DockExpanded, guidanceVisible: false, includeActionDock: true,
+                    onboarding: guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions), out var logisticsTarget);
+            hudInteraction.CapturePointer(logisticsCaptured);
+            if (logisticsTarget.IsValid && operationsController.OpenEntity(inputSnapshot, logisticsTarget, presentationInteraction, selectionController.Selection))
+            {
+                selectionController.CancelPointerInteraction(); minimapInteraction.Reset(); actionPanel.Close();
+            }
             var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured,
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured || logisticsCaptured,
                 selection: selectionController.Selection);
             hudInteraction.CapturePointer(operationsResult.Captured);
             hudInteraction.CaptureKeyboard(operationsController.HasKeyboardFocus);
+            if (operationsController.TryTakeProductionCommand(out var productionCommand))
+            {
+                var observed = inputSnapshot?.Tick ?? SimulationTick.Zero;
+                bool submitted = simulationHost.TrySubmit(inputSnapshot?.SessionId ?? SimulationSessionId.None, gateway => productionCommand.Cancel
+                    ? gateway.SubmitUnitProductionCancel(LocalPlayer, productionCommand.Request, observed)
+                    : gateway.SubmitUnitProductionPriority(LocalPlayer, productionCommand.Request, productionCommand.Priority, observed), out ulong productionSequence);
+                operationsController.ProductionSubmitted(submitted, productionSequence);
+            }
             if (operationsController.TryTakeRuleRequest(out PlayerActionRequest ruleRequest))
             {
                 SimulationTick observedTick = inputSnapshot?.Tick ?? SimulationTick.Zero;
@@ -1399,13 +1467,18 @@ internal sealed class ClientApplication
                     camera.CenterOn(operationsTarget);
                     selectionController.CancelPointerInteraction();
                     minimapInteraction.Reset();
-                    if (operationsResult.Controls != PlayerActionPanelMode.Closed)
+                    if (operationsResult.Controls != PlayerActionPanelMode.Closed || operationsResult.BeginRally)
                     {
                         selectionController.Selection.SetSingle(operationsResult.Navigate);
                         presentationInteraction.SetSelection(selectionController.Selection.Entities);
                         inputState.SuppressHeldInput();
                         operationsController.Close(inputState, presentationInteraction);
-                        actionPanel.OpenOperationsControls(operationsResult.Controls);
+                        if (operationsResult.BeginRally)
+                        {
+                            actionPanel.Close();
+                            tacticalTargetingController.BeginRally(operationsResult.Navigate, inputSnapshot.SessionId);
+                        }
+                        else actionPanel.OpenOperationsControls(operationsResult.Controls);
                         hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
                     }
                 }
@@ -1472,6 +1545,7 @@ internal sealed class ClientApplication
                     inputSnapshot?.Tick ??
                     SimulationTick.Zero;
 
+                selectionController.CommandFeedback.Show(minimapMovement.WorldTarget, valid: true);
                 RequireSubmission(
                     simulationHost,
                     gateway =>
@@ -1480,13 +1554,13 @@ internal sealed class ClientApplication
                             movementEntities,
                             minimapMovement.WorldTarget,
                             observedTick,
-                            activeFormation));
-                selectionController.CommandFeedback.Show(minimapMovement.WorldTarget, valid: true);
+                            activeFormation), selectionController.CommandFeedback, actionPanel);
             }
 
             if (minimapInteraction.TryTakeActionRequest(
                     out PlayerActionRequest minimapAction))
             {
+                tacticalTargetingController.Cancel();
                 DispatchPlayerActionRequest(
                     minimapAction,
                     simulationHost,
@@ -1494,17 +1568,16 @@ internal sealed class ClientApplication
                     tacticalTargetingController,
                     presentationInteraction,
                     inputSnapshot?.Tick ??
-                        SimulationTick.Zero);
-                tacticalTargetingController.Cancel();
+                        SimulationTick.Zero, inputState, actionPanel);
             }
 
             if (minimapInteraction.TryTakeOverlaySelection(
                     out StrategicOverlayMode selectedOverlay))
             {
-                informationLayer.SetOverlay(
-                    selectedOverlay);
-                presentationInteraction.SetStrategicOverlay(
-                    selectedOverlay);
+                informationLayer.SetOverlay(selectedOverlay == StrategicOverlayMode.Logistics &&
+                    StrategicLogisticsCapacityFilters.IsLogistics(informationLayer.OverlayMode)
+                        ? StrategicLogisticsCapacityFilters.Next(informationLayer.OverlayMode) : selectedOverlay);
+                presentationInteraction.SetStrategicOverlay(informationLayer.OverlayMode);
             }
 
             if (!hudInteraction.KeyboardCaptured)
@@ -1537,6 +1610,11 @@ internal sealed class ClientApplication
                 currentExperience?.MatchStatus ==
                 PlayerMatchStatus.Active && !renderHost.IsPreparingTerrain;
 
+            if (restoredControlGroups is { } savedGroups && SelectedCombatGroup.Resolve(currentSnapshot) is { } groupSnapshot)
+            {
+                combatGroupRegistry.Restore(groupSnapshot.SessionId, LocalPlayer, savedGroups, groupSnapshot.EligibleEntities);
+                restoredControlGroups = null;
+            }
             CombatGroupInputResult combatGroupInputResult =
                 combatGroupInput.Update(
                     inputState,
@@ -1591,10 +1669,21 @@ internal sealed class ClientApplication
                         tacticalTargetingController,
                         presentationInteraction,
                         currentSnapshot?.Tick ??
-                            SimulationTick.Zero);
+                            SimulationTick.Zero, inputState, actionPanel);
                 }
 
+                if (targetingWasActive && !tacticalTargetingController.IsActive &&
+                    !tacticalTargetingController.CommandFeedback.IsVisible)
+                    actionPanel.ShowDemolitionFeedback("CANCELLED - TARGETING");
+
                 bool placementWasActive = buildingPlacementController.IsActive;
+                if (tacticalTargetingController.TryTakeRallyPoint(out var rallyPoint))
+                {
+                    var observed = currentSnapshot?.Tick ?? SimulationTick.Zero;
+                    if (!simulationHost.TrySubmit(rallyPoint.Session, gateway => gateway.SubmitUnitProductionRallyPoint(
+                        LocalPlayer, rallyPoint.Factory, rallyPoint.Target, observed), out _))
+                        tacticalTargetingController.CommandFeedback.Show(rallyPoint.Target, valid: false);
+                }
                 if (!tacticalTargetingController.IsActive)
                 {
                     buildingPlacementController.Update(
@@ -1648,7 +1737,7 @@ internal sealed class ClientApplication
                                     movementRequest.Append ? QueuedOrderEdit.Append : QueuedOrderEdit.Replace,
                                     movementRequest.Patrol, observedTick, requestedFormation)
                                 : gateway.SubmitMovement(LocalPlayer, movementEntities,
-                                    movementRequest.WorldTarget, observedTick, requestedFormation));
+                                    movementRequest.WorldTarget, observedTick, requestedFormation), selectionController.CommandFeedback, actionPanel);
                     }
                 }
 
@@ -1721,7 +1810,7 @@ internal sealed class ClientApplication
                 presentationInteraction,
                 actionPanel,
                 scenario.Services.Resources,
-                operationsController);
+                operationsController, selectionController.CommandFeedback, tacticalTargetingController.CommandFeedback);
 
             TacticalTargetingView tacticalTargetingView =
                 tacticalTargetingController.CreateView(
@@ -1847,7 +1936,7 @@ internal sealed class ClientApplication
 
             preAlphaUx = preAlphaUx with
             {
-                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
+                InteractionHint = tacticalTargetingController.Mode == TacticalTargetingMode.Rally ? "SET RALLY: LEFT WORLD GROUND / RIGHT OR ESC CANCEL / ROUTE ON SPAWN" : buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
                 Onboarding = guidanceInteraction.View,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding,
                     simulationPaused || operationsController.View.Open || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||
@@ -1882,6 +1971,7 @@ internal sealed class ClientApplication
                     MetricsActive: (smokeTest || window.IsFocused) && !window.IsMinimized,
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
+                    TacticalDisplay: _settings.TacticalDisplay,
                     NotificationExpansion: alertController.Expansion, NavigationDiagnostics: navigationView),
                     gameplayDraw, debugDraw, selectionController.Selection.Entities);
                 lastPublishedCamera = publicationCamera;
@@ -2078,7 +2168,9 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController buildingPlacementController,
         RtsTacticalTargetingController tacticalTargetingController,
         PresentationInteractionState presentationInteraction,
-        SimulationTick observedTick)
+        SimulationTick observedTick,
+        InputState? initiatingInput = null,
+        PlayerActionPanelController? actionPanel = null)
     {
         switch (request.Kind)
         {
@@ -2108,7 +2200,7 @@ internal sealed class ClientApplication
 
                 tacticalTargetingController.Begin(
                     request,
-                    simulationHost.SessionId);
+                    simulationHost.SessionId, initiatingInput);
                 return;
         }
 
@@ -2119,6 +2211,15 @@ internal sealed class ClientApplication
                     request.TacticalEntities?.ToArray()
             };
 
+        RtsCommandFeedback? marker = request.Kind is PlayerActionRequestKind.SubmitAttack or
+            PlayerActionRequestKind.SubmitAttackMove or PlayerActionRequestKind.SubmitRetreat or
+            PlayerActionRequestKind.SubmitFireMissionCoordinate or PlayerActionRequestKind.SubmitFireMissionContact
+            ? tacticalTargetingController.CommandFeedback : null;
+        if (request.Kind is PlayerActionRequestKind.SubmitAttackMove or PlayerActionRequestKind.SubmitRetreat or
+            PlayerActionRequestKind.SubmitFireMissionCoordinate)
+            marker!.Show(request.TacticalWorldTarget, true,
+                request.Kind != PlayerActionRequestKind.SubmitRetreat,
+                request.Kind == PlayerActionRequestKind.SubmitAttackMove);
         RequireSubmission(
             simulationHost,
             gateway =>
@@ -2135,20 +2236,25 @@ internal sealed class ClientApplication
                 }
 
                 return receipt;
-            });
+            }, marker, actionPanel);
     }
 
     private static void RequireSubmission(
         ClientSimulationHost simulationHost,
-        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission)
+        Func<PlayerCommandGateway, PlayerCommandSubmissionReceipt> submission,
+        RtsCommandFeedback? marker = null,
+        PlayerActionPanelController? actionPanel = null)
     {
-        if (!simulationHost.TrySubmit(
-                simulationHost.SessionId,
-                submission))
+        bool submitted = simulationHost.TrySubmit(simulationHost.SessionId, submission, out ulong sequence);
+        if (marker is not null)
         {
-            throw new InvalidOperationException(
-                "Simulation command boundary is full or stopping.");
+            marker.TrackSubmission(sequence, simulationHost.SessionId);
+            if (!submitted) marker.ObserveSubmission(sequence, null);
         }
+        if (!submitted && actionPanel is not null)
+            actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - COMMAND BOUNDARY FULL / STOPPING");
+        else if (!submitted && marker is null)
+            throw new InvalidOperationException("Simulation command boundary is full or stopping.");
     }
 
     private static void DrainSubmissionCompletions(
@@ -2157,12 +2263,16 @@ internal sealed class ClientApplication
         RtsBuildingPlacementController placement,
         PresentationInteractionState interaction,
         ref ulong placementHostSequence,
-        OperationsController operations)
+        OperationsController operations,
+        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback,
+        PlayerActionPanelController actionPanel)
     {
         while (simulationHost.TryReadSubmissionCompletion(
                    out ClientSubmissionCompletion completion))
         {
             operations.ObserveRuleSubmission(completion.HostSequence, completion.Receipt);
+            movementFeedback.ObserveSubmission(completion.HostSequence, completion.Receipt);
+            tacticalFeedback.ObserveSubmission(completion.HostSequence, completion.Receipt);
             if (completion.HostSequence == placementHostSequence)
             {
                 placement.ObserveSubmission(completion.Receipt, interaction);
@@ -2171,6 +2281,7 @@ internal sealed class ClientApplication
             if (completion.Receipt is
                 PlayerCommandSubmissionReceipt receipt)
             {
+                if (!receipt.Accepted) actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - COMMAND BOUNDARY FULL");
                 lastCommandReceipt =
                     receipt;
                 continue;
@@ -2179,6 +2290,7 @@ internal sealed class ClientApplication
             if (completion.Failure !=
                 ClientSubmissionFailure.None)
             {
+                actionPanel.ShowDemolitionFeedback("REQUEST REJECTED - SESSION UNAVAILABLE");
                 Console.Error.WriteLine(
                     $"[simulation:submission-rejected] sequence={completion.HostSequence} " +
                     $"reason={completion.Failure}");
@@ -2943,6 +3055,7 @@ internal sealed class ClientApplication
     private static bool TrySaveCurrentMatch(
         MatchRuntime scenario,
         string saveDirectory,
+        CombatGroupRegistry groups,
         out string feedback)
     {
         ArgumentNullException.ThrowIfNull(
@@ -2957,7 +3070,7 @@ internal sealed class ClientApplication
 
             MatchSaveData save =
                 MatchPersistenceService.CaptureSave(
-                    scenario);
+                    scenario) with { ControlGroups = groups.Capture(LocalPlayer) };
             string timestamp =
                 DateTimeOffset.UtcNow.ToString(
                     "yyyyMMdd-HHmmss-fff",
@@ -3742,12 +3855,15 @@ internal sealed class ClientApplication
         PresentationInteractionState interaction,
         PlayerActionPanelController actionPanel,
         ResourceCatalog resources,
-        OperationsController operations)
+        OperationsController operations,
+        RtsCommandFeedback movementFeedback, RtsCommandFeedback tacticalFeedback)
     {
         while (commandGateway.Results.TryRead(
                    out PlayerCommandResultReadModel result))
         {
             operations.ObserveRuleResult(result);
+            movementFeedback.ObserveResult(result);
+            tacticalFeedback.ObserveResult(result);
             placement.ObserveResult(result, interaction);
             if(result.Kind==PlayerCommandKind.ConveyorConstruction)
                 actionPanel.ShowDemolitionFeedback(result.State==PlayerCommandFeedbackState.Accepted?

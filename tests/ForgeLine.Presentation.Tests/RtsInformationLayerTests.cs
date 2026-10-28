@@ -577,6 +577,9 @@ public sealed class RtsInformationLayerTests
         Assert.Equal(
             StrategicOverlayMode.Logistics,
             controller.OverlayMode);
+        controller.CycleOverlay(); Assert.Equal(StrategicOverlayMode.Conveyors, controller.OverlayMode);
+        controller.CycleOverlay(); Assert.Equal(StrategicOverlayMode.Cargo, controller.OverlayMode);
+        controller.CycleOverlay(); Assert.Equal(StrategicOverlayMode.FieldLogistics, controller.OverlayMode);
         controller.CycleOverlay();
         Assert.Equal(
             StrategicOverlayMode.Supply,

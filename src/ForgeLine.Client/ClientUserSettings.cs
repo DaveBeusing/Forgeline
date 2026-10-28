@@ -39,12 +39,14 @@ internal sealed record ClientUserSettings
     public bool ShowStudioSplash { get; init; } = true;
 
     public bool ReducedUiMotion { get; init; }
+    public TacticalDisplaySettings TacticalDisplay { get; init; } = new();
     public bool UiSoundEnabled { get; init; }
     public float UiSoundVolume { get; init; } = .35f;
     public UiFeedbackSettings CreateUiFeedbackSettings() => new(ReducedUiMotion, UiSoundEnabled, UiSoundVolume);
 
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
 
+    public NotificationPreferences Notifications { get; init; } = NotificationPreferences.Default;
     public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
 
     public bool EdgeScrollEnabled { get; init; } = true;
@@ -103,9 +105,12 @@ internal sealed record ClientUserSettings
             nameof(SceneExposure));
 
         CreateUiFeedbackSettings().Validate();
+        TacticalDisplay.Validate();
         WorldAudio.Validate();
         ArgumentNullException.ThrowIfNull(Tooltips);
         Tooltips.Validate();
+        if (Notifications is null) throw new InvalidDataException("Notification preferences are missing.");
+        Notifications.Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
         Particles.Validate();
@@ -281,6 +286,9 @@ internal sealed class ClientSettingsStore
             string? tooltipProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "tooltips", StringComparison.OrdinalIgnoreCase));
             JsonNode? tooltip = tooltipProperty is null ? null : document[tooltipProperty];
             if (tooltipProperty is not null) document.Remove(tooltipProperty);
+            string? displayProperty = document.Select(x => x.Key).FirstOrDefault(x => string.Equals(x, "tacticalDisplay", StringComparison.OrdinalIgnoreCase));
+            JsonNode? display = displayProperty is null ? null : document[displayProperty];
+            if (displayProperty is not null) document.Remove(displayProperty);
             ClientUserSettings settings =
                 JsonSerializer.Deserialize<ClientUserSettings>(
                     document.ToJsonString(),
@@ -338,6 +346,21 @@ internal sealed class ClientSettingsStore
                 }
             }
             string? bindingRecovery = null;
+            string? displayRecovery = null;
+            if (displayProperty is not null)
+            {
+                try
+                {
+                    var parsed = display?.Deserialize<TacticalDisplaySettings>(JsonOptions) ?? throw new InvalidDataException("Tactical display settings are missing.");
+                    parsed.Validate();
+                    settings = settings with { TacticalDisplay = parsed };
+                }
+                catch (Exception exception) when (exception is JsonException or InvalidDataException or ArgumentException)
+                {
+                    displayRecovery = $"Tactical display settings reset: {exception.Message} Other settings were preserved.";
+                    _ = TryQuarantineInvalidSettings();
+                }
+            }
             if (gameplayProperty is not null)
             {
                 try
@@ -356,15 +379,15 @@ internal sealed class ClientSettingsStore
                 }
             }
             cancellationToken.ThrowIfCancellationRequested();
-            if (migrated || bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null) Save(settings);
+            if (migrated || bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null || displayRecovery is not null) Save(settings);
 
             return new ClientSettingsLoadResult(
                 settings,
                 _path,
                 CreatedDefaults: false,
-                RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null,
-                RecoveryMessage: graphicsRecovery is null && bindingRecovery is null && tooltipRecovery is null ? null :
-                    string.Join(" ", new[] { graphicsRecovery, bindingRecovery, tooltipRecovery }.Where(message => message is not null)));
+                RecoveredInvalidSettings: bindingRecovery is not null || graphicsRecovery is not null || tooltipRecovery is not null || displayRecovery is not null,
+                RecoveryMessage: graphicsRecovery is null && bindingRecovery is null && tooltipRecovery is null && displayRecovery is null ? null :
+                    string.Join(" ", new[] { graphicsRecovery, bindingRecovery, tooltipRecovery, displayRecovery }.Where(message => message is not null)));
         }
         catch (Exception exception)
             when (exception is JsonException or

@@ -17,8 +17,12 @@ internal static class Program
         if (args.Length == 4 && args[0] == "--navigation-diagnostics-capture" &&
             args[3] == "--developer-navigation-diagnostics")
             return RunNavigationDiagnosticsCapture(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--engagement-policy-capture")
+            return ObjectActionRingRuntimeCapture.Run(args[1],args[2],engagementOnly:true);
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
+        if(args.Length==3&&args[0]=="--practice-guidance-capture")
+            return OnboardingCapture.Run(args[1],args[2],practice:true);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")
             return OnboardingCapture.Run(args[1], args[2], lessons: true);
         if (args.Length == 3 && args[0] == "--onboarding-capture")
@@ -29,8 +33,15 @@ internal static class Program
             return RunDockCapture(args[1], args[2], args[0] == "--command-dock-reference");
         if (args.Length == 3 && args[0] == "--battlefield-hud-timing")
             return RunHudTiming(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--debrief-capture")
+            return MatchDebriefCaptureQualification.Run(args[1], args[2]);
+
+        if (args.Length == 3 && args[0] == "--global-production-capture")
+            return BattlefieldHudCapture.Run(args[1], args[2], productionOnly: true);
         if (args.Length == 3 && args[0] == "--battlefield-hud-capture")
             return RunHudCapture(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--tactical-display-capture")
+            return RunTacticalDisplayCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--cinematic-menu-capture")
             return RunCinematicCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--author-menu-background")
@@ -60,6 +71,9 @@ internal static class Program
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunHudCapture(string output, string runtimeRoot) => BattlefieldHudCapture.Run(output, runtimeRoot);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunTacticalDisplayCapture(string output, string runtimeRoot) => BattlefieldHudCapture.Run(output, runtimeRoot, accessibilityOnly: true);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunCinematicCapture(string output, string runtimeRoot) => FrontendLayoutCapture.Run(output, runtimeRoot);
@@ -114,7 +128,7 @@ internal static class Program
 
             if (string.Equals(argument, "--scenario", StringComparison.OrdinalIgnoreCase))
             {
-                if (index + 1 >= args.Length || args[++index] is not ("central-divide" or "split-basin" or ForgeLine.Game.CentralDivideScenario.CompositionKey or ForgeLine.Game.SplitBasinBattlefield.CompositionKey))
+                if (index + 1 >= args.Length || args[++index] is not ("central-divide" or "split-basin" or ForgeLine.Game.CentralDivideScenario.CompositionKey or ForgeLine.Game.SplitBasinBattlefield.CompositionKey or ForgeLine.Game.PracticeLessons.ReconKey or ForgeLine.Game.PracticeLessons.IndustryKey or ForgeLine.Game.PracticeLessons.SupplyKey))
                 {
                     Console.Error.WriteLine("--scenario requires central-divide, split-basin or its registered composition key.");
                     return false;

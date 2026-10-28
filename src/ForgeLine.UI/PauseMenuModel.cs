@@ -10,7 +10,8 @@ public enum PauseMenuCommand : byte
     ReturnToMenu = 4,
     Controls = 5,
     Settings = 6,
-    DeveloperTools = 7
+    DeveloperTools = 7,
+    RetryPractice = 8
 }
 
 public readonly record struct PauseMenuItem(
@@ -50,6 +51,16 @@ public sealed class PauseMenuModel
     ];
 
     private PauseMenuItem[] _items = s_items;
+    private bool _practice;
+    public void SetPracticeAvailable(bool available)
+    {
+        if(_practice==available)return;
+        _practice=available;string focused=_focus.FocusedId;
+        _items=_items.Where(i=>i.Command!=PauseMenuCommand.RetryPractice).Select(i=>i.Command==PauseMenuCommand.ReturnToMenu
+            ?i with {Label=available?"SKIP PRACTICE / MENU":"RETURN TO MENU"}:i).ToArray();
+        if(available)_items=_items.Prepend(new PauseMenuItem("retry-practice","RETRY PRACTICE",PauseMenuCommand.RetryPractice)).ToArray();
+        _focus=new(_items.Where(i=>i.IsEnabled).Select(i=>i.Id));_focus.TryFocus(focused);
+    }
     private FrontendFocusModel _focus = new(s_items.Select(item => item.Id));
     public PauseMenuModel(bool developerToolsAvailable = false) => SetDeveloperToolsAvailable(developerToolsAvailable);
     public void SetDeveloperToolsAvailable(bool available)
@@ -61,6 +72,7 @@ public sealed class PauseMenuModel
         _items = available ? s_items.Take(3).Append(new PauseMenuItem("developer-tools", "DEVELOPER TOOLS", PauseMenuCommand.DeveloperTools)).Concat(s_items.Skip(3)).ToArray() : s_items;
         _focus = new(_items.Where(item => item.IsEnabled).Select(item => item.Id));
         _focus.TryFocus(focused);
+        bool practice=_practice;_practice=false;SetPracticeAvailable(practice);
     }
 
     public IReadOnlyList<PauseMenuItem> Items =>

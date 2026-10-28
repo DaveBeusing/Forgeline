@@ -16,12 +16,15 @@ internal sealed class UiTextBatch : IDisposable
     private static readonly ConditionalWeakTable<IGraphicsDevice, Atlas> s_atlases = new();
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline? _pipeline;
+    private IGraphicsPipeline? _contrastPipeline;
+    private readonly GraphicsShaderBytecode? _vertexShader;
     private readonly Atlas? _atlas;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = [];
     private Vertex[] _vertices = new Vertex[384];
     private int _count, _missing, _dropped;
     private bool _disposed;
     internal HudRect? Clip { get; set; }
+    internal bool HighContrast { get; set; }
     public bool Ready => _atlas is not null;
     public string? FailureReason { get; }
     public int VertexCount => _count;
@@ -48,6 +51,7 @@ internal sealed class UiTextBatch : IDisposable
                     return float4(color.rgb,color.a*coverage);
                 }
                 """, GraphicsShaderStage.Pixel, "PSMain", "UiTextPixel.hlsl");
+            _vertexShader = vertex;
             pipeline = graphics.CreateGraphicsPipeline(new(vertex, pixel)
             {
                 CullMode = GraphicsCullMode.None,
@@ -151,15 +155,40 @@ internal sealed class UiTextBatch : IDisposable
             var replacement = _graphics.CreateBuffer(new((ulong)_vertices.Length * 32, GraphicsBufferMemory.Upload));
             buffer?.Dispose(); buffer = replacement; _buffers[context.FrameIndex] = buffer;
         }
-        buffer.SetData<Vertex>(_vertices.AsSpan(0, _count)); context.SetPipeline(_pipeline!); context.SetPixelTexture(0, _atlas!.Texture);
+        buffer.SetData<Vertex>(_vertices.AsSpan(0, _count));
+        context.SetPipeline(HighContrast ? _contrastPipeline ??= CreateContrastPipeline() : _pipeline!);
+        context.SetPixelTexture(0, _atlas!.Texture);
         context.SetVertexBuffer(buffer, 32); context.Draw(_count);
     }
     public void Dispose()
     {
         if (_disposed) return;
-        foreach (var buffer in _buffers.Values) buffer.Dispose(); _buffers.Clear(); _pipeline?.Dispose();
+        foreach (var buffer in _buffers.Values) buffer.Dispose(); _buffers.Clear(); _pipeline?.Dispose(); _contrastPipeline?.Dispose();
         if (_atlas is not null && --_atlas.Users == 0) { _atlas.Texture.Dispose(); s_atlases.Remove(_graphics); }
         _disposed = true;
+    }
+    private IGraphicsPipeline CreateContrastPipeline()
+    {
+        // Reuse the SDF padding for a dark halo. Geometry, clipping, glyph capacity and
+        // upload stride stay identical; only the presentation pipeline changes.
+        var compiler = new DxcShaderCompiler();
+        var pixel = compiler.Compile("""
+            Texture2D<float> Atlas:register(t0); SamplerState LinearSampler:register(s0);
+            float4 PSMain(float4 position:SV_Position,float4 color:COLOR,float2 uv:TEXCOORD):SV_Target0 {
+                float field=Atlas.Sample(LinearSampler,uv);
+                float edge=max(fwidth(field)*.5,1.0/255);
+                float ink=smoothstep(.5-edge,.5+edge,field);
+                float halo=smoothstep(.20-edge,.20+edge,field);
+                return float4(ink.xxx,halo*color.a);
+            }
+            """, GraphicsShaderStage.Pixel, "PSMain", "UiHighContrastTextPixel.hlsl");
+        return _graphics.CreateGraphicsPipeline(new(_vertexShader!, pixel)
+        {
+            CullMode = GraphicsCullMode.None, AlphaBlendEnabled = true, PixelTextureCount = 1,
+            VertexElements = [new("POSITION", 0, GraphicsVertexElementFormat.Float2, 0, 0),
+                new("COLOR", 0, GraphicsVertexElementFormat.Float4, 8, 0),
+                new("TEXCOORD", 0, GraphicsVertexElementFormat.Float2, 24, 0)]
+        });
     }
     [StructLayout(LayoutKind.Sequential)] private readonly record struct Vertex(Vector2 Position, Vector4 Color, Vector2 Uv);
     private sealed class Atlas

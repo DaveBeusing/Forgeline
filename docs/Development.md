@@ -243,3 +243,15 @@ No menu or mutating tool is implied by these contracts.
 ## Fair opponent qualification
 
 The early CI fair-opponent step runs named-policy, legal-intelligence, raid-counterplay and blocked-factory recovery cases. Opt-in normal-stock seeded cohorts retain fixed tick bounds and explicitly distinguish completed matches from censored results. See [Fair opponent difficulty](FairOpponentDifficulty.md) for selection and commands; the canonical terminal gate and shared pacing runner are unchanged.
+
+## Strategic logistics capacity
+
+The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
+
+## Command replay qualification
+
+The early CI command-replay step preserves the existing journal, integrity and save-cancellation checks and adds cooperative replay cancellation plus optional intermediate diagnostic comparisons. See [Deterministic command replay](DeterministicCommandReplay.md) for CLI stop behavior, schema/visibility limits and API reproduction, and [executed qualification](CommandReplayQualification.md) for measured results.
+
+## Strategic map audit
+
+After the Release build, run `./build/Test-StrategicMapAudit.ps1` for every registered compiled map, repeatable JSON/Markdown, explicit warning exceptions and controlled failure cases. The same check and focused regression suite run early in CI. See [criteria and reproduction](StrategicMapBalanceAudit.md).

@@ -1,0 +1,2175 @@
+{
+  "SchemaVersion": 2,
+  "Runtime": ".NET 10.0.13",
+  "OperatingSystem": "Microsoft Windows 10.0.26300",
+  "ProcessArchitecture": "X64",
+  "ProcessorCount": 24,
+  "Profile": "Gameplay",
+  "RequestedTicksPerMatch": 100000000,
+  "RequestedMatches": 1,
+  "StartingSeed": 17,
+  "Matches": [
+    {
+      "MatchIndex": 1,
+      "Seed": 17,
+      "Telemetry": {
+        "SchemaVersion": 2,
+        "ObservedTicks": 8502,
+        "TickRate": 20,
+        "MatchResult": {
+          "Status": "Active",
+          "Lifecycle": "Running",
+          "Outcome": "None",
+          "TerminationReason": "None",
+          "Winner": 0,
+          "DefeatedPlayer": 0,
+          "StartedAtTick": 0,
+          "CompletedAtTick": 0,
+          "FinalizedAtTick": 0,
+          "TransitionCount": 2
+        },
+        "Metrics": [
+          {
+            "Name": "combat.damage.applied",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "health"
+          },
+          {
+            "Name": "combat.destructions",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "count"
+          },
+          {
+            "Name": "economy.processing.output.quantity",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 480,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.processing.output.quantity",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 240,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.processing.output.quantity",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 240,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.processing.throughput_per_second",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 1.1291460832745235,
+            "Unit": "quantity_per_second"
+          },
+          {
+            "Name": "economy.processing.throughput_per_second",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 0.5645730416372617,
+            "Unit": "quantity_per_second"
+          },
+          {
+            "Name": "economy.processing.throughput_per_second",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 0.5645730416372617,
+            "Unit": "quantity_per_second"
+          },
+          {
+            "Name": "economy.production.utilization",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0.02749511422602601,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "economy.production.utilization",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 0.02749511422602601,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "economy.production.utilization",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 0.02749511422602601,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "match",
+            "Dimension": "resource.ferrous_ore",
+            "Value": 620,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "match",
+            "Dimension": "resource.silicates",
+            "Value": 620.0000000001955,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "match",
+            "Dimension": "resource.volatiles",
+            "Value": 500,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:1",
+            "Dimension": "resource.ferrous_ore",
+            "Value": 250,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:1",
+            "Dimension": "resource.silicates",
+            "Value": 250.00000000007913,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:1",
+            "Dimension": "resource.volatiles",
+            "Value": 250,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:2",
+            "Dimension": "resource.ferrous_ore",
+            "Value": 370,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:2",
+            "Dimension": "resource.silicates",
+            "Value": 370.0000000001164,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "economy.resource_income.quantity",
+            "Owner": "player:2",
+            "Dimension": "resource.volatiles",
+            "Value": 250,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "expansion.completed_buildings",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 15,
+            "Unit": "count"
+          },
+          {
+            "Name": "expansion.completed_buildings",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 17,
+            "Unit": "count"
+          },
+          {
+            "Name": "logistics.cargo.completed_orders",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 18,
+            "Unit": "count"
+          },
+          {
+            "Name": "logistics.cargo.delivered.quantity",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 1920,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "logistics.cargo.failed_transports",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "count"
+          },
+          {
+            "Name": "logistics.cargo.route_failures",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "count"
+          },
+          {
+            "Name": "logistics.cargo.travel_time.average_ticks",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 1262.3333333333333,
+            "Unit": "ticks"
+          },
+          {
+            "Name": "logistics.cargo.travel_time.maximum_ticks",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 2137,
+            "Unit": "ticks"
+          },
+          {
+            "Name": "logistics.distribution.completed_requests",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 1,
+            "Unit": "count"
+          },
+          {
+            "Name": "logistics.distribution.failed_requests",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "count"
+          },
+          {
+            "Name": "match.duration.seconds",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 425.1,
+            "Unit": "seconds"
+          },
+          {
+            "Name": "match.duration.ticks",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 8502,
+            "Unit": "ticks"
+          },
+          {
+            "Name": "match.terminal",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "boolean"
+          },
+          {
+            "Name": "match.winner",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0,
+            "Unit": "player_id"
+          },
+          {
+            "Name": "power.demand.average",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 496.02728769701247,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.demand.average",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 241.07892260644553,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.demand.average",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 254.94836509056694,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.generation.average",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 560.4210773935545,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.generation.average",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 272.67701717243,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.generation.average",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 287.7440602211244,
+            "Unit": "power"
+          },
+          {
+            "Name": "power.shortage.duration_seconds",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 5.05,
+            "Unit": "seconds"
+          },
+          {
+            "Name": "power.shortage.duration_seconds",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 5.05,
+            "Unit": "seconds"
+          },
+          {
+            "Name": "power.shortage.duration_seconds",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 5.05,
+            "Unit": "seconds"
+          },
+          {
+            "Name": "storage.utilization.average",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0.1211662444714866,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "storage.utilization.average",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 0.1212284216671184,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "storage.utilization.average",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 0.12110406727583252,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "storage.utilization.peak",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 0.52625,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "storage.utilization.peak",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Value": 0.52625,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "storage.utilization.peak",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Value": 0.52625,
+            "Unit": "ratio"
+          },
+          {
+            "Name": "supply.ammunition.transferred.quantity",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 163.99999999999946,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "supply.fuel.transferred.quantity",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 28.697777952554134,
+            "Unit": "quantity"
+          },
+          {
+            "Name": "supply.shortage.duration_seconds",
+            "Owner": "match",
+            "Dimension": "",
+            "Value": 252.9,
+            "Unit": "seconds"
+          },
+          {
+            "Name": "units.production.completed",
+            "Owner": "player:1",
+            "Dimension": "directorate.unit.rifle_squad",
+            "Value": 4,
+            "Unit": "count"
+          },
+          {
+            "Name": "units.production.completed",
+            "Owner": "player:2",
+            "Dimension": "directorate.unit.rifle_squad",
+            "Value": 1,
+            "Unit": "count"
+          }
+        ],
+        "Milestones": [
+          {
+            "Name": "progression.first_chain_disruption",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Tick": 622
+          },
+          {
+            "Name": "progression.first_chain_disruption",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Tick": 622
+          },
+          {
+            "Name": "progression.first_chain_recovery",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Tick": 1639
+          },
+          {
+            "Name": "progression.first_chain_recovery",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Tick": 2168
+          },
+          {
+            "Name": "progression.first_extractor_expansion",
+            "Owner": "player:1",
+            "Dimension": "building.directorate.extractor",
+            "Tick": 201
+          },
+          {
+            "Name": "progression.first_extractor_expansion",
+            "Owner": "player:2",
+            "Dimension": "building.directorate.extractor",
+            "Tick": 201
+          },
+          {
+            "Name": "progression.first_processing_output",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Tick": 1668
+          },
+          {
+            "Name": "progression.first_processing_output",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Tick": 2207
+          },
+          {
+            "Name": "progression.first_research_completed",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Tick": 260
+          },
+          {
+            "Name": "progression.first_research_completed",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Tick": 260
+          },
+          {
+            "Name": "progression.first_strategic_expansion",
+            "Owner": "player:1",
+            "Dimension": "",
+            "Tick": 401
+          },
+          {
+            "Name": "progression.first_strategic_expansion",
+            "Owner": "player:2",
+            "Dimension": "",
+            "Tick": 401
+          },
+          {
+            "Name": "progression.first_supply_depot_expansion",
+            "Owner": "player:1",
+            "Dimension": "building.directorate.supply_depot",
+            "Tick": 1231
+          },
+          {
+            "Name": "progression.first_supply_depot_expansion",
+            "Owner": "player:2",
+            "Dimension": "building.directorate.supply_depot",
+            "Tick": 1231
+          }
+        ],
+        "Debug": {
+          "Supply": {
+            "SuppliedUnits": 10,
+            "LowSupplyUnits": 1,
+            "CriticalUnits": 0,
+            "UnsuppliedUnits": 0,
+            "Providers": 6,
+            "FuelTransferred": 28.697777952554134,
+            "AmmunitionTransferred": 163.99999999999946
+          },
+          "Production": {
+            "ProcessingFacilities": 8,
+            "RunningProcessingFacilities": 0,
+            "BlockedProcessingFacilities": 8,
+            "CompletedProcessingCycles": 48,
+            "UnitProductionFacilities": 4,
+            "RunningUnitProductionFacilities": 0,
+            "BlockedUnitProductionFacilities": 3,
+            "CompletedUnits": 5
+          },
+          "Fronts": [
+            {
+              "Player": 1,
+              "CombatUnits": 23,
+              "Centroid": {}
+            },
+            {
+              "Player": 2,
+              "CombatUnits": 22,
+              "Centroid": {}
+            }
+          ],
+          "Objectives": [
+            {
+              "Player": 1,
+              "StrategicState": "Mobilizing",
+              "ActiveGoal": "PrepareOffensive"
+            },
+            {
+              "Player": 2,
+              "StrategicState": "Mobilizing",
+              "ActiveGoal": "PrepareOffensive"
+            }
+          ]
+        },
+        "Pacing": [
+          {
+            "Name": "progression.first_conveyor_delivery",
+            "Owner": "player:1",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_processing_output",
+            "Owner": "player:1",
+            "Tick": 1668
+          },
+          {
+            "Name": "progression.first_mobile_supply",
+            "Owner": "player:1",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_research_completed",
+            "Owner": "player:1",
+            "Tick": 260
+          },
+          {
+            "Name": "progression.first_authorized_contact",
+            "Owner": "player:1",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_chain_disruption",
+            "Owner": "player:1",
+            "Tick": 622
+          },
+          {
+            "Name": "progression.first_chain_recovery",
+            "Owner": "player:1",
+            "Tick": 1639
+          },
+          {
+            "Name": "progression.first_strategic_expansion",
+            "Owner": "player:1",
+            "Tick": 401
+          },
+          {
+            "Name": "progression.first_conveyor_delivery",
+            "Owner": "player:2",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_processing_output",
+            "Owner": "player:2",
+            "Tick": 2207
+          },
+          {
+            "Name": "progression.first_mobile_supply",
+            "Owner": "player:2",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_research_completed",
+            "Owner": "player:2",
+            "Tick": 260
+          },
+          {
+            "Name": "progression.first_authorized_contact",
+            "Owner": "player:2",
+            "Tick": null
+          },
+          {
+            "Name": "progression.first_chain_disruption",
+            "Owner": "player:2",
+            "Tick": 622
+          },
+          {
+            "Name": "progression.first_chain_recovery",
+            "Owner": "player:2",
+            "Tick": 2168
+          },
+          {
+            "Name": "progression.first_strategic_expansion",
+            "Owner": "player:2",
+            "Tick": 401
+          },
+          {
+            "Name": "progression.first_combat_damage",
+            "Owner": "match",
+            "Tick": null
+          }
+        ],
+        "Decisions": {
+          "ConfigurationFingerprint": "F632F06556338695EBE3BD720038BEDA506FF95083E64BB8D5CEE542FD1DE86E",
+          "Scenario": "central-divide.directorate.v1",
+          "Profile": "Gameplay",
+          "StartedAtTick": 0,
+          "EndTick": 8502,
+          "ObservedTicks": 8502,
+          "MissedTicks": 0,
+          "TruncatedTicks": 0,
+          "LongestNoProgressTicks": 3054,
+          "ScoutAvailable": true,
+          "ResearchAvailable": true,
+          "TechnologyUnlockAvailable": true,
+          "Players": [
+            {
+              "Player": 1,
+              "FactoryTicks": 13964,
+              "FactoryRunningTicks": 356,
+              "ResourceFacilityTicks": 43642,
+              "ResourceShortfallFacilityTicks": 38529,
+              "SupplyUnitTicks": 41566,
+              "SupplyShortageTicks": 5056,
+              "LongestSupplyShortageTicks": 4141,
+              "FirstSupplyShortageTick": 1,
+              "FirstTechnologyUnlockTick": 260,
+              "FrontTravelMeters": 49.254761093179695,
+              "FrontComparableTicks": 8497
+            },
+            {
+              "Player": 2,
+              "FactoryTicks": 13964,
+              "FactoryRunningTicks": 89,
+              "ResourceFacilityTicks": 43642,
+              "ResourceShortfallFacilityTicks": 42678,
+              "SupplyUnitTicks": 28677,
+              "SupplyShortageTicks": 1023,
+              "LongestSupplyShortageTicks": 917,
+              "FirstSupplyShortageTick": 1,
+              "FirstTechnologyUnlockTick": 260,
+              "FrontTravelMeters": 16.099122825078666,
+              "FrontComparableTicks": 8500
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "Analysis": {
+    "Metrics": [
+      {
+        "Name": "combat.damage.applied",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "health",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "combat.destructions",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.output.quantity",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 480,
+        "Maximum": 480,
+        "Mean": 480,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.output.quantity",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 240,
+        "Maximum": 240,
+        "Mean": 240,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.output.quantity",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 240,
+        "Maximum": 240,
+        "Mean": 240,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.throughput_per_second",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "quantity_per_second",
+        "SampleCount": 1,
+        "Minimum": 1.1291460832745235,
+        "Maximum": 1.1291460832745235,
+        "Mean": 1.1291460832745235,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.throughput_per_second",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "quantity_per_second",
+        "SampleCount": 1,
+        "Minimum": 0.5645730416372617,
+        "Maximum": 0.5645730416372617,
+        "Mean": 0.5645730416372617,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.processing.throughput_per_second",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "quantity_per_second",
+        "SampleCount": 1,
+        "Minimum": 0.5645730416372617,
+        "Maximum": 0.5645730416372617,
+        "Mean": 0.5645730416372617,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.production.utilization",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.02749511422602601,
+        "Maximum": 0.02749511422602601,
+        "Mean": 0.02749511422602601,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.production.utilization",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.02749511422602601,
+        "Maximum": 0.02749511422602601,
+        "Mean": 0.02749511422602601,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.production.utilization",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.02749511422602601,
+        "Maximum": 0.02749511422602601,
+        "Mean": 0.02749511422602601,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "match",
+        "Dimension": "resource.ferrous_ore",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 620,
+        "Maximum": 620,
+        "Mean": 620,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "match",
+        "Dimension": "resource.silicates",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 620.0000000001955,
+        "Maximum": 620.0000000001955,
+        "Mean": 620.0000000001955,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "match",
+        "Dimension": "resource.volatiles",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 500,
+        "Maximum": 500,
+        "Mean": 500,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:1",
+        "Dimension": "resource.ferrous_ore",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 250,
+        "Maximum": 250,
+        "Mean": 250,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:1",
+        "Dimension": "resource.silicates",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 250.00000000007913,
+        "Maximum": 250.00000000007913,
+        "Mean": 250.00000000007913,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:1",
+        "Dimension": "resource.volatiles",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 250,
+        "Maximum": 250,
+        "Mean": 250,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:2",
+        "Dimension": "resource.ferrous_ore",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 370,
+        "Maximum": 370,
+        "Mean": 370,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:2",
+        "Dimension": "resource.silicates",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 370.0000000001164,
+        "Maximum": 370.0000000001164,
+        "Mean": 370.0000000001164,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "economy.resource_income.quantity",
+        "Owner": "player:2",
+        "Dimension": "resource.volatiles",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 250,
+        "Maximum": 250,
+        "Mean": 250,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "expansion.completed_buildings",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 15,
+        "Maximum": 15,
+        "Mean": 15,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "expansion.completed_buildings",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 17,
+        "Maximum": 17,
+        "Mean": 17,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.completed_orders",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 18,
+        "Maximum": 18,
+        "Mean": 18,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.delivered.quantity",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 1920,
+        "Maximum": 1920,
+        "Mean": 1920,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.failed_transports",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.route_failures",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.travel_time.average_ticks",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ticks",
+        "SampleCount": 1,
+        "Minimum": 1262.3333333333333,
+        "Maximum": 1262.3333333333333,
+        "Mean": 1262.3333333333333,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.cargo.travel_time.maximum_ticks",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ticks",
+        "SampleCount": 1,
+        "Minimum": 2137,
+        "Maximum": 2137,
+        "Mean": 2137,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.distribution.completed_requests",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 1,
+        "Maximum": 1,
+        "Mean": 1,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "logistics.distribution.failed_requests",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "match.duration.seconds",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "seconds",
+        "SampleCount": 1,
+        "Minimum": 425.1,
+        "Maximum": 425.1,
+        "Mean": 425.1,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "match.duration.ticks",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ticks",
+        "SampleCount": 1,
+        "Minimum": 8502,
+        "Maximum": 8502,
+        "Mean": 8502,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "match.terminal",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "boolean",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "match.winner",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "player_id",
+        "SampleCount": 1,
+        "Minimum": 0,
+        "Maximum": 0,
+        "Mean": 0,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.demand.average",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 496.02728769701247,
+        "Maximum": 496.02728769701247,
+        "Mean": 496.02728769701247,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.demand.average",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 241.07892260644553,
+        "Maximum": 241.07892260644553,
+        "Mean": 241.07892260644553,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.demand.average",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 254.94836509056694,
+        "Maximum": 254.94836509056694,
+        "Mean": 254.94836509056694,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.generation.average",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 560.4210773935545,
+        "Maximum": 560.4210773935545,
+        "Mean": 560.4210773935545,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.generation.average",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 272.67701717243,
+        "Maximum": 272.67701717243,
+        "Mean": 272.67701717243,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.generation.average",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "power",
+        "SampleCount": 1,
+        "Minimum": 287.7440602211244,
+        "Maximum": 287.7440602211244,
+        "Mean": 287.7440602211244,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.shortage.duration_seconds",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "seconds",
+        "SampleCount": 1,
+        "Minimum": 5.05,
+        "Maximum": 5.05,
+        "Mean": 5.05,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.shortage.duration_seconds",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "seconds",
+        "SampleCount": 1,
+        "Minimum": 5.05,
+        "Maximum": 5.05,
+        "Mean": 5.05,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "power.shortage.duration_seconds",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "seconds",
+        "SampleCount": 1,
+        "Minimum": 5.05,
+        "Maximum": 5.05,
+        "Mean": 5.05,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.average",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.1211662444714866,
+        "Maximum": 0.1211662444714866,
+        "Mean": 0.1211662444714866,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.average",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.1212284216671184,
+        "Maximum": 0.1212284216671184,
+        "Mean": 0.1212284216671184,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.average",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.12110406727583252,
+        "Maximum": 0.12110406727583252,
+        "Mean": 0.12110406727583252,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.peak",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.52625,
+        "Maximum": 0.52625,
+        "Mean": 0.52625,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.peak",
+        "Owner": "player:1",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.52625,
+        "Maximum": 0.52625,
+        "Mean": 0.52625,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "storage.utilization.peak",
+        "Owner": "player:2",
+        "Dimension": "",
+        "Unit": "ratio",
+        "SampleCount": 1,
+        "Minimum": 0.52625,
+        "Maximum": 0.52625,
+        "Mean": 0.52625,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "supply.ammunition.transferred.quantity",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 163.99999999999946,
+        "Maximum": 163.99999999999946,
+        "Mean": 163.99999999999946,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "supply.fuel.transferred.quantity",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "quantity",
+        "SampleCount": 1,
+        "Minimum": 28.697777952554134,
+        "Maximum": 28.697777952554134,
+        "Mean": 28.697777952554134,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "supply.shortage.duration_seconds",
+        "Owner": "match",
+        "Dimension": "",
+        "Unit": "seconds",
+        "SampleCount": 1,
+        "Minimum": 252.9,
+        "Maximum": 252.9,
+        "Mean": 252.9,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "units.production.completed",
+        "Owner": "player:1",
+        "Dimension": "directorate.unit.rifle_squad",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 4,
+        "Maximum": 4,
+        "Mean": 4,
+        "StandardDeviation": 0
+      },
+      {
+        "Name": "units.production.completed",
+        "Owner": "player:2",
+        "Dimension": "directorate.unit.rifle_squad",
+        "Unit": "count",
+        "SampleCount": 1,
+        "Minimum": 1,
+        "Maximum": 1,
+        "Mean": 1,
+        "StandardDeviation": 0
+      }
+    ],
+    "Milestones": [
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:1",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 622,
+        "MaximumTick": 622,
+        "MeanTick": 622
+      },
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:2",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 622,
+        "MaximumTick": 622,
+        "MeanTick": 622
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:1",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 1639,
+        "MaximumTick": 1639,
+        "MeanTick": 1639
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:2",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 2168,
+        "MaximumTick": 2168,
+        "MeanTick": 2168
+      },
+      {
+        "Name": "progression.first_extractor_expansion",
+        "Owner": "player:1",
+        "Dimension": "building.directorate.extractor",
+        "SampleCount": 1,
+        "MinimumTick": 201,
+        "MaximumTick": 201,
+        "MeanTick": 201
+      },
+      {
+        "Name": "progression.first_extractor_expansion",
+        "Owner": "player:2",
+        "Dimension": "building.directorate.extractor",
+        "SampleCount": 1,
+        "MinimumTick": 201,
+        "MaximumTick": 201,
+        "MeanTick": 201
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:1",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 1668,
+        "MaximumTick": 1668,
+        "MeanTick": 1668
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:2",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 2207,
+        "MaximumTick": 2207,
+        "MeanTick": 2207
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:1",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 260,
+        "MaximumTick": 260,
+        "MeanTick": 260
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:2",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 260,
+        "MaximumTick": 260,
+        "MeanTick": 260
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:1",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 401,
+        "MaximumTick": 401,
+        "MeanTick": 401
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:2",
+        "Dimension": "",
+        "SampleCount": 1,
+        "MinimumTick": 401,
+        "MaximumTick": 401,
+        "MeanTick": 401
+      },
+      {
+        "Name": "progression.first_supply_depot_expansion",
+        "Owner": "player:1",
+        "Dimension": "building.directorate.supply_depot",
+        "SampleCount": 1,
+        "MinimumTick": 1231,
+        "MaximumTick": 1231,
+        "MeanTick": 1231
+      },
+      {
+        "Name": "progression.first_supply_depot_expansion",
+        "Owner": "player:2",
+        "Dimension": "building.directorate.supply_depot",
+        "SampleCount": 1,
+        "MinimumTick": 1231,
+        "MaximumTick": 1231,
+        "MeanTick": 1231
+      }
+    ],
+    "Pacing": [
+      {
+        "Name": "progression.first_authorized_contact",
+        "Owner": "player:1",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_authorized_contact",
+        "Owner": "player:2",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:1",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 622,
+        "MaximumTick": 622,
+        "MeanTick": 622
+      },
+      {
+        "Name": "progression.first_chain_disruption",
+        "Owner": "player:2",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 622,
+        "MaximumTick": 622,
+        "MeanTick": 622
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:1",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 1639,
+        "MaximumTick": 1639,
+        "MeanTick": 1639
+      },
+      {
+        "Name": "progression.first_chain_recovery",
+        "Owner": "player:2",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 2168,
+        "MaximumTick": 2168,
+        "MeanTick": 2168
+      },
+      {
+        "Name": "progression.first_combat_damage",
+        "Owner": "match",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_conveyor_delivery",
+        "Owner": "player:1",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_conveyor_delivery",
+        "Owner": "player:2",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_mobile_supply",
+        "Owner": "player:1",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_mobile_supply",
+        "Owner": "player:2",
+        "ReachedMatches": 0,
+        "UnreachedMatches": 1,
+        "MinimumTick": null,
+        "MaximumTick": null,
+        "MeanTick": null
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:1",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 1668,
+        "MaximumTick": 1668,
+        "MeanTick": 1668
+      },
+      {
+        "Name": "progression.first_processing_output",
+        "Owner": "player:2",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 2207,
+        "MaximumTick": 2207,
+        "MeanTick": 2207
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:1",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 260,
+        "MaximumTick": 260,
+        "MeanTick": 260
+      },
+      {
+        "Name": "progression.first_research_completed",
+        "Owner": "player:2",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 260,
+        "MaximumTick": 260,
+        "MeanTick": 260
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:1",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 401,
+        "MaximumTick": 401,
+        "MeanTick": 401
+      },
+      {
+        "Name": "progression.first_strategic_expansion",
+        "Owner": "player:2",
+        "ReachedMatches": 1,
+        "UnreachedMatches": 0,
+        "MinimumTick": 401,
+        "MaximumTick": 401,
+        "MeanTick": 401
+      }
+    ]
+  },
+  "Comparison": [],
+  "SourceIdentity": "0.1.505-dev",
+  "PacingBenchmarks": {
+    "SchemaVersion": 1,
+    "ExecutionStatus": "Cancelled",
+    "Context": "{\u0022ScenarioKey\u0022:\u0022central-divide.directorate.v1\u0022,\u0022Profile\u0022:\u0022Gameplay\u0022,\u0022TickCount\u0022:100000000,\u0022Rates\u0022:[20],\u0022Seeds\u0022:[17],\u0022Configurations\u0022:[\u0022F632F06556338695EBE3BD720038BEDA506FF95083E64BB8D5CEE542FD1DE86E\u0022],\u0022CommandSource\u0022:\u0022Existing deterministic opponents; no external commands\u0022}",
+    "GameAssemblySha256": "FB97ADBA509BA33757F55E0F2EB2019EA244CC46207406425A2DF7F5D2E9C436",
+    "Thresholds": {
+      "FirstContactMaximumSeconds": 600,
+      "SupplyPressureMaximumSeconds": 120,
+      "NoProgressMaximumSeconds": 300,
+      "FactoryUptimeMinimumRatio": 0.1,
+      "MinimumObservationSeconds": 60,
+      "VictoryMinimumSeconds": 2700,
+      "VictoryMaximumSeconds": 5400
+    },
+    "Runs": [
+      {
+        "Seed": 17,
+        "StopReason": "Cancelled",
+        "ConfigurationFingerprint": "F632F06556338695EBE3BD720038BEDA506FF95083E64BB8D5CEE542FD1DE86E",
+        "EndTick": 8502,
+        "Measurements": [
+          {
+            "Name": "activity.longest_no_progress",
+            "Owner": "match",
+            "Availability": "Reached",
+            "Value": 152.7,
+            "Unit": "seconds",
+            "Evidence": "No new milestone, processing output, combat damage or stable-membership front motion; intent is unknown."
+          },
+          {
+            "Name": "combat.first_damage",
+            "Owner": "match",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          },
+          {
+            "Name": "contact.first_authorized",
+            "Owner": "player:1",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          },
+          {
+            "Name": "contact.first_authorized",
+            "Owner": "player:2",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          },
+          {
+            "Name": "expansion.first_strategic",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 20.05,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "expansion.first_strategic",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 20.05,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "factory.productive_uptime",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 0.02549412775708966,
+            "Unit": "ratio",
+            "Evidence": "Running unit-production facility ticks / all observed unit-production facility ticks."
+          },
+          {
+            "Name": "factory.productive_uptime",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 0.006373531939272415,
+            "Unit": "ratio",
+            "Evidence": "Running unit-production facility ticks / all observed unit-production facility ticks."
+          },
+          {
+            "Name": "front.centroid_travel",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 49.254761093179695,
+            "Unit": "meters",
+            "Evidence": "Combat-unit centroid travel only across equal full-generation membership; not territorial front position."
+          },
+          {
+            "Name": "front.centroid_travel",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 16.099122825078666,
+            "Unit": "meters",
+            "Evidence": "Combat-unit centroid travel only across equal full-generation membership; not territorial front position."
+          },
+          {
+            "Name": "research.first_completed",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 13,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "research.first_completed",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 13,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "resources.shortfall",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 1926.45,
+            "Unit": "facility_seconds",
+            "Evidence": "Processing and unit-production NoInput facility time; no missing resource is inferred."
+          },
+          {
+            "Name": "resources.shortfall",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 2133.9,
+            "Unit": "facility_seconds",
+            "Evidence": "Processing and unit-production NoInput facility time; no missing resource is inferred."
+          },
+          {
+            "Name": "scout.first_produced",
+            "Owner": "player:1",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          },
+          {
+            "Name": "scout.first_produced",
+            "Owner": "player:2",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          },
+          {
+            "Name": "supply.first_chain_disruption",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 31.1,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.first_chain_disruption",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 31.1,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.first_chain_recovery",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 81.95,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.first_chain_recovery",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 108.4,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.first_pressure",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 0.05,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.first_pressure",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 0.05,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "supply.longest_pressure",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 207.05,
+            "Unit": "seconds",
+            "Evidence": "Continuous observed unit shortage; not proof of zero physical throughput."
+          },
+          {
+            "Name": "supply.longest_pressure",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 45.85,
+            "Unit": "seconds",
+            "Evidence": "Continuous observed unit shortage; not proof of zero physical throughput."
+          },
+          {
+            "Name": "technology.first_unlock",
+            "Owner": "player:1",
+            "Availability": "Reached",
+            "Value": 13,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "technology.first_unlock",
+            "Owner": "player:2",
+            "Availability": "Reached",
+            "Value": 13,
+            "Unit": "seconds",
+            "Evidence": "First completed-tick observation."
+          },
+          {
+            "Name": "victory",
+            "Owner": "match",
+            "Availability": "Unreached",
+            "Value": null,
+            "Unit": "seconds",
+            "Evidence": "Not observed within this run; not tick zero."
+          }
+        ],
+        "Warnings": [
+          {
+            "Code": "low_factory_uptime",
+            "Metric": "factory.productive_uptime",
+            "Owner": "player:1",
+            "Message": "Low productive factory share; inspect demand, inputs, power and intentional idle time."
+          },
+          {
+            "Code": "low_factory_uptime",
+            "Metric": "factory.productive_uptime",
+            "Owner": "player:2",
+            "Message": "Low productive factory share; inspect demand, inputs, power and intentional idle time."
+          },
+          {
+            "Code": "sustained_supply_pressure",
+            "Metric": "supply.longest_pressure",
+            "Owner": "player:1",
+            "Message": "Unit shortage persisted; inspect real deliveries and consumption."
+          }
+        ]
+      }
+    ],
+    "Distributions": [
+      {
+        "Name": "activity.longest_no_progress",
+        "Owner": "match",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 152.7,
+        "Median": 152.7,
+        "P90": 152.7,
+        "Maximum": 152.7,
+        "Mean": 152.7
+      },
+      {
+        "Name": "combat.first_damage",
+        "Owner": "match",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      },
+      {
+        "Name": "contact.first_authorized",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      },
+      {
+        "Name": "contact.first_authorized",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      },
+      {
+        "Name": "expansion.first_strategic",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 20.05,
+        "Median": 20.05,
+        "P90": 20.05,
+        "Maximum": 20.05,
+        "Mean": 20.05
+      },
+      {
+        "Name": "expansion.first_strategic",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 20.05,
+        "Median": 20.05,
+        "P90": 20.05,
+        "Maximum": 20.05,
+        "Mean": 20.05
+      },
+      {
+        "Name": "factory.productive_uptime",
+        "Owner": "player:1",
+        "Unit": "ratio",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 0.02549412775708966,
+        "Median": 0.02549412775708966,
+        "P90": 0.02549412775708966,
+        "Maximum": 0.02549412775708966,
+        "Mean": 0.02549412775708966
+      },
+      {
+        "Name": "factory.productive_uptime",
+        "Owner": "player:2",
+        "Unit": "ratio",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 0.006373531939272415,
+        "Median": 0.006373531939272415,
+        "P90": 0.006373531939272415,
+        "Maximum": 0.006373531939272415,
+        "Mean": 0.006373531939272415
+      },
+      {
+        "Name": "front.centroid_travel",
+        "Owner": "player:1",
+        "Unit": "meters",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 49.254761093179695,
+        "Median": 49.254761093179695,
+        "P90": 49.254761093179695,
+        "Maximum": 49.254761093179695,
+        "Mean": 49.254761093179695
+      },
+      {
+        "Name": "front.centroid_travel",
+        "Owner": "player:2",
+        "Unit": "meters",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 16.099122825078666,
+        "Median": 16.099122825078666,
+        "P90": 16.099122825078666,
+        "Maximum": 16.099122825078666,
+        "Mean": 16.099122825078666
+      },
+      {
+        "Name": "research.first_completed",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 13,
+        "Median": 13,
+        "P90": 13,
+        "Maximum": 13,
+        "Mean": 13
+      },
+      {
+        "Name": "research.first_completed",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 13,
+        "Median": 13,
+        "P90": 13,
+        "Maximum": 13,
+        "Mean": 13
+      },
+      {
+        "Name": "resources.shortfall",
+        "Owner": "player:1",
+        "Unit": "facility_seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 1926.45,
+        "Median": 1926.45,
+        "P90": 1926.45,
+        "Maximum": 1926.45,
+        "Mean": 1926.45
+      },
+      {
+        "Name": "resources.shortfall",
+        "Owner": "player:2",
+        "Unit": "facility_seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 2133.9,
+        "Median": 2133.9,
+        "P90": 2133.9,
+        "Maximum": 2133.9,
+        "Mean": 2133.9
+      },
+      {
+        "Name": "scout.first_produced",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      },
+      {
+        "Name": "scout.first_produced",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      },
+      {
+        "Name": "supply.first_chain_disruption",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 31.1,
+        "Median": 31.1,
+        "P90": 31.1,
+        "Maximum": 31.1,
+        "Mean": 31.1
+      },
+      {
+        "Name": "supply.first_chain_disruption",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 31.1,
+        "Median": 31.1,
+        "P90": 31.1,
+        "Maximum": 31.1,
+        "Mean": 31.1
+      },
+      {
+        "Name": "supply.first_chain_recovery",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 81.95,
+        "Median": 81.95,
+        "P90": 81.95,
+        "Maximum": 81.95,
+        "Mean": 81.95
+      },
+      {
+        "Name": "supply.first_chain_recovery",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 108.4,
+        "Median": 108.4,
+        "P90": 108.4,
+        "Maximum": 108.4,
+        "Mean": 108.4
+      },
+      {
+        "Name": "supply.first_pressure",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 0.05,
+        "Median": 0.05,
+        "P90": 0.05,
+        "Maximum": 0.05,
+        "Mean": 0.05
+      },
+      {
+        "Name": "supply.first_pressure",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 0.05,
+        "Median": 0.05,
+        "P90": 0.05,
+        "Maximum": 0.05,
+        "Mean": 0.05
+      },
+      {
+        "Name": "supply.longest_pressure",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 207.05,
+        "Median": 207.05,
+        "P90": 207.05,
+        "Maximum": 207.05,
+        "Mean": 207.05
+      },
+      {
+        "Name": "supply.longest_pressure",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 45.85,
+        "Median": 45.85,
+        "P90": 45.85,
+        "Maximum": 45.85,
+        "Mean": 45.85
+      },
+      {
+        "Name": "technology.first_unlock",
+        "Owner": "player:1",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 13,
+        "Median": 13,
+        "P90": 13,
+        "Maximum": 13,
+        "Mean": 13
+      },
+      {
+        "Name": "technology.first_unlock",
+        "Owner": "player:2",
+        "Unit": "seconds",
+        "Reached": 1,
+        "Unreached": 0,
+        "Unavailable": 0,
+        "Minimum": 13,
+        "Median": 13,
+        "P90": 13,
+        "Maximum": 13,
+        "Mean": 13
+      },
+      {
+        "Name": "victory",
+        "Owner": "match",
+        "Unit": "seconds",
+        "Reached": 0,
+        "Unreached": 1,
+        "Unavailable": 0,
+        "Minimum": null,
+        "Median": null,
+        "P90": null,
+        "Maximum": null,
+        "Mean": null
+      }
+    ],
+    "BaselineCompatibility": "NoComparableBaseline",
+    "Differences": []
+  }
+}

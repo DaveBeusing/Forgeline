@@ -690,6 +690,10 @@ public sealed class RtsMinimapInteractionTests
         controller.CycleOverlay();
         controller.CycleOverlay();
 
+        controller.CycleOverlay();
+        controller.CycleOverlay();
+        controller.CycleOverlay();
+
         Assert.Equal(
             StrategicOverlayMode.Power,
             controller.OverlayMode);

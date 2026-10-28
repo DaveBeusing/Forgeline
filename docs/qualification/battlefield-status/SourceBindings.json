@@ -1,0 +1,108 @@
+{
+  "Base": "201af6aad7ace07df21608c1d058d23b0828b070",
+  "BaseTree": "5c40a9e8e8b87ecbd351033136b1aed633bb9120",
+  "ProductRevision": "bcda51fcd4cd78d985061ca0308138795a3d9a57",
+  "Version": "0.1.504",
+  "Sdk": "10.0.402",
+  "Build": "Release Public; complete ForgeLine.sln; zero warnings/errors",
+  "Tests": {
+    "Presentation": 75,
+    "Game": 18,
+    "Failures": 0,
+    "Skipped": 0
+  },
+  "Architecture": {
+    "Projects": 46,
+    "Cycles": 0
+  },
+  "Native": {
+    "Backend": "Windows x64 D3D12 WARP",
+    "Width": 1600,
+    "Height": 900,
+    "Profiles": [
+      {
+        "Distance": 120,
+        "Dpi": 96,
+        "UiScale": 1
+      },
+      {
+        "Distance": 1000,
+        "Dpi": 192,
+        "UiScale": 2
+      }
+    ],
+    "Description": "Isolated actual HUD renderer on a dark background; before means no authorized status, after means owned empty artillery. Not terrain or live battle qualification."
+  },
+  "Sources": [
+    {
+      "Path": "src/ForgeLine.Game/PlayerBattlefieldStatus.cs",
+      "Sha256": "4d3c7dbd323879bf1f22df47d940a1673d7a15807a7d0beff5a60b114b74c154",
+      "RepositoryLfSha256": "4d3c7dbd323879bf1f22df47d940a1673d7a15807a7d0beff5a60b114b74c154"
+    },
+    {
+      "Path": "src/ForgeLine.Game/PlayerExperienceSnapshot.cs",
+      "Sha256": "152d62d92eab02c9bc997e931f026dd0b5e4012f1fbaa0a1fae2819c3d5da28a",
+      "RepositoryLfSha256": "a54d5723b17761e4a2cce43ccda0d50f5ac2d42285c959282cee1738a6e65b62"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/CombatGroupOperationalSnapshot.cs",
+      "Sha256": "3e9f7c655f2eddff43ae168b5b93bd187f7104317fe79e13d1792c45c91d1f93",
+      "RepositoryLfSha256": "9a7462b6f65340536f68341959618884ec21b4349bfb95234b06f07b7803b3bf"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/BattlefieldStatusText.cs",
+      "Sha256": "b6c7fec64761c541f5942b4d6f51c73dfbde3728dffcb858dcbafc87d1566e34",
+      "RepositoryLfSha256": "b6c7fec64761c541f5942b4d6f51c73dfbde3728dffcb858dcbafc87d1566e34"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/WorldHoverTooltipSurface.cs",
+      "Sha256": "73af406f72f4e16714cc836eaf701550cb3b050d7d328008f99ba08a78bfb46a",
+      "RepositoryLfSha256": "47a5c0142a7d7ca52e9ab0a654eccfcacf32af2efeaa63bda3a815d2950a412c"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/BattlefieldStatusOverlay.cs",
+      "Sha256": "2fe1b81dac30e3615ca218191e5a244c0b959ada0570cb1086646a07f054820c",
+      "RepositoryLfSha256": "2fe1b81dac30e3615ca218191e5a244c0b959ada0570cb1086646a07f054820c"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/RtsInformationOverlayRenderer.cs",
+      "Sha256": "a5085a5c53dded49b56c3ddf7c16fce3a28ebda06cc6f03146b5ad9b71292d1f",
+      "RepositoryLfSha256": "853075815fe377e30e012fbdf21d60ac5f320d2c7ee58e07333f3ca99be98fe4"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/RtsStrategicOverlayHudModel.cs",
+      "Sha256": "46ef9997dffcc276d37f33126abfccabbac053eec4530a931ed728fc79dc7e63",
+      "RepositoryLfSha256": "9bdc97fef64cb7299dc382c4f6d0d249952dbd683ed867604e5b323b5211da05"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/BattlefieldStatusOverlayTests.cs",
+      "Sha256": "d05aa0e1462c28a1490108cff6092394cf35455b2a76a6fea80cdb465b50ed4f",
+      "RepositoryLfSha256": "d05aa0e1462c28a1490108cff6092394cf35455b2a76a6fea80cdb465b50ed4f"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/BattlefieldStatusNativeTests.cs",
+      "Sha256": "62e90589f6268fc13d863b731aa415705f1b3dafd29de1e695ff0fd992bb0d50",
+      "RepositoryLfSha256": "62e90589f6268fc13d863b731aa415705f1b3dafd29de1e695ff0fd992bb0d50"
+    },
+    {
+      "Path": "Directory.Build.props",
+      "Sha256": "005f44c09d6ae60c1965882344bb81bb2e86ed7af17102af43dd75f732d208dd",
+      "RepositoryLfSha256": "0e1ec85916ca1ad883a1d1b5ea804d860a55423610f8203c299cb56e97ff0790"
+    }
+  ],
+  "Assemblies": [
+    {
+      "Path": "src/ForgeLine.Game/bin/Release/net10.0/ForgeLine.Game.dll",
+      "Sha256": "20195c5c7a1ac192eb2a29ef01bd3181df1d7685782b7c2da1b234d2247aee28"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/bin/Release/net10.0-windows/ForgeLine.Presentation.dll",
+      "Sha256": "7529220f609294f16bbdf8effe0c396ef1d30c4fd41e64a2580d69a46a7a6ab7"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll",
+      "Sha256": "96b183574a8cdabd1866026ebb53e75fd7202cceb5fc0bb91454cce0388bbbb4"
+    }
+  ],
+  "SourceEncoding": "UTF-8. Sha256 records actual measured compiler inputs; RepositoryLfSha256 records canonical Git text after CRLF normalization."
+}

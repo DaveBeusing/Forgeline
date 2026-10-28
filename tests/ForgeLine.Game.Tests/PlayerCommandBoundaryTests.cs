@@ -467,6 +467,25 @@ public sealed class PlayerCommandBoundaryTests
     }
 
     [Fact]
+    public void UnitProductionPriorityGatewayPreservesAuthoritativeOwnershipValidation()
+    {
+        using var scenario=CreateHumanScenario(seed:4120); var gateway=CreateGateway(scenario);
+        var entities=scenario.Simulation.Entities;
+        var inventory=scenario.Inventories.CreateInventory(new InventorySpecification(1000));
+        foreach(uint owner in new uint[]{1,2})
+        {
+            var facility=entities.CreateEntity();
+            entities.AddComponent(facility,new UnitProductionFacility(inventory,UnitProductionCapability.Vehicle,new(owner),Vector3.Zero,scenario.Simulation.CurrentTick));
+            var request=entities.CreateEntity();
+            entities.AddComponent(request,new UnitProductionRequest(facility,UnitIds.ScoutVehicle,ProductionPriority.Normal,scenario.Simulation.CurrentTick));
+            Assert.True(gateway.SubmitUnitProductionPriority(new(1),request,ProductionPriority.High,scenario.Simulation.CurrentTick).Accepted);
+            scenario.Simulation.AdvanceOneTick(); Assert.True(gateway.Results.TryRead(out var result));
+            Assert.Equal(owner==1?PlayerCommandFeedbackState.Accepted:PlayerCommandFeedbackState.Rejected,result.State);
+            Assert.Equal(owner==1?ProductionPriority.High:ProductionPriority.Normal,entities.GetComponent<UnitProductionRequest>(request).Priority);
+        }
+    }
+
+    [Fact]
     public void LogisticsStockPolicySubmissionEnforcesOwnershipAndThresholds()
     {
         using MatchRuntime scenario =
