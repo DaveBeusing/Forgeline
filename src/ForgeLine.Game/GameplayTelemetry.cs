@@ -152,7 +152,11 @@ public sealed record GameplayTelemetrySnapshot(
     IReadOnlyList<GameplayMetric> Metrics,
     IReadOnlyList<GameplayMilestone> Milestones,
     GameplayTelemetryDebugSummary Debug,
-    IReadOnlyList<GameplayPacingMilestone>? Pacing = null);
+    IReadOnlyList<GameplayPacingMilestone>? Pacing = null)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PracticeSnapshot? Practice { get; init; }
+}
 
 public sealed partial class GameplayTelemetryCollector
 {
@@ -312,7 +316,7 @@ public sealed partial class GameplayTelemetryCollector
             metrics,
             milestones,
             CaptureDebugSummary(),
-            CapturePacing());
+            CapturePacing()) { Practice=_scenario.Practice?.Capture(new(1),_scenario.Simulation.CurrentTick) };
     }
 
     private void CaptureInitialDeposits()

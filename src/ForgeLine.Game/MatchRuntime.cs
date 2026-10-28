@@ -78,6 +78,7 @@ public sealed class MatchRuntime : IDisposable
     }
 
     public GameplayProgressJournal Progress { get; }
+    public PracticeSession? Practice { get; private set; }
 
     public MatchRuntimeSettings RuntimeSettings { get; }
     internal MatchRuntimeSettings PersistenceBaseSettings { get; private set; }
@@ -163,6 +164,7 @@ public sealed class MatchRuntime : IDisposable
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(runtimeSettings);
+        runtimeSettings = PracticeLessons.Configure(runtimeSettings);
         runtimeSettings.Validate();
 #if FORGELINE_DEVELOPER_TOOLS
         DeveloperRestartPlan? developerPlan = null;
@@ -749,7 +751,7 @@ public sealed class MatchRuntime : IDisposable
         services.Conveyors = conveyors;
         services.ConveyorFlow = conveyorFlow;
 
-        return new MatchRuntime(
+        var runtime = new MatchRuntime(
             runtimeSettings,
             matchConfiguration,
             scheduler,
@@ -776,6 +778,14 @@ public sealed class MatchRuntime : IDisposable
             opponents,
             unitFactory,
             initialization, progress);
+        if(PracticeLessons.TryGet(runtimeSettings.Composition.Key,out var practice))
+        {
+            runtime.Practice=new PracticeSession(runtime,practice!);
+            simulation.RegisterSystem(runtime.Practice);
+            services.RegisteredSystemTypes=services.RegisteredSystemTypes.Append(typeof(PracticeSession)).ToArray();
+            simulation.RegisterTickObserver(runtime.Practice);
+        }
+        return runtime;
     }
 
     private static AxisAlignedBounds[] CollectStaticNavigationObstacles(
