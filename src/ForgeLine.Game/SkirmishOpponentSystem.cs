@@ -3255,7 +3255,7 @@ public sealed class SkirmishOpponentSystem : ISimulationSystem
         }
 
         bool mechanizedResearchFunding = _research is not null &&
-            HasLiveCoreGroundForce(owned, configuration) &&
+            GetUnitCount(owned, UnitIds.ScoutVehicle) >= 1 &&
             GetUnitCount(owned, UnitIds.SupplyTruck) >= configuration.MinimumSupplyTrucks &&
             TechnologyStateQueries.IsCompleted(context.Entities, controller.Player, TechnologyIds.IndustrialStandardization) &&
             !TechnologyStateQueries.IsCompleted(context.Entities, controller.Player, TechnologyIds.MechanizedSystems);

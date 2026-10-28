@@ -10,8 +10,10 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class SkirmishProductionPolicyTests
 {
-    [Fact]
-    public void MechanizedResearchFundingCompetesWithFactoryBuffersAfterGroundSupplyIsEstablished()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MechanizedResearchFundingCompetesWithFactoryBuffersAfterScoutAndSupplyAreEstablished(bool groundEstablished)
     {
         var settings = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation);
         using var scenario = CentralDivideScenario.Create(settings);
@@ -26,7 +28,7 @@ public sealed class SkirmishProductionPolicyTests
         scenario.UnitFactory.Create(units[UnitIds.ScoutVehicle], home + Vector3.UnitZ * 100, owner);
         for (int i = 0; i < settings.OpponentConfigurations[owner.Value].MinimumSupplyTrucks; i++)
             scenario.UnitFactory.Create(units[UnitIds.SupplyTruck], home + Vector3.UnitZ * (120 + i * 20), owner);
-        for (int i = 0; i < settings.OpponentConfigurations[owner.Value].MinimumObjectivePressureUnits; i++)
+        for (int i = 0; groundEstablished && i < settings.OpponentConfigurations[owner.Value].MinimumObjectivePressureUnits; i++)
             scenario.UnitFactory.Create(units[UnitIds.MainBattleTank], home + Vector3.UnitZ * (140 + i * 20), owner);
         scenario.Simulation.RunTicks(2, TestContext.Current.CancellationToken);
         Assert.Equal(LogisticsStockPriority.Critical, FindStockPolicy(entities, core, ResourceIds.Steel).Priority);
