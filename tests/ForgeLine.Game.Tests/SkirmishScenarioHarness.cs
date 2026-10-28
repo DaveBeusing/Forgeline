@@ -39,6 +39,17 @@ internal sealed class SkirmishScenarioHarness
                 home + new Vector3(0, 0, 100 + count * 20), player);
     }
 
+    internal static void EnsureExpansionForceForPolicyFixture(MatchRuntime scenario, PlayerId player)
+    {
+        var configuration = CentralDivideScenario.CreateSettings(MatchScenarioProfile.Validation).OpponentConfigurations[player.Value];
+        Vector3 home = scenario.Simulation.Entities.GetComponent<WorldTransform>(scenario.GetBase(player).CommandCore).Position;
+        foreach (var (unit, minimum) in new[] { (UnitIds.ScoutVehicle, 1),
+                     (UnitIds.MainBattleTank, configuration.MinimumObjectivePressureUnits), (UnitIds.MobileArtillery, 1) })
+            for (int count = scenario.CountUnits(player, unit); count < minimum; count++)
+                scenario.UnitFactory.Create(DirectorateContent.CreateUnitCatalog()[unit],
+                    home + new Vector3(120 + (int)unit.Value * 20, 0, 120 + count * 20), player);
+    }
+
     internal static bool HasExpansionFundingPrerequisites(MatchRuntime scenario, PlayerId player)
     {
         BuildingId[] industry = [BuildingIds.PowerPlant, BuildingIds.StorageDepot, BuildingIds.Smelter,

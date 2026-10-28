@@ -494,6 +494,7 @@ public sealed class SkirmishSupplyPolicyTests
                     "; neighbors=" + string.Join(" | ", neighbors));
             }
         Assert.True(funded, string.Join("\n", queueDiagnostics));
+        SkirmishScenarioHarness.EnsureExpansionForceForPolicyFixture(scenario, side.Player);
         void SetAvailable(ResourceId resource, double quantity)
         {
             double current = scenario.Inventories.GetAvailableQuantity(side.StartingInventory, resource);

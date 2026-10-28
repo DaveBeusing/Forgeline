@@ -90,6 +90,7 @@ public sealed class SkirmishProductionPolicyTests
             SkirmishScenarioHarness.EnsureCargoForPolicyFixture(scenario, owner, 3);
             Assert.True(scenario.RunUntil(current => SkirmishScenarioHarness.HasExpansionFundingPrerequisites(current, owner),
                 24_000, TestContext.Current.CancellationToken));
+            SkirmishScenarioHarness.EnsureExpansionForceForPolicyFixture(scenario, owner);
             ulong nextDecision = scenario.GetOpponentState(owner).LastDecisionTick.Value + settings.OpponentConfigurations[owner.Value].ReactionCadenceTicks;
             while (scenario.Simulation.CurrentTick.Value + 1 < nextDecision) scenario.Simulation.AdvanceOneTick();
         }

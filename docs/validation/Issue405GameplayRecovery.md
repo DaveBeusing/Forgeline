@@ -14,3 +14,5 @@ Local evidence recorded during remediation:
 - Physical waiting-scout resupply completed in the measured 2,400-tick diagnostic, after remaining in motion at the former 1,200-tick cutoff. The production fixture now allows a complete authored processing cycle before asserting OutputFull.
 
 The full Game suite, remaining bootstrap policy cases and the unchanged seed-2026 80,000-tick require-terminal gate still need final successful qualification. This document does not claim CI success while any of those checks remain failing or incomplete.
+
+The construction-policy fixtures now explicitly author their required third cargo truck and, immediately before their isolated decision, the live scout/tank/artillery roles required by CanPlanExpansion. These test-only arrangements do not change runtime starting vehicles, stocks, paid technology/production tests, the 40,000-tick strategic-loop limit, or the 80,000-tick natural terminal gate.
