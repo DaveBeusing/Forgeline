@@ -9,6 +9,30 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class UiTextBatchTests
 {
     [Fact]
+    public void ContrastPipelineChangesOnlyPixelsAndReusesGeometryAtlasAndBuffers()
+    {
+        using var device = new Device();
+        var batch = new UiTextBatch(device);
+        var context = new RecordingContext();
+        batch.Begin(); batch.Add("SUPPLY CRITICAL / ÄÖÜ 125%", 10, 10, 18, Vector4.One, 1280, 720);
+        batch.Render(context);
+        var normal = device.Buffers[0].Bytes.ToArray();
+        var original = device.Buffers[0];
+        batch.HighContrast = true;
+        batch.Render(context);
+        Assert.Equal(normal, device.Buffers[0].Bytes);
+        Assert.Equal(2, device.Pipelines.Count);
+        Assert.Equal(1, device.TextureCreates);
+        Assert.Same(original, Assert.Single(device.Buffers));
+        batch.HighContrast = false; batch.Render(context);
+        batch.HighContrast = true; batch.Render(context);
+        Assert.Equal(2, device.Pipelines.Count);
+        Assert.Equal(0, batch.Diagnostics.MissingGlyphs);
+        batch.Dispose();
+        Assert.All(device.Pipelines, pipeline => Assert.True(pipeline.Disposed));
+    }
+
+    [Fact]
     public void AtlasLeaseAndFrameBuffersHaveExplicitLifetimes()
     {
         using var device = new Device();

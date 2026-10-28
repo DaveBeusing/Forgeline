@@ -1,0 +1,92 @@
+[
+  {
+    "Mode": "None",
+    "width": 1920,
+    "height": 1080,
+    "dpi": 96,
+    "LastLogisticsCapacityItems": 0,
+    "LastLogisticsCapacityOmitted": 0,
+    "LastRenderedVertexCount": 816,
+    "TextDiagnostics": {
+      "Glyphs": 45,
+      "Vertices": 270,
+      "MissingGlyphs": 0,
+      "DroppedGlyphs": 0,
+      "UploadBytes": 8640,
+      "AtlasReady": true,
+      "FailureReason": null
+    }
+  },
+  {
+    "Mode": "Logistics",
+    "width": 1920,
+    "height": 1080,
+    "dpi": 96,
+    "LastLogisticsCapacityItems": 31,
+    "LastLogisticsCapacityOmitted": 2,
+    "LastRenderedVertexCount": 4410,
+    "TextDiagnostics": {
+      "Glyphs": 393,
+      "Vertices": 2358,
+      "MissingGlyphs": 0,
+      "DroppedGlyphs": 0,
+      "UploadBytes": 75456,
+      "AtlasReady": true,
+      "FailureReason": null
+    }
+  },
+  {
+    "Mode": "Conveyors",
+    "width": 1920,
+    "height": 1080,
+    "dpi": 96,
+    "LastLogisticsCapacityItems": 9,
+    "LastLogisticsCapacityOmitted": 2,
+    "LastRenderedVertexCount": 2304,
+    "TextDiagnostics": {
+      "Glyphs": 257,
+      "Vertices": 1542,
+      "MissingGlyphs": 0,
+      "DroppedGlyphs": 0,
+      "UploadBytes": 49344,
+      "AtlasReady": true,
+      "FailureReason": null
+    }
+  },
+  {
+    "Mode": "Cargo",
+    "width": 1920,
+    "height": 1080,
+    "dpi": 96,
+    "LastLogisticsCapacityItems": 11,
+    "LastLogisticsCapacityOmitted": 0,
+    "LastRenderedVertexCount": 3174,
+    "TextDiagnostics": {
+      "Glyphs": 326,
+      "Vertices": 1956,
+      "MissingGlyphs": 0,
+      "DroppedGlyphs": 0,
+      "UploadBytes": 62592,
+      "AtlasReady": true,
+      "FailureReason": null
+    }
+  },
+  {
+    "Mode": "FieldLogistics",
+    "width": 1920,
+    "height": 1080,
+    "dpi": 96,
+    "LastLogisticsCapacityItems": 11,
+    "LastLogisticsCapacityOmitted": 0,
+    "LastRenderedVertexCount": 2994,
+    "TextDiagnostics": {
+      "Glyphs": 296,
+      "Vertices": 1776,
+      "MissingGlyphs": 0,
+      "DroppedGlyphs": 0,
+      "UploadBytes": 56832,
+      "AtlasReady": true,
+      "FailureReason": null
+    }
+  }
+]

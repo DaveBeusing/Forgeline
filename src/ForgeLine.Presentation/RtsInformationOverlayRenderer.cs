@@ -8,13 +8,19 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public sealed class RtsInformationOverlayRenderer : IDisposable
+public sealed partial class RtsInformationOverlayRenderer : IDisposable
 {
     private const int MaxVertices = 262_144;
     private const int VertexStride = 24;
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    private TacticalDisplaySettings _displaySettings;
+    internal void ConfigureDisplay(TacticalDisplaySettings settings)
+    {
+        _displaySettings = settings;
+        _text.HighContrast = settings.HighContrast;
+    }
     private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =
@@ -23,6 +29,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         new OverlayVertex[MaxVertices];
     private readonly RuntimeUiIconPalette? _runtimePalette;
     private readonly RtsMinimapScratch _minimapScratch = new();
+    private readonly BattlefieldStatusOverlay _battlefieldStatus = new();
+    internal int LastBattlefieldStatusMarkers { get; private set; }
 
     private GameplayBindingRegistry _bindings = GameplayBindingRegistry.Default;
     private int _vertexCount;
@@ -90,6 +98,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
         LastWorldLabels = 0;
+        LastLogisticsCapacityItems = LastLogisticsCapacityOmitted = 0;
+
+        LastBattlefieldStatusMarkers = 0;
 
         if (context.Width <= 0 ||
             context.Height <= 0)
@@ -117,7 +128,9 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
         if (preAlphaUx.Mode == PreAlphaUxMode.None)
         {
+            EmitLogisticsCapacity(camera, snapshot, view, layout, context.Width, context.Height);
             EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
+            EmitBattlefieldStatus(camera, snapshot, view, layout, context.Width, context.Height);
             EmitGameplayLabels(camera, gameplayOverlay, layout, context.Width, context.Height);
         }
         if (view.MinimapEnabled)
@@ -308,11 +321,56 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         _skin.PanelClip(new(0,0,width,height));
     }
 
+    private void EmitBattlefieldStatus(RtsCamera camera, PresentationSnapshot snapshot, in RtsInformationLayerView view,
+        in GameplayHudLayout layout, int width, int height)
+    {
+        var clip = new HudRect(layout.SafeArea.X, layout.TopStatusBar.Bottom, layout.SafeArea.Width,
+            MathF.Max(0, layout.Minimap.Y - layout.TopStatusBar.Bottom));
+        float scale = layout.Scale;
+        _battlefieldStatus.Update(snapshot, camera, view, clip, scale, width, height);
+        LastBattlefieldStatusMarkers = _battlefieldStatus.Count;
+        _text.Clip = clip;
+        foreach (ref readonly var marker in _battlefieldStatus.Markers)
+        {
+            Vector4 color = marker.Critical ? ForgeLineUiPalette.Critical : ForgeLineUiPalette.Warning;
+            float x = marker.Position.X, y = marker.Position.Y;
+            // Backing and stable letter/shape semantics survive dark terrain, VFX and label-density limits.
+            EmitQuad(x - 7 * scale, y - 8 * scale, 14 * scale, 16 * scale, new(.025f, .03f, .04f, .95f), width, height);
+            EmitQuad(x - scale, y - 5 * scale, 2 * scale, 6 * scale, color, width, height);
+            EmitQuad(x - scale, y + 3 * scale, 2 * scale, 2 * scale, color, width, height);
+            if (marker.Label.Length == 0) continue;
+            EmitQuad(marker.Bounds.X, y + 10 * scale, marker.Bounds.Width, 17 * scale,
+                new(.025f, .03f, .04f, .95f), width, height);
+            EmitText(marker.Label, marker.Bounds.X + 3 * scale, y + 11 * scale,
+                marker.Bounds.Right - 3 * scale, new(1, 1, 1, 1), .85f * scale, width, height);
+        }
+        _text.Clip = null;
+    }
+
     private void EmitOrderArtwork(RtsCamera camera, in RtsCommandMarkerView marker, float scale, int width, int height)
     {
         if (!marker.Visible) return;
         var point = camera.WorldToScreen(marker.Position,width,height);
-        if (point.IsVisible) _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        if (!point.IsVisible) return;
+        if (marker.State == RtsCommandMarkerState.Pending)
+        {
+            float x = point.Position.X - 9 * scale, y = point.Position.Y - 9 * scale;
+            Vector4 pending = new(1, .72f, .18f, 1);
+            EmitQuad(x, y, 18 * scale, 2 * scale, pending, width, height);
+            EmitQuad(x, y + 16 * scale, 18 * scale, 2 * scale, pending, width, height);
+            EmitQuad(x, y + 2 * scale, 2 * scale, 14 * scale, pending, width, height);
+            EmitQuad(x + 16 * scale, y + 2 * scale, 2 * scale, 14 * scale, pending, width, height);
+        }
+        else _skin.Order(new(point.Position.X-12*scale,point.Position.Y-12*scale,24*scale,24*scale),marker);
+        string label = marker.State switch
+        {
+            RtsCommandMarkerState.Pending => "PENDING",
+            RtsCommandMarkerState.Partial => "PARTIAL",
+            RtsCommandMarkerState.Rejected => "REJECTED",
+            _ => "ACCEPTED"
+        };
+        _text.AddCentered(label, new(point.Position.X-60*scale, point.Position.Y+14*scale,120*scale,18*scale),
+            12*scale, Vector4.One, width, height);
     }
 
     private void EmitMinimap(
@@ -761,9 +819,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     buttonWidth,
                     selector.Height);
 
-            bool selected =
-                mode ==
-                selectedMode;
+            bool selected = mode == selectedMode || mode == StrategicOverlayMode.Logistics &&
+                StrategicLogisticsCapacityFilters.IsLogistics(selectedMode);
             if (!_skin.Control(rect, selected: selected, role: "control.tab")) EmitQuad(
                 rect.X,
                 rect.Y,
@@ -864,14 +921,15 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             {
                 int count = mode switch
                 {
-                    StrategicOverlayMode.Logistics => overlay.LogisticsLinks.Count,
+                    StrategicOverlayMode.Logistics or StrategicOverlayMode.Conveyors or StrategicOverlayMode.Cargo or StrategicOverlayMode.FieldLogistics => CountLogisticsSamples(overlay.LogisticsCapacity, mode),
                     StrategicOverlayMode.Supply => overlay.Supply.Count,
                     StrategicOverlayMode.Sensors => overlay.Sensors.Count,
                     StrategicOverlayMode.Navigation => overlay.NavigationSectors.Count,
                     StrategicOverlayMode.Power => overlay.PowerEntities.Count,
                     _ => overlay.LogisticsNodes.Count + overlay.Supply.Count + overlay.PowerEntities.Count
                 };
-                text.Append(" LOCAL "); text.Append(count);
+                text.Append(" SAMPLED "); text.Append(count);
+                if (overlay.LogisticsCapacity is { } capacity && (capacity.Omitted > 0 || capacity.ScanLimited)) text.Append(" +LIMIT");
             }
         }
         float fittedScale = MathF.Min(scale * .8f, legend.Height / 30);
@@ -2155,7 +2213,11 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         int height,
         float opacity = 1)
     {
-        if (_skin.Icon(icon, x, y, size, new Vector4(1,1,1,opacity))) return;
+        // Authored icons contain their original colors. Alternate team palettes use
+        // the established distinct procedural glyphs instead of tinting baked art.
+        bool alternateTeam = _displaySettings.TeamPalette != TacticalTeamPalette.Standard &&
+            icon is RtsUiIcon.MinimapFriendlyUnit or RtsUiIcon.MinimapVisibleEnemy or RtsUiIcon.MinimapDetectedContact;
+        if (!alternateTeam && _skin.Icon(icon, x, y, size, new Vector4(1,1,1,opacity))) return;
         RtsUiIconDefinition definition =
             RtsUiIconCatalog.Get(
                 icon);
@@ -2188,18 +2250,23 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     continue;
                 }
 
+                int run = 1;
+                if (alternateTeam)
+                    while (column + run < 5 && pattern[row * 5 + column + run] == '1') run++;
+
                 EmitQuad(
                     x +
                     column *
                         pixel,
                     y +
                     row *
-                        pixel,
+                        pixel * run,
                     pixel,
                     pixel,
                     color,
                     width,
                     height);
+                column += run - 1;
             }
         }
     }
@@ -2211,12 +2278,18 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             RtsUiIconCatalog.Get(
                 icon);
 
-        return _runtimePalette is not null &&
+        Vector4 color = _runtimePalette is not null &&
                _runtimePalette.TryResolve(
                    definition.AssetId,
                    out Vector4 runtimeColor)
             ? runtimeColor
             : definition.FallbackTint;
+        return icon switch
+        {
+            RtsUiIcon.MinimapFriendlyUnit => _displaySettings.TeamColor(false, color),
+            RtsUiIcon.MinimapVisibleEnemy or RtsUiIcon.MinimapDetectedContact => _displaySettings.TeamColor(true, color),
+            _ => color
+        };
     }
 
     private void EmitPixelLine(Vector2 a, Vector2 b, float thickness, Vector4 color, int width, int height)

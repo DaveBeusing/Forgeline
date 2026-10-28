@@ -213,3 +213,7 @@ parameters and terminal gate. Neither profile's success substitutes for the othe
 ## Bounded player after-action report
 
 The terminal client and explicit headless --debrief-output path share a player-scoped first/latest summary independent of offline all-player telemetry. The result remains authoritative; unavailable historical causes, battle/contact/territory evidence and safe map coordinates are stated explicitly. See [debrief controls, schema, privacy and qualification](AfterActionStrategicDebrief.md).
+
+## Decision benchmark extension
+
+Headless telemetry output can also retain bounded decision observations and a schema-1 pacing benchmark block with nullable availability, cohort-safe comparisons and advisory thresholds. Existing client telemetry does not enable this extension. See [Match pacing benchmarks](MatchPacingBenchmarks.md).

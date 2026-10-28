@@ -30,4 +30,9 @@ Invoke-DebriefContract @('--scenario','central-divide','--ticks','1','--debrief-
 Invoke-DebriefContract @('--scenario','central-divide','--ticks','1','--matches','2','--debrief-output',(Join-Path $destination 'invalid.json')) 1
 Invoke-DebriefContract @('--scenario','central-divide','--ticks','1','--debrief-player','999','--debrief-output',(Join-Path $destination 'foreign.json')) 1
 Invoke-DebriefContract @('--scenario','central-divide','--ticks','1','--save-output',(Join-Path $destination 'shared.json'),'--debrief-output',(Join-Path $destination 'shared.json')) 1
+$thresholds = Join-Path $destination 'thresholds.json'
+[IO.File]::WriteAllText($thresholds, '{}')
+$thresholdHash = (Get-FileHash -LiteralPath $thresholds).Hash
+Invoke-DebriefContract @('--scenario','central-divide','--ticks','1','--telemetry-output',(Join-Path $destination 'telemetry.json'),'--pacing-thresholds',(Join-Path $destination 'thresholds.json'),'--debrief-output',(Join-Path $destination 'thresholds.json')) 1
+if ((Get-FileHash -LiteralPath $thresholds).Hash -ne $thresholdHash) { throw 'Debrief export modified pacing threshold input.' }
 Write-Host "Player debrief CLI contracts passed."

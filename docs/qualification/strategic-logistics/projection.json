@@ -1,0 +1,11 @@
+{
+  "FixtureRows": 4096,
+  "CopiedRows": 3072,
+  "Projected": 80,
+  "Omitted": 2992,
+  "MillisecondsPerBuild": 0.5260484375,
+  "BytesPerBuild": 0,
+  "Warmups": 32,
+  "Samples": 128,
+  "Notes": "Copied representative projection CPU only; not GPU or human readability acceptance."
+}

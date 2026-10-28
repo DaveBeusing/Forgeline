@@ -52,7 +52,7 @@ internal static class ContextualCommandModel
             if (index >= 6) return false;
             command = new(PlayerActionPanelMode.Tactical, index,
                 PlayerActionDockHudModel.ResolveItemTitle(PlayerActionPanelMode.Tactical, index, actions),
-                bindings.TacticalPrompt,
+                bindings.TacticalShortcut(index),
                 selectionPending ? PlayerActionDockItemState.Disabled("UPDATING SELECTION") :
                 localPending || actions.PendingCommandCount > 0 ? PlayerActionDockItemState.Disabled("REQUEST PENDING") :
                     PlayerActionDockHudModel.ResolveItemState(PlayerActionPanelMode.Tactical, index, actions));

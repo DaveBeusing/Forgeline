@@ -163,6 +163,8 @@ public sealed class StrategicOverlaySnapshot
                 nameof(powerNetworks)));
     }
 
+    public StrategicLogisticsCapacitySnapshot? LogisticsCapacity { get; init; }
+
     public SimulationTick Tick { get; }
     public SimulationSessionId Session { get; }
     public PlayerId Player { get; }
@@ -201,7 +203,7 @@ internal static class StrategicOverlaySnapshotFactory
         SimulationContext context,
         PresentationExtractionContext extraction,
         StrategicOverlayMode mode,
-        FactionIntelligenceSnapshot? intelligence)
+        FactionIntelligenceSnapshot? intelligence, RenderInstance[] instances)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(extraction);
@@ -210,22 +212,8 @@ internal static class StrategicOverlaySnapshotFactory
             mode ==
             StrategicOverlayMode.All;
 
-        StrategicLogisticsNodeReadModel[] logisticsNodes =
-            all ||
-            mode ==
-                StrategicOverlayMode.Logistics
-                ? CaptureLogisticsNodes(
-                    context.Entities,
-                    extraction)
-                : [];
-        StrategicLogisticsLinkReadModel[] logisticsLinks =
-            all ||
-            mode ==
-                StrategicOverlayMode.Logistics
-                ? CaptureLogisticsLinks(
-                    extraction,
-                    logisticsNodes)
-                : [];
+        StrategicLogisticsNodeReadModel[] logisticsNodes = [];
+        StrategicLogisticsLinkReadModel[] logisticsLinks = [];
         StrategicSupplyReadModel[] supply =
             all ||
             mode ==
@@ -280,7 +268,9 @@ internal static class StrategicOverlaySnapshotFactory
             navigationPortals,
             powerEntities,
             powerNetworks, extraction.Scenario.Simulation.SessionId, extraction.Player)
-        { TacticalAreas = all || mode == StrategicOverlayMode.Sensors
+        { LogisticsCapacity = all || StrategicLogisticsCapacityFilters.IsLogistics(mode)
+            ? StrategicLogisticsCapacityCapture.Capture(context, extraction, instances) : null,
+          TacticalAreas = all || mode == StrategicOverlayMode.Sensors
             ? Array.AsReadOnly(CaptureTacticalAreas(extraction.Scenario)) : Array.Empty<StrategicTacticalAreaReadModel>() };
     }
 
@@ -302,118 +292,6 @@ internal static class StrategicOverlaySnapshotFactory
                 Ground(b.Maximum.X, b.Maximum.Z), Ground(b.Minimum.X, b.Maximum.Z), area.BlocksVisual));
         }
         return rows.ToArray();
-    }
-
-    private static StrategicLogisticsNodeReadModel[] CaptureLogisticsNodes(
-        EntityRegistry entities,
-        PresentationExtractionContext extraction)
-    {
-        IReadOnlyList<LogisticsNode> nodes =
-            extraction.Scenario.Logistics.GetNodes();
-        var result =
-            new List<StrategicLogisticsNodeReadModel>(
-                nodes.Count);
-
-        for (int index = 0;
-             index < nodes.Count;
-             index++)
-        {
-            LogisticsNode node =
-                nodes[index];
-
-            if (!IsOwned(
-                    entities,
-                    node.Entity,
-                    extraction.Player))
-            {
-                continue;
-            }
-
-            result.Add(
-                new StrategicLogisticsNodeReadModel(
-                    node.Entity,
-                    node.WorldPosition,
-                    node.Kind,
-                    node.Capabilities,
-                    node.Enabled));
-        }
-
-        return result.ToArray();
-    }
-
-    private static StrategicLogisticsLinkReadModel[] CaptureLogisticsLinks(
-        PresentationExtractionContext extraction,
-        StrategicLogisticsNodeReadModel[] localNodes)
-    {
-        if (localNodes.Length == 0)
-        {
-            return [];
-        }
-
-        var positions =
-            new Dictionary<LogisticsNodeId, Vector3>(
-                localNodes.Length);
-        IReadOnlyList<LogisticsNode> nodes =
-            extraction.Scenario.Logistics.GetNodes();
-
-        for (int index = 0;
-             index < nodes.Count;
-             index++)
-        {
-            LogisticsNode node =
-                nodes[index];
-
-            for (int localIndex = 0;
-                 localIndex <
-                     localNodes.Length;
-                 localIndex++)
-            {
-                if (localNodes[
-                        localIndex].Entity ==
-                    node.Entity)
-                {
-                    positions[node.Id] =
-                        node.WorldPosition;
-                    break;
-                }
-            }
-        }
-
-        IReadOnlyList<LogisticsEdge> edges =
-            extraction.Scenario.Logistics.GetEdges();
-        var result =
-            new List<StrategicLogisticsLinkReadModel>(
-                edges.Count);
-
-        for (int index = 0;
-             index < edges.Count;
-             index++)
-        {
-            LogisticsEdge edge =
-                edges[index];
-
-            if (edge.Mode !=
-                    LogisticsTransportMode.GroundRoad ||
-                !positions.TryGetValue(
-                    edge.Source,
-                    out Vector3 source) ||
-                !positions.TryGetValue(
-                    edge.Destination,
-                    out Vector3 destination))
-            {
-                continue;
-            }
-
-            result.Add(
-                new StrategicLogisticsLinkReadModel(
-                    source,
-                    destination,
-                    edge.Mode,
-                    edge.CapacityPerSecond,
-                    edge.Enabled));
-        }
-
-        return result.ToArray();
     }
 
     private static StrategicSupplyReadModel[] CaptureSupply(
