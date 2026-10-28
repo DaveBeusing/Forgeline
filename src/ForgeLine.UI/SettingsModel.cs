@@ -21,7 +21,10 @@ public readonly record struct FrontendSettingsSnapshot(
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
     public NotificationPreferences Notifications { get; init; } = NotificationPreferences.Default;
     public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
+    public TacticalDisplaySettings TacticalDisplay { get; init; } = new();
 }
+
+public enum AccessibilityPreset : byte { Standard, Readable, HighContrast }
 
 public sealed class SettingsModel
 {
@@ -46,6 +49,39 @@ public sealed class SettingsModel
     {
         ArgumentNullException.ThrowIfNull(preferences); preferences.Validate();
         Settings = Settings with { Notifications = preferences };
+    }
+
+    public void SetTacticalDisplay(TacticalDisplaySettings settings)
+    {
+        settings.Validate();
+        Settings = Settings with { TacticalDisplay = settings };
+    }
+
+    public AccessibilityPreset? DisplayPreset => (Settings.UiScale, Settings.FeedbackSettings.ReducedMotion,
+        Settings.TacticalDisplay.HighContrast, Settings.TacticalDisplay.TeamPalette) switch
+    {
+        (1f, false, false, TacticalTeamPalette.Standard) => AccessibilityPreset.Standard,
+        (1.25f, true, false, TacticalTeamPalette.Standard) => AccessibilityPreset.Readable,
+        (1.25f, true, true, TacticalTeamPalette.BlueOrange) => AccessibilityPreset.HighContrast,
+        _ => null
+    };
+
+    public void ApplyAccessibilityPreset(AccessibilityPreset preset)
+    {
+        if (!Enum.IsDefined(preset)) throw new ArgumentOutOfRangeException(nameof(preset));
+        Settings = Settings with
+        {
+            UiScale = preset == AccessibilityPreset.Standard ? 1f : 1.25f,
+            TacticalDisplay = new() { HighContrast = preset == AccessibilityPreset.HighContrast,
+                TeamPalette = preset == AccessibilityPreset.HighContrast ? TacticalTeamPalette.BlueOrange : TacticalTeamPalette.Standard },
+            FeedbackSettings = Settings.FeedbackSettings with { ReducedMotion = preset != AccessibilityPreset.Standard }
+        };
+    }
+
+    public void ResetAccessibility()
+    {
+        ApplyAccessibilityPreset(AccessibilityPreset.Standard);
+        Settings = Settings with { Tooltips = HoverTooltipSettings.Default };
     }
 
     public void SetTooltips(HoverTooltipSettings settings)

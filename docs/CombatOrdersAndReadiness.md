@@ -315,3 +315,7 @@ Stop and Hold remain distinct existing commands. Stop clears tactical intent thr
 ## Active-state recovery qualification
 
 GroupedResupplyAndReplacementRoundTripThroughSaveAndReplay uses the normal MatchRuntime systems with an explicit reproducible initial composition, finite Ammo stock and supported recorded PlayerTacticalActionCommand / PlayerLogisticsActionCommand adapters. It captures active grouped partial resupply, a replacing Hold order and subsequent normal navigation. Each checkpoint is serialized, restored and replayed, with complete authoritative hashes checked immediately and during continued ticks. The same-generation combat group and current command remain authoritative; no private command type or test-only persistence exception is accepted.
+
+## Explicit engagement policies
+
+The existing Combat ring now exposes Hold Fire, Return Fire and Fire At Will through owned tactical commands, independent of movement/queued orders. See [tactical groups and engagement rules](TacticalGroupsAndEngagement.md) for precedence, component coverage and persistence.

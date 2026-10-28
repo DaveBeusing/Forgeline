@@ -19,6 +19,7 @@ internal sealed class OperationsWorldOverlaySurface : IGameplayHudSurface
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
     private readonly UiTextBatch _text;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _text.HighContrast = settings.HighContrast;
     private int _count, _width, _height;
     private bool _disposed;
 

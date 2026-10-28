@@ -17,7 +17,7 @@ namespace ForgeLine.Client;
 internal static class BattlefieldHudCapture
 {
     private static readonly JsonSerializerOptions s_json = new() { WriteIndented = true };
-    internal static int Run(string output, string runtimeRoot, bool timingOnly = false)
+    internal static int Run(string output, string runtimeRoot, bool timingOnly = false, bool accessibilityOnly = false)
     {
         try
         {
@@ -41,6 +41,7 @@ internal static class BattlefieldHudCapture
                 var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
                 foreach (var display in new[] { (1280, 720), (1920, 1080), (2560, 1440), (3440, 1440), (3840, 2160) })
                 {
+                    if (accessibilityOnly && (zoom != RtsReferenceZoom.NormalGameplay || (display != (1280, 720) && display != (1920, 1080)))) continue;
                     if (timingOnly && display != (1920, 1080)) continue;
                     // The complete display/DPI/scale matrix uses normal zoom; strategic adds the same
                     // three state inspections at the reference display without duplicating layout work.
@@ -48,11 +49,18 @@ internal static class BattlefieldHudCapture
                     graphics.WaitForIdle(); graphics.Resize(display.Item1, display.Item2);
                     ground.Prepare(camera, display.Item1, display.Item2);
                     foreach (uint dpi in new uint[] { 96, 144, 192 })
-                    foreach (float scale in new[] { .75f, 1f, 2f })
+                    foreach (float scale in accessibilityOnly ? new[] { 1f, 1.25f, 1.5f } : new[] { .75f, 1f, 2f })
                     {
+                        if (accessibilityOnly && dpi != 96) continue;
                         if (timingOnly && (dpi != 96 || scale != 1)) continue;
                         if (zoom == RtsReferenceZoom.Strategic && (dpi != 96 || scale != 1)) continue;
                         foreach (string state in new[] { "Mixed", "Supply", "Production" })
+                        foreach (var displaySettings in accessibilityOnly ? new[]
+                        {
+                            new TacticalDisplaySettings(),
+                            new TacticalDisplaySettings { HighContrast = true, TeamPalette = TacticalTeamPalette.BlueOrange },
+                            new TacticalDisplaySettings { HighContrast = true, TeamPalette = TacticalTeamPalette.Grayscale }
+                        } : new[] { new TacticalDisplaySettings() })
                         {
                             var snapshot = State(fixture.Snapshot, state);
                             var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
@@ -64,7 +72,7 @@ internal static class BattlefieldHudCapture
                                 c.BeginPass(GraphicsFramePass.Overlay);
                                 hud.Render(c, camera, snapshot, terrain.WorldBounds, RtsInformationLayerView.Empty,
                                     default, default, FormationTemplate.Compact, CombatGroupOverviewView.Empty, default,
-                                    dpi, scale, operations: operations);
+                                    dpi, scale, operations: operations, displaySettings: displaySettings);
                             }
                             void Record(IGraphicsCommandContext c)
                             {
@@ -79,17 +87,18 @@ internal static class BattlefieldHudCapture
                             if (!text.AtlasReady || text.MissingGlyphs != 0 || text.DroppedGlyphs != 0)
                                 throw new InvalidDataException("Incomplete native HUD text.");
                             string key = FormattableString.Invariant($"{state}-{zoom}-{display.Item1}x{display.Item2}-{dpi}dpi-{scale:0.00}");
+                            if (accessibilityOnly) key += "-" + displaySettings.TeamPalette + "-contrast" + displaySettings.HighContrast;
                             string? image = null;
-                            if ((dpi == 96 && scale == 1) || (display == (1280, 720) && dpi == 192 && scale == 2))
+                            if (accessibilityOnly || (dpi == 96 && scale == 1) || (display == (1280, 720) && dpi == 192 && scale == 2))
                             {
                                 image = key + ".png";
                                 ReferenceCaptureImage.WritePng(Path.Combine(output, image), display.Item1, display.Item2, pixels);
                             }
                             object? timing = null;
-                            if (display == (1920, 1080) && dpi == 96 && scale == 1 && zoom == RtsReferenceZoom.NormalGameplay)
+                            if (!accessibilityOnly && display == (1920, 1080) && dpi == 96 && scale == 1 && zoom == RtsReferenceZoom.NormalGameplay)
                                 timing = Measure(graphics, RecordHud);
                             results.Add(new { State = state, Zoom = zoom.ToString(), Width = display.Item1, Height = display.Item2,
-                                Dpi = dpi, UiScale = scale, Image = image, Repeatable = true,
+                                Dpi = dpi, UiScale = scale, Display = displaySettings, Image = image, Repeatable = true,
                                 PixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), HudVertices = hud.LastRenderedVertexCount,
                                 Text = text, HudOnlyTiming = timing });
                             Console.WriteLine("[hud:capture] " + key);

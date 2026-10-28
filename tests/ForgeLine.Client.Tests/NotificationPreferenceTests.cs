@@ -38,6 +38,45 @@ public sealed class NotificationPreferenceTests
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
     }
 
+
+    [Fact]
+    public void NotificationAndDisplayPreferencesRoundTripTogetherAndResetIndependently()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "forgeline-combined-settings", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new ClientSettingsStore(root);
+            store.Save(new ClientUserSettings
+            {
+                TacticalDisplay = new() { HighContrast = true, TeamPalette = TacticalTeamPalette.Grayscale },
+                Notifications = new() { Mode = NotificationMode.Quiet, ShowInformational = false },
+                GameplayBindings = new ForgeLine.Input.GameplayBindings().With(ForgeLine.Input.GameplayAction.Stop, ForgeLine.Platform.PlatformKey.J)
+            });
+            var adapter = new ClientSettingsFrontendAdapter(store);
+            var model = adapter.Load();
+            Assert.True(model.Settings.TacticalDisplay.HighContrast);
+            Assert.Equal(NotificationMode.Quiet, model.Settings.Notifications.Mode);
+            model.SetNotifications(new() { Mode = NotificationMode.Batched, ShowInformational = false });
+            adapter.Apply(model);
+            var saved = store.Load().Settings;
+            Assert.Equal(TacticalTeamPalette.Grayscale, saved.TacticalDisplay.TeamPalette);
+            Assert.True(saved.TacticalDisplay.HighContrast);
+            model = adapter.Load();
+            model.ResetAccessibility();
+            adapter.Apply(model);
+            saved = store.Load().Settings;
+            Assert.Equal(new TacticalDisplaySettings(), saved.TacticalDisplay);
+            Assert.Equal(NotificationMode.Batched, saved.Notifications.Mode);
+            Assert.False(saved.Notifications.ShowInformational);
+            Assert.Equal(ForgeLine.Platform.PlatformKey.J,
+                new ForgeLine.Input.GameplayBindingRegistry(saved.GameplayBindings).Key(ForgeLine.Input.GameplayAction.Stop));
+            Assert.Equal(26, (int)ForgeLine.Input.GameplayAction.Attack);
+            Assert.Equal(33, (int)ForgeLine.Input.GameplayAction.RetreatToRecovery);
+            Assert.Equal(34, (int)ForgeLine.Input.GameplayAction.NextAlert);
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
     [Fact]
     public void UnknownModeIsRejectedBeforePersistence()
     {

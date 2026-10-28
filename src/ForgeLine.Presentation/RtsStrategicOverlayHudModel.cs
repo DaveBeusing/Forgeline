@@ -13,7 +13,7 @@ public static class RtsStrategicOverlayHudModel
     public static string Legend(StrategicOverlayMode mode) => mode switch
     {
         StrategicOverlayMode.Logistics => "LINE LINK X OFF - LOAD N/A",
-        StrategicOverlayMode.Supply => "RING RANGE X CRITICAL/OFF",
+        StrategicOverlayMode.Supply => "! CRITICAL P PIN S SUP L LOW",
         StrategicOverlayMode.Sensors => "GREEN COVER / AMBER SCREEN / RANGES",
         StrategicOverlayMode.Navigation => "BOX SECTOR POINT PORTAL",
         StrategicOverlayMode.Power => "X OFF DIAMOND BROWNOUT",

@@ -18,7 +18,8 @@ public enum FrontendSettingsField : byte
     RenderQuality = 8,
     ResolutionScale = 9, Antialiasing = 10, Shadows = 11, Textures = 12, ObjectDetail = 13,
     SurfaceDetail = 14, VegetationMotion = 15, Atmosphere = 16, Particles = 17, ReducedUiMotion = 18, UiSoundEnabled = 19, UiSoundVolume = 20,
-    WorldSoundEnabled = 21, MasterSoundVolume = 22, WorldSoundVolume = 23, AlertSoundVolume = 24, AmbienceSoundVolume = 25, TooltipDelay = 26, TooltipTextSize = 27, NotificationMode = 28, InformationalAlerts = 29
+    WorldSoundEnabled = 21, MasterSoundVolume = 22, WorldSoundVolume = 23, AlertSoundVolume = 24, AmbienceSoundVolume = 25, TooltipDelay = 26, TooltipTextSize = 27,
+    DisplayPreset = 28, HighContrast = 29, TeamPalette = 30, ResetAccessibility = 31, NotificationMode = 32, InformationalAlerts = 33
 }
 
 public enum FrontendSettingsSection : byte { General, Graphics, Audio, Bindings }
@@ -29,7 +30,8 @@ public sealed class SettingsInteractionModel
     [
         [FrontendSettingsField.OutputResolution, FrontendSettingsField.BorderlessFullscreen, FrontendSettingsField.UiScale,
          FrontendSettingsField.EdgeScroll, FrontendSettingsField.CameraSpeed, FrontendSettingsField.Onboarding, FrontendSettingsField.ReducedUiMotion,
-         FrontendSettingsField.TooltipDelay, FrontendSettingsField.TooltipTextSize, FrontendSettingsField.NotificationMode, FrontendSettingsField.InformationalAlerts],
+         FrontendSettingsField.TooltipDelay, FrontendSettingsField.TooltipTextSize,
+         FrontendSettingsField.DisplayPreset, FrontendSettingsField.HighContrast, FrontendSettingsField.TeamPalette, FrontendSettingsField.ResetAccessibility, FrontendSettingsField.NotificationMode, FrontendSettingsField.InformationalAlerts],
         [FrontendSettingsField.RenderQuality, FrontendSettingsField.ResolutionScale, FrontendSettingsField.Antialiasing,
          FrontendSettingsField.Shadows, FrontendSettingsField.Textures, FrontendSettingsField.ObjectDetail,
          FrontendSettingsField.SurfaceDetail, FrontendSettingsField.VegetationMotion, FrontendSettingsField.Atmosphere, FrontendSettingsField.Particles],
@@ -184,9 +186,11 @@ public sealed class SettingsInteractionModel
                 _candidate = candidate;
                 try
                 {
-                    model.SetGameplayBindings(bindings.With(BindingAction, candidate));
+                    model.SetGameplayBindings(candidate == PlatformKey.Unknown
+                        ? bindings.Reset(BindingAction) : bindings.With(BindingAction, candidate));
                     CanApply = true;
-                    BindingFeedback = "BINDING READY - APPLY TO SAVE";
+                    BindingFeedback = candidate == PlatformKey.Unknown
+                        ? "DEFAULT RESTORED - APPLY TO SAVE" : "BINDING READY - APPLY TO SAVE";
                 }
                 catch (InvalidDataException exception) { CanApply = false; BindingFeedback = exception.Message.ToUpperInvariant(); }
                 break;
@@ -216,6 +220,14 @@ public sealed class SettingsInteractionModel
                 model.SetGraphicsSettings(graphics with { VegetationMotion = Cycle(graphics.VegetationMotion, direction) }); break;
             case FrontendSettingsField.ReducedUiMotion:
                 model.SetUiFeedback(settings.FeedbackSettings with { ReducedMotion = !settings.FeedbackSettings.ReducedMotion }); break;
+            case FrontendSettingsField.DisplayPreset:
+                model.ApplyAccessibilityPreset((AccessibilityPreset)(((int)(model.DisplayPreset ?? AccessibilityPreset.Standard) + Math.Sign(direction) + 3) % 3)); break;
+            case FrontendSettingsField.HighContrast:
+                model.SetTacticalDisplay(settings.TacticalDisplay with { HighContrast = !settings.TacticalDisplay.HighContrast }); break;
+            case FrontendSettingsField.TeamPalette:
+                model.SetTacticalDisplay(settings.TacticalDisplay with { TeamPalette = (TacticalTeamPalette)(((int)settings.TacticalDisplay.TeamPalette + Math.Sign(direction) + 3) % 3) }); break;
+            case FrontendSettingsField.ResetAccessibility:
+                model.ResetAccessibility(); break;
             case FrontendSettingsField.UiSoundEnabled:
                 model.SetUiFeedback(settings.FeedbackSettings with { SoundEnabled = !settings.FeedbackSettings.SoundEnabled }); break;
             case FrontendSettingsField.UiSoundVolume:

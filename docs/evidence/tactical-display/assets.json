@@ -1,0 +1,84 @@
+{
+  "contentSignature": "f8416ea299da82358086ec219bedbe38fbb27d2a7680b6691d3f78da352b4c3b",
+  "assetCount": 2049,
+  "meshCount": 940,
+  "textureCount": 919,
+  "materialCount": 149,
+  "skinCount": 2,
+  "skinRuntimeBytes": 3630411,
+  "animationCount": 38,
+  "animationRuntimeBytes": 242424,
+  "uiSkinCount": 1,
+  "uiSkinRuntimeBytes": 99652,
+  "totalRuntimeBytes": 94731442,
+  "meshRuntimeBytes": 43903213,
+  "textureRuntimeBytes": 46660587,
+  "studioSplashTextureRuntimeBytes": 1786417,
+  "materialRuntimeBytes": 195155,
+  "catalogLoadDuration": "00:00:00.1687256",
+  "assetReadDuration": "00:00:23.1204862",
+  "largestAssets": [
+    {
+      "assetId": "texture.infrastructure.directorate.conveyor.base",
+      "type": "texture",
+      "runtimeBytes": 5587838
+    },
+    {
+      "assetId": "texture.directorate.surface.atlas_base",
+      "type": "texture",
+      "runtimeBytes": 5587812
+    },
+    {
+      "assetId": "branding.forgeline.menu.directorate",
+      "type": "texture",
+      "runtimeBytes": 3146855
+    },
+    {
+      "assetId": "skin.directorate.combat_engineer",
+      "type": "skin",
+      "runtimeBytes": 2129106
+    },
+    {
+      "assetId": "skin.directorate.rifle_squad",
+      "type": "skin",
+      "runtimeBytes": 1501305
+    },
+    {
+      "assetId": "texture.world.terrain.crushed_gravel",
+      "type": "texture",
+      "runtimeBytes": 1399134
+    },
+    {
+      "assetId": "texture.world.terrain.concrete_base",
+      "type": "texture",
+      "runtimeBytes": 1399130
+    },
+    {
+      "assetId": "texture.world.terrain.cracked_earth",
+      "type": "texture",
+      "runtimeBytes": 1399130
+    },
+    {
+      "assetId": "texture.world.terrain.rocky_scrub",
+      "type": "texture",
+      "runtimeBytes": 1399122
+    },
+    {
+      "assetId": "texture.world.terrain.dark_ash",
+      "type": "texture",
+      "runtimeBytes": 1399110
+    },
+    {
+      "assetId": "texture.world.terrain.dry_dirt",
+      "type": "texture",
+      "runtimeBytes": 1399110
+    },
+    {
+      "assetId": "texture.world.terrain.bedrock",
+      "type": "texture",
+      "runtimeBytes": 1399106
+    }
+  ],
+  "issues": [],
+  "success": true
+}

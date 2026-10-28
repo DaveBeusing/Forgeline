@@ -209,6 +209,7 @@ internal sealed class ResourcePowerHudSurface : IGameplayHudSurface
     public UiTextDiagnostics TextDiagnostics => _renderer.TextDiagnostics;
     public GameplayHudSkinDiagnostics SkinDiagnostics => _renderer.SkinDiagnostics;
     public int LastRenderedVertexCount => _renderer.LastRenderedVertexCount;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _renderer.ConfigureDisplay(settings);
 
     public void Render(
         in GameplayHudRenderContext context) =>
@@ -248,6 +249,7 @@ internal sealed class ResourcePowerHudRenderer : IDisposable
 
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    internal void ConfigureDisplay(TacticalDisplaySettings settings) => _text.HighContrast = settings.HighContrast;
     private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _vertexBuffers =

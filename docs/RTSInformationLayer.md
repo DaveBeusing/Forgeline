@@ -346,3 +346,7 @@ Selection marquee and short-lived order markers follow the frame-owned interacti
 
 The information renderer rebuilds minimap symbols, selection/group membership and fog cells in render-owner scratch collections. Each update clears prior contents while retaining capacity, including across session replacement. Borrowed frame lists are consumed immediately by that renderer and never published. The public `RtsMinimapModelBuilder.Build` still returns an owned immutable copy for external callers; both paths use the same mapping rules. See [Interaction qualification](InteractionQualification.md) for state/display coverage and the warm allocation guard.
 
+
+## Battlefield status detail
+
+Owned strength, suppression, resupply and artillery mission causes extend the current inspector and Supply/All overlays. See [Battlefield status readability](BattlefieldStatusReadability.md) for symbol semantics, density limits and visibility gates.

@@ -1,0 +1,56 @@
+{
+  "SchemaVersion": 1,
+  "Status": "SimulationFault",
+  "ScenarioKey": "central-divide.directorate.v1",
+  "Profile": "Gameplay",
+  "Seed": 17,
+  "RequestedTicks": 100000000,
+  "LastCompletedTick": 5115,
+  "CompletedObservation": {
+    "ConfigurationFingerprint": "F632F06556338695EBE3BD720038BEDA506FF95083E64BB8D5CEE542FD1DE86E",
+    "Scenario": "central-divide.directorate.v1",
+    "Profile": "Gameplay",
+    "StartedAtTick": 0,
+    "EndTick": 5115,
+    "ObservedTicks": 5115,
+    "MissedTicks": 0,
+    "TruncatedTicks": 0,
+    "LongestNoProgressTicks": 1901,
+    "ScoutAvailable": true,
+    "ResearchAvailable": true,
+    "TechnologyUnlockAvailable": true,
+    "Players": [
+      {
+        "Player": 1,
+        "FactoryTicks": 7190,
+        "FactoryRunningTicks": 356,
+        "ResourceFacilityTicks": 23320,
+        "ResourceShortfallFacilityTicks": 21679,
+        "SupplyUnitTicks": 17517,
+        "SupplyShortageTicks": 1589,
+        "LongestSupplyShortageTicks": 915,
+        "FirstSupplyShortageTick": 1,
+        "FirstTechnologyUnlockTick": 260,
+        "FrontTravelMeters": 49.7406566896243,
+        "FrontComparableTicks": 5110
+      },
+      {
+        "Player": 2,
+        "FactoryTicks": 7190,
+        "FactoryRunningTicks": 0,
+        "ResourceFacilityTicks": 23320,
+        "ResourceShortfallFacilityTicks": 23286,
+        "SupplyUnitTicks": 15345,
+        "SupplyShortageTicks": 917,
+        "LongestSupplyShortageTicks": 917,
+        "FirstSupplyShortageTick": 1,
+        "FirstTechnologyUnlockTick": 260,
+        "FrontTravelMeters": 0,
+        "FrontComparableTicks": 5114
+      }
+    ]
+  },
+  "ErrorType": "System.Collections.Generic.KeyNotFoundException",
+  "Message": "Entity 80:1 does not have component MovementOrder.",
+  "Scope": "Last completed observation only. Failed-tick state is not captured; not a successful baseline."
+}
