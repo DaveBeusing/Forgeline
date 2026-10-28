@@ -53,6 +53,8 @@ public sealed record SourceAssetDefinition
 
     public TextureCompressionQuality TextureCompressionQuality { get; init; } = TextureCompressionQuality.Best;
 
+    public ScatterAssetMetadata? Scatter { get; init; }
+
     public float Scale { get; init; } = 1f;
 
     public IReadOnlyList<string> Dependencies { get; init; } = [];
