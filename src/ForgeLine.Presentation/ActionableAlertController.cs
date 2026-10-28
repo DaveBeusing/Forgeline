@@ -104,7 +104,7 @@ public sealed class ActionableAlertController
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
         if (changed) { _pending = false; return new(captured); }
         if (nextAlert && !input.IsKeyDown(PlatformKey.LeftControl) && !input.IsKeyDown(PlatformKey.RightControl) &&
-            !input.IsKeyDown(PlatformKey.LeftShift) && !input.IsKeyDown(PlatformKey.RightShift) && !input.WasKeyPressedWithShift(key))
+            !input.IsKeyDown(PlatformKey.LeftShift) && !input.IsKeyDown(PlatformKey.RightShift) && !input.WasKeyPressedWithShift(key) && !input.WasKeyPressedWithControl(key))
         {
             _pending = false;
             return NextAlert(experience, alerts, plain.Revision);

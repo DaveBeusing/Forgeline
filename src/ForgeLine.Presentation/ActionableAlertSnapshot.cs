@@ -41,7 +41,7 @@ public sealed class ActionableAlertSnapshot
         foreach (var group in causes.Groups) if (group.Reason == OperationsDiagnosisReason.NoPower) powerGroups++;
         if (powerGroups == 0) return this;
         return new(Session, Tick, Player, Alerts.Select(alert => alert.Identity.Kind == PlayerAlertState.LowPower
-            ? alert with { Label = FormattableString.Invariant($"POWER CONSTRAINED / {powerGroups} SHARED CAUSE(S){(causes.Limited ? " / LIMITED" : "")}"),
+            ? alert with { Label = FormattableString.Invariant($"{alert.Label} / {powerGroups} SHARED CAUSE(S){(causes.Limited ? " / LIMITED" : "")}"),
                 Target = causes.NextPowerMember(default) } : alert).ToArray(), Changes, Preferences);
     }
     public static ActionableAlertSnapshot? Resolve(PresentationSnapshot? snapshot) =>
