@@ -1,0 +1,110 @@
+{
+  "BaseCommit": "d1bb676d7d779bae4ef5d943a0305e3115b79e66\n",
+  "Contract": "Local working-source qualification. Assembly informational version identifies the base revision; these normalized source hashes bind the reviewed modifications. Hosted PR CI is pending publication.",
+  "Files": [
+    {
+      "Path": ".github/workflows/ci.yml",
+      "Sha256": "4a57e3a2f3bf2e16c9c60e7b729b30345d1e5edcbe66bb9652c9b2083bb65400"
+    },
+    {
+      "Path": "Directory.Build.props",
+      "Sha256": "4e9b2badafdbb7fd9f70db4bed4272b513aba7e3764c5c9e5c873b6c35ca1a40"
+    },
+    {
+      "Path": "build/Test-MatchDebrief.ps1",
+      "Sha256": "1e1aed25f1bfdaa7fb146ef943596831bdc7fb363912b3e1dbbca84f62c9050f"
+    },
+    {
+      "Path": "docs/AfterActionStrategicDebrief.md",
+      "Sha256": "19124f3d3023f104c946fb669f658950dec0c7e0e6122a37d5e4f6d0fca6ce0b"
+    },
+    {
+      "Path": "docs/GameplayTelemetry.md",
+      "Sha256": "6e2e1f20f56e2a0cdfab53ebfb8fd8def2bc51880ced995a8453ba7813f22211"
+    },
+    {
+      "Path": "docs/MatchFlowAndPlayerExperience.md",
+      "Sha256": "fbce515703bf857d6bcb0895e93eb95a1aa70cefc572fcb623336113a84c5e37"
+    },
+    {
+      "Path": "docs/adr/BoundedPlayerMatchDebrief.md",
+      "Sha256": "34b61deaf6aef687e59807873c0469187e01c9a9f655180b610704f513b30932"
+    },
+    {
+      "Path": "src/ForgeLine.Client/ClientApplication.cs",
+      "Sha256": "18cd34246d3a9028baf46617aef42329d166637f8fb7252a0cd1b2b09a6abc22"
+    },
+    {
+      "Path": "src/ForgeLine.Client/ClientDebriefStore.cs",
+      "Sha256": "4c599225d71828c95e89974e664e8c7476cf0089a30f1f6ead9d692621e4962d"
+    },
+    {
+      "Path": "src/ForgeLine.Client/MatchDebriefCaptureQualification.cs",
+      "Sha256": "d678246debb748ab4cd6a575ccae781fcb53b0372a216a9f376e49b0225152c2"
+    },
+    {
+      "Path": "src/ForgeLine.Client/Program.cs",
+      "Sha256": "7f84358acdd8a3d6e3ad727ec082ab483be6a71ba5a619230cb020e7913c5aee"
+    },
+    {
+      "Path": "src/ForgeLine.Game/MatchDebriefSerializer.cs",
+      "Sha256": "0098d675155a311060c7a25184918651e25e4ddd07f456975d17f393632a3827"
+    },
+    {
+      "Path": "src/ForgeLine.Game/MatchDebriefSummary.cs",
+      "Sha256": "b0a6e879f678b694fade44ee5b397e4666003e8b43795608da8bd1cac728dc09"
+    },
+    {
+      "Path": "src/ForgeLine.Headless/HeadlessOptions.cs",
+      "Sha256": "f646d574edc27f9bf57e5b94a48b3a7c4c0aa5b2006321fbb024abba33691681"
+    },
+    {
+      "Path": "src/ForgeLine.Headless/Program.cs",
+      "Sha256": "3beeeaea8287341052cc5cfab166b9c576e3668b4a4e884dab00544d51e8bdae"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/MatchDebriefController.cs",
+      "Sha256": "19f4caceca29309766658510689f9d94bedd1a33fe25ef50b657ab5c8a8966ed"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsHudSurface.Debrief.cs",
+      "Sha256": "03cdd892ad1050769fb1ffb56b2c6feb359e114fc5b878482bdc8f4ee7c3e70f"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsHudSurface.cs",
+      "Sha256": "c32099a25d31c05ec7ee242a881bd5e4a1a770445a87903409fd61f2b181c64f"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/PreAlphaUxView.cs",
+      "Sha256": "143a1862ce7a643613f302c638660c24ae0b949f713a39e43b126d9f7533c825"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/PresentationExtractor.Debrief.cs",
+      "Sha256": "35fc778095b80e3a195fcbcab0664396ff1c6d2464a2401f9763333f369ed3a6"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/PresentationExtractor.cs",
+      "Sha256": "73703441ee93af6c29fc724f81c09ce1ad85a894f47cb34b33b6ab9576faa74b"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/PresentationSnapshot.cs",
+      "Sha256": "668734c738c4bd933df1a040fd393e46f1cd10485551a13a6ef5bb29fdae8112"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/RtsInformationOverlayRenderer.cs",
+      "Sha256": "827c1c6619d022ab328bad9b71a44f25a59ad02ee75e5c049e92e83f4b18cb7e"
+    },
+    {
+      "Path": "tests/ForgeLine.Client.Tests/ClientDebriefStoreTests.cs",
+      "Sha256": "72fb6e7faeeb5da8cd80f4f7a22d3bcb5d3383078dd39a14bf31a0c82cb1321c"
+    },
+    {
+      "Path": "tests/ForgeLine.Game.Tests/MatchDebriefTests.cs",
+      "Sha256": "485e51cc4c0783a9127ddb24c99b6006e6407a2db6a9454c825f475427d69279"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/MatchDebriefTests.cs",
+      "Sha256": "5008e50f73a5192d28f0fd6e2d404fa34ea9deb5ecadda744ddd95fae5c24b99"
+    }
+  ]
+}

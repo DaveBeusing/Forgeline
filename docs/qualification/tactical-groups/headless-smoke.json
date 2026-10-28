@@ -1,0 +1,53 @@
+{
+  "Runtime": ".NET 10.0.13",
+  "OperatingSystem": "Microsoft Windows 10.0.26300",
+  "ProcessArchitecture": "X64",
+  "ProcessorCount": 24,
+  "Seed": 12345,
+  "TickRate": 20,
+  "RequestedTicks": 64,
+  "ExecutedTicks": 64,
+  "RequestedEntities": 1000,
+  "ElapsedMilliseconds": 1.8859,
+  "ThroughputTicksPerSecond": 33936.051752478925,
+  "Loop": {
+    "CompletedTicks": 64,
+    "CommandsProcessed": 0,
+    "SystemInvocations": 0,
+    "PendingCommands": 0,
+    "PeakPendingCommands": 0
+  },
+  "Diagnostics": {
+    "Enabled": true,
+    "ConfiguredTicksPerSecond": 20,
+    "CompletedTicks": 64,
+    "LastTickDuration": "00:00:00.0000004",
+    "AverageTickDuration": "00:00:00.0000208",
+    "MaxTickDuration": "00:00:00.0013029",
+    "ObservedAllocatedBytes": 16400,
+    "ObservedGen0Collections": 0,
+    "ObservedGen1Collections": 0,
+    "ObservedGen2Collections": 0,
+    "Entities": {
+      "LiveEntityCount": 1000,
+      "EntityCapacity": 1000,
+      "ComponentTypeCount": 1,
+      "TotalComponentCount": 1000
+    },
+    "Components": [
+      {
+        "ComponentType": "ForgeLine.Headless.Program\u002BHeadlessEntityMarker",
+        "Count": 1000
+      }
+    ],
+    "Jobs": null,
+    "Runtime": {
+      "TotalAllocatedBytes": 690328,
+      "HeapSizeBytes": 0,
+      "MemoryLoadBytes": 0,
+      "Gen0Collections": 0,
+      "Gen1Collections": 0,
+      "Gen2Collections": 0
+    }
+  }
+}

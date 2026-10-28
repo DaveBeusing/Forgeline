@@ -131,6 +131,8 @@ public sealed record MatchSaveData(
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public PracticeSnapshot? PracticeProgress { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PlayerControlGroupSaveData? ControlGroups { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public DeveloperParameterAuditData[]? ParameterChanges { get; init; }
 }
 

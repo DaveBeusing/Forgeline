@@ -464,6 +464,74 @@ public sealed class TacticalTargetingInteractionTests
             result.State);
     }
 
+    [Fact]
+    public void OpeningClickAndBlockedHeldClickCannotBecomeWorldTargets()
+    {
+        var selected = new EntityId(103, 1);
+        var snapshot = CreateSnapshot(selected, Tactical(selected));
+        var input = new InputState();
+        var targeting = new RtsTacticalTargetingController();
+        Down();
+        targeting.Begin(PlayerActionRequest.BeginAttackMoveTargeting([selected]), snapshot.SessionId, input);
+        Update();
+        Assert.False(targeting.TryTakeRequest(out _));
+        input.BeginFrame();
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 800, 450));
+        Update();
+        input.BeginFrame(); Down(); Update(true);
+        input.BeginFrame(); Update();
+        Assert.False(targeting.TryTakeRequest(out _));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 800, 450));
+        input.BeginFrame(); Down(); Update();
+        Assert.True(targeting.TryTakeRequest(out _));
+        Update();
+        Assert.False(targeting.TryTakeRequest(out _));
+        void Down() => input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        void Update(bool blocked = false) => targeting.Update(input, CreateCamera(), new FlatTerrain(), snapshot, 1600, 900, FormationTemplate.Compact, blocked);
+    }
+
+    [Fact]
+    public void BriefClickUsesPressCoordinateAndCapturedShiftAfterPointerMoves()
+    {
+        var selected = new EntityId(103, 1);
+        var snapshot = CreateSnapshot(selected, Tactical(selected));
+        var input = new InputState();
+        var targeting = new RtsTacticalTargetingController();
+        targeting.Begin(PlayerActionRequest.BeginAttackMoveTargeting([selected]), snapshot.SessionId);
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.LeftShift));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp, PlatformMouseButton.Left, 800, 450));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.LeftShift));
+        input.Apply(PlatformInputEvent.PointerMoved(1200, 700));
+        targeting.Update(input, CreateCamera(), new FlatTerrain(), snapshot, 1600, 900, FormationTemplate.Line);
+        Assert.True(targeting.TryTakeRequest(out var request));
+        Assert.True(request.AppendOrders);
+        Assert.True(Vector3.Distance(Vector3.Zero, request.TacticalWorldTarget) < .01f);
+        Assert.Equal(RtsCommandMarkerState.Pending, targeting.CommandFeedback.State);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MissingOrOldActionSnapshotCannotResolveTarget(bool stale)
+    {
+        var selected = new EntityId(103, 1);
+        var current = CreateSnapshot(selected, Tactical(selected));
+        var snapshot = new PresentationSnapshot(new SimulationTick(5), TimeSpan.FromMilliseconds(50), 0,
+            ReadOnlySpan<RenderInstance>.Empty, sessionId: current.SessionId,
+            playerActions: stale ? current.PlayerActions : null);
+        var input = new InputState();
+        var targeting = new RtsTacticalTargetingController();
+        targeting.Begin(PlayerActionRequest.BeginAttackMoveTargeting([selected]), current.SessionId);
+        input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown, PlatformMouseButton.Left, 800, 450));
+        targeting.Update(input, CreateCamera(), new FlatTerrain(), snapshot, 1600, 900, FormationTemplate.Line);
+        Assert.False(targeting.TryTakeRequest(out _));
+        Assert.False(targeting.CreateView(snapshot).HasPointerTarget);
+        input.BeginFrame();
+        targeting.Update(input, CreateCamera(), new FlatTerrain(), current, 1600, 900, FormationTemplate.Line);
+        Assert.False(targeting.TryTakeRequest(out _));
+    }
+
     private static PlayerTacticalActionReadModel Tactical(
         EntityId selected) =>
         new(

@@ -28,4 +28,7 @@ public readonly record struct PreAlphaUxView(
     string SettingsPath,
     EarlyGameGuidanceView Guidance = default,
     PlacementContextFeedbackView Placement = default,
-    string InteractionHint = "", GameplayBindingRegistry? Bindings = null, OnboardingPresentation? Onboarding = null);
+    string InteractionHint = "", GameplayBindingRegistry? Bindings = null, OnboardingPresentation? Onboarding = null)
+{
+    public MatchDebriefView? Debrief { get; init; }
+}

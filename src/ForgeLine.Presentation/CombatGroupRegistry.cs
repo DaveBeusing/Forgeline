@@ -1,4 +1,5 @@
 using ForgeLine.Core;
+using ForgeLine.Game;
 using ForgeLine.Simulation;
 
 namespace ForgeLine.Presentation;
@@ -99,6 +100,7 @@ public sealed class CombatGroupRegistry
             {
                 target.Add(
                     entity);
+                if (target.Count == PlayerControlGroupSaveData.MaximumMembersPerSlot) break;
             }
         }
 
@@ -165,7 +167,7 @@ public sealed class CombatGroupRegistry
             slot);
 
         if (string.IsNullOrWhiteSpace(
-                label))
+                label) || label.Any(char.IsControl))
         {
             return false;
         }
@@ -214,6 +216,38 @@ public sealed class CombatGroupRegistry
         return _members[
                 slot]
             .ToArray();
+    }
+
+    public PlayerControlGroupSaveData Capture(PlayerId player)
+    {
+        var slots = new List<PlayerControlGroupSlot>(SlotCount);
+        for (int i = 0; i < SlotCount; i++)
+            if (_members[i].Count > 0)
+                slots.Add(new(i, _labels[i], Array.AsReadOnly(_members[i].ToArray())));
+        return new(player, ActiveSlot, slots.AsReadOnly());
+    }
+
+    public bool Restore(SimulationSessionId session, PlayerId player, PlayerControlGroupSaveData data,
+        IReadOnlyCollection<EntityId> validMembers)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(validMembers);
+        if (!session.IsSpecified || !player.IsSpecified || data.Player != player || data.Slots is null || data.Slots.Count > SlotCount ||
+            data.ActiveSlot is < -1 or >= SlotCount) return false;
+        var seen = new HashSet<int>();
+        foreach (var slot in data.Slots)
+            if (slot is null || slot.Slot is < 0 or >= SlotCount || !seen.Add(slot.Slot) ||
+                string.IsNullOrWhiteSpace(slot.Label) || slot.Label.Length > 24 || slot.Label.Any(char.IsControl) ||
+                slot.Members is null || slot.Members.Count > PlayerControlGroupSaveData.MaximumMembersPerSlot) return false;
+        _sessionId = session;
+        ResetSlots();
+        foreach (var slot in data.Slots)
+        {
+            Assign(slot.Slot, slot.Members.ToArray(), validMembers);
+            Rename(slot.Slot, slot.Label);
+        }
+        ActiveSlot = data.ActiveSlot >= 0 && _members[data.ActiveSlot].Count > 0 ? data.ActiveSlot : NoActiveSlot;
+        return true;
     }
 
     private void Prune(

@@ -1,0 +1,117 @@
+{
+  "BaseRevision": "8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
+  "Version": "0.1.505",
+  "SourceNormalization": "UTF-8 with LF line endings; GitBlobSha1 is the canonical text blob identity.",
+  "Binaries": {
+    "ForgeLine.Client.dll": "c0eb047aa11a135ce5e95639b889b20b7e240170a25fe7e4942c125ba2b6b0eb",
+    "ForgeLine.Presentation.dll": "7201ae4b27b8e3f11e5f23e936ce2f3093f537e20be7158a538684ed8f9cdf7c",
+    "ForgeLine.Game.dll": "eb2cdbf1e420d0d282c0f5825890239304dc92d8943cc8c3a56ca415d4f0c7e3"
+  },
+  "Files": [
+    {
+      "Path": "Directory.Build.props",
+      "Utf8LfSha256": "370a4a3896f5a390cdd6b3eba4e6ba23ccf5d17545dfa827310ce3960256e10d",
+      "GitBlobSha1": "d57aeb0a9c4fa7b3b0b8002bbe682aa8c988a561"
+    },
+    {
+      "Path": "assets/source/ui/directorate/artwork/artwork.catalog.json",
+      "Utf8LfSha256": "359949fa4c684fe512df8ff1e7879b952bfe00ae6506702e3873e80ff5fc41cc",
+      "GitBlobSha1": "f1dc62425060112f0fd7befa084f46c0b7fff892"
+    },
+    {
+      "Path": "build/Author-DirectorateUiArtwork.py",
+      "Utf8LfSha256": "c76ae79e12fe257564d445ed01deea9029de24035860b1d4510281eb3916c0c2",
+      "GitBlobSha1": "3468d4dee775d14ed8126641c4b8ab2fbb7f477a"
+    },
+    {
+      "Path": "src/ForgeLine.Client/BattlefieldHudCapture.cs",
+      "Utf8LfSha256": "fab561b36b829ebfef1c638e6f6de8558f9d4d130bc9aa1c3739e2eab70e6d11",
+      "GitBlobSha1": "90b6719d309466d523a0df2315cf23e7eae014d5"
+    },
+    {
+      "Path": "src/ForgeLine.Client/ClientApplication.cs",
+      "Utf8LfSha256": "673b2cc4d76ec6b9dbfac93de99d70b0ef2c0292dd7bac40e2316e251010a46f",
+      "GitBlobSha1": "5609cc71af60de32b31f2b9f00d71b0976522c0d"
+    },
+    {
+      "Path": "src/ForgeLine.Client/Program.cs",
+      "Utf8LfSha256": "0a0ac65067855d1b13072eb6cc6b27b8f470d018341c17397f1e32d6f5d90cdf",
+      "GitBlobSha1": "39fa45ce10afc7e740941d25890c40d72d7849d5"
+    },
+    {
+      "Path": "src/ForgeLine.Game/PlayerCommandBoundary.cs",
+      "Utf8LfSha256": "3595cf0f2a1c14b094f51f648b68f5137a90394c0cbcc8af12a371f7ccca77e4",
+      "GitBlobSha1": "ffbcd7d7dbf60b6f6828e819377c806586455e8b"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/GlobalProductionController.cs",
+      "Utf8LfSha256": "a896c3d5fb149bc1aab379da6879894de904f9fc629d9849c25a28f8f5e5129b",
+      "GitBlobSha1": "ff1f51a0462fb5f903eb5d389fd243a90d853e24"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/GlobalProductionSnapshot.cs",
+      "Utf8LfSha256": "9deaed1b7f689cfec754c1dabe817f6c2247540732d3f20c592b6c9109d77f2f",
+      "GitBlobSha1": "4485d7430fd48dbcaa7792c9e8adeceaeb6d11b2"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsController.cs",
+      "Utf8LfSha256": "b8556bf022372aa5e4dd459c2ab293b467fe17cbe34c81e19feb3c3c361b5566",
+      "GitBlobSha1": "f971940b0c85852935d4bc84499cb166969f5a03"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsHudSurface.Production.cs",
+      "Utf8LfSha256": "41c5aea57980318d5c80650611970e8433b2c40759a68c6afe843d0afbbbfb3d",
+      "GitBlobSha1": "25d47651379e5cb4112b7a97bce342b0a4276fe6"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsHudSurface.cs",
+      "Utf8LfSha256": "7f599c24088dbd8434c45f42ab26740af3615140b1d9de7dbbb0a35e0f1d201d",
+      "GitBlobSha1": "c21ed0d7bdfc3d78cbd1def16f4545b6b22bd580"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/OperationsSnapshot.cs",
+      "Utf8LfSha256": "c0421436329d1e14ae1144d1b4d0130f133537decfd42b1a268d4b85393520d2",
+      "GitBlobSha1": "9041ab0987272b5b88f60c3437b244830852dc13"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/PresentationExtractor.cs",
+      "Utf8LfSha256": "e200fdd2b3b5693761be829aabe69815eab567de457348294e6548aecc58a11e",
+      "GitBlobSha1": "c64ca7dfdbd6f76ea5857ef49c21e3f065249a6b"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/RtsInformationLayer.cs",
+      "Utf8LfSha256": "0a390dda3bf0a7242c4e1856a2230d632767a751a415f5a08a7ea83c6e623d7e",
+      "GitBlobSha1": "a09aa5de415e2c6a9fd046fddf0a21a2228b331d"
+    },
+    {
+      "Path": "src/ForgeLine.Presentation/RtsTacticalTargetingController.cs",
+      "Utf8LfSha256": "59924299e45246136cfb107149f68915f403b45f2b20b50d8b5f5528361d95c2",
+      "GitBlobSha1": "fa903c33328c3cec546c301aea7307abcf42b267"
+    },
+    {
+      "Path": "tests/ForgeLine.Game.Tests/MatchPersistenceTests.cs",
+      "Utf8LfSha256": "08fa3bdb5b6e81ac35d4c7940104f919bbcd8bb7c7464ef20b580ff1541b860b",
+      "GitBlobSha1": "fef626c8c8e749199e52998d4551384317796991"
+    },
+    {
+      "Path": "tests/ForgeLine.Game.Tests/PlayerCommandBoundaryTests.cs",
+      "Utf8LfSha256": "230b5539658e7039d3fc419267253130fee790982075f6b9232c15df634b8c14",
+      "GitBlobSha1": "126f7a3c0fc950b12b3487755286fe029180b7d5"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/GlobalProductionRallyTests.cs",
+      "Utf8LfSha256": "c8b51b01c684fc7416995f706e2cb7e12e11dd66626c6312698b03173c7d75d3",
+      "GitBlobSha1": "fe76de5479fedc06a0349f5641f80f5b11292498"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/GlobalProductionRenderingTests.cs",
+      "Utf8LfSha256": "dd0dfcec0ce1c3156aa2f38fbb52a8d7a866578150c38b545cd2aa8c1c9c3bbd",
+      "GitBlobSha1": "1ceeae29d110d81b122e1b4ab241c51cbf60a904"
+    },
+    {
+      "Path": "tests/ForgeLine.Presentation.Tests/GlobalProductionTests.cs",
+      "Utf8LfSha256": "fae3cd917d254dc6d9ddc05dde33c861338aa836fdd6e4055c46faea0d51623e",
+      "GitBlobSha1": "e7ce58f3f894dfef1039f67d84376e439d978154"
+    }
+  ]
+}

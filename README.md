@@ -95,8 +95,8 @@ A branded native startup surface appears before settings and graphics initializa
 | Build / industrial production / unit production | B / P / U |
 | Logistics / supply / combat / technology | L / Y / K / H |
 | Strategic overlays | F10 |
-| Controls help | F1 or F12 |
-| Development metrics | Shift + F1 |
+| Controls help | Escape → Controls |
+| Developer tools (Developer build) | F1 |
 | Restart finished match / exit session | R / Escape |
 
 Gameplay shortcuts can be changed in Settings through GAMEPLAY ACTION and GAMEPLAY KEY. Conflicts block APPLY with an explanation; saved camera mappings retain priority. Mouse selection, control-group digits, help and Escape remain fixed. See [input binding rules](docs/GameplayInputAccessibilityAndQualification.md).

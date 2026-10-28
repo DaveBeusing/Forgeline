@@ -72,18 +72,6 @@ internal static class Program
         }
 #endif
 
-        if (options.LoadInput is not null)
-        {
-            return ValidateSaveRecovery(
-                options.LoadInput, registry.Resolve);
-        }
-
-        if (options.ReplayInput is not null)
-        {
-            return ValidateReplayPlayback(
-                options.ReplayInput, registry.Resolve);
-        }
-
         using var shutdown =
             new CancellationTokenSource();
         ConsoleCancelEventHandler cancelHandler =
@@ -98,6 +86,11 @@ internal static class Program
 
         try
         {
+            if (options.LoadInput is not null)
+                return ValidateSaveRecovery(options.LoadInput, registry.Resolve, shutdown.Token);
+            if (options.ReplayInput is not null)
+                return ValidateReplayPlayback(options.ReplayInput, registry.Resolve, shutdown.Token);
+
             return options.Scenario switch
             {
                 HeadlessScenarioKind.Lightweight =>
@@ -112,6 +105,11 @@ internal static class Program
                     throw new InvalidOperationException(
                         $"Unsupported headless scenario '{options.Scenario}'.")
             };
+        }
+        catch (OperationCanceledException) when (shutdown.IsCancellationRequested)
+        {
+            Console.Error.WriteLine("Headless execution cancelled.");
+            return 2;
         }
         finally
         {
@@ -191,6 +189,7 @@ internal static class Program
 #else
         MatchScenarioSettings settings = CentralDivideScenario.CreateSettings(options.Profile);
 #endif
+        var pacingThresholds = PacingBenchmarkReport.ReadThresholds(options.PacingThresholdsInput);
         var reports =
             new List<MatchExecutionReport>(
                 options.MatchCount);
@@ -232,10 +231,12 @@ internal static class Program
                 CentralDivideScenario.Create(
                     runtimeSettings,
                     cancellationToken);
+            if (options.DebriefOutput is not null && !scenario.MatchConfiguration.Participants.Any(p => p.Player.Value == options.DebriefPlayer))
+                throw new ArgumentException("The requested debrief player is not a configured participant.");
             GameplayTelemetryCollector? telemetry =
                 options.TelemetryOutput is not null
                     ? new GameplayTelemetryCollector(
-                        scenario)
+                        scenario, captureDecisionBenchmarks: true)
                     : null;
             SkirmishProgressionDiagnostics? progression = null;
             if (options.DiagnosticsOutput is not null)
@@ -258,7 +259,18 @@ internal static class Program
                    !cancellationToken.IsCancellationRequested &&
                    !scenario.GetMatchState().HasResult)
             {
-                scenario.Simulation.AdvanceOneTick();
+                try { scenario.Simulation.AdvanceOneTick(); }
+                catch (Exception error) when (error is KeyNotFoundException or InvalidOperationException or ArgumentException)
+                {
+                    if (options.TelemetryOutput is { } output)
+                    {
+                        try { PacingBenchmarkReport.WriteFailure(output + ".failure.json", options, matchSeed,
+                            telemetry?.CaptureDecisionObservation(), error); }
+                        catch (Exception writeError) when (writeError is IOException or UnauthorizedAccessException)
+                        { Console.Error.WriteLine($"Pacing failure report could not be written: {writeError.Message}"); }
+                    }
+                    throw new InvalidOperationException("Headless simulation failed: " + error.Message, error);
+                }
                 executedTicks++;
                 telemetry?.Observe();
             }
@@ -281,6 +293,12 @@ internal static class Program
                     matchStopwatch.Elapsed,
                     scenario);
             reports.Add(report);
+
+            if (options.DebriefOutput is { } debriefOutput)
+            {
+                MatchDebriefSerializer.Write(debriefOutput, MatchDebriefCapture.Capture(scenario, scenario.MatchConfiguration.Participants.First(p => p.Player.Value == options.DebriefPlayer).Player));
+                Console.WriteLine("Player debrief: " + Path.GetFullPath(debriefOutput));
+            }
 
             if (telemetry is not null)
             {
@@ -385,7 +403,7 @@ internal static class Program
             GameplayTelemetryBatchReport telemetryReport =
                 GameplayTelemetryBatchReport.Create(
                     options,
-                    telemetryMatches);
+                    telemetryMatches, pacingThresholds, cancellationToken.IsCancellationRequested);
             telemetryReport.Write(
                 options.TelemetryOutput);
             Console.WriteLine(
@@ -409,7 +427,7 @@ internal static class Program
     }
 
     private static int ValidateSaveRecovery(
-        string path, Func<string, MatchComposition> resolver)
+        string path, Func<string, MatchComposition> resolver, CancellationToken cancellationToken)
     {
         try
         {
@@ -420,10 +438,10 @@ internal static class Program
             bool developerData = save.Configuration.DeveloperInitialProfile is not null || save.DeveloperModified ||
                 save.ParameterChanges is not null || save.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
             using MatchRuntime restored = developerData
-                ? MatchPersistenceService.RestoreDeveloper(save, DeveloperToolsCapability.Current, resolver)
-                : MatchPersistenceService.Restore(save, resolver);
+                ? MatchPersistenceService.RestoreDeveloper(save, DeveloperToolsCapability.Current, resolver, cancellationToken: cancellationToken)
+                : MatchPersistenceService.RestoreCancellable(save, cancellationToken, resolveComposition: resolver);
 #else
-            using MatchRuntime restored = MatchPersistenceService.Restore(save, resolver);
+            using MatchRuntime restored = MatchPersistenceService.RestoreCancellable(save, cancellationToken, resolveComposition: resolver);
 #endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
@@ -448,7 +466,7 @@ internal static class Program
     }
 
     private static int ValidateReplayPlayback(
-        string path, Func<string, MatchComposition> resolver)
+        string path, Func<string, MatchComposition> resolver, CancellationToken cancellationToken)
     {
         try
         {
@@ -459,10 +477,10 @@ internal static class Program
             bool developerData = replay.Configuration.DeveloperInitialProfile is not null || replay.DeveloperModified ||
                 replay.ParameterChanges is not null || replay.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
             using MatchRuntime playback = developerData
-                ? MatchPersistenceService.PlayDeveloperReplay(replay, DeveloperToolsCapability.Current, resolver)
-                : MatchPersistenceService.PlayReplay(replay, resolver);
+                ? MatchPersistenceService.PlayDeveloperReplayCancellable(replay, DeveloperToolsCapability.Current, cancellationToken, resolveComposition: resolver)
+                : MatchPersistenceService.PlayReplayCancellable(replay, cancellationToken, resolveComposition: resolver);
 #else
-            using MatchRuntime playback = MatchPersistenceService.PlayReplay(replay, resolver);
+            using MatchRuntime playback = MatchPersistenceService.PlayReplayCancellable(replay, cancellationToken, resolveComposition: resolver);
 #endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
@@ -691,8 +709,11 @@ internal static class Program
         writer.WriteLine("  --matches <count>            Fresh match matches to execute (default: 1).");
         writer.WriteLine("  --require-terminal           Fail if a match does not end within the tick budget.");
         writer.WriteLine("  --diagnostics-output <path>  Write a structured JSON diagnostics report.");
+        writer.WriteLine("  --debrief-output <path>      Write one bounded player-scoped first/latest match summary.");
+        writer.WriteLine("  --debrief-player <id>        Configured summary owner (default 1); requires --debrief-output.");
         writer.WriteLine("  --telemetry-output <path>    Write observational gameplay telemetry and batch aggregates.");
         writer.WriteLine("  --telemetry-baseline <path>  Compare telemetry aggregates with a prior telemetry report.");
+        writer.WriteLine("  --pacing-thresholds <json>  Advisory logical-time pacing limits; requires telemetry output.");
         writer.WriteLine("  --save-output <path>         Write a versioned match save after one match.");
         writer.WriteLine("  --replay-output <path>       Write a deterministic command replay after one match.");
         writer.WriteLine("  --load-input <path>          Validate and reconstruct a saved match, then exit.");

@@ -1,0 +1,9 @@
+{
+  "OwnedSegments": 4096,
+  "Tick": 1,
+  "Copied": 1026,
+  "Omitted": 3072,
+  "ScanLimited": false,
+  "TickAndExtractionMilliseconds": 68.6252,
+  "Notes": "One observed complete simulation tick including existing world/conveyor capture; not isolated extraction time or a comparative benchmark."
+}

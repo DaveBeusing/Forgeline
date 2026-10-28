@@ -1,0 +1,9 @@
+{
+  "FirstContactMaximumSeconds": 480,
+  "SupplyPressureMaximumSeconds": 90,
+  "NoProgressMaximumSeconds": 240,
+  "FactoryUptimeMinimumRatio": 0.1,
+  "MinimumObservationSeconds": 60,
+  "VictoryMinimumSeconds": 1500,
+  "VictoryMaximumSeconds": 2400
+}

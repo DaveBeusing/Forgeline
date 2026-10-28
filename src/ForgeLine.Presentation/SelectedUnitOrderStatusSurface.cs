@@ -7,6 +7,7 @@ namespace ForgeLine.Presentation;
 internal sealed class SelectedUnitOrderStatusSurface : IGameplayHudSurface
 {
     private readonly UiTextBatch _text;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _text.HighContrast = settings.HighContrast;
     private bool _disposed;
 
     public SelectedUnitOrderStatusSurface(IGraphicsDevice graphics)

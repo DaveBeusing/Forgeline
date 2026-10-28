@@ -40,11 +40,17 @@ internal readonly record struct PresentationInteractionRequestSnapshot(
     StrategicOverlayMode StrategicOverlay,
     EntityId HoveredEntity,
     SimulationSessionId HoverSessionId,
-    bool OperationsOpen = false, bool NavigationDiagnosticsOpen = false);
+    bool OperationsOpen = false, bool NavigationDiagnosticsOpen = false, NotificationPreferences? Notifications = null);
 
 public sealed class PresentationInteractionState
 {
     private readonly object _gate = new();
+    private NotificationPreferences _notifications = NotificationPreferences.Default;
+    public void SetNotificationPreferences(NotificationPreferences preferences)
+    {
+        ArgumentNullException.ThrowIfNull(preferences); preferences.Validate();
+        lock (_gate) _notifications = preferences;
+    }
     private EntityId[] _selectedEntities = [];
     private BuildingPlacementPreviewRequest? _placementRequest;
     private bool _debugEnabled;
@@ -220,7 +226,7 @@ public sealed class PresentationInteractionState
                 _strategicOverlay,
                 _hoveredEntity,
                 _hoverSessionId,
-                _operationsOpen, _navigationDiagnosticsOpen);
+                _operationsOpen, _navigationDiagnosticsOpen, _notifications);
         }
     }
 }

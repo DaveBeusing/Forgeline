@@ -88,6 +88,37 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Bounded player debrief and resilient result controls
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.MatchDebriefTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.MatchDebriefTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ClientDebriefStoreTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-MatchDebrief.ps1
+
+      - name: Strategic logistics capacity and legal Operations drilldown
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class 'ForgeLine.Presentation.Tests.StrategicLogisticsCapacity*' ForgeLine.Presentation.Tests.RtsInformationLayerTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests ForgeLine.Presentation.Tests.OperationsTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+
+      - name: Command replay cancellation and integrity
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.CancellableCommandReplayTests ForgeLine.Game.Tests.MatchPersistenceTests ForgeLine.Game.Tests.PersistenceBoundaryTests ForgeLine.Game.Tests.CancellableMatchRestorationTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Strategic map balance and connectivity audit
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.StrategicMapAuditTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-StrategicMapAudit.ps1
+
       - name: Integrated developer tools and closed public variant
         shell: pwsh
         run: ./build/Test-DeveloperToolsQualification.ps1
@@ -113,7 +144,7 @@ jobs:
       - name: Tactical supply, convoy and bounded navigation contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.TacticalCombatSystemTests ForgeLine.Game.Tests.CargoTransportSystemTests ForgeLine.Game.Tests.MoveEntitiesCommandTests ForgeLine.Game.Tests.HierarchicalNavigationSystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.EngagementPolicyTests ForgeLine.Game.Tests.TacticalCombatSystemTests ForgeLine.Game.Tests.CargoTransportSystemTests ForgeLine.Game.Tests.MoveEntitiesCommandTests ForgeLine.Game.Tests.HierarchicalNavigationSystemTests ForgeLine.Game.Tests.MatchPersistenceTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Navigation.Tests/ForgeLine.Navigation.Tests.csproj --configuration Release --no-build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -139,13 +170,17 @@ jobs:
       - name: Gameplay progress and optional guidance contracts
         shell: pwsh
         run: |
-          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.PracticeScenarioTests ForgeLine.Game.Tests.GameplayPacingProgressTests ForgeLine.Game.Tests.GameplayProgressJournalTests ForgeLine.Game.Tests.GameplayTelemetryTests ForgeLine.Game.Tests.PlayerConstructionProductionFlowTests ForgeLine.Game.Tests.ConveyorPersistenceTests --parallel none
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.PracticeScenarioTests ForgeLine.Game.Tests.MatchPacingBenchmarksTests ForgeLine.Game.Tests.GameplayPacingProgressTests ForgeLine.Game.Tests.GameplayProgressJournalTests ForgeLine.Game.Tests.GameplayTelemetryTests ForgeLine.Game.Tests.PlayerConstructionProductionFlowTests ForgeLine.Game.Tests.ConveyorPersistenceTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.PracticeGuidanceTests ForgeLine.Presentation.Tests.EarlyGameGuidanceTests ForgeLine.Presentation.Tests.GuidanceLessonTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.PracticeEntryTests ForgeLine.Client.Tests.GameplayGuidanceInteractionTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile gameplay --ticks 64 --seed 17 --telemetry-output artifacts/gameplay-observation-smoke.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-PacingBenchmarks.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Run-PacingBenchmarks.ps1 -Mode Quick -NoBuild -OutputRoot artifacts/pacing-quick
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Operations chain diagnosis and safe focus contracts
@@ -303,7 +338,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Single object ring interaction contracts
-        run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ObjectActionRingTests ForgeLine.Client.Tests.GroupActionRingTests
+        run: dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.ControlGroupSaveTests ForgeLine.Client.Tests.ObjectActionRingTests ForgeLine.Client.Tests.GroupActionRingTests
 
       - name: Compile and qualify runtime assets
         run: dotnet run --project tools/ForgeLine.AssetCompiler/ForgeLine.AssetCompiler.csproj --configuration Release --no-build -- --mode build --source assets/source --runtime assets/runtime --clean --qualification-output artifacts/asset-qualification.json
@@ -344,7 +379,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.TacticalCursorTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.TacticalArtworkTests ForgeLine.Presentation.Tests.SelectionMarkerTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests ForgeLine.Presentation.Tests.RtsInformationLayerTests ForgeLine.Presentation.Tests.TacticalTargetingInteractionTests
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.EngagementGroupTests ForgeLine.Presentation.Tests.CombatGroupRegistryTests ForgeLine.Presentation.Tests.SelectedCombatGroupTests ForgeLine.Presentation.Tests.TacticalArtworkTests ForgeLine.Presentation.Tests.SelectionMarkerTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests ForgeLine.Presentation.Tests.RtsInformationLayerTests ForgeLine.Presentation.Tests.TacticalTargetingInteractionTests
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Graphical frontend skin and pointer contracts
@@ -493,6 +528,8 @@ jobs:
           path: |
             artifacts/*.json
             artifacts/maps/*.json
+            artifacts/pacing-quick/**
+            artifacts/pacing-contracts/**
             artifacts/visual-reference-warp/**
             artifacts/ui-reference-warp/**
             artifacts/rendering-benchmarks/**

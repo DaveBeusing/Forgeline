@@ -4,6 +4,14 @@ namespace ForgeLine.Client;
 
 internal static class ClientSaveCatalog
 {
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<MatchRuntime, PlayerControlGroupSaveData> s_groups = new();
+    internal static PlayerControlGroupSaveData? TakeControlGroups(MatchRuntime runtime)
+    {
+        if (!s_groups.TryGetValue(runtime, out var data)) return null;
+        s_groups.Remove(runtime);
+        return data;
+    }
+
     internal static IReadOnlyList<ForgeLine.UI.LoadGameEntry> Discover(
         string directory) => Discover(directory, CancellationToken.None);
 
@@ -122,7 +130,9 @@ internal static class ClientSaveCatalog
             MatchPersistenceSerializer.ReadSave(
                 entry.Path);
         cancellationToken.ThrowIfCancellationRequested();
-        return MatchPersistenceService.RestoreCancellable(
+        var runtime = MatchPersistenceService.RestoreCancellable(
             save, cancellationToken, reportProgress, resolveComposition);
+        if (save.ControlGroups is { } groups) s_groups.Add(runtime, groups);
+        return runtime;
     }
 }

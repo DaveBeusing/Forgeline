@@ -27,8 +27,11 @@ internal readonly record struct HeadlessOptions(
     string? ReplayInput,
     bool ShowHelp)
 {
+    public string? DebriefOutput { get; init; }
+    public ulong DebriefPlayer { get; init; } = 1;
     public string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
     public string? ScenarioRoot { get; init; }
+    public string? PacingThresholdsInput { get; init; }
     public string? DeveloperPresetInput { get; init; }
     public string? ReproductionId { get; init; }
     public string? ReproductionOutput { get; init; }
@@ -54,6 +57,9 @@ internal readonly record struct HeadlessOptions(
         int entityCount = 0;
         int matchCount = 1;
         bool requireTerminal = false;
+        string? debriefOutput = null;
+        ulong debriefPlayer = 1;
+        bool debriefPlayerSpecified = false;
         string? diagnosticsOutput = null;
         string? telemetryOutput = null;
         string? telemetryBaseline = null;
@@ -63,6 +69,7 @@ internal readonly record struct HeadlessOptions(
         string? replayInput = null;
         bool showHelp = false;
         string? scenarioRoot = null;
+        string? pacingThresholdsInput = null;
         string scenarioKey = CentralDivideScenario.CompositionKey;
         string? developerPresetInput = null;
         string? reproductionId = null;
@@ -81,6 +88,10 @@ internal readonly record struct HeadlessOptions(
                     scenario = ParseScenario(selected);
                     scenarioKey = PracticeLessons.TryGet(selected.ToLowerInvariant(),out _) ? selected.ToLowerInvariant() : selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
                         ? SplitBasinBattlefield.CompositionKey : CentralDivideScenario.CompositionKey;
+                    break;
+
+                case "--pacing-thresholds":
+                    pacingThresholdsInput = GetValue(args, ref index, argument);
                     break;
 
                 case "--scenario-root":
@@ -166,6 +177,15 @@ internal readonly record struct HeadlessOptions(
                             argument);
                     break;
 
+                case "--debrief-output":
+                    debriefOutput = GetValue(args, ref index, argument);
+                    scenario = HeadlessScenarioKind.Match;
+                    break;
+                case "--debrief-player":
+                    debriefPlayer = ParseUInt64(args, ref index, argument);
+                    debriefPlayerSpecified = true;
+                    break;
+
                 case "--telemetry-output":
                     telemetryOutput =
                         GetValue(
@@ -236,6 +256,24 @@ internal readonly record struct HeadlessOptions(
 
         if (!showHelp)
         {
+            if (debriefPlayer == 0 || debriefPlayerSpecified && debriefOutput is null)
+                throw new ArgumentException("--debrief-player must be positive and requires --debrief-output.");
+            if (debriefOutput is not null)
+            {
+                if (matchCount != 1 || loadInput is not null || replayInput is not null)
+                    throw new ArgumentException("Debrief export requires one fresh match without recovery input.");
+                foreach (var other in new[] { diagnosticsOutput, telemetryOutput, telemetryBaseline, pacingThresholdsInput, saveOutput, replayOutput, reproductionOutput })
+                    if (other is not null && string.Equals(Path.GetFullPath(other), Path.GetFullPath(debriefOutput), StringComparison.OrdinalIgnoreCase))
+                        throw new ArgumentException("Debrief output must have an independent file path.");
+            }
+
+            if (pacingThresholdsInput is not null && telemetryOutput is not null &&
+                string.Equals(Path.GetFullPath(pacingThresholdsInput), Path.GetFullPath(telemetryOutput), StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Pacing thresholds and telemetry output must use different paths.");
+            if (pacingThresholdsInput is not null && telemetryOutput is null)
+                throw new ArgumentException("--pacing-thresholds requires --telemetry-output.");
+            if (telemetryOutput is not null && matchCount > 128)
+                throw new ArgumentException("Telemetry benchmark batches support at most 128 matches.");
             if (scenarioRoot is not null && scenario != HeadlessScenarioKind.Match)
                 throw new ArgumentException("--scenario-root requires a registered match scenario.");
             ValidateCombination(
@@ -273,7 +311,7 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp) { ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey,
+            showHelp) { DebriefOutput = debriefOutput, DebriefPlayer = debriefPlayer, ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey, PacingThresholdsInput = pacingThresholdsInput,
                 DeveloperPresetInput = developerPresetInput, ReproductionId = reproductionId, ReproductionOutput = reproductionOutput,
                 ScenarioWasSpecified = scenarioWasSpecified, ProfileWasSpecified = profileWasSpecified, SeedWasSpecified = seedWasSpecified };
     }
