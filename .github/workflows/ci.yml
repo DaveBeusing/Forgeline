@@ -88,6 +88,13 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Strategic map balance and connectivity audit
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.StrategicMapAuditTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-StrategicMapAudit.ps1
+
       - name: Integrated developer tools and closed public variant
         shell: pwsh
         run: ./build/Test-DeveloperToolsQualification.ps1
