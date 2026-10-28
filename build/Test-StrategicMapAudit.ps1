@@ -50,3 +50,4 @@ $blocked = Join-Path $root "blocked-output"
 "output path fixture" | Set-Content -LiteralPath $blocked -Encoding utf8
 Invoke-Audit "output-failure" @("--audit-all", "--qualification-output", (Join-Path $blocked "report.json")) $false
 Write-Host "Strategic audit: all registered maps, identical JSON/Markdown, explicit exception, stale/duplicate rejection and controlled CLI/output failures passed."
+exit 0
