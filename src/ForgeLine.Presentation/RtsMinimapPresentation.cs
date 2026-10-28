@@ -463,6 +463,12 @@ public sealed class RtsInformationLayerController
                 StrategicOverlayMode.None =>
                     StrategicOverlayMode.Logistics,
                 StrategicOverlayMode.Logistics =>
+                    StrategicOverlayMode.Conveyors,
+                StrategicOverlayMode.Conveyors =>
+                    StrategicOverlayMode.Cargo,
+                StrategicOverlayMode.Cargo =>
+                    StrategicOverlayMode.FieldLogistics,
+                StrategicOverlayMode.FieldLogistics =>
                     StrategicOverlayMode.Supply,
                 StrategicOverlayMode.Supply =>
                     StrategicOverlayMode.Sensors,

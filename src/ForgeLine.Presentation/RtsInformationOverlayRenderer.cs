@@ -8,7 +8,7 @@ using ForgeLine.World;
 
 namespace ForgeLine.Presentation;
 
-public sealed class RtsInformationOverlayRenderer : IDisposable
+public sealed partial class RtsInformationOverlayRenderer : IDisposable
 {
     private const int MaxVertices = 262_144;
     private const int VertexStride = 24;
@@ -98,6 +98,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         LastGuidanceVertexCount = 0;
         LastWorldCorners = LastWorldMeters = 0;
         LastWorldLabels = 0;
+        LastLogisticsCapacityItems = LastLogisticsCapacityOmitted = 0;
+
         LastBattlefieldStatusMarkers = 0;
 
         if (context.Width <= 0 ||
@@ -126,6 +128,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
 
         if (preAlphaUx.Mode == PreAlphaUxMode.None)
         {
+            EmitLogisticsCapacity(camera, snapshot, view, layout, context.Width, context.Height);
             EmitWorldArtwork(camera, snapshot, view, targeting, layout, context.Width, context.Height);
             EmitBattlefieldStatus(camera, snapshot, view, layout, context.Width, context.Height);
             EmitGameplayLabels(camera, gameplayOverlay, layout, context.Width, context.Height);
@@ -815,9 +818,8 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
                     buttonWidth,
                     selector.Height);
 
-            bool selected =
-                mode ==
-                selectedMode;
+            bool selected = mode == selectedMode || mode == StrategicOverlayMode.Logistics &&
+                StrategicLogisticsCapacityFilters.IsLogistics(selectedMode);
             if (!_skin.Control(rect, selected: selected, role: "control.tab")) EmitQuad(
                 rect.X,
                 rect.Y,
@@ -918,14 +920,15 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             {
                 int count = mode switch
                 {
-                    StrategicOverlayMode.Logistics => overlay.LogisticsLinks.Count,
+                    StrategicOverlayMode.Logistics or StrategicOverlayMode.Conveyors or StrategicOverlayMode.Cargo or StrategicOverlayMode.FieldLogistics => CountLogisticsSamples(overlay.LogisticsCapacity, mode),
                     StrategicOverlayMode.Supply => overlay.Supply.Count,
                     StrategicOverlayMode.Sensors => overlay.Sensors.Count,
                     StrategicOverlayMode.Navigation => overlay.NavigationSectors.Count,
                     StrategicOverlayMode.Power => overlay.PowerEntities.Count,
                     _ => overlay.LogisticsNodes.Count + overlay.Supply.Count + overlay.PowerEntities.Count
                 };
-                text.Append(" LOCAL "); text.Append(count);
+                text.Append(" SAMPLED "); text.Append(count);
+                if (overlay.LogisticsCapacity is { } capacity && (capacity.Omitted > 0 || capacity.ScanLimited)) text.Append(" +LIMIT");
             }
         }
         float fittedScale = MathF.Min(scale * .8f, legend.Height / 30);

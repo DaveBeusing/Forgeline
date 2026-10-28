@@ -211,7 +211,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                     context,
                     _extraction,
                     interaction.StrategicOverlay,
-                    intelligenceSnapshot);
+                    intelligenceSnapshot, instances);
 
         CombatGroupOperationalSnapshot? combatGroups =
             _extraction is null

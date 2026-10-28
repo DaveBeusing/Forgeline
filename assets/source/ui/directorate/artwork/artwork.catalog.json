@@ -31634,6 +31634,24 @@
       "dynamicLabelRequired": true
     },
     {
+      "domain": "StrategicOverlayMode",
+      "member": "Conveyors",
+      "role": "unit_role.logistics",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "StrategicOverlayMode",
+      "member": "Cargo",
+      "role": "unit_role.logistics",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "StrategicOverlayMode",
+      "member": "FieldLogistics",
+      "role": "command.supply",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "FrontendSettingsField",
       "member": "DisplayPreset",
       "role": "utility.display",

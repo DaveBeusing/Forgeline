@@ -172,7 +172,10 @@ public enum StrategicOverlayMode : byte
     Sensors,
     Navigation,
     Power,
-    All
+    All,
+    Conveyors,
+    Cargo,
+    FieldLogistics
 }
 
 public enum RtsMinimapSymbolKind : byte

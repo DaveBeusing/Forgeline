@@ -6,13 +6,18 @@ public static class RtsStrategicOverlayHudModel
 
     public static string Label(StrategicOverlayMode mode) => mode switch
     {
-        StrategicOverlayMode.Logistics => "ROUTES", StrategicOverlayMode.Supply => "SUPPLY",
+        StrategicOverlayMode.Logistics => "BELT / CARGO / FIELD",
+        StrategicOverlayMode.Conveyors => "LOCAL CONVEYORS", StrategicOverlayMode.Cargo => "REGIONAL CARGO",
+        StrategicOverlayMode.FieldLogistics => "FIELD SERVICE ORDERS", StrategicOverlayMode.Supply => "SUPPLY",
         StrategicOverlayMode.Sensors => "SENSORS", StrategicOverlayMode.Navigation => "NAVIGATION",
         StrategicOverlayMode.Power => "POWER", StrategicOverlayMode.All => "ALL LAYERS", _ => "OVERLAYS OFF"
     };
     public static string Legend(StrategicOverlayMode mode) => mode switch
     {
-        StrategicOverlayMode.Logistics => "LINE LINK X OFF - LOAD N/A",
+        StrategicOverlayMode.Logistics => "LOG: FILTER / X BLOCK / ? UNKNOWN",
+        StrategicOverlayMode.Conveyors => "LOG: NEXT / SOLID BELT / X BLOCK",
+        StrategicOverlayMode.Cargo => "LOG: NEXT / DASH ROAD / RESV LOAD",
+        StrategicOverlayMode.FieldLogistics => "LOG: NEXT / DOT ORDER / RATE N/A",
         StrategicOverlayMode.Supply => "! CRITICAL P PIN S SUP L LOW",
         StrategicOverlayMode.Sensors => "GREEN COVER / AMBER SCREEN / RANGES",
         StrategicOverlayMode.Navigation => "BOX SECTOR POINT PORTAL",

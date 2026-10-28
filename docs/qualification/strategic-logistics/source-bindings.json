@@ -1,0 +1,100 @@
+{
+  "SchemaVersion": 1,
+  "BaseMaster": "08e8cf2f2e2632b3239229dc6840928d957c364c",
+  "QualificationSource": "b91b5b36864796f8be960e1e09b5550798872db0",
+  "Version": "0.1.506",
+  "Sources": {
+    "Directory.Build.props": "fcfe794b4bb96a0c1ad42187dbb22d418b0c4a321157e7e00d6812bb12b2157d",
+    "src/ForgeLine.Client/ClientApplication.cs": "17c49573e8409d09efa2c09cf87ad8992e235cb802133aaf1c56fe1f00f377d2",
+    "src/ForgeLine.Presentation/OperationsController.cs": "4458c4d23cb3dbd9f4278d5c00fdbc46a09af9e38debd0eff02e972227c17993",
+    "src/ForgeLine.Presentation/PresentationExtractor.cs": "369356c338e0c1c11d98e0102c793b29216104f9aa461dd55595f801858f0bdc",
+    "src/ForgeLine.Presentation/RtsInformationLayer.cs": "40fae235cf3e19fc076c12da4bbe8977a459834dc5aad93868f7aa6116f19802",
+    "src/ForgeLine.Presentation/RtsInformationOverlayRenderer.cs": "0e14659842b0e976e87f08b70b07c0abaa1e5bb23e3bbb9d0e1e4b802ad00aba",
+    "src/ForgeLine.Presentation/RtsMinimapPresentation.cs": "7a382596b56243d860868ac03399343a95ecf230fcf8deb4d8a43ef4b663e92e",
+    "src/ForgeLine.Presentation/RtsStrategicOverlayHudModel.cs": "806a7d195af3566c8d6e3ea4664396ce400b271905a9a6a2d4325d7496e795d8",
+    "src/ForgeLine.Presentation/StrategicOverlaySnapshot.cs": "bd4b470803f02d278eb5ba0bffd9e21b80e7ae497746868220a0cd36199a0152",
+    "src/ForgeLine.Presentation/StrategicLogisticsCapacity.cs": "15c0d80319224eaae0edebaeec5e0dcdf34b772380dd421de67fa7e002f6dd64",
+    "src/ForgeLine.Presentation/StrategicLogisticsCapacityOverlay.cs": "090450f7f045df007aecd8e37de4a8e1a853351ac47a8f88bd8870d7c04818fb",
+    "src/ForgeLine.Presentation/RtsInformationOverlayRenderer.Logistics.cs": "23b2237fab6bca43e7aaee87eb28de6fe854fb89d9b10f145aa857ddb1edcd51",
+    "tests/ForgeLine.Presentation.Tests/StrategicLogisticsCapacityTests.cs": "1e30400e46c95be02bb7daacd63d0693a1bc3d73569c666d955a36fe45392a0a",
+    "tests/ForgeLine.Presentation.Tests/StrategicLogisticsCapacityNativeTests.cs": "36ff0c88f0b71f5557d7a2246df6ad5eb574d2aab65442e3d72412858b19798c",
+    ".github/workflows/ci.yml": "9e6b24dc8b41cb61db276691c52bbecce7a9419b06511c5f5aa04894ec2136df",
+    "tests/ForgeLine.Presentation.Tests/RtsInformationLayerTests.cs": "f30236462e0c855a13e4b8598afcda74ac400592b1757a807781f64d1383d755",
+    "tests/ForgeLine.Presentation.Tests/RtsMinimapInteractionTests.cs": "f194d4208541280c7f2e31a98eeda1977eb65253b47f3255382b4e0fba476770"
+  },
+  "Binaries": {
+    "src/ForgeLine.Presentation/bin/Release/net10.0-windows/ForgeLine.Presentation.dll": "2d28d2839a7db59f8b5fd3dd6eb26391efa4b4c6802c2d9dac1967c2566812f9",
+    "src/ForgeLine.Client/bin/Release/net10.0-windows/win-x64/ForgeLine.Client.dll": "1aa42eab7a0fef764293bd265ce86daa44f0a68ab980c7601d64195d619451fa",
+    "tests/ForgeLine.Presentation.Tests/bin/Release/net10.0-windows/ForgeLine.Presentation.Tests.dll": "67d41a369207d614a34911a73ac8e40212059703d26ec01ec18b39eb5baee04b"
+  },
+  "NativePixels": [
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1280x720-192dpi-Cargo.rgba",
+      "RgbaSha256": "397cdadb04827eae6463076f0ed465ba1172cf5d7b413f0debbe1d3666303c6e",
+      "PngFile": "capacity-1280x720-192dpi-Cargo.png",
+      "PngSha256": "84ac659dc8b1948470b235fca86a16f309b084a1218f917e9808e8781ed7ad20"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1280x720-192dpi-Conveyors.rgba",
+      "RgbaSha256": "dc57a9f6f32b1bcdbabd1c201335d57244cca0d4fbf9335690d62df22825895a",
+      "PngFile": "capacity-1280x720-192dpi-Conveyors.png",
+      "PngSha256": "dd9a01a2e6565aed15be437c883c1a0774a460b7ac3fa9ecae4b4c2c8b8a8822"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1280x720-192dpi-FieldLogistics.rgba",
+      "RgbaSha256": "7ad56bf68b8306b8ae2289ca81664714df234357f8a453dc5f2500db04bc85c5",
+      "PngFile": "capacity-1280x720-192dpi-FieldLogistics.png",
+      "PngSha256": "6a70115aea1d2706e237b70e931d198eac7698f8da58fbf13109e2df045c5027"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1280x720-192dpi-Logistics.rgba",
+      "RgbaSha256": "2830ede63541758b60aed033eedc7d830d7ac42e90613d7eadc1621e6a8b3684",
+      "PngFile": "capacity-1280x720-192dpi-Logistics.png",
+      "PngSha256": "864533a82ea9de2e02e07bd24e3930eaf669b880e9af74e63deb2c769d24a0db"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1280x720-192dpi-None.rgba",
+      "RgbaSha256": "923034089c42dd8e9d49de290118baf9579b5a610bb6e8d59dd7974611b027c4",
+      "PngFile": "capacity-1280x720-192dpi-None.png",
+      "PngSha256": "322f8b1151c33f954196e0c06b6c86314eceaec66a864403ecd0da9bedc5ca91"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1920x1080-96dpi-Cargo.rgba",
+      "RgbaSha256": "82ddf0e68249d11bf35c55a7e905075c805c3ea2d622750f8a651f10513c8b06",
+      "PngFile": "capacity-1920x1080-96dpi-Cargo.png",
+      "PngSha256": "1f42e3c399e4c7bbf8de6cf09ad8dd73967af857ec61de4e00496ad9434e35f6"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1920x1080-96dpi-Conveyors.rgba",
+      "RgbaSha256": "435912b68948d35cac1432929799f05251ffe7ae13508447f95a8570de057f21",
+      "PngFile": "capacity-1920x1080-96dpi-Conveyors.png",
+      "PngSha256": "5b9ac0170996c9254086c26223d9fa394e9db404c249db83be2867e2ca46a9ec"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1920x1080-96dpi-FieldLogistics.rgba",
+      "RgbaSha256": "a3ca84654eac2d5745694e192eb81c452e55b8bbf110c2bf8b5d6dc30972443a",
+      "PngFile": "capacity-1920x1080-96dpi-FieldLogistics.png",
+      "PngSha256": "8ca0ac78846588651778fdcd82676c8139fa5021ae1176d8ce58b621f2bb74ac"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1920x1080-96dpi-Logistics.rgba",
+      "RgbaSha256": "ec86aafd27c7afba4e02c67746fe755ebdf250442cecee42c6153d0b19ff10a8",
+      "PngFile": "capacity-1920x1080-96dpi-Logistics.png",
+      "PngSha256": "05bed31a2b450ec0903b553a4e25eba5b4f45322f6ddd695854b0cdf39573c70"
+    },
+    {
+      "GeneratedFile": "artifacts/logistics-native/capacity-1920x1080-96dpi-None.rgba",
+      "RgbaSha256": "2deb538a1922bc3254ed871abea5b5ba9db822870cf67948a3dc54ff7b736d8c",
+      "PngFile": "capacity-1920x1080-96dpi-None.png",
+      "PngSha256": "c231ff666c1e0b08740808345d81b98eb95022e32eff26beb4f98460447c1775"
+    }
+  ],
+  "EvidenceClass": "Native D3D12 WARP information-layer fixtures; not a complete physical-adapter battlefield acceptance",
+  "Sdk": "10.0.402",
+  "Host": {
+    "Platform": "win32",
+    "Release": "10.0.26300",
+    "LogicalProcessors": 24
+  },
+  "InitialProductSource": "b2260661af9628030eea3ebdf52994ecc834093d"
+}

@@ -88,6 +88,13 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Strategic logistics capacity and legal Operations drilldown
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class 'ForgeLine.Presentation.Tests.StrategicLogisticsCapacity*' ForgeLine.Presentation.Tests.RtsInformationLayerTests ForgeLine.Presentation.Tests.RtsMinimapInteractionTests ForgeLine.Presentation.Tests.OperationsTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+
       - name: Command replay cancellation and integrity
         shell: pwsh
         run: |

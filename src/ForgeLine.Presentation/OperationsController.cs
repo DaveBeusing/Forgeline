@@ -139,6 +139,15 @@ public sealed class OperationsController
     public OperationsView View { get; private set; }
     public void OpenCategory(OperationsCategory category, SimulationSessionId session, PresentationInteractionState interaction)
     { _armed = false; _rules.Close(); _templates.Close(); _production.Close(); View = new(true, category, Session: session); interaction.SetOperationsOpen(true); }
+    public bool OpenEntity(PresentationSnapshot? snapshot, EntityId entity, PresentationInteractionState interaction, SelectionSet selection)
+    {
+        if (!OperationsWorldOverlay.CanFocus(snapshot, entity)) return false;
+        OpenCategory(OperationsCategory.All, snapshot!.SessionId, interaction);
+        _session = snapshot.SessionId; _initialized = false;
+        View = View with { Selected = entity };
+        selection.SetSingle(entity); interaction.SetSelection(selection.Entities);
+        return true;
+    }
     public bool ContainsSurface(System.Numerics.Vector2 point, in GameplayHudLayout layout) =>
         View.Open && !View.Suppressed && SurfaceBounds(layout).Contains(point);
     private HudRect SurfaceBounds(in GameplayHudLayout layout) => View.Production is { } production
