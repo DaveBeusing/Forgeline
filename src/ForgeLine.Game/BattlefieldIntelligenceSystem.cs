@@ -426,28 +426,21 @@ public sealed class BattlefieldIntelligenceSystem : ISimulationSystem
             return;
         }
 
-        foreach (EntityId candidate in
-                 context.Entities.Query<
-                     IntelligenceSignature,
-                     WorldTransform>(
-                         QueryIterationOrder.StableByEntityIndex))
+        // Match indexed admission order without retaining entity identities across
+        // scans. The temporary set is bounded by the current in-range population.
+        var fallback = new List<EntityId>();
+        foreach (EntityId candidate in context.Entities.Query<IntelligenceSignature, WorldTransform>(
+                     QueryIterationOrder.StableByEntityIndex))
         {
-            WorldTransform transform =
-                context.Entities.GetComponent<WorldTransform>(
-                    candidate);
-            Vector3 delta =
-                transform.Position -
-                center;
-
-            if (delta.LengthSquared() >
-                rangeMeters * rangeMeters)
-            {
-                continue;
-            }
-
+            Vector3 delta = context.Entities.GetComponent<WorldTransform>(candidate).Position - center;
+            if (delta.LengthSquared() <= rangeMeters * rangeMeters) fallback.Add(candidate);
+        }
+        int offset = fallback.Count == 0 ? 0 : (int)(rotation % (ulong)fallback.Count);
+        for (int index = 0; index < fallback.Count; index++)
+        {
             _candidatesThisTick++;
             _totalCandidates++;
-            visitor(candidate);
+            visitor(fallback[(int)(((long)offset + index) % fallback.Count)]);
         }
     }
 

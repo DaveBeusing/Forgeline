@@ -17,7 +17,41 @@ internal static class PolicyTemplateSelectionCapture
         var stock = scenario.Inventories;
         var rules = scenario.OperationsRules.Capture(extraction.Player);
         var rows = new List<PolicyTemplateTargetSnapshot>(PolicyTemplate.MaximumTargets);
-        foreach (EntityId entity in selection.Take(PolicyTemplate.MaximumTargets).Distinct())
+        var selected = selection.Take(PolicyTemplate.MaximumTargets).Distinct().ToArray();
+        var eligible = selected.Where(entity => entities.TryGetComponent(entity, out ControllableEntity control) &&
+            control.Owner == extraction.Player && control.IsControllable && entities.HasComponent<CompletedBuilding>(entity) &&
+            entities.TryGetComponent(entity, out HealthState health) && !health.IsDepleted).ToHashSet();
+        EntityId onlyEligible = eligible.Count == 1 ? eligible.First() : default;
+        var policiesByTarget = new Dictionary<EntityId, List<(EntityId Entity, LogisticsStockPolicy Policy)>>();
+        var overflow = new HashSet<EntityId>();
+        var requestsByTarget = new Dictionary<EntityId, List<PlayerProductionRequestReadModel>>();
+        if (eligible.Count > 0)
+        {
+            // One stable global pass, retaining only this bounded selection. The
+            // first 32 rows and first duplicate still have their original order.
+            foreach (var policyEntity in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
+            {
+                var policy = entities.GetComponent<LogisticsStockPolicy>(policyEntity);
+                if (onlyEligible.IsValid ? policy.TargetEntity != onlyEligible : !eligible.Contains(policy.TargetEntity)) continue;
+                if (!policiesByTarget.TryGetValue(policy.TargetEntity, out var bucket))
+                    policiesByTarget.Add(policy.TargetEntity, bucket = new(32));
+                if (bucket.Count == 32) { overflow.Add(policy.TargetEntity); continue; }
+                bucket.Add((policyEntity, policy));
+            }
+            foreach (var requestEntity in entities.Query<ProductionRequest>(QueryIterationOrder.StableByEntityIndex))
+            {
+                var request = entities.GetComponent<ProductionRequest>(requestEntity);
+                if ((onlyEligible.IsValid ? request.Facility != onlyEligible : !eligible.Contains(request.Facility)) ||
+                    !entities.TryGetComponent(request.Facility, out ProductionFacility facility)) continue;
+                if (!requestsByTarget.TryGetValue(request.Facility, out var bucket))
+                    requestsByTarget.Add(request.Facility, bucket = new(32));
+                if (bucket.Count == 32) continue;
+                bucket.Add(new(requestEntity, request.RecipeId, request.RecipeId.ToString(), request.Priority,
+                    request.Mode, request.Paused, facility.ActiveRequest == requestEntity)
+                { DesiredStockResource = request.DesiredStockResourceId, DesiredStockQuantity = request.DesiredStockQuantity });
+            }
+        }
+        foreach (EntityId entity in selected)
         {
             string unavailable = !entities.TryGetComponent(entity, out ControllableEntity owner) ||
                 owner.Owner != extraction.Player || !owner.IsControllable ? "NOT OWNED OR CONTROLLABLE" :
@@ -36,27 +70,25 @@ internal static class PolicyTemplateSelectionCapture
                 name += FormattableString.Invariant($" ({pose.Position.X:0},{pose.Position.Z:0})");
             InventoryId input = ConveyorSimulationSystem.ResolveInventory(entities, entity, true);
             var facts = new List<PolicyTemplateStockFact>(32);
-            var policies = new List<(EntityId Entity, LogisticsStockPolicy Policy)>(32);
-            bool policyOverflow = false;
-            foreach (EntityId policyEntity in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
-            {
-                var policy = entities.GetComponent<LogisticsStockPolicy>(policyEntity);
-                if (policy.TargetEntity != entity) continue;
-                if (policies.Count == 32) { policyOverflow = true; continue; }
-                policies.Add((policyEntity, policy));
-            }
+            var policies = policiesByTarget.GetValueOrDefault(entity) ?? [];
+            bool policyOverflow = overflow.Contains(entity);
             if (stock.Contains(input))
                 foreach (var resource in scenario.Services.Resources.Definitions.Take(32))
                 {
-                    var matching = policies.Where(item => item.Policy.ResourceId == resource.Id).ToArray();
-                    var first = matching.Length > 0 ? matching[0] : default;
+                    int matching = 0;
+                    (EntityId Entity, LogisticsStockPolicy Policy) first = default;
+                    double others = 0;
+                    foreach (var item in policies)
+                    {
+                        if (item.Policy.ResourceId == resource.Id)
+                        { if (matching++ == 0) first = item; }
+                        else if (item.Policy.Enabled) others += item.Policy.DesiredTarget;
+                    }
                     double quantity = stock.GetQuantity(input, resource.Id);
                     double capacity = stock.GetResourceCapacity(input, resource.Id);
-                    double others = policies.Where(item => item.Policy.ResourceId != resource.Id && item.Policy.Enabled)
-                        .Sum(item => item.Policy.DesiredTarget);
-                    facts.Add(new(resource.Id, resource.DisplayName[..Math.Min(96, resource.DisplayName.Length)], first.Entity, matching.Length,
+                    facts.Add(new(resource.Id, resource.DisplayName[..Math.Min(96, resource.DisplayName.Length)], first.Entity, matching,
                         first.Policy.DesiredMinimum, first.Policy.DesiredTarget, first.Policy.DesiredMaximum,
-                        first.Policy.Priority, matching.Length == 0 || first.Policy.Enabled, quantity,
+                        first.Policy.Priority, matching == 0 || first.Policy.Enabled, quantity,
                         stock.GetReservedQuantity(input, resource.Id), capacity, others));
                 }
             PlayerProductionFacilityActionReadModel? production = null;
@@ -72,15 +104,7 @@ internal static class PolicyTemplateSelectionCapture
                         recipe.Inputs.Take(9).Select(cost => Amount(facility.InputInventory, cost.ResourceId, cost.Quantity)).ToArray(),
                         recipe.Outputs.Take(9).Select(cost => Amount(facility.OutputInventory, cost.ResourceId, cost.Quantity)).ToArray()));
                 }
-                var requests = new List<PlayerProductionRequestReadModel>(32);
-                foreach (EntityId requestEntity in entities.Query<ProductionRequest>(QueryIterationOrder.StableByEntityIndex))
-                {
-                    var request = entities.GetComponent<ProductionRequest>(requestEntity);
-                    if (request.Facility != entity || requests.Count == 32) continue;
-                    requests.Add(new(requestEntity, request.RecipeId, request.RecipeId.ToString(), request.Priority,
-                        request.Mode, request.Paused, facility.ActiveRequest == requestEntity)
-                    { DesiredStockResource = request.DesiredStockResourceId, DesiredStockQuantity = request.DesiredStockQuantity });
-                }
+                var requests = requestsByTarget.GetValueOrDefault(entity) ?? [];
                 production = new(entity, facility.ActiveRequest, facility.ActiveRecipe, facility.Status,
                     facility.BlockReason, 0, recipes, requests,
                     AutomaticProcessing.RecipeFor(facility.Capabilities).IsSpecified);
