@@ -10,7 +10,7 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class StrategicMapExperienceTests
 {
     [Theory]
-    [InlineData(StrategicOverlayMode.Logistics, "ROUTES", "LOAD N/A")]
+    [InlineData(StrategicOverlayMode.Logistics, "BELT / CARGO / FIELD", "UNKNOWN")]
     [InlineData(StrategicOverlayMode.Supply, "SUPPLY", "CRITICAL")]
     [InlineData(StrategicOverlayMode.Sensors, "SENSORS", "RANGE")]
     [InlineData(StrategicOverlayMode.Navigation, "NAVIGATION", "SECTOR")]
