@@ -152,7 +152,7 @@ public sealed class OperationsController
     { _armed = false; _rules.Close(); _templates.Close(); _production.Close(); View = new(true, Session: session, Notifications: true); interaction.SetOperationsOpen(true); }
     public void CancelInput(InputState input)
     {
-        _production.CancelInput();
+        _production.CancelInput(input);
         _rules.CancelInput(input); _templates.CancelInput(input);
         SynchronizeKeys(input);
         _consumeLeftGesture |= _armed && input.IsMouseButtonDown(PlatformMouseButton.Left);
@@ -184,7 +184,7 @@ public sealed class OperationsController
         View = View with { Suppressed = blocked || input.FocusLostThisFrame };
         if (View.Suppressed)
         {
-            _production.CancelInput();
+            _production.CancelInput(input);
             _armed = false;
             if (View.TemplateControls.HasValue)
             { _templates.Update(input, snapshot, layout, true, selection); View = View with { TemplateControls = _templates.View }; }
@@ -381,7 +381,7 @@ public sealed class OperationsController
     }
     private void NextMeasurement() => View = View with { MeasurementPage = View.MeasurementPage == int.MaxValue ? 0 : View.MeasurementPage + 1 };
     private void OpenProduction(InputState input)
-    { _armed = false; _rules.Close(); _templates.Close(); _production.Open(); View = View with { Production = _production.View }; input.SuppressHeldInput(); }
+    { _armed = false; _rules.Close(); _templates.Close(); _production.Open(); _production.CancelInput(input); View = View with { Production = _production.View }; input.SuppressHeldInput(); }
     private void OpenTemplates(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, SelectionSet? selection)
     {
         _armed = false; _rules.Close();

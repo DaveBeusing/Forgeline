@@ -3,8 +3,8 @@
   "Version": "0.1.505",
   "SourceNormalization": "UTF-8 with LF line endings; GitBlobSha1 is the canonical text blob identity.",
   "Binaries": {
-    "ForgeLine.Client.dll": "d635c6da7a7bf759be9d31c02bb4abe1187a058484a520e436611ee882558636",
-    "ForgeLine.Presentation.dll": "61ba374488e768b301819f5a752b1bb50c1ae0f42e0b3e20c81ab0fa31235fa1",
+    "ForgeLine.Client.dll": "c0eb047aa11a135ce5e95639b889b20b7e240170a25fe7e4942c125ba2b6b0eb",
+    "ForgeLine.Presentation.dll": "7201ae4b27b8e3f11e5f23e936ce2f3093f537e20be7158a538684ed8f9cdf7c",
     "ForgeLine.Game.dll": "eb2cdbf1e420d0d282c0f5825890239304dc92d8943cc8c3a56ca415d4f0c7e3"
   },
   "Files": [
@@ -45,8 +45,8 @@
     },
     {
       "Path": "src/ForgeLine.Presentation/GlobalProductionController.cs",
-      "Utf8LfSha256": "e36f30b450c2dbff9534c1e02f8ad79f3b5d9a83bc0307f77cd9e1e2557994a1",
-      "GitBlobSha1": "1367aa5e712ff29508b78278722190391f516dc5"
+      "Utf8LfSha256": "a896c3d5fb149bc1aab379da6879894de904f9fc629d9849c25a28f8f5e5129b",
+      "GitBlobSha1": "ff1f51a0462fb5f903eb5d389fd243a90d853e24"
     },
     {
       "Path": "src/ForgeLine.Presentation/GlobalProductionSnapshot.cs",
@@ -55,8 +55,8 @@
     },
     {
       "Path": "src/ForgeLine.Presentation/OperationsController.cs",
-      "Utf8LfSha256": "a334d9fb6400710b046b8ac0c04267ee2aa98957964b3eaa79d8b74dbe36bd46",
-      "GitBlobSha1": "20d4eff16e52422bcebfc4cdd64b700039611daf"
+      "Utf8LfSha256": "b8556bf022372aa5e4dd459c2ab293b467fe17cbe34c81e19feb3c3c361b5566",
+      "GitBlobSha1": "f971940b0c85852935d4bc84499cb166969f5a03"
     },
     {
       "Path": "src/ForgeLine.Presentation/OperationsHudSurface.Production.cs",
@@ -110,8 +110,8 @@
     },
     {
       "Path": "tests/ForgeLine.Presentation.Tests/GlobalProductionTests.cs",
-      "Utf8LfSha256": "ace87beca6827ae3df41cc56a6fd014fac3535921b3b5154241f1babb15211f8",
-      "GitBlobSha1": "d6d2efc33e6b73486cbeb822cb66b9c4fe4cece0"
+      "Utf8LfSha256": "fae3cd917d254dc6d9ddc05dde33c861338aa836fdd6e4055c46faea0d51623e",
+      "GitBlobSha1": "e7ce58f3f894dfef1039f67d84376e439d978154"
     }
   ]
 }

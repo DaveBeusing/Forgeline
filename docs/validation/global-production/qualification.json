@@ -1,7 +1,7 @@
 {
   "Version": "0.1.505-dev+8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
   "PresentationVersion": "0.1.505-dev+8749198f89ce1f1c90684c0bcb3f8a3398e28f45",
-  "PresentationSha256": "61BA374488E768B301819F5A752B1BB50C1AE0F42E0B3E20C81AB0FA31235FA1",
+  "PresentationSha256": "7201AE4B27B8E3F11E5F23E936CE2F3093F537E20BE7158A538684ED8F9CDF7C",
   "Fixture": "FEC403C8D79C176E2BA0956A71E7BCE7F93863A3B2C56A4307E61D78CEA9464F",
   "Device": {
     "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
@@ -307,9 +307,9 @@
       "HudOnlyTiming": {
         "Warmups": 64,
         "Samples": 128,
-        "SubmitP50Microseconds": 1200.2,
-        "GpuSamples": 122,
-        "GpuP50Milliseconds": 0.115232
+        "SubmitP50Microseconds": 566.3,
+        "GpuSamples": 128,
+        "GpuP50Milliseconds": 0.113056
       }
     },
     {
@@ -335,9 +335,9 @@
       "HudOnlyTiming": {
         "Warmups": 64,
         "Samples": 128,
-        "SubmitP50Microseconds": 664.8,
-        "GpuSamples": 123,
-        "GpuP50Milliseconds": 0.11376
+        "SubmitP50Microseconds": 749,
+        "GpuSamples": 124,
+        "GpuP50Milliseconds": 0.112704
       }
     },
     {
@@ -363,9 +363,9 @@
       "HudOnlyTiming": {
         "Warmups": 64,
         "Samples": 128,
-        "SubmitP50Microseconds": 625.1,
+        "SubmitP50Microseconds": 604.5,
         "GpuSamples": 124,
-        "GpuP50Milliseconds": 0.108096
+        "GpuP50Milliseconds": 0.10688
       }
     },
     {

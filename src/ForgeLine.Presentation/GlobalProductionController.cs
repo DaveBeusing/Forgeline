@@ -73,7 +73,8 @@ internal sealed class GlobalProductionController
     internal GlobalProductionView View { get; private set; } = new(Focus: 1, Feedback: "");
     internal void Open() { View = new(Focus: 1, Feedback: ""); _armed = false; _pending = null; _initialized = false; _submission = 0; _correlation = default; }
     internal void Close() { _armed = false; _pending = null; _submission = 0; _correlation = default; }
-    internal void CancelInput() => _armed = false;
+    internal void CancelInput(InputState input)
+    { _armed = false; _press = input.MousePressSequence(PlatformMouseButton.Left); }
     internal bool TryTakeCommand(out GlobalProductionCommand command)
     { command = _pending ?? default; bool found = _pending.HasValue; _pending = null; return found; }
     internal void Submitted(bool success, ulong sequence)

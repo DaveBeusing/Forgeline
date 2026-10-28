@@ -14,6 +14,23 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class GlobalProductionTests
 {
     [Fact]
+    public void SkippedPauseFrameCannotRearmAnOldHeldCancelGesture()
+    {
+        var controller=new GlobalProductionController(GameplayBindingRegistry.Default);controller.Open();
+        var snapshot=Snapshot();var input=new InputState();var layout=GameplayHudLayout.Create(1600,900,96);
+        controller.Update(input,snapshot,layout,[],false);
+        var row=GlobalProductionLayout.Control(layout,10);
+        Edge(input,PlatformInputEventKind.MouseButtonDown,row);controller.Update(input,snapshot,layout,[],false);
+        Edge(input,PlatformInputEventKind.MouseButtonUp,row);controller.Update(input,snapshot,layout,[],false);
+        var cancel=GlobalProductionLayout.Control(layout,23);
+        Edge(input,PlatformInputEventKind.MouseButtonDown,cancel);
+        controller.CancelInput(input); // The parent skips the subpanel update while paused.
+        input.BeginFrame();controller.Update(input,snapshot,layout,[],false);
+        Edge(input,PlatformInputEventKind.MouseButtonUp,cancel);controller.Update(input,snapshot,layout,[],false);
+        Assert.False(controller.TryTakeCommand(out _));
+    }
+
+    [Fact]
     public void QueueFeedbackRequiresMatchingSubmissionCorrelationAndSession()
     {
         var controller=new GlobalProductionController(GameplayBindingRegistry.Default); controller.Open();
