@@ -239,3 +239,7 @@ The public publisher forces false and verifies assembly variant metadata.
 See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
 request/result, parameter, preset and provider contracts and ownership handoffs.
 No menu or mutating tool is implied by these contracts.
+
+## Strategic map audit
+
+After the Release build, run `./build/Test-StrategicMapAudit.ps1` for every registered compiled map, repeatable JSON/Markdown, explicit warning exceptions and controlled failure cases. The same check and focused regression suite run early in CI. See [criteria and reproduction](StrategicMapBalanceAudit.md).
