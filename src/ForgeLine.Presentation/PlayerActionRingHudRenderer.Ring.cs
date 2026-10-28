@@ -51,6 +51,7 @@ internal sealed partial class PlayerActionRingHudRenderer
             bool hovered = ring.Open && ring.HoveredSlot == i;
             bool pending = panel.ContextualPending && item && panel.SelectedIndex == target.ItemIndex;
             Vector4 fill = RadialActionVisuals.Background(enabled, hovered, ring.Pressed && hovered, pending, opacity);
+            if (_displaySettings.HighContrast) fill = new(0, 0, 0, opacity);
             RingSegment(geometry, i, fill, width, height);
             if (activeStockField && !hovered)
                 RingHoverArc(geometry, i, new Vector4(.3f, .8f, 1, opacity),

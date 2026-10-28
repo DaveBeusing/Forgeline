@@ -1,0 +1,1482 @@
+{
+  "Version": "0.1.504-dev\u002B201af6aad7ace07df21608c1d058d23b0828b070",
+  "PresentationVersion": "0.1.504-dev\u002B201af6aad7ace07df21608c1d058d23b0828b070",
+  "PresentationSha256": "7A0FEF6721EAEC9E2E9013952D4B951FC87AAE5F771339B8223C457A1247BA2C",
+  "Fixture": "FEC403C8D79C176E2BA0956A71E7BCE7F93863A3B2C56A4307E61D78CEA9464F",
+  "Device": {
+    "AdapterName": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU",
+    "DedicatedVideoMemoryBytes": 25309478912,
+    "IsSoftwareAdapter": false,
+    "FeatureLevel": "Level_12_1",
+    "DebugLayerEnabled": false,
+    "Advanced": {
+      "MeshShaderQuerySucceeded": true,
+      "MeshShadersSupported": true,
+      "RaytracingQuerySucceeded": true,
+      "RaytracingSupported": true
+    }
+  },
+  "WindowDpi": 144,
+  "Contract": "Authored owned snapshot states over the existing native battlefield fixture; not a natural match or approved golden. Layout DPI is not physical monitor certification.",
+  "TimingContract": "HUD-only complete clear/overlay/text GPU frame; no world. CPU submit includes waits/Present. Fixed paused snapshots; same device required for comparison.",
+  "Cases": [
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "498CAF12D53F686B103769C157AE2AA03E7B25CEA1C6C2A3F5E4410455383718",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "B3A084E4BD8BA9B0E8129B1203E0A57325945A3D7438CAAA0C510321E2A872D4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "1BDAE0564C053A0BD46D0C26BC00E1CBDE0F72E72736452C652255378A498AC4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "498CAF12D53F686B103769C157AE2AA03E7B25CEA1C6C2A3F5E4410455383718",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "B3A084E4BD8BA9B0E8129B1203E0A57325945A3D7438CAAA0C510321E2A872D4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "1BDAE0564C053A0BD46D0C26BC00E1CBDE0F72E72736452C652255378A498AC4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "C369075C0F6DEEA9B534B0BCB1CB659F766751D4DECA5B09F26F641571C5A754",
+      "HudVertices": 61116,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "47FC63E5F11AB96E207B16BE498DF4B0E851FC38D531C929EF5284BC250B0A5C",
+      "HudVertices": 61368,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "6F6B731223C28633C138AE45A1E6C0C92DE117AA5A197E0DB7F6133292ED0C8D",
+      "HudVertices": 61368,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "85597386A2F42F1394AD34D37885F7F7D6D34EB407FF848DFF8C1F561C1A1358",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "5D35F386FDDA269CA44373DD99CBD33765516ABEACCAB2159AB45F67FA226D3A",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "2E3F6D0B4CE09AA24609264A4C0A2DC70E1952C2C9634FC50CBE773B6B1CFAE6",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "85597386A2F42F1394AD34D37885F7F7D6D34EB407FF848DFF8C1F561C1A1358",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "5D35F386FDDA269CA44373DD99CBD33765516ABEACCAB2159AB45F67FA226D3A",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "2E3F6D0B4CE09AA24609264A4C0A2DC70E1952C2C9634FC50CBE773B6B1CFAE6",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "F9763FA3C6C6363A7CD2A3A00B4425233E7D25BCA8626467122471A7A3EC6E2A",
+      "HudVertices": 60804,
+      "Text": {
+        "Glyphs": 562,
+        "Vertices": 3372,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 107904,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "492C1E8022F0C9C6A16EDCEABCFEEBD1E7143DC8158DC207732CE3375B6893ED",
+      "HudVertices": 61056,
+      "Text": {
+        "Glyphs": 562,
+        "Vertices": 3372,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 107904,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "857C51E432809C508B81E5C081BDD90843245D9595E7ECC290E5570E1D6FCB79",
+      "HudVertices": 61056,
+      "Text": {
+        "Glyphs": 562,
+        "Vertices": 3372,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 107904,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "934F1C98A63ECA34539EDFD0C5B99875725697903747ECE3CE08AE63DABB3F07",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "306903EE98991EE83189BC6225651FD77F9BC254656E8393095421907B7413B9",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1280x720-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "035E08FA7A65D29FAC5192EAFF0B310D6CDB5F693C1B6DCB0DFAE47D86FE11CF",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "934F1C98A63ECA34539EDFD0C5B99875725697903747ECE3CE08AE63DABB3F07",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "306903EE98991EE83189BC6225651FD77F9BC254656E8393095421907B7413B9",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1280x720-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "035E08FA7A65D29FAC5192EAFF0B310D6CDB5F693C1B6DCB0DFAE47D86FE11CF",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "44B2ABB25D3D1A51C1E202C3A56BCD41D3629C6B05C243CB16EC473EC8D98CD8",
+      "HudVertices": 60348,
+      "Text": {
+        "Glyphs": 487,
+        "Vertices": 2922,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 93504,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "3AAAA96942305CFF23B54732C5D2D82D9F02A22D5105D735776475D4ECCF98AE",
+      "HudVertices": 60600,
+      "Text": {
+        "Glyphs": 487,
+        "Vertices": 2922,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 93504,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1280,
+      "Height": 720,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1280x720-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "E79638DB43F0E0790CA55BC157EE543BEA53485337163DB1D647C88D6AC59356",
+      "HudVertices": 60600,
+      "Text": {
+        "Glyphs": 487,
+        "Vertices": 2922,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 93504,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "178410C27131368DFB176DB2A87CC112ED54D653570E15A400C357857BCA52E3",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "F3EAB2A8C7A5D3E1E1F6B0F210D04FA53AF6E82B5ACD9D37C5637F01946884A2",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "1ECD9A0A4F60CAA9EF681FFA3009B893185475DFF91220A4BF6B6EB6F77DBBE3",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "178410C27131368DFB176DB2A87CC112ED54D653570E15A400C357857BCA52E3",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "F3EAB2A8C7A5D3E1E1F6B0F210D04FA53AF6E82B5ACD9D37C5637F01946884A2",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "1ECD9A0A4F60CAA9EF681FFA3009B893185475DFF91220A4BF6B6EB6F77DBBE3",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.00-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "CE363125698B041A66704583BDB6D7B70CA5DFEF191DAE35272687143FA0CE1E",
+      "HudVertices": 61302,
+      "Text": {
+        "Glyphs": 645,
+        "Vertices": 3870,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123840,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.00-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "CFCF6F4152A799077ECFEC2B49B65B54BA25CECAB170D98A87365756DFD5A44C",
+      "HudVertices": 61554,
+      "Text": {
+        "Glyphs": 645,
+        "Vertices": 3870,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123840,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.00-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "B16DC241958B0F553767E5E63C77D7936C1654E96BAA76C18C2C608A26298856",
+      "HudVertices": 61554,
+      "Text": {
+        "Glyphs": 645,
+        "Vertices": 3870,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123840,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "EF51C4FAAE226692AAC0B889C86C40D9A9578CB1F8E422E4C5E648B61D66C461",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "7922F46D4EBC922E6E02FD52A12B0A1BA5798ACD563B753EC1708D45DED4E8C4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "E474CA065B457709113722EE3972E6F7C18157C74CF7A48EF4B27FB1890B0051",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "EF51C4FAAE226692AAC0B889C86C40D9A9578CB1F8E422E4C5E648B61D66C461",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "7922F46D4EBC922E6E02FD52A12B0A1BA5798ACD563B753EC1708D45DED4E8C4",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "E474CA065B457709113722EE3972E6F7C18157C74CF7A48EF4B27FB1890B0051",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.25-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "886F0C6CFF0A2A0CA02E48918818572B4E72148020CAA1E13E2AC5DFC4EDE8FE",
+      "HudVertices": 61296,
+      "Text": {
+        "Glyphs": 644,
+        "Vertices": 3864,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123648,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.25-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "250097FBBACC8B400829E61D6BF7F89E0994329ECAAFC08137FB7E67753ECC9B",
+      "HudVertices": 61548,
+      "Text": {
+        "Glyphs": 644,
+        "Vertices": 3864,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123648,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.25,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.25-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "D5A5FF979FD60C026DAC7D3513B6FF425CD3D5E5D71CA1349359BC4581F95187",
+      "HudVertices": 61548,
+      "Text": {
+        "Glyphs": 644,
+        "Vertices": 3864,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 123648,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "02337B74391E684CB5F7D5DE2A69951DE9E4AAA1987DCB26D559C1875D4089CB",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "DE72535F01CACB5C28F5E1618DE739D13E6066B8D56A406E54C38ED4B8CA7F61",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Mixed",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Mixed-NormalGameplay-1920x1080-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "B096F1AE20C8F8A33E14B5A35741CD08479BC4A3A82CB44A0D9A63030A00D080",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "02337B74391E684CB5F7D5DE2A69951DE9E4AAA1987DCB26D559C1875D4089CB",
+      "HudVertices": 58140,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "DE72535F01CACB5C28F5E1618DE739D13E6066B8D56A406E54C38ED4B8CA7F61",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Supply",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Supply-NormalGameplay-1920x1080-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "B096F1AE20C8F8A33E14B5A35741CD08479BC4A3A82CB44A0D9A63030A00D080",
+      "HudVertices": 58392,
+      "Text": {
+        "Glyphs": 244,
+        "Vertices": 1464,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 46848,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": false,
+        "TeamPalette": 0
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.50-Standard-contrastFalse.png",
+      "Repeatable": true,
+      "PixelSha256": "873FF88CFD78AD8B77F513F2ED6B4402FA36D9FC3A8F0B9FCFA7AE647B5CF57E",
+      "HudVertices": 61116,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 1
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.50-BlueOrange-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "A9F03ED90CF0EACD3875E9B72D3638017055B5CDCEAA9D7085700548903AA363",
+      "HudVertices": 61368,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    },
+    {
+      "State": "Production",
+      "Zoom": "NormalGameplay",
+      "Width": 1920,
+      "Height": 1080,
+      "Dpi": 96,
+      "UiScale": 1.5,
+      "Display": {
+        "Version": 1,
+        "HighContrast": true,
+        "TeamPalette": 2
+      },
+      "Image": "Production-NormalGameplay-1920x1080-96dpi-1.50-Grayscale-contrastTrue.png",
+      "Repeatable": true,
+      "PixelSha256": "C514DB53F097455C1930C00B59F6ADD096FA9FF12A982C22EF66D6DF0BA347B8",
+      "HudVertices": 61368,
+      "Text": {
+        "Glyphs": 614,
+        "Vertices": 3684,
+        "MissingGlyphs": 0,
+        "DroppedGlyphs": 0,
+        "UploadBytes": 117888,
+        "AtlasReady": true,
+        "FailureReason": null
+      },
+      "HudOnlyTiming": null
+    }
+  ]
+}

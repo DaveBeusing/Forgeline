@@ -13,6 +13,7 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
     private const int MaxLines = 12;
     private readonly IGraphicsDevice _graphics;
     private readonly UiTextBatch _text;
+    public void ConfigureDisplay(TacticalDisplaySettings settings) => _text.HighContrast = settings.HighContrast;
     private readonly GameplayHudSkin _skin;
     private readonly IGraphicsPipeline _pipeline;
     private readonly Dictionary<int, IGraphicsBuffer> _buffers = new(4);

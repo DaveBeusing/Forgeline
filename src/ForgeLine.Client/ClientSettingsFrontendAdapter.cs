@@ -59,6 +59,7 @@ internal sealed class ClientSettingsFrontendAdapter
                     snapshot.CameraBindings,
                 GameplayBindings = snapshot.GameplayBindings ?? new(),
                 ReducedUiMotion = snapshot.FeedbackSettings.ReducedMotion,
+                TacticalDisplay = snapshot.TacticalDisplay,
                 UiSoundEnabled = snapshot.FeedbackSettings.SoundEnabled,
                 UiSoundVolume = snapshot.FeedbackSettings.SoundVolume,
                 WorldAudio = snapshot.WorldAudio,
@@ -82,6 +83,6 @@ internal sealed class ClientSettingsFrontendAdapter
             settings.ShowOnboarding,
             settings.EdgeScrollEnabled,
             settings.CameraPanSpeedMultiplier,
-            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality, settings.CreateRenderQualitySettings(), settings.CreateUiFeedbackSettings()) { WorldAudio = settings.WorldAudio, Tooltips = settings.Tooltips };
+            settings.CameraBindings, settings.GameplayBindings, (FrontendRenderQuality)settings.RenderQuality.Quality, settings.CreateRenderQualitySettings(), settings.CreateUiFeedbackSettings()) { WorldAudio = settings.WorldAudio, Tooltips = settings.Tooltips, TacticalDisplay = settings.TacticalDisplay };
     }
 }

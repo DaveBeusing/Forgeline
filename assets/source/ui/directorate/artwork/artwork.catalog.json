@@ -31628,6 +31628,34 @@
       "dynamicLabelRequired": true
     },
     {
+      "domain": "FrontendSettingsField",
+      "member": "DisplayPreset",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "HighContrast",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "TeamPalette",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "ResetAccessibility",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
       "domain": "GameplayAction",
       "member": "Attack",
       "role": "command.attack",
