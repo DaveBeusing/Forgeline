@@ -233,6 +233,52 @@ public sealed class PersistenceBoundaryTests
             Assert.Throws<MatchPersistenceException>(() => MatchPersistenceSerializer.DeserializeSave(invalid)).Reason);
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(8192)]
+    [InlineData(MatchPersistenceValidation.MaximumRecoveryEntityCapacity)]
+    public void SupportedRecoveryCapacitySurvivesPreflightWithoutAllocation(int capacity)
+    {
+        using var runtime = CreateRuntime();
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        var configuration = save.Configuration with { InitialEntityCapacity = capacity };
+        var recording = MatchPersistenceService.CaptureReplay(runtime) with { Configuration = configuration };
+        Assert.Equal(capacity, MatchPersistenceSerializer.DeserializeSave(
+            MatchPersistenceSerializer.SerializeSave(save with { Configuration = configuration })).Configuration.InitialEntityCapacity);
+        Assert.Equal(capacity, MatchPersistenceSerializer.DeserializeReplay(
+            MatchPersistenceSerializer.SerializeReplay(recording)).Configuration.InitialEntityCapacity);
+    }
+
+    [Theory]
+    [InlineData(MatchPersistenceValidation.MaximumRecoveryEntityCapacity + 1)]
+    [InlineData(int.MaxValue)]
+    public void ExcessiveRecoveryCapacityFailsBeforeCompositionResolution(int capacity)
+    {
+        using var runtime = CreateRuntime();
+        var save = MatchPersistenceService.CaptureSave(runtime);
+        var configuration = save.Configuration with { InitialEntityCapacity = capacity };
+        var invalid = save with { Configuration = configuration };
+        var recording = MatchPersistenceService.CaptureReplay(runtime) with { Configuration = configuration };
+        int resolutions = 0;
+        MatchComposition Resolve(string key) { resolutions++; throw new InvalidOperationException("Must not resolve content."); }
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.Restore(invalid, Resolve)).Reason);
+        Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+            Assert.Throws<MatchPersistenceException>(() => MatchPersistenceService.PlayReplay(recording, Resolve)).Reason);
+        foreach (var kind in new[] { MatchPersistenceDocumentKind.Save, MatchPersistenceDocumentKind.Replay })
+        {
+            string document = kind == MatchPersistenceDocumentKind.Save
+                ? MatchPersistenceSerializer.SerializeSave(save)
+                : MatchPersistenceSerializer.SerializeReplay(MatchPersistenceService.CaptureReplay(runtime));
+            var payload = JsonNode.Parse(JsonNode.Parse(document)!["Payload"]!.GetValue<string>())!.AsObject();
+            payload["Configuration"]!["InitialEntityCapacity"] = capacity;
+            Assert.Equal(MatchPersistenceFailureReason.CorruptDocument,
+                Assert.Throws<MatchPersistenceException>(() => Read(Envelope(payload.ToJsonString(), kind), kind)).Reason);
+        }
+        Assert.Equal(0, resolutions);
+        Assert.Equal(save.StateSha256, MatchPersistenceService.CaptureSave(runtime).StateSha256);
+    }
+
     private static MatchRuntime CreateRuntime() => MatchRuntime.Create(
         CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, seed: 4242), TestContext.Current.CancellationToken);
 
