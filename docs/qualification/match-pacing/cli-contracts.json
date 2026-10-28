@@ -1,0 +1,47 @@
+[
+  {
+    "Name": "baseline",
+    "Expected": 0,
+    "Actual": 0
+  },
+  {
+    "Name": "repeat",
+    "Expected": 0,
+    "Actual": 0
+  },
+  {
+    "Name": "incompatible",
+    "Expected": 0,
+    "Actual": 0
+  },
+  {
+    "Name": "invalid-thresholds",
+    "Expected": 1,
+    "Actual": 1
+  },
+  {
+    "Name": "unknown-threshold",
+    "Expected": 1,
+    "Actual": 1
+  },
+  {
+    "Name": "threshold-without-output",
+    "Expected": 1,
+    "Actual": 1
+  },
+  {
+    "Name": "missing-threshold-file",
+    "Expected": 1,
+    "Actual": 1
+  },
+  {
+    "Name": "output-is-directory",
+    "Expected": 1,
+    "Actual": 1
+  },
+  {
+    "Name": "observed-warning-paths",
+    "Expected": 0,
+    "Actual": 0
+  }
+]

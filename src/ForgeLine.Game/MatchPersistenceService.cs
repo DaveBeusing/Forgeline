@@ -94,26 +94,47 @@ public static class MatchPersistenceService
     public static MatchRuntime PlayDeveloperReplay(MatchReplayData replay, DeveloperToolsCapability capability,
         Func<string, MatchComposition>? resolveComposition = null) => PlayReplayCore(replay, resolveComposition, capability);
 
+    public static MatchRuntime PlayReplayCancellable(MatchReplayData replay, CancellationToken cancellationToken,
+        Action<MatchRestorationProgress>? reportProgress = null, Func<string, MatchComposition>? resolveComposition = null,
+        IReadOnlyList<MatchReplayCheckpoint>? checkpoints = null) =>
+        PlayReplayCore(replay, resolveComposition, null, reportProgress, checkpoints, cancellationToken);
+
+    public static MatchRuntime PlayDeveloperReplayCancellable(MatchReplayData replay, DeveloperToolsCapability capability,
+        CancellationToken cancellationToken, Action<MatchRestorationProgress>? reportProgress = null,
+        Func<string, MatchComposition>? resolveComposition = null, IReadOnlyList<MatchReplayCheckpoint>? checkpoints = null) =>
+        PlayReplayCore(replay, resolveComposition, capability, reportProgress, checkpoints, cancellationToken);
+
     private static MatchRuntime PlayReplayCore(MatchReplayData replay, Func<string, MatchComposition>? resolveComposition,
-        DeveloperToolsCapability? capability)
+        DeveloperToolsCapability? capability, Action<MatchRestorationProgress>? reportProgress = null,
+        IReadOnlyList<MatchReplayCheckpoint>? checkpoints = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        reportProgress?.Invoke(new(MatchRestorationPhase.Configuration));
+        cancellationToken.ThrowIfCancellationRequested();
         ValidateReplay(
             replay);
         RequireRecoveryCapability(replay.Configuration, replay.Commands, replay.ParameterChanges, null, capability);
+        MatchReplayCheckpoint[] expected = ValidateCheckpoints(checkpoints, replay.FinalTick);
 
         MatchRuntime? scenario = null;
 
         try
         {
+            reportProgress?.Invoke(new(MatchRestorationPhase.ScenarioAssembly));
+            cancellationToken.ThrowIfCancellationRequested();
             scenario =
                 CreateAndSchedule(
                     replay.Configuration,
                     replay.Commands,
-                    resolveComposition, developerCapability: capability);
+                    resolveComposition, developerCapability: capability, cancellationToken: cancellationToken);
             RunToTickWithControls(
                 scenario,
                 replay.FinalTick,
-                replay.Commands);
+                replay.Commands, reportProgress, expected, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            reportProgress?.Invoke(new(MatchRestorationPhase.HashVerification, replay.FinalTick, replay.FinalTick));
+            cancellationToken.ThrowIfCancellationRequested();
 
             VerifyParameterChanges(scenario, replay.ParameterChanges);
             if (scenario.Simulation.Random.State !=
@@ -151,10 +172,15 @@ public static class MatchPersistenceService
                     $"Replay authoritative state diverged at tick {replay.FinalTick}: expected {replay.FinalStateSha256}, actual {actualHash}.");
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             MatchRuntime result =
                 scenario;
             scenario = null;
             return result;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (MatchPersistenceException)
         {
@@ -292,7 +318,7 @@ public static class MatchPersistenceService
             RunToTickWithControls(
                 scenario,
                 targetTick,
-                commands, reportProgress, cancellationToken);
+                commands, reportProgress, cancellationToken: cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();
             reportProgress?.Invoke(new(MatchRestorationPhase.HashVerification, targetTick, targetTick));
@@ -449,7 +475,7 @@ public static class MatchPersistenceService
         ulong targetTick,
         IReadOnlyList<RecordedSimulationCommand> commands,
         Action<MatchRestorationProgress>? reportProgress = null,
-        CancellationToken cancellationToken = default)
+        MatchReplayCheckpoint[]? checkpoints = null, CancellationToken cancellationToken = default)
     {
         RecordedSimulationCommand[] controls =
             commands
@@ -461,8 +487,25 @@ public static class MatchPersistenceService
                         command.RecordingOrder)
                 .ToArray();
         int controlIndex = 0;
+        int checkpointIndex = 0;
+        void VerifyCheckpoint()
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (checkpoints is null || checkpointIndex >= checkpoints.Length ||
+                checkpoints[checkpointIndex].Tick != scenario.Simulation.CurrentTick.Value) return;
+            MatchReplayCheckpoint expected = checkpoints[checkpointIndex++];
+            MatchReplayCheckpoint actual = MatchReplayCheckpoint.Capture(scenario);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (expected.RandomState != actual.RandomState)
+                throw Failure(MatchPersistenceFailureReason.RandomStateMismatch,
+                    $"Replay checkpoint RNG diverged at tick {actual.Tick}.");
+            if (!string.Equals(expected.StateSha256, actual.StateSha256, StringComparison.Ordinal))
+                throw Failure(MatchPersistenceFailureReason.StateMismatch,
+                    $"Replay checkpoint state diverged at tick {actual.Tick}: expected {expected.StateSha256}, actual {actual.StateSha256}.");
+        }
         reportProgress?.Invoke(new(MatchRestorationPhase.Replay, scenario.Simulation.CurrentTick.Value, targetTick));
 
+        VerifyCheckpoint();
         while (scenario.Simulation.CurrentTick.Value <
                targetTick)
         {
@@ -484,11 +527,15 @@ public static class MatchPersistenceService
                     control);
                 controlIndex++;
             }
+            VerifyCheckpoint();
             // Report only complete tick/control boundaries; observers never alter replay scheduling.
             if (currentTick % 64 == 0 || currentTick == targetTick)
                 reportProgress?.Invoke(new(MatchRestorationPhase.Replay, currentTick, targetTick));
         }
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (checkpoints is not null && checkpointIndex != checkpoints.Length)
+            throw Failure(MatchPersistenceFailureReason.CorruptDocument, "Replay checkpoints were not reached.");
 
         if (controlIndex !=
             controls.Length)
@@ -497,6 +544,26 @@ public static class MatchPersistenceService
                 MatchPersistenceFailureReason.CorruptDocument,
                 "Replay contains a control command outside the captured tick range.");
         }
+    }
+
+    private static MatchReplayCheckpoint[] ValidateCheckpoints(IReadOnlyList<MatchReplayCheckpoint>? checkpoints, ulong finalTick)
+    {
+        if (checkpoints is null) return [];
+        if (checkpoints.Count > MatchReplayCheckpoint.MaximumCount)
+            throw Failure(MatchPersistenceFailureReason.CorruptDocument, "Replay checkpoint count exceeds its limit.");
+        MatchReplayCheckpoint[] copied = checkpoints.ToArray();
+        ulong previous = 0;
+        for (int index = 0; index < copied.Length; index++)
+        {
+            MatchReplayCheckpoint checkpoint = copied[index];
+            if (checkpoint is not null && checkpoint.SchemaVersion != 1)
+                throw Failure(MatchPersistenceFailureReason.IncompatibleVersion, "Replay checkpoint schema is incompatible.");
+            if (checkpoint is null || checkpoint.Tick > finalTick ||
+                (index > 0 && checkpoint.Tick <= previous) || !MatchPersistenceValidation.Hash(checkpoint.StateSha256))
+                throw Failure(MatchPersistenceFailureReason.CorruptDocument, "Replay checkpoints require increasing in-range ticks and complete checksums.");
+            previous = checkpoint.Tick;
+        }
+        return copied;
     }
 
     private static void ValidateCommandHistory(
@@ -566,6 +633,7 @@ public static class MatchPersistenceService
             save.SchemaVersion);
         MatchPersistenceValidation.Configuration(save.Configuration);
         ValidateScenarioIdentity(save.SchemaVersion, save.Configuration);
+        PlayerControlGroupSaveData.Validate(save.ControlGroups, save.Configuration, save.SchemaVersion);
         MatchPersistenceValidation.Commands(save.Commands, save.SchemaVersion);
         MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
 

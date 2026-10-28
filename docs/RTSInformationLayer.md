@@ -350,3 +350,7 @@ The information renderer rebuilds minimap symbols, selection/group membership an
 ## Strategic logistics capacity
 
 The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
+
+## Battlefield status detail
+
+Owned strength, suppression, resupply and artillery mission causes extend the current inspector and Supply/All overlays. See [Battlefield status readability](BattlefieldStatusReadability.md) for symbol semantics, density limits and visibility gates.

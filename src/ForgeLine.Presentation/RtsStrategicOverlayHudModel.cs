@@ -18,7 +18,7 @@ public static class RtsStrategicOverlayHudModel
         StrategicOverlayMode.Conveyors => "LOG: NEXT / SOLID BELT / X BLOCK",
         StrategicOverlayMode.Cargo => "LOG: NEXT / DASH ROAD / RESV LOAD",
         StrategicOverlayMode.FieldLogistics => "LOG: NEXT / DOT ORDER / RATE N/A",
-        StrategicOverlayMode.Supply => "RING RANGE X CRITICAL/OFF",
+        StrategicOverlayMode.Supply => "! CRITICAL P PIN S SUP L LOW",
         StrategicOverlayMode.Sensors => "GREEN COVER / AMBER SCREEN / RANGES",
         StrategicOverlayMode.Navigation => "BOX SECTOR POINT PORTAL",
         StrategicOverlayMode.Power => "X OFF DIAMOND BROWNOUT",

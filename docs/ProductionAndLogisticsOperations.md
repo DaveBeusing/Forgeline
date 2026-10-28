@@ -70,3 +70,7 @@ The separate [Operations Diagnosis](OperationsDiagnosis.md) provides an immutabl
 ## Strategic logistics capacity
 
 The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
+
+## Global unit queues
+
+Choose QUEUES in the open Operations header for the collapsible factory overview. It shares existing unit-production requests, stock reservations, priorities and rally commands. See [Global production overview](GlobalProductionOverview.md) for filters, material scope, input ownership and qualification.

@@ -17,7 +17,7 @@ namespace ForgeLine.Client;
 internal static class BattlefieldHudCapture
 {
     private static readonly JsonSerializerOptions s_json = new() { WriteIndented = true };
-    internal static int Run(string output, string runtimeRoot, bool timingOnly = false)
+    internal static int Run(string output, string runtimeRoot, bool timingOnly = false, bool accessibilityOnly = false, bool productionOnly = false)
     {
         try
         {
@@ -41,30 +41,41 @@ internal static class BattlefieldHudCapture
                 var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, zoom));
                 foreach (var display in new[] { (1280, 720), (1920, 1080), (2560, 1440), (3440, 1440), (3840, 2160) })
                 {
+                    if (accessibilityOnly && (zoom != RtsReferenceZoom.NormalGameplay || (display != (1280, 720) && display != (1920, 1080)))) continue;
                     if (timingOnly && display != (1920, 1080)) continue;
+                    if (productionOnly && display != (1280,720) && display != (1920,1080) && display != (3440,1440)) continue;
                     // The complete display/DPI/scale matrix uses normal zoom; strategic adds the same
                     // three state inspections at the reference display without duplicating layout work.
                     if (zoom == RtsReferenceZoom.Strategic && display != (1920, 1080)) continue;
                     graphics.WaitForIdle(); graphics.Resize(display.Item1, display.Item2);
                     ground.Prepare(camera, display.Item1, display.Item2);
                     foreach (uint dpi in new uint[] { 96, 144, 192 })
-                    foreach (float scale in new[] { .75f, 1f, 2f })
+                    foreach (float scale in accessibilityOnly ? new[] { 1f, 1.25f, 1.5f } : new[] { .75f, 1f, 2f })
                     {
+                        if (accessibilityOnly && dpi != 96) continue;
                         if (timingOnly && (dpi != 96 || scale != 1)) continue;
+                        if (productionOnly && (dpi == 144 || scale == .75f)) continue;
                         if (zoom == RtsReferenceZoom.Strategic && (dpi != 96 || scale != 1)) continue;
-                        foreach (string state in new[] { "Mixed", "Supply", "Production" })
+                        foreach (string state in productionOnly ? new[] { "Queues", "QueuesMaterials", "QueuesCollapsed" } : new[] { "Mixed", "Supply", "Production" })
+                        foreach (var displaySettings in accessibilityOnly ? new[]
+                        {
+                            new TacticalDisplaySettings(),
+                            new TacticalDisplaySettings { HighContrast = true, TeamPalette = TacticalTeamPalette.BlueOrange },
+                            new TacticalDisplaySettings { HighContrast = true, TeamPalette = TacticalTeamPalette.Grayscale }
+                        } : new[] { new TacticalDisplaySettings() })
                         {
                             var snapshot = State(fixture.Snapshot, state);
                             var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
                             var world = new RenderWorld(); world.Update(buffer);
-                            var operations = state == "Production" ? new OperationsView(true, Session: snapshot.SessionId,
+                            var operations = state == "Production" || state.StartsWith("Queues", StringComparison.Ordinal) ? new OperationsView(true, Session: snapshot.SessionId,
                                 Selected: snapshot.PlayerExperience!.Value.Selection.PrimaryEntity) : default;
+                            if (state.StartsWith("Queues", StringComparison.Ordinal)) operations = operations with {Production=new GlobalProductionView(Factory:snapshot.PlayerExperience!.Value.Selection.PrimaryEntity,Request:new(900,1),DetailPage:state=="QueuesMaterials"?1:0,Collapsed:state=="QueuesCollapsed",Focus:1,Feedback:"")};
                             void RecordHud(IGraphicsCommandContext c)
                             {
                                 c.BeginPass(GraphicsFramePass.Overlay);
                                 hud.Render(c, camera, snapshot, terrain.WorldBounds, RtsInformationLayerView.Empty,
                                     default, default, FormationTemplate.Compact, CombatGroupOverviewView.Empty, default,
-                                    dpi, scale, operations: operations);
+                                    dpi, scale, operations: operations, displaySettings: displaySettings);
                             }
                             void Record(IGraphicsCommandContext c)
                             {
@@ -79,17 +90,18 @@ internal static class BattlefieldHudCapture
                             if (!text.AtlasReady || text.MissingGlyphs != 0 || text.DroppedGlyphs != 0)
                                 throw new InvalidDataException("Incomplete native HUD text.");
                             string key = FormattableString.Invariant($"{state}-{zoom}-{display.Item1}x{display.Item2}-{dpi}dpi-{scale:0.00}");
+                            if (accessibilityOnly) key += "-" + displaySettings.TeamPalette + "-contrast" + displaySettings.HighContrast;
                             string? image = null;
-                            if ((dpi == 96 && scale == 1) || (display == (1280, 720) && dpi == 192 && scale == 2))
+                            if (accessibilityOnly || (dpi == 96 && scale == 1) || (display == (1280, 720) && dpi == 192 && scale == 2))
                             {
                                 image = key + ".png";
                                 ReferenceCaptureImage.WritePng(Path.Combine(output, image), display.Item1, display.Item2, pixels);
                             }
                             object? timing = null;
-                            if (display == (1920, 1080) && dpi == 96 && scale == 1 && zoom == RtsReferenceZoom.NormalGameplay)
+                            if (!accessibilityOnly && display == (1920, 1080) && dpi == 96 && scale == 1 && zoom == RtsReferenceZoom.NormalGameplay)
                                 timing = Measure(graphics, RecordHud);
                             results.Add(new { State = state, Zoom = zoom.ToString(), Width = display.Item1, Height = display.Item2,
-                                Dpi = dpi, UiScale = scale, Image = image, Repeatable = true,
+                                Dpi = dpi, UiScale = scale, Display = displaySettings, Image = image, Repeatable = true,
                                 PixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), HudVertices = hud.LastRenderedVertexCount,
                                 Text = text, HudOnlyTiming = timing });
                             Console.WriteLine("[hud:capture] " + key);
@@ -169,6 +181,17 @@ internal static class BattlefieldHudCapture
             [new(owned, "Vehicle Factory", OperationsCategory.Production, "BLOCKED", "STEEL SHORTAGE",
                 "Required steel is below the captured queue requirement.", 2, 12, 200, 500, 300, null, null, PlayerActionPanelMode.UnitProduction)],
             [new(ResourceIds.Steel, "Steel", 12, null)], [], 1, 0);
+        if (state.StartsWith("Queues", StringComparison.Ordinal))
+        {
+            var orders = new[] {
+                new GlobalProductionOrder(new(900,1),UnitIds.MainBattleTank,"Main Battle Tank",ProductionPriority.High,false,true,true,[new(ResourceIds.Steel,"Steel",80),new(ResourceIds.Electronics,"Electronics",20)]),
+                new GlobalProductionOrder(new(901,1),UnitIds.ScoutVehicle,"Scout Vehicle",ProductionPriority.Normal,false,false,false,[new(ResourceIds.Steel,"Steel",40)]) };
+            var factories = Enumerable.Range(0,7).Select(i=>new GlobalProductionFactory(i==0?owned:new EntityId((uint)(800+i),1),i==0?"Vehicle Factory":"Infantry Factory",
+                i==0?UnitProductionCapability.Vehicle:UnitProductionCapability.Infantry,i==0?UnitProductionStatus.NoPower:UnitProductionStatus.Running,
+                i==0?UnitProductionBlockReason.NoPower:UnitProductionBlockReason.None,new(900,1),.42,2,0,new System.Numerics.Vector3(80,0,120),i==0?orders:[orders[0] with {Unit=UnitIds.RifleSquad,Name="Rifle Squad"},orders[1] with {Unit=UnitIds.RifleSquad,Name="Rifle Squad"}])).ToArray();
+            operations=new OperationsSnapshot(operations.Session,operations.Tick,operations.Player,operations.Facilities,operations.Resources,operations.Routes,operations.FacilityCount,operations.RouteCount) {Production=new(source.SessionId,source.Tick,experience.Player,factories,
+                [new(new(1),true,[new(ResourceIds.Steel,"Steel",200,80),new(ResourceIds.Electronics,"Electronics",45,20)])],7,14)};
+        }
         return new(source.Tick, source.TickDuration, source.SimulationEntityCount, source.Instances,
             source.Intelligence, source.SessionId, experience, playerActions: source.PlayerActions,
             vfxMetrics: source.VfxMetrics, alerts: alerts, operations: operations);

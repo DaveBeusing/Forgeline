@@ -29,7 +29,7 @@ screenshots and measurements below are historical; current-source native
 D3D12/WARP and human visual approval remain distinct gates.
 
 
-The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most six copied records including a confirmed Cargo fleet shortage. Their identity is session, player, condition and onset tick. Repeated completed ticks keep the identity; resolution removes the record, recurrence starts another identity. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
+The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most eight copied records including a confirmed Cargo fleet shortage, current Core Under Attack and observed Work Completed. Their identity is session, player, condition, onset tick and observed cause. Live cleared conditions disappear immediately. Attention resolution requires three seconds of completed healthy ticks; brief same-cause recurrence keeps its identity, with a five-second recurrence cooldown after confirmed resolution. Critical recurrence and a changed cause bypass that cooldown. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
 
 ## Current notification and context-hint presentation
 
@@ -55,7 +55,7 @@ Routes use lines with a cross for disabled links. Route capacity is configured t
 
 ## Costs and qualification
 
-Alert capture runs at the existing completed-tick cadence (20 Hz for canonical matches), scans owned controllable candidates once and retains at most six records. Source scan cost scales with candidates; no constant-time extraction claim is made. Existing strategic capture and geometry caps are preserved. The added brownout shape adds four lines per retained brownout marker, at most 128 markers in Power or 48 in All. The retained HUD reads copied lists and performs no live ECS query.
+Alert capture runs at the existing completed-tick cadence (20 Hz for canonical matches), scans owned controllable candidates once and retains at most eight records. Source scan cost scales with candidates; no constant-time extraction claim is made. Existing strategic capture and geometry caps are preserved. The added brownout shape adds four lines per retained brownout marker, at most 128 markers in Power or 48 in All. The retained HUD reads copied lists and performs no live ECS query.
 
 `ActionableAlertTests` and `StrategicMapExperienceTests` cover deduplication, resolution/recurrence, session/rollback, destruction, ownership, lifecycle input guards, unavailable destinations, compact geometry, strategic freshness, immutable lists and brownout shape. Existing minimap, display, intelligence and client journeys remain regression gates. `--alert-map-hotpaths artifacts/alert-map-hotpaths.json` measures active-alert full HUD/minimap plus idle alert input at 1/10/100/1000 entities across all seven layers and both dock states, with five active conditions, one
 command result and one local navigation result, with 128 warmups and 256 samples. The report includes visible cards, CPU draw/vertex/upload counts. These null
@@ -64,7 +64,7 @@ must remain zero. CPU/null-graphics timings exclude extraction, world overlay dr
 
 Native startup/window qualification checks composition and material bindings. Live alert-to-inspector/operations journeys, save/load interaction, terrain contrast, tiny-scale text, monitor DPI/focus transitions and steady-state GPU performance require separate manual acceptance. Startup smoke does not claim those results.
 
-Allocation qualification sets `DOTNET_TieredCompilation=0` for the alert/map benchmark process only, then uses the same 128 warmups, 256 samples and strict zero-byte gate. This holds the compilation policy fixed while sampling; it does not change the client runtime or permit allocations. The report records that setting. Set `$env:DOTNET_TieredCompilation = '0'` before the documented benchmark command for a matching local qualification, and restore the prior environment value afterwards. See [.NET compilation configuration](https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation).
+Allocation qualification sets `DOTNET_TieredCompilation=0` for the alert/map benchmark process only, together with DOTNET_gcConcurrent=0 as required by the benchmark host, then uses the same 128 warmups, 256 samples and strict zero-byte gate. This holds the compilation policy fixed while sampling; it does not change the client runtime or permit allocations. The report records that setting. Set `$env:DOTNET_TieredCompilation = '0'` before the documented benchmark command for a matching local qualification, and restore the prior environment value afterwards. See [.NET compilation configuration](https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation).
 
 The HUD information update bounds alert cards and their actual pointer regions. Empty rows, row gaps and space right of a card no longer capture world input or open Operations. Critical supply precedes transient command feedback. Minimap controls and its two-line legend fit the actual map size; semantic intelligence sources remain unchanged. See [HUD evidence](BattlefieldHudQualification.md).
 
@@ -102,3 +102,44 @@ The former persistent OPERATIONS tab, its left-column hit rectangle and the rela
 The complete condition must persist for ten seconds of completed simulation ticks without a shrinking backlog. Clearing uses three seconds of hysteresis followed by a five-second recurrence cooldown. The existing alert identity is `(session, player, CargoFleetShortage, onset tick)`; reappearance gets a new identity, rollback and session changes reset evidence, and the UI receives only authorized copied observations. The warning exposes `BACKLOG`, `ACTIVE`, `IDLE` and `EFFECTIVE` counts plus a valid owned affected facility for FOCUS; it does not invent a number of additional trucks or delivery ETA. Details suggest inspecting LOGISTICS orders and assessing whether to build more Cargo Trucks once fuel, source availability, route and bay issues are ruled out. No trucks are automatically created.
 
 The existing alert stack, MORE overflow, full Operations Notifications detail and shared hit geometry are unchanged; the new warning is ranked after production warnings but before lower-priority constrained-power information. Tests cover sustained evidence, resets, normalization and the separate causal rejection conditions. Native contrast, physical mouse/DPI/monitor qualification and save/replay/recovery journeys remain open until explicitly observed on a source-bound build.
+
+## Operational attention controls
+
+Actual positive DamageApplied events targeting the configured, living owned Command Core
+raise CORE UNDER ATTACK immediately, even before its health crosses the existing CORE
+DAMAGED threshold. The row persists for five simulation seconds after the latest hit.
+It copies neither attacker identity nor attacker position. Core Destroyed, Under Attack,
+Core Damaged and Critical Supply precede command results and routine industrial notices.
+The existing three-row stack and severity-marked MORE summary remain bounded.
+
+Owned production/supply/power observations carry an aggregate cause fingerprint. Multiple
+facilities with the same current cause remain grouped; No Input, No Power, Output Full,
+Paused, Brownout/Offline and Unsupplied changes update the incident rather than borrowing
+an unrelated onset. Existing shared-power groups and safe facility cycling remain in use.
+The eight-category snapshot also exposes at most eight Started, CauseChanged or Resolved
+transitions for the current completed tick. These are adapter output, not a persistent log.
+No UI controller mutates a simulation entity or issues a gameplay order while navigating.
+
+Settings → General offers NOTIFICATIONS (ALL / BATCHED / QUIET) and INFORMATIONAL ALERTS.
+ALL is the backward-compatible default. BATCHED accumulates observed unit/building
+completion-counter deltas for five simulation seconds before publishing one completion
+summary; ALL reports them immediately and coalesces within the visible five-second burst.
+The first capture after session/load/rollback establishes a baseline and invents no past
+completion. QUIET suppresses warning/information rows in the compact stack, while every
+critical condition and command acknowledgement remains available. INFORMATIONAL ALERTS
+only controls Work Completed rows. Raw current facts remain available in Operations in
+all modes. These visual preferences do not alter existing audio volume or mute settings.
+APPLY persists and applies to the running match at the next completed capture; BACK
+discards the draft. Existing display, graphics, camera, input and audio choices survive.
+
+Settings → Bindings exposes NEXT ALERT. Its default is UNBOUND to preserve saved global
+keys; assigning a free key enables one retained-tap activation through the existing FOCUS
+route. Repeated presses cycle current authorized targets in priority order, including
+conditions behind MORE. Short Ctrl/Shift chords are excluded even when the modifier was
+released before the frame. Modal, pause, focus, session and resize guards remain in force.
+Missing/destroyed/recycled targets are skipped; no usable current destination opens the
+existing Operations detail fallback. No stale or hidden enemy position is retained as a
+camera fallback. F1 developer controls and radial/minimap ownership remain unchanged.
+
+See [the bounded attention decision](adr/BoundedOperationalAlertAttention.md) and
+[executed qualification](OperationalAlertQualification.md) for validation and limitations.

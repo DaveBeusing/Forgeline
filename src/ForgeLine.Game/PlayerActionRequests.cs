@@ -39,7 +39,8 @@ public enum PlayerActionRequestKind : byte
     DissolveCargoConvoy = 29,
     SubmitOperationsRule = 30,
     SetConveyorRouting = 31,
-    RepairBridge = 32
+    RepairBridge = 32,
+    SetFirePolicy = 33
 }
 
 public readonly record struct PlayerActionRequest(
@@ -75,6 +76,12 @@ public readonly record struct PlayerActionRequest(
     EntityId[]? ConvoyEscorts = null,
     EntityId ConvoyGroup = default)
 {
+    public ForgeLine.Combat.FirePolicy FirePolicy { get; init; }
+    public static PlayerActionRequest SetFirePolicy(IReadOnlyCollection<EntityId> units, ForgeLine.Combat.FirePolicy policy) =>
+        new(PlayerActionRequestKind.SetFirePolicy, BuildingId.None, default, RecipeId.None, UnitId.None,
+            default, false, ProductionPriority.Normal, ProductionRequestMode.OneShot, ResourceId.None, 0,
+            TacticalEntities: units.ToArray()) { FirePolicy = policy };
+
     public bool AppendOrders { get; init; }
     public uint ExpectedInfrastructureRevision { get; init; }
     public static PlayerActionRequest RepairBridge(EntityId engineer, EntityId bridge, EntityId source, uint revision) =>

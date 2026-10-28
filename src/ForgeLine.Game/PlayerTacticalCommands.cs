@@ -16,7 +16,10 @@ public enum PlayerTacticalActionOperation : byte
     FireMissionCoordinate = 6,
     FireMissionContact = 7,
     CancelFireMission = 8,
-    RetreatToRecovery = 9
+    RetreatToRecovery = 9,
+    HoldFire = 10,
+    ReturnFire = 11,
+    FireAtWill = 12
 }
 
 public enum PlayerTacticalActionFailureReason : byte
@@ -111,6 +114,9 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
                 requestedRounds,
                 1);
         }
+
+        if (operation >= PlayerTacticalActionOperation.HoldFire && units.Length > 1024)
+            throw new ArgumentException("Engagement policies support at most 1024 selected units.", nameof(units));
 
         Operation = operation;
         Issuer = issuer;
@@ -357,6 +363,39 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
             weapons,
             artilleryWeapons);
 
+    public static PlayerTacticalActionCommand SetFirePolicy(PlayerId issuer, ReadOnlySpan<EntityId> units,
+        FirePolicy policy, SimulationTick tick, FactionIntelligenceStore intelligence,
+        WeaponCatalog weapons, ArtilleryWeaponCatalog artilleryWeapons) =>
+        new(policy switch { FirePolicy.HoldFire => PlayerTacticalActionOperation.HoldFire,
+                FirePolicy.ReturnFire => PlayerTacticalActionOperation.ReturnFire,
+                FirePolicy.FireAtWill => PlayerTacticalActionOperation.FireAtWill,
+                _ => throw new ArgumentOutOfRangeException(nameof(policy)) },
+            issuer, units, default, default, default, FormationTemplate.Compact, 0, tick,
+            intelligence, weapons, artilleryWeapons);
+
+    private void ExecuteFirePolicy(SimulationContext context)
+    {
+        FirePolicy policy = Operation switch { PlayerTacticalActionOperation.HoldFire => FirePolicy.HoldFire,
+            PlayerTacticalActionOperation.ReturnFire => FirePolicy.ReturnFire, _ => FirePolicy.FireAtWill };
+        // Policy edits leave explicit movement, deferred orders, Hold and Retreat intact.
+        var owned = TacticalCommandUtilities.FilterOwnedCombatUnits(context, Issuer, _units, out _);
+        foreach (var unit in owned)
+        {
+            if (!context.Entities.HasComponent<FirePolicyState>(unit) ||
+                !context.Entities.TryGetComponent(unit, out WeaponState weapon) ||
+                context.Entities.TryGetComponent(unit, out HealthState health) && health.IsDepleted) continue;
+            var previous = context.Entities.GetComponent<FirePolicyState>(unit);
+            var retaliation = previous.Policy == policy ? previous.RetaliationTarget : default;
+            var next = new FirePolicyState(policy, retaliation);
+            context.Entities.SetComponent(unit, next);
+            if (!next.Permits(weapon.Target))
+                context.Entities.SetComponent(unit, weapon with { Target = EntityId.Invalid });
+            AcceptedTargetCount++;
+        }
+        RejectedTargetCount = _units.Length - AcceptedTargetCount;
+        if (AcceptedTargetCount == 0) FailureReason = PlayerTacticalActionFailureReason.NoEligibleUnits;
+    }
+
     public void Execute(SimulationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -369,6 +408,11 @@ public sealed class PlayerTacticalActionCommand : ISimulationCommand
 
         switch (Operation)
         {
+            case PlayerTacticalActionOperation.HoldFire:
+            case PlayerTacticalActionOperation.ReturnFire:
+            case PlayerTacticalActionOperation.FireAtWill:
+                ExecuteFirePolicy(context);
+                break;
             case PlayerTacticalActionOperation.Attack:
                 ExecuteAttack(context);
                 break;

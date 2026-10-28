@@ -14,7 +14,7 @@ namespace ForgeLine.Client;
 internal static class ObjectActionRingRuntimeCapture
 {
     private static readonly JsonSerializerOptions JsonOptions=new() { WriteIndented=true,IncludeFields=true };
-    internal static int Run(string output,string runtimeRoot)
+    internal static int Run(string output,string runtimeRoot,bool engagementOnly=false)
     {
         try
         {
@@ -28,6 +28,45 @@ internal static class ObjectActionRingRuntimeCapture
             using var hud=new GameplayHudRenderer(graphics,assets);
             var camera=new RtsCamera(RtsVisualReference.CreateCameraSettings(scene.Target,RtsReferenceZoom.NormalGameplay));
             var layout=GameplayHudLayout.Create(1920,1080,96);
+            if (engagementOnly)
+            {
+                var captures = new List<object>();
+                foreach (var display in new[] { (1920,1080,96u,1f), (1280,720,144u,1f), (3840,2160,192u,1.5f) })
+                {
+                    graphics.WaitForIdle(); graphics.Resize(display.Item1,display.Item2);
+                    var captureLayout=GameplayHudLayout.Create(display.Item1,display.Item2,display.Item3,display.Item4);
+                    var snapshot=GroupActionRingCapture.Fixture(scene.Snapshot,UiReferenceScenario.GroupRing);
+                    var buffer=new PresentationSnapshotBuffer();buffer.Publish(snapshot);var world=new RenderWorld();world.Update(buffer);
+                    var panel=GroupActionRingCapture.View(snapshot,UiReferenceScenario.GroupRing,world,camera,captureLayout,display.Item3,display.Item4,tacticalPage:2);
+                    if (!panel.Ring.Open || !panel.Ring.Geometry.IsValid) throw new InvalidDataException("Engagement ring could not be placed.");
+                    var selection=new SelectionSet();selection.Replace(snapshot.PlayerActions!.Tactical!.SelectedEntities.ToArray());
+                    var selected=SelectedCombatGroup.Create(snapshot.CombatGroups!,selection);
+                    var groups=new CombatGroupOverviewView([],[],selected);
+                    void Draw(IGraphicsCommandContext c)
+                    {
+                        c.BeginPass(GraphicsFramePass.Overlay);
+                        var hover=new HoverTooltipView(snapshot.SessionId,default,default,panel.Ring.Geometry.Center,true,
+                            c.Width,c.Height,captureLayout.Scale,SelectionStatus:true,
+                            SelectionRevision:panel.Ring.SelectionRevision,MenuRevision:panel.Ring.Revision);
+                        hud.Render(c,camera,snapshot,terrain.WorldBounds,RtsInformationLayerView.Empty,panel,default,
+                            FormationTemplate.Compact,groups,default,display.Item3,display.Item4,hoverTooltip:hover);
+                    }
+                    for(int i=0;i<4;i++) graphics.RenderFrame(GraphicsColor.ForgeLineClear,Draw);
+                    var pixels=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,Draw);
+                    var repeat=graphics.CaptureFrame(GraphicsColor.ForgeLineClear,Draw);
+                    if(!pixels.AsSpan().SequenceEqual(repeat) || hud.TextDiagnostics.MissingGlyphs!=0 || hud.TextDiagnostics.DroppedGlyphs!=0)
+                        throw new InvalidDataException("Engagement capture was unstable or lost text.");
+                    string image=$"engagement-{display.Item1}x{display.Item2}.png";
+                    ReferenceCaptureImage.WritePng(Path.Combine(output,image),display.Item1,display.Item2,pixels);
+                    captures.Add(new {Image=image,Width=display.Item1,Height=display.Item2,Dpi=display.Item3,Scale=display.Item4,
+                        Repeatable=true,Text=hud.TextDiagnostics,Skin=hud.SkinDiagnostics,Policy=selected.PolicyLabel});
+                }
+                File.WriteAllText(Path.Combine(output,"engagement.json"),JsonSerializer.Serialize(new {
+                    Scope="Native D3D12 authored owned-group HUD fixture; gameplay authority is qualified separately by tests.",
+                    Source=typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                    Captures=captures,Diagnostics=graphics.Diagnostics },JsonOptions));
+                return 0;
+            }
             var states=new[] { UiReferenceScenario.RingConstruction,UiReferenceScenario.RingProduction,UiReferenceScenario.RingUnits,
                 UiReferenceScenario.RingLogistics,UiReferenceScenario.RingSupply,UiReferenceScenario.RingTactical,UiReferenceScenario.RingTechnology,UiReferenceScenario.RingParameters,UiReferenceScenario.GroupRing,UiReferenceScenario.GroupRingTools,UiReferenceScenario.GroupRingPartial };
             var frames=states.Select(state=>

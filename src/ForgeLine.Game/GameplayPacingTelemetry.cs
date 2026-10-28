@@ -53,6 +53,7 @@ public sealed partial class GameplayTelemetryCollector
         foreach (var entity in _scenario.Simulation.Entities.Query<CompletedBuilding, WorldTransform>(QueryIterationOrder.StableByEntityIndex))
         {
             var building = _scenario.Simulation.Entities.GetComponent<CompletedBuilding>(entity);
+            if (building.CompletedAtTick.Value == 0 || building.CompletedAtTick > tick) continue;
             var position = _scenario.Simulation.Entities.GetComponent<WorldTransform>(entity).Position;
             foreach (var participant in _scenario.MatchConfiguration.Participants)
             {

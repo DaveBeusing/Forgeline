@@ -216,7 +216,7 @@ The Simulation benchmark host contains `FormationRoutingBenchmarks`, comparing 1
 
 ## Player combat groups
 
-Persistent player combat groups are **client/presentation organizational state**, not simulation-owned movement or combat-group entities. `CombatGroupRegistry` owns ten session-scoped slots for the local player and stores full-generation `EntityId` values only. A session replacement clears all assignments, labels, and the active slot.
+Persistent player combat groups are **client/presentation organizational state**, not simulation-owned movement or combat-group entities. `CombatGroupRegistry` owns ten session-scoped slots for the local player and stores full-generation `EntityId` values only. A new session clears assignments, labels, and active slot; loading a payload-12 save then restores its bounded optional control-group metadata after owned completed-tick eligibility is available. See [tactical groups and engagement rules](TacticalGroupsAndEngagement.md).
 
 This is intentionally separate from simulation-owned `MovementGroup`, `CombatGroupMember`, and `CombatGroupIntent` state. Those simulation types are transient execution structures created by real movement/tactical commands. A player control group does not become a new ECS entity, does not grant buffs, and does not own formation, readiness, supply, or combat behavior.
 
