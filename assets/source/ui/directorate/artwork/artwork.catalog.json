@@ -30859,6 +30859,12 @@
     },
     {
       "domain": "PlayerActionRequestKind",
+      "member": "SetFirePolicy",
+      "role": "command.hold",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
       "member": "RequestResupply",
       "role": "command.supply",
       "availability": "runtime_required"
@@ -31648,6 +31654,54 @@
       "role": "utility.display",
       "availability": "runtime_required",
       "dynamicLabelRequired": true
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Attack",
+      "role": "command.attack",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "AttackMove",
+      "role": "command.attack_move",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Stop",
+      "role": "command.stop",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Hold",
+      "role": "command.hold",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Retreat",
+      "role": "command.retreat",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "FireMission",
+      "role": "command.fire_mission",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "CancelFireMission",
+      "role": "command.cancel",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "RetreatToRecovery",
+      "role": "command.retreat",
+      "availability": "runtime_required"
     }
   ],
   "referenceOnly": [

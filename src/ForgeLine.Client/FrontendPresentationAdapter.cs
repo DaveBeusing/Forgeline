@@ -202,7 +202,7 @@ internal static class FrontendPresentationAdapter
                 , new FrontendDetailLineView(GraphicsSettingsText.Get("BindingAction"), GameplayBindingRegistry.Definitions[(int)action].Label,
                     IsFocused: focused == FrontendSettingsField.BindingAction, CanDecrease: true, CanIncrease: true),
                 new FrontendDetailLineView(GraphicsSettingsText.Get("BindingKey"), interaction.BindingCandidate is { } candidate ?
-                    GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
+                    candidate == ForgeLine.Platform.PlatformKey.Unknown ? "DEFAULT / " + registry.Prompt(action) : GameplayBindingRegistry.KeyLabel(candidate) : registry.Prompt(action),
                     IsFocused: focused == FrontendSettingsField.BindingKey, CanDecrease: true, CanIncrease: true),
                 new FrontendDetailLineView(GraphicsSettingsText.Get("RenderQuality"), settings.RenderQuality.ToString().ToUpperInvariant(),
                     IsFocused: focused == FrontendSettingsField.RenderQuality, CanDecrease: true, CanIncrease: true),

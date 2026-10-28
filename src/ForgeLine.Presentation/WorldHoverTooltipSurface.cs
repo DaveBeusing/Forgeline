@@ -228,6 +228,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             Line(text.Written);
             Covered("AVG HEALTH", group.Health, group.HealthCount);
             Covered("AVG READINESS", group.Readiness, group.ReadinessCount);
+            Line(group.ObjectiveLabel);
+            Line(group.PolicyLabel);
             Covered("AVG FUEL", group.Fuel, group.SupplyCount);
             Covered("AVG AMMUNITION", group.Ammunition, group.SupplyCount);
             for (int row = 0; row < 2; row++)
@@ -373,6 +375,15 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             Line(builder.Written);
         }
         if (details.HasReadiness) Percent("READINESS", details.Readiness);
+        if (details.HasReadiness && details.Strength is { } strength) Percent("STRENGTH", strength);
+        if (details.Count == 1)
+        {
+            string suppression = BattlefieldStatusText.Suppression(details.BattlefieldStatus);
+            if (suppression.Length > 0) Line(suppression);
+            if (details.BattlefieldStatus.Resupplying) Line("RESUPPLY ORDER ACTIVE");
+            string fire = BattlefieldStatusText.Fire(details.BattlefieldStatus, details.HasSupply, details.AmmunitionFraction);
+            if (fire.Length > 0) Line(fire);
+        }
         if (details.HasPower) Line(SelectionInspectorHudModel.ResolvePowerLabel(details.PowerState));
         if (details.Work.Kind != PlayerWorkKind.None)
         {

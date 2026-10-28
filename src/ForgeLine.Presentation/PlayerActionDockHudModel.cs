@@ -51,7 +51,9 @@ internal static class PlayerActionDockHudModel
             0 => compact ? "Atk" : "Attack",
             1 => compact ? "Atk-M" : "Atk move",
             2 => "Stop", 3 => "Hold", 4 => compact ? "Ret" : "Retreat",
-            5 => "Fire", 6 => "Cease", 7 => compact ? "Rcv" : "Recover", _ => ""
+            5 => "Fire", 6 => "Cease", 7 => compact ? "Rcv" : "Recover",
+            8 => "Hold fire", 9 => "Retaliate",
+            10 => "Free fire", _ => ""
         };
     }
 
@@ -168,6 +170,9 @@ internal static class PlayerActionDockHudModel
                         RtsUiIcon.StatusAmmunition,
                     2 =>
                         RtsUiIcon.CommandSupply,
+                    8 => RtsUiIcon.CommandStop,
+                    9 => RtsUiIcon.CommandHold,
+                    10 => RtsUiIcon.CommandAttack,
                     _ =>
                         RtsUiIcon.CursorInvalid
                 };
@@ -340,6 +345,9 @@ internal static class PlayerActionDockHudModel
                         "CANCEL FIRE",
                     7 =>
                         "RECOVERY",
+                    8 => "HOLD FIRE",
+                    9 => "RETURN FIRE",
+                    10 => "FIRE AT WILL",
                     _ =>
                         string.Empty
                 };
@@ -1296,7 +1304,7 @@ internal static class PlayerActionDockHudModel
         }
 
         if (index < 0 ||
-            index >= 8)
+            index >= 11)
         {
             return PlayerActionDockItemState.Disabled(
                 "UNAVAILABLE");
@@ -1307,6 +1315,12 @@ internal static class PlayerActionDockHudModel
             return PlayerActionDockItemState.Disabled(
                 "NO ELIGIBLE UNITS");
         }
+
+        if (index >= 8 && tactical.RequestedSelectionCount > 1024)
+            return PlayerActionDockItemState.Disabled("SELECTION LIMIT 1024");
+
+        if (index >= 8 && tactical.FirePolicyEligibleCount == 0)
+            return PlayerActionDockItemState.Disabled("NO ARMED UNITS");
 
         if (index == 0 &&
             tactical.Targets.Count == 0)

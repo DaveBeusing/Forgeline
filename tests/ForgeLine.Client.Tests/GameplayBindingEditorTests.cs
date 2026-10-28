@@ -48,7 +48,7 @@ public sealed class GameplayBindingEditorTests
         Assert.Contains(controls.DetailLines, line => line.Label == "BASE FOCUS" && line.Value == "G");
     }
     [Fact]
-    public void CandidateCyclingTraversesReservedUnknownEntryWithoutJumpingToDefault()
+    public void CandidateCyclingResetsAtDefaultEntryAndKeepsTraversingAfterConflict()
     {
         var model = Model(); model.SetGameplayBindings(new GameplayBindings().With(GameplayAction.Build, PlatformKey.Z));
         var editor = new SettingsInteractionModel(); editor.Focus(FrontendSettingsField.BindingKey);
@@ -56,11 +56,13 @@ public sealed class GameplayBindingEditorTests
         Assert.Equal(PlatformKey.Delete, editor.BindingCandidate); Assert.False(editor.CanApply);
         Assert.Contains("CONFLICT", editor.BindingFeedback);
         editor.Adjust(model, 1);
-        Assert.Equal(PlatformKey.Unknown, editor.BindingCandidate); Assert.False(editor.CanApply);
+        Assert.Equal(PlatformKey.Unknown, editor.BindingCandidate); Assert.True(editor.CanApply);
+        Assert.Empty(model.Settings.GameplayBindings!.Overrides);
+        Assert.Contains("DEFAULT RESTORED", editor.BindingFeedback);
         editor.Adjust(model, 1);
         Assert.Equal(PlatformKey.W, editor.BindingCandidate); Assert.False(editor.CanApply);
         Assert.Contains("CAMERA", editor.BindingFeedback);
-        Assert.Equal(PlatformKey.Z, model.Bindings.Key(GameplayAction.Build));
+        Assert.Equal(PlatformKey.B, model.Bindings.Key(GameplayAction.Build));
     }
     private static SettingsModel Model() => new(new(1600, 900, false, 1, true, true, 1, new(), new()));
 }

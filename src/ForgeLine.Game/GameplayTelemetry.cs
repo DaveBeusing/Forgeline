@@ -152,7 +152,11 @@ public sealed record GameplayTelemetrySnapshot(
     IReadOnlyList<GameplayMetric> Metrics,
     IReadOnlyList<GameplayMilestone> Milestones,
     GameplayTelemetryDebugSummary Debug,
-    IReadOnlyList<GameplayPacingMilestone>? Pacing = null);
+    IReadOnlyList<GameplayPacingMilestone>? Pacing = null)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public MatchPacingObservation? Decisions { get; init; }
+}
 
 public sealed partial class GameplayTelemetryCollector
 {
@@ -160,6 +164,7 @@ public sealed partial class GameplayTelemetryCollector
 
     private const string MatchOwner = "match";
     private readonly MatchRuntime _scenario;
+    private readonly MatchPacingObserver? _decisions;
     private readonly Dictionary<EntityId, DepositObservation> _deposits =
         new();
     private readonly Dictionary<EntityId, UnitObservation> _units =
@@ -216,7 +221,7 @@ public sealed partial class GameplayTelemetryCollector
     private double _totalCargoTravelTicks;
     private ulong _maximumCargoTravelTicks;
 
-    public GameplayTelemetryCollector(MatchRuntime scenario)
+    public GameplayTelemetryCollector(MatchRuntime scenario, bool captureDecisionBenchmarks = false)
     {
         _scenario =
             scenario ??
@@ -224,6 +229,7 @@ public sealed partial class GameplayTelemetryCollector
         foreach (var participant in _scenario.MatchConfiguration.Participants)
             _playerOwners.Add(participant.Player, $"player:{participant.Player.Value}");
 
+        _decisions = captureDecisionBenchmarks ? new MatchPacingObserver(_scenario) : null;
         CaptureInitialDeposits();
         CaptureInitialUnits();
         CaptureInitialBuildings();
@@ -231,6 +237,9 @@ public sealed partial class GameplayTelemetryCollector
     }
 
     public ulong ObservedTicks => _observedTicks;
+
+    // Reads only retained completed-tick counters and static configuration, including after a simulation fault.
+    public MatchPacingObservation? CaptureDecisionObservation() => _decisions?.Capture();
 
     public void Observe()
     {
@@ -246,6 +255,7 @@ public sealed partial class GameplayTelemetryCollector
         ObserveSupplyShortage();
         ObserveObjectives();
         ObservePacing();
+        _decisions?.Observe();
     }
 
     public GameplayTelemetrySnapshot Capture()
@@ -312,7 +322,7 @@ public sealed partial class GameplayTelemetryCollector
             metrics,
             milestones,
             CaptureDebugSummary(),
-            CapturePacing());
+            CapturePacing()) { Decisions = _decisions?.Capture() };
     }
 
     private void CaptureInitialDeposits()
@@ -524,6 +534,7 @@ public sealed partial class GameplayTelemetryCollector
 
                 if (delta > 0.0)
                 {
+                    _decisions?.NotifyActivity();
                     if (!string.Equals(
                             owner,
                             MatchOwner,
@@ -1037,6 +1048,7 @@ public sealed partial class GameplayTelemetryCollector
                 owner,
                 dimension,
                 observedAtTick ?? _scenario.Simulation.CurrentTick.Value));
+        _decisions?.NotifyActivity();
     }
 
     private void AddResourceIncomeMetrics(
