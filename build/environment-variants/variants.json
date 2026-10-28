@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "variants": [
+    {"familyId": "mesh.world.vegetation.conifer", "id": "mesh.world.vegetation.conifer_swept", "bend": 0.22},
+    {"familyId": "mesh.world.vegetation.broadleaf", "id": "mesh.world.vegetation.broadleaf_asymmetric", "bend": -0.24},
+    {"familyId": "mesh.world.prop.rock", "id": "mesh.world.prop.rock_leaning", "bend": 0.28}
+  ]
+}

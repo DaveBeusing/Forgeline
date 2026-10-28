@@ -1,0 +1,51 @@
+{
+  "id": "mesh.world.vegetation.conifer_swept",
+  "lods": [
+    {
+      "assetId": "mesh.world.vegetation.conifer_swept_lod1",
+      "level": 1,
+      "maxDistance": 190
+    }
+  ],
+  "materialReferences": [
+    "material.world.vegetation"
+  ],
+  "scatter": {
+    "biomeAffinities": [
+      "biome.dry",
+      "biome.temperate"
+    ],
+    "familyId": "mesh.world.vegetation.conifer",
+    "generatorVersion": 1,
+    "groundAnchor": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "interaction": "presentationOnly",
+    "minimumSpacingMeters": 7,
+    "naturalSizeMeters": {
+      "x": 7,
+      "y": 17,
+      "z": 7
+    },
+    "slopeDegrees": {
+      "max": 30,
+      "min": 0
+    },
+    "tintMultiplier": {
+      "max": 1.08,
+      "min": 0.9
+    },
+    "uniformScale": {
+      "max": 1.2,
+      "min": 0.8
+    },
+    "yawDegrees": {
+      "max": 360,
+      "min": 0
+    }
+  },
+  "source": "conifer_swept.glb",
+  "type": "mesh"
+}

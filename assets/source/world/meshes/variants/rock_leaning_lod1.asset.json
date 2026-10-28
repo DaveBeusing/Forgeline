@@ -1,0 +1,8 @@
+{
+  "id": "mesh.world.prop.rock_leaning_lod1",
+  "materialReferences": [
+    "material.world.prop.industrial"
+  ],
+  "source": "rock_leaning_lod1.glb",
+  "type": "mesh"
+}

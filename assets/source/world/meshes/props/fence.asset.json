@@ -11,5 +11,40 @@
     "material.world.prop.industrial"
   ],
   "source": "../sources/blender/props/fence/high.glb",
-  "type": "mesh"
+  "type": "mesh",
+  "scatter": {
+    "generatorVersion": 1,
+    "familyId": "mesh.world.prop.fence",
+    "groundAnchor": {
+      "x": 0,
+      "y": -0.5,
+      "z": 0
+    },
+    "naturalSizeMeters": {
+      "x": 18,
+      "y": 3,
+      "z": 1
+    },
+    "uniformScale": {
+      "min": 1,
+      "max": 1
+    },
+    "tintMultiplier": {
+      "min": 1,
+      "max": 1
+    },
+    "yawDegrees": {
+      "min": 0,
+      "max": 0
+    },
+    "slopeDegrees": {
+      "min": 0,
+      "max": 5
+    },
+    "minimumSpacingMeters": 19.8,
+    "biomeAffinities": [
+      "biome.industrial"
+    ],
+    "interaction": "presentationOnly"
+  }
 }

@@ -11,5 +11,41 @@
       "assetId": "mesh.world.vegetation.conifer_lod1",
       "maxDistance": 190
     }
-  ]
+  ],
+  "scatter": {
+    "generatorVersion": 1,
+    "familyId": "mesh.world.vegetation.conifer",
+    "groundAnchor": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "naturalSizeMeters": {
+      "x": 7,
+      "y": 17,
+      "z": 7
+    },
+    "uniformScale": {
+      "min": 0.8,
+      "max": 1.2
+    },
+    "tintMultiplier": {
+      "min": 0.9,
+      "max": 1.08
+    },
+    "yawDegrees": {
+      "min": 0,
+      "max": 360
+    },
+    "slopeDegrees": {
+      "min": 0,
+      "max": 30
+    },
+    "minimumSpacingMeters": 7,
+    "biomeAffinities": [
+      "biome.dry",
+      "biome.temperate"
+    ],
+    "interaction": "presentationOnly"
+  }
 }

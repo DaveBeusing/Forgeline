@@ -11,5 +11,40 @@
     "material.world.prop.industrial"
   ],
   "source": "../sources/blender/props/drum/high.glb",
-  "type": "mesh"
+  "type": "mesh",
+  "scatter": {
+    "generatorVersion": 1,
+    "familyId": "mesh.world.prop.drum",
+    "groundAnchor": {
+      "x": 0,
+      "y": -0.5,
+      "z": 0
+    },
+    "naturalSizeMeters": {
+      "x": 1.6,
+      "y": 2.4,
+      "z": 1.6
+    },
+    "uniformScale": {
+      "min": 1,
+      "max": 1
+    },
+    "tintMultiplier": {
+      "min": 1,
+      "max": 1
+    },
+    "yawDegrees": {
+      "min": 0,
+      "max": 0
+    },
+    "slopeDegrees": {
+      "min": 0,
+      "max": 5
+    },
+    "minimumSpacingMeters": 1.7600000000000002,
+    "biomeAffinities": [
+      "biome.industrial"
+    ],
+    "interaction": "presentationOnly"
+  }
 }

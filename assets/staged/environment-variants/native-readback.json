@@ -1,0 +1,48 @@
+{
+  "assets": [
+    {
+      "id": "mesh.world.vegetation.conifer_swept",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "232158dc424ba7a7362baca8df5ba0f27416f38cfc1400667024769ffefdda6d",
+      "triangles": 80,
+      "vertices": 240
+    },
+    {
+      "id": "mesh.world.vegetation.conifer_swept_lod1",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "b9934abdafc213ced0f7b2027af06f9b8281c57b455dfc0ba7e9a6b797b33a02",
+      "triangles": 48,
+      "vertices": 144
+    },
+    {
+      "id": "mesh.world.vegetation.broadleaf_asymmetric",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "e18268d43f46e91efce82732fcefc899f26a75f2b9b4d48f125f8da512aa5efc",
+      "triangles": 624,
+      "vertices": 1512
+    },
+    {
+      "id": "mesh.world.vegetation.broadleaf_asymmetric_lod1",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "4db29315b45ec3b707272ec916485f2fe63a68a23db6f49feedad082f38b5bcc",
+      "triangles": 152,
+      "vertices": 360
+    },
+    {
+      "id": "mesh.world.prop.rock_leaning",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "7a5903b6d33cc08199ae2c172ef8c3bf2fa6347cd9746bf4ef4083d876a6ce15",
+      "triangles": 16,
+      "vertices": 48
+    },
+    {
+      "id": "mesh.world.prop.rock_leaning_lod1",
+      "maximumPositionDeviation": 0.0,
+      "sourceSha256": "a43e17bf2dc9344f4b16aa45b84fac620aa5d4b97c07376e9360386f28197b2a",
+      "triangles": 12,
+      "vertices": 24
+    }
+  ],
+  "blenderVersion": "5.2.2 LTS",
+  "schemaVersion": 1
+}

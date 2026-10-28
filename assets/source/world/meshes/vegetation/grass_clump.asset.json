@@ -11,5 +11,41 @@
       "assetId": "mesh.world.vegetation.grass_clump_lod1",
       "maxDistance": 110
     }
-  ]
+  ],
+  "scatter": {
+    "generatorVersion": 1,
+    "familyId": "mesh.world.vegetation.grass_clump",
+    "groundAnchor": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "naturalSizeMeters": {
+      "x": 7,
+      "y": 1,
+      "z": 6
+    },
+    "uniformScale": {
+      "min": 0.8,
+      "max": 1.2
+    },
+    "tintMultiplier": {
+      "min": 0.9,
+      "max": 1.08
+    },
+    "yawDegrees": {
+      "min": 0,
+      "max": 360
+    },
+    "slopeDegrees": {
+      "min": 0,
+      "max": 40
+    },
+    "minimumSpacingMeters": 7,
+    "biomeAffinities": [
+      "biome.dry",
+      "biome.temperate"
+    ],
+    "interaction": "presentationOnly"
+  }
 }
