@@ -31158,6 +31158,12 @@
       "availability": "runtime_required"
     },
     {
+      "domain": "TacticalTargetingMode",
+      "member": "Rally",
+      "role": "command.move",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "BattlefieldSupplyStatus",
       "member": "Supplied",
       "role": "status.supplied",

@@ -1386,6 +1386,14 @@ internal sealed class ClientApplication
                 selection: selectionController.Selection);
             hudInteraction.CapturePointer(operationsResult.Captured);
             hudInteraction.CaptureKeyboard(operationsController.HasKeyboardFocus);
+            if (operationsController.TryTakeProductionCommand(out var productionCommand))
+            {
+                var observed = inputSnapshot?.Tick ?? SimulationTick.Zero;
+                bool submitted = simulationHost.TrySubmit(inputSnapshot?.SessionId ?? SimulationSessionId.None, gateway => productionCommand.Cancel
+                    ? gateway.SubmitUnitProductionCancel(LocalPlayer, productionCommand.Request, observed)
+                    : gateway.SubmitUnitProductionPriority(LocalPlayer, productionCommand.Request, productionCommand.Priority, observed), out ulong productionSequence);
+                operationsController.ProductionSubmitted(submitted, productionSequence);
+            }
             if (operationsController.TryTakeRuleRequest(out PlayerActionRequest ruleRequest))
             {
                 SimulationTick observedTick = inputSnapshot?.Tick ?? SimulationTick.Zero;
@@ -1406,13 +1414,18 @@ internal sealed class ClientApplication
                     camera.CenterOn(operationsTarget);
                     selectionController.CancelPointerInteraction();
                     minimapInteraction.Reset();
-                    if (operationsResult.Controls != PlayerActionPanelMode.Closed)
+                    if (operationsResult.Controls != PlayerActionPanelMode.Closed || operationsResult.BeginRally)
                     {
                         selectionController.Selection.SetSingle(operationsResult.Navigate);
                         presentationInteraction.SetSelection(selectionController.Selection.Entities);
                         inputState.SuppressHeldInput();
                         operationsController.Close(inputState, presentationInteraction);
-                        actionPanel.OpenOperationsControls(operationsResult.Controls);
+                        if (operationsResult.BeginRally)
+                        {
+                            actionPanel.Close();
+                            tacticalTargetingController.BeginRally(operationsResult.Navigate, inputSnapshot.SessionId);
+                        }
+                        else actionPanel.OpenOperationsControls(operationsResult.Controls);
                         hudInteraction.CaptureKeyboard(actionPanel.HasKeyboardFocus);
                     }
                 }
@@ -1611,6 +1624,13 @@ internal sealed class ClientApplication
                     actionPanel.ShowDemolitionFeedback("CANCELLED - TARGETING");
 
                 bool placementWasActive = buildingPlacementController.IsActive;
+                if (tacticalTargetingController.TryTakeRallyPoint(out var rallyPoint))
+                {
+                    var observed = currentSnapshot?.Tick ?? SimulationTick.Zero;
+                    if (!simulationHost.TrySubmit(rallyPoint.Session, gateway => gateway.SubmitUnitProductionRallyPoint(
+                        LocalPlayer, rallyPoint.Factory, rallyPoint.Target, observed), out _))
+                        tacticalTargetingController.CommandFeedback.Show(rallyPoint.Target, valid: false);
+                }
                 if (!tacticalTargetingController.IsActive)
                 {
                     buildingPlacementController.Update(
@@ -1863,7 +1883,7 @@ internal sealed class ClientApplication
 
             preAlphaUx = preAlphaUx with
             {
-                InteractionHint = buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
+                InteractionHint = tacticalTargetingController.Mode == TacticalTargetingMode.Rally ? "SET RALLY: LEFT WORLD GROUND / RIGHT OR ESC CANCEL / ROUTE ON SPAWN" : buildingPlacementController.IsActive ? buildingPlacementController.InteractionHint : alertController.Feedback.Length > 0 ? alertController.Feedback : actionPanel.Feedback.Length > 0 ? actionPanel.Feedback : cameraFocus.Feedback,
                 Onboarding = guidanceInteraction.View,
                 Guidance = guidance.Update(currentSnapshot, preAlphaUx.ShowOnboarding,
                     simulationPaused || operationsController.View.Open || !window.IsFocused || selectionController.IsDragSelecting || buildingPlacementController.IsActive ||

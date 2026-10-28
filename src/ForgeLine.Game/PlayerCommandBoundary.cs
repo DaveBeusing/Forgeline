@@ -624,6 +624,18 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
             envelope);
     }
 
+    public PlayerCommandSubmissionReceipt SubmitUnitProductionPriority(PlayerId issuer,
+        EntityId request, ProductionPriority priority, SimulationTick observedTick)
+    {
+        if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
+        if (!TryBeginSubmission(PlayerCommandKind.UnitProduction, issuer, observedTick,
+                out var correlation, out var targetTick, out var source, out var rejected)) return rejected;
+        var command = PlayerUnitProductionActionCommand.SetPriority(issuer, request, priority, observedTick);
+        var envelope = _simulation.SubmitCommand(command, targetTick, source);
+        _pending.Add(PendingCommand.ForUnitProduction(correlation, envelope, command));
+        return AcceptedReceipt(correlation, PlayerCommandKind.UnitProduction, source, observedTick, envelope);
+    }
+
     public PlayerCommandSubmissionReceipt SubmitLogisticsStockPolicy(
         PlayerId issuer,
         EntityId target,
