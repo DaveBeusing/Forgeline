@@ -30805,6 +30805,12 @@
     },
     {
       "domain": "PlayerActionRequestKind",
+      "member": "SetConveyorRouting",
+      "role": "command.priority",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
       "member": "SetProductionPaused",
       "role": "command.production_pause",
       "availability": "runtime_required"
@@ -31401,6 +31407,20 @@
     {
       "domain": "FrontendSettingsField",
       "member": "BorderlessFullscreen",
+      "role": "utility.display",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "TooltipDelay",
+      "role": "utility.general",
+      "availability": "runtime_required",
+      "dynamicLabelRequired": true
+    },
+    {
+      "domain": "FrontendSettingsField",
+      "member": "TooltipTextSize",
       "role": "utility.display",
       "availability": "runtime_required",
       "dynamicLabelRequired": true
