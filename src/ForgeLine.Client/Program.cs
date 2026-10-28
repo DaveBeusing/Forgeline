@@ -29,6 +29,8 @@ internal static class Program
             return RunDockCapture(args[1], args[2], args[0] == "--command-dock-reference");
         if (args.Length == 3 && args[0] == "--battlefield-hud-timing")
             return RunHudTiming(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--debrief-capture")
+            return MatchDebriefCaptureQualification.Run(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--battlefield-hud-capture")
             return RunHudCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--cinematic-menu-capture")

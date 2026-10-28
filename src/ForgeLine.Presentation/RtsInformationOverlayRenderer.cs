@@ -171,6 +171,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
             layout.GroupOverviewScale,
             context.Width,
             context.Height);
+        if (preAlphaUx.Debrief is not { } debrief || !debrief.IsCurrent(snapshot))
         EmitSystemOverlay(
             snapshot.PlayerExperience,
             preAlphaUx,
