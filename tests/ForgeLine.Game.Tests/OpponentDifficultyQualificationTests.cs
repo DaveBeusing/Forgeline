@@ -33,10 +33,12 @@ public sealed class OpponentDifficultyQualificationTests
         using var runtime = MatchRuntime.Create(settings, TestContext.Current.CancellationToken);
         var elapsed = Stopwatch.StartNew();
         bool terminal = runtime.RunUntil(r => r.GetMatchState().IsTerminal, 80_000, TestContext.Current.CancellationToken);
+        TestContext.Current.CancellationToken.ThrowIfCancellationRequested();
         elapsed.Stop();
         var state = runtime.GetMatchState();
         var diagnostics = runtime.Opponents.CaptureQualificationDecisions();
         Assert.InRange(runtime.Simulation.CurrentTick.Value, 1UL, 80_000UL);
+        Assert.True(terminal || runtime.Simulation.CurrentTick.Value == 80_000, "An incomplete run cannot be reported as a censored result.");
         Assert.InRange(runtime.Opponents.WorkMetrics.ScratchStatesCreated, 0, 2);
         Assert.InRange(diagnostics.Count, 0, 2);
         var report = new
