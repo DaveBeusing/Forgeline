@@ -18,11 +18,11 @@ internal static class GroupActionRingCapture
             .DistinctBy(i => i.Entity).Take(3).ToArray();
         if (actors.Length < 2) throw new InvalidDataException("Group reference requires at least two permitted actors.");
         var selected = actors.Select(i => i.Entity).ToArray();
-        var tactical = new PlayerTacticalActionReadModel(selected,selected.Length,1,0,1,0,false,true,default,default,[],[]);
+        var tactical = new PlayerTacticalActionReadModel(selected,selected.Length,1,0,1,0,false,true,default,default,[],[], firePolicyEligibleCount: 1);
         var actions = new PlayerActionSnapshot(source.SessionId,source.Tick,[],0,null,null,tactical:tactical);
         var members = actors.Select((i,n) => new CombatGroupMemberReadModel(i.Entity,i.Selectable.Category,true,.2,true,
             BattlefieldSupplyStatus.Critical,.2,.3,false,0,0,false,default,false,default,false,default,
-            i.UnitFeature.Unit,n==0)).ToArray();
+            i.UnitFeature.Unit,n==0, n==0, ForgeLine.Combat.FirePolicy.ReturnFire)).ToArray();
         var instances = source.Instances.ToArray();
         return new(source.Tick,source.TickDuration,source.SimulationEntityCount,instances,source.Intelligence,source.SessionId,
             experience with { Selection = experience.Selection with { Count=selected.Length,PrimaryEntity=selected[0],Kind=PlayerSelectionKind.Mixed,DisplayName="Mixed selection" } },
@@ -31,7 +31,7 @@ internal static class GroupActionRingCapture
     }
 
     internal static PlayerActionPanelView View(PresentationSnapshot snapshot, UiReferenceScenario state, RenderWorld world,
-        RtsCamera camera, in GameplayHudLayout layout, uint dpi, float scale)
+        RtsCamera camera, in GameplayHudLayout layout, uint dpi, float scale, int tacticalPage = 0)
     {
         var entities = snapshot.PlayerActions!.Tactical!.SelectedEntities;
         world.TryGetInterpolatedInstance(entities[0],1,out var actor);
@@ -58,6 +58,15 @@ internal static class GroupActionRingCapture
             input.BeginFrame();input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonDown,PlatformMouseButton.Left,(int)point.X,(int)point.Y));
             controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,currentSelection:selection);
             input.BeginFrame();input.Apply(PlatformInputEvent.MouseButtonChanged(PlatformInputEventKind.MouseButtonUp,PlatformMouseButton.Left,(int)point.X,(int)point.Y));
+            controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,currentSelection:selection);
+            panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions,dpi,scale);
+            ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);
+        }
+        for (int page = 0; page < tacticalPage; page++)
+        {
+            input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, PlatformKey.E));
+            controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,currentSelection:selection);
+            input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, PlatformKey.E));
             controller.Update(input,snapshot,layout.ViewportWidth,layout.ViewportHeight,dpi,scale,currentSelection:selection);
             panel=controller.CreateView(layout.ViewportWidth,layout.ViewportHeight,snapshot.PlayerActions,dpi,scale);
             ring=panel.Ring.Project(world,camera,1,snapshot,layout,occupied);

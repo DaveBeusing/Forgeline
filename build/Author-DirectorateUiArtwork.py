@@ -264,6 +264,7 @@ REQUESTS = dict(zip("BeginBuildingPlacement QueueProduction SetProductionPaused 
                     "command.build building_role.factory command.production_pause command.cancel_production command.unit_production command.cancel_unit_production command.stock command.remove_stock command.automatic_resupply command.supply command.attack command.attack_move command.stop command.hold command.retreat command.fire_mission command.cancel_fire_mission command.attack command.attack_move command.retreat command.fire_mission command.fire_mission command.surrender command.priority command.recovery utility.research command.cancel_research utility.group command.cancel".split()))
 REQUESTS["SubmitOperationsRule"] = "utility.settings"
 REQUESTS["RepairBridge"] = "command.repair"
+REQUESTS["SetFirePolicy"] = "command.hold"
 REQUESTS["SetConveyorRouting"] = "command.priority"
 UTILITY = "settings controls audio muted pause play new_game load save save_return exit return_menu credits display general bindings group rotate research next_item primary_setting secondary_setting decrease increase expand collapse scroll_up scroll_down back forward info formation overlay minimap".split()
 STATUS = "health fuel ammunition power alert damaged maintenance warning critical pending accepted rejected invalid unavailable supplied low unsupplied activate operational construction idle unpowered destroyed partial".split()

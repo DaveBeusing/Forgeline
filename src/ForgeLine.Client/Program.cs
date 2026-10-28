@@ -17,6 +17,8 @@ internal static class Program
         if (args.Length == 4 && args[0] == "--navigation-diagnostics-capture" &&
             args[3] == "--developer-navigation-diagnostics")
             return RunNavigationDiagnosticsCapture(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--engagement-policy-capture")
+            return ObjectActionRingRuntimeCapture.Run(args[1],args[2],engagementOnly:true);
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")

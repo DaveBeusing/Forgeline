@@ -914,6 +914,9 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
     public PlayerCommandSubmissionReceipt SubmitFirePolicy(PlayerId issuer, ReadOnlySpan<EntityId> units,
         ForgeLine.Combat.FirePolicy policy, SimulationTick observedTick)
     {
+        if (units.Length is < 1 or > 1024)
+            return new(SessionId, PlayerCommandCorrelationId.None, PlayerCommandKind.Tactical,
+                SimulationCommandSource.None, observedTick, observedTick, 0, false, PlayerCommandSubmissionFailure.BoundaryFull);
         RequireTacticalServices();
         return SubmitTacticalAction(PlayerCommandKind.Tactical, issuer, observedTick,
             PlayerTacticalActionCommand.SetFirePolicy(issuer, units, policy, observedTick,

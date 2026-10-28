@@ -861,7 +861,7 @@ public sealed partial class PlayerActionPanelController
     {
         if (tactical is null ||
             SelectedIndex < 0 ||
-            SelectedIndex >= 8)
+            SelectedIndex >= 11)
         {
             return;
         }
@@ -894,6 +894,9 @@ public sealed partial class PlayerActionPanelController
                     PlayerActionRequest.RetreatToRecovery(
                         tactical.SelectedEntities,
                         FormationTemplate.Column),
+                8 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.HoldFire),
+                9 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.ReturnFire),
+                10 => PlayerActionRequest.SetFirePolicy(tactical.SelectedEntities, ForgeLine.Combat.FirePolicy.FireAtWill),
                 _ =>
                     default
             };

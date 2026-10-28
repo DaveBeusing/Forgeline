@@ -418,6 +418,7 @@ internal sealed class ClientApplication
                 ControllableEntityCategory.Logistics));
         var combatGroupRegistry =
             new CombatGroupRegistry();
+        var restoredControlGroups = ClientSaveCatalog.TakeControlGroups(scenario);
         var combatGroupInput =
             new CombatGroupInputController();
         var operationsController = new OperationsController(_gameplayBindings);
@@ -1131,6 +1132,7 @@ internal sealed class ClientApplication
                 else if (TrySaveCurrentMatch(
                              scenario,
                              saveDirectory,
+                             combatGroupRegistry,
                              out pauseMenuFeedback) &&
                          pauseMenuCommand ==
                              PauseMenuCommand.SaveAndReturnToMenu)
@@ -1537,6 +1539,11 @@ internal sealed class ClientApplication
                 currentExperience?.MatchStatus ==
                 PlayerMatchStatus.Active && !renderHost.IsPreparingTerrain;
 
+            if (restoredControlGroups is { } savedGroups && SelectedCombatGroup.Resolve(currentSnapshot) is { } groupSnapshot)
+            {
+                combatGroupRegistry.Restore(groupSnapshot.SessionId, LocalPlayer, savedGroups, groupSnapshot.EligibleEntities);
+                restoredControlGroups = null;
+            }
             CombatGroupInputResult combatGroupInputResult =
                 combatGroupInput.Update(
                     inputState,
@@ -2943,6 +2950,7 @@ internal sealed class ClientApplication
     private static bool TrySaveCurrentMatch(
         MatchRuntime scenario,
         string saveDirectory,
+        CombatGroupRegistry groups,
         out string feedback)
     {
         ArgumentNullException.ThrowIfNull(
@@ -2957,7 +2965,7 @@ internal sealed class ClientApplication
 
             MatchSaveData save =
                 MatchPersistenceService.CaptureSave(
-                    scenario);
+                    scenario) with { ControlGroups = groups.Capture(LocalPlayer) };
             string timestamp =
                 DateTimeOffset.UtcNow.ToString(
                     "yyyyMMdd-HHmmss-fff",

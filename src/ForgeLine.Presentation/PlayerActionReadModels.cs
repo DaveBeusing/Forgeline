@@ -473,7 +473,8 @@ public sealed class PlayerTacticalActionReadModel
         int pinnedCount = 0,
         int repairingCount = 0,
         RetreatRecoveryReason retreatReason = RetreatRecoveryReason.None,
-        EntityId retreatProvider = default)
+        EntityId retreatProvider = default,
+        int firePolicyEligibleCount = 0)
     {
         _selectedEntities =
             Array.AsReadOnly(
@@ -515,11 +516,14 @@ public sealed class PlayerTacticalActionReadModel
         RepairingCount = repairingCount;
         RetreatReason = retreatReason;
         RetreatProvider = retreatProvider;
+        FirePolicyEligibleCount = firePolicyEligibleCount;
         HasCommonOrder = hasCommonOrder;
         MixedOrderState = mixedOrderState;
         CurrentOrder = currentOrder;
         CurrentStatus = currentStatus;
     }
+
+    public int FirePolicyEligibleCount { get; }
 
     public IReadOnlyList<EntityId> SelectedEntities =>
         _selectedEntities;
@@ -1046,6 +1050,7 @@ internal static partial class PlayerActionSnapshotFactory
             new List<EntityId>(selectedEntities.Count);
         var artillery =
             new List<PlayerArtilleryActionReadModel>();
+        int firePolicyEligible = 0;
         int criticalSupply = 0;
         int resupplying = 0;
         int suppressed = 0;
@@ -1090,6 +1095,8 @@ internal static partial class PlayerActionSnapshotFactory
             if (isCombatEligible)
             {
                 combatEligible.Add(entity);
+                if (entities.HasComponent<WeaponState>(entity) && entities.HasComponent<FirePolicyState>(entity) &&
+                    (!entities.TryGetComponent(entity, out HealthState policyHealth) || !policyHealth.IsDepleted)) firePolicyEligible++;
 
                 if (entities.TryGetComponent(
                         entity,
@@ -1348,7 +1355,8 @@ internal static partial class PlayerActionSnapshotFactory
             observedRetreatRecovery &&
             !mixedRetreatRecovery
                 ? retreatProvider
-                : EntityId.Invalid);
+                : EntityId.Invalid,
+            firePolicyEligible);
     }
 
     private static PlayerLogisticsActionReadModel? CaptureLogistics(
