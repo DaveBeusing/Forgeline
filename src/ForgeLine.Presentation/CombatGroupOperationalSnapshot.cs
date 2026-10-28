@@ -25,7 +25,11 @@ public readonly record struct CombatGroupMemberReadModel(
     bool HasOrderStatus,
     CombatOrderStatus OrderStatus,
     UnitId Unit = default,
-    bool CombatEligible = false)
+    bool CombatEligible = false,
+    bool HasFirePolicy = false,
+    FirePolicy FirePolicy = FirePolicy.FireAtWill,
+    bool HasMovementIntent = false,
+    bool Patrolling = false)
 {
     public PlayerBattlefieldStatus BattlefieldStatus { get; init; }
 }
@@ -618,7 +622,12 @@ internal static class CombatGroupOperationalSnapshotFactory
                         ? tactical.Status
                         : default,
                     entities.TryGetComponent(entity, out UnitIdentity identity) ? identity.UnitId : default,
-                    entities.HasComponent<WorldTransform>(entity) && entities.HasComponent<Combatant>(entity))
+                    entities.HasComponent<WorldTransform>(entity) && entities.HasComponent<Combatant>(entity),
+                    entities.HasComponent<WeaponState>(entity) && entities.HasComponent<FirePolicyState>(entity),
+                    entities.TryGetComponent(entity, out FirePolicyState policy) ? policy.Policy : FirePolicy.FireAtWill,
+                    entities.HasComponent<MovementOrder>(entity) || entities.HasComponent<MovementGroupMember>(entity) ||
+                        entities.HasComponent<NavigationRouteState>(entity),
+                    entities.TryGetComponent(entity, out QueuedUnitOrders queue) && queue.Repeating)
                 { BattlefieldStatus = PlayerBattlefieldStatusCapture.Capture(entities, entity, player) });
         }
 

@@ -227,6 +227,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
             Line(text.Written);
             Covered("AVG HEALTH", group.Health, group.HealthCount);
             Covered("AVG READINESS", group.Readiness, group.ReadinessCount);
+            Line(group.ObjectiveLabel);
+            Line(group.PolicyLabel);
             Covered("AVG FUEL", group.Fuel, group.SupplyCount);
             Covered("AVG AMMUNITION", group.Ammunition, group.SupplyCount);
             for (int row = 0; row < 2; row++)

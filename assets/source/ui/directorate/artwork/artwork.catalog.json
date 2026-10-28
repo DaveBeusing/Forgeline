@@ -30859,6 +30859,12 @@
     },
     {
       "domain": "PlayerActionRequestKind",
+      "member": "SetFirePolicy",
+      "role": "command.hold",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
       "member": "RequestResupply",
       "role": "command.supply",
       "availability": "runtime_required"
@@ -31620,6 +31626,54 @@
       "role": "unit_role.reconnaissance",
       "availability": "runtime_required",
       "dynamicLabelRequired": true
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Attack",
+      "role": "command.attack",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "AttackMove",
+      "role": "command.attack_move",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Stop",
+      "role": "command.stop",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Hold",
+      "role": "command.hold",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "Retreat",
+      "role": "command.retreat",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "FireMission",
+      "role": "command.fire_mission",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "CancelFireMission",
+      "role": "command.cancel",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "GameplayAction",
+      "member": "RetreatToRecovery",
+      "role": "command.retreat",
+      "availability": "runtime_required"
     }
   ],
   "referenceOnly": [
@@ -31706,7 +31760,7 @@
         "sha256": "ec024aeedae8381e6946a4ec03cdf99e91c474f7dc9aa15e39b4ad4fcae539fe",
         "camera": {
           "target": {
-            "x": -1.2814999e-06,
+            "x": -0.0000012814999,
             "y": 0.009000003,
             "z": -0.009000003
           },
@@ -31786,7 +31840,7 @@
         "sha256": "61d351fcabdd65934e9aa0012a4e9c69d5ca99358b7417e8f88f24e0df128da5",
         "camera": {
           "target": {
-            "x": -1.2814999e-06,
+            "x": -0.0000012814999,
             "y": 0.009000003,
             "z": -0.009000003
           },
@@ -31866,7 +31920,7 @@
         "sha256": "f4543222ee50ce2ed5a534a6b199156f0ccd70d38d593eee75a0d918a78aeeb4",
         "camera": {
           "target": {
-            "x": -1.2814999e-06,
+            "x": -0.0000012814999,
             "y": 0.009000003,
             "z": -0.009000003
           },
@@ -31946,7 +32000,7 @@
         "sha256": "d8e32b9109c06a033ece741a6debe22c26850d20ee83599668e8ece7a2e40ea5",
         "camera": {
           "target": {
-            "x": -1.2814999e-06,
+            "x": -0.0000012814999,
             "y": 0.009000003,
             "z": -0.009000003
           },
@@ -32026,7 +32080,7 @@
         "sha256": "1926a15b7228b19dbc844bec08ea49cb7bfcdfe4a5a09525b503fa7491f60e6f",
         "camera": {
           "target": {
-            "x": -1.2814999e-06,
+            "x": -0.0000012814999,
             "y": 0.009000003,
             "z": -0.009000003
           },

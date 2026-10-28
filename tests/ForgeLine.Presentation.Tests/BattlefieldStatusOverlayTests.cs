@@ -21,6 +21,32 @@ public sealed class BattlefieldStatusOverlayTests
         Assert.Equal(before, MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256());
     }
 
+
+    [Fact]
+    public void OwnedGroupCaptureKeepsBattlefieldStatusAndEngagementMetadata()
+    {
+        using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Gameplay, 23) with
+        { Participants = CentralDivideScenario.CreateDefaultParticipants(false, false) }, TestContext.Current.CancellationToken);
+        var entities = runtime.Simulation.Entities;
+        var unit = runtime.GetBase(new(1)).StartingUnits.First(e => entities.HasComponent<WeaponState>(e));
+        if (entities.HasComponent<FirePolicyState>(unit))
+            entities.SetComponent(unit, new FirePolicyState(FirePolicy.ReturnFire));
+        else entities.AddComponent(unit, new FirePolicyState(FirePolicy.ReturnFire));
+        var suppression = new SuppressionState(1, SuppressionLevel.Pinned, default, default);
+        if (entities.HasComponent<SuppressionState>(unit)) entities.SetComponent(unit, suppression);
+        else entities.AddComponent(unit, suppression);
+        var buffer = WorldHoverExtractionTests.Observe(runtime, new PresentationInteractionState());
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        Assert.NotNull(snapshot.CombatGroups);
+        Assert.True(snapshot.CombatGroups.TryGet(unit, out var member));
+        Assert.True(member.HasFirePolicy);
+        Assert.Equal(FirePolicy.ReturnFire, member.FirePolicy);
+        var expected = PlayerBattlefieldStatusCapture.Capture(entities, unit, new(1));
+        Assert.NotEqual(default, expected);
+        Assert.Equal(expected, member.BattlefieldStatus);
+    }
+
     [Fact]
     public void ForeignDestroyedAndRecycledEntitiesPublishNoPrivateOperationalState()
     {

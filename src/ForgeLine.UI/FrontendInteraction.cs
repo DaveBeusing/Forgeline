@@ -184,9 +184,11 @@ public sealed class SettingsInteractionModel
                 _candidate = candidate;
                 try
                 {
-                    model.SetGameplayBindings(bindings.With(BindingAction, candidate));
+                    model.SetGameplayBindings(candidate == PlatformKey.Unknown
+                        ? bindings.Reset(BindingAction) : bindings.With(BindingAction, candidate));
                     CanApply = true;
-                    BindingFeedback = "BINDING READY - APPLY TO SAVE";
+                    BindingFeedback = candidate == PlatformKey.Unknown
+                        ? "DEFAULT RESTORED - APPLY TO SAVE" : "BINDING READY - APPLY TO SAVE";
                 }
                 catch (InvalidDataException exception) { CanApply = false; BindingFeedback = exception.Message.ToUpperInvariant(); }
                 break;

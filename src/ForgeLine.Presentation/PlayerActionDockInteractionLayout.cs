@@ -54,7 +54,7 @@ internal static class PlayerActionDockInteractionLayout
             PlayerActionPanelMode.Tactical =>
                 actions?.Tactical is null
                     ? 0
-                    : 8,
+                    : 11,
             PlayerActionPanelMode.Technology =>
                 actions?.Technology.Count ??
                 0,

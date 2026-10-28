@@ -158,6 +158,10 @@ public static class PlayerActionRequestDispatcher
                         observedTick);
                 return true;
 
+            case PlayerActionRequestKind.SetFirePolicy:
+                receipt = gateway.SubmitFirePolicy(player, request.TacticalEntities ?? [], request.FirePolicy, observedTick);
+                return true;
+
             case PlayerActionRequestKind.SubmitHoldPosition:
                 receipt =
                     gateway.SubmitHoldPosition(
