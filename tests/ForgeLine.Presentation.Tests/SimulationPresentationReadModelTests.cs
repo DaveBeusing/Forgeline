@@ -222,9 +222,7 @@ public sealed class SimulationPresentationReadModelTests
         RtsCamera camera = CreateCamera();
         var terrain = new FlatTerrain();
 
-        input.Apply(PlatformInputEvent.KeyChanged(
-            PlatformInputEventKind.KeyDown,
-            PlatformKey.F5));
+        controller.SelectBuilding(BuildingIds.PowerPlant);
         input.Apply(PlatformInputEvent.PointerMoved(800, 450));
 
         controller.Update(
@@ -281,9 +279,7 @@ public sealed class SimulationPresentationReadModelTests
         RtsCamera camera = CreateCamera();
         var terrain = new FlatTerrain();
 
-        input.Apply(PlatformInputEvent.KeyChanged(
-            PlatformInputEventKind.KeyDown,
-            PlatformKey.F5));
+        controller.SelectBuilding(BuildingIds.PowerPlant);
         input.Apply(PlatformInputEvent.PointerMoved(800, 450));
 
         controller.Update(

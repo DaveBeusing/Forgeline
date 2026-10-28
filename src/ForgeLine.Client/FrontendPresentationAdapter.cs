@@ -321,6 +321,7 @@ internal static class FrontendPresentationAdapter
             new("FOCUS CONTROL GROUP", "DOUBLE DIGIT"),
             new("CLEAR CONTROL GROUP", "CTRL + SHIFT + DIGIT"),
             new("OPTIONAL GUIDE", "SHIFT + F12"),
+            new("DETAILED STATS", "SHIFT + F1"),
             new("WORLD DEBUG", "F2")
         };
         if (!DeveloperToolsCapability.Current.IsCompiled || developerSessionActive == false) lines.RemoveAll(line => line.Label == "WORLD DEBUG");
