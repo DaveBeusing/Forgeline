@@ -88,6 +88,12 @@ jobs:
       - name: Build
         run: dotnet build ForgeLine.sln --configuration Release --no-restore
 
+      - name: Command replay cancellation and integrity
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.CancellableCommandReplayTests ForgeLine.Game.Tests.MatchPersistenceTests ForgeLine.Game.Tests.PersistenceBoundaryTests ForgeLine.Game.Tests.CancellableMatchRestorationTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Integrated developer tools and closed public variant
         shell: pwsh
         run: ./build/Test-DeveloperToolsQualification.ps1

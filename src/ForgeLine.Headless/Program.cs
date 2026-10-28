@@ -72,18 +72,6 @@ internal static class Program
         }
 #endif
 
-        if (options.LoadInput is not null)
-        {
-            return ValidateSaveRecovery(
-                options.LoadInput, registry.Resolve);
-        }
-
-        if (options.ReplayInput is not null)
-        {
-            return ValidateReplayPlayback(
-                options.ReplayInput, registry.Resolve);
-        }
-
         using var shutdown =
             new CancellationTokenSource();
         ConsoleCancelEventHandler cancelHandler =
@@ -98,6 +86,11 @@ internal static class Program
 
         try
         {
+            if (options.LoadInput is not null)
+                return ValidateSaveRecovery(options.LoadInput, registry.Resolve, shutdown.Token);
+            if (options.ReplayInput is not null)
+                return ValidateReplayPlayback(options.ReplayInput, registry.Resolve, shutdown.Token);
+
             return options.Scenario switch
             {
                 HeadlessScenarioKind.Lightweight =>
@@ -112,6 +105,11 @@ internal static class Program
                     throw new InvalidOperationException(
                         $"Unsupported headless scenario '{options.Scenario}'.")
             };
+        }
+        catch (OperationCanceledException) when (shutdown.IsCancellationRequested)
+        {
+            Console.Error.WriteLine("Headless execution cancelled.");
+            return 2;
         }
         finally
         {
@@ -409,7 +407,7 @@ internal static class Program
     }
 
     private static int ValidateSaveRecovery(
-        string path, Func<string, MatchComposition> resolver)
+        string path, Func<string, MatchComposition> resolver, CancellationToken cancellationToken)
     {
         try
         {
@@ -420,10 +418,10 @@ internal static class Program
             bool developerData = save.Configuration.DeveloperInitialProfile is not null || save.DeveloperModified ||
                 save.ParameterChanges is not null || save.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
             using MatchRuntime restored = developerData
-                ? MatchPersistenceService.RestoreDeveloper(save, DeveloperToolsCapability.Current, resolver)
-                : MatchPersistenceService.Restore(save, resolver);
+                ? MatchPersistenceService.RestoreDeveloper(save, DeveloperToolsCapability.Current, resolver, cancellationToken: cancellationToken)
+                : MatchPersistenceService.RestoreCancellable(save, cancellationToken, resolveComposition: resolver);
 #else
-            using MatchRuntime restored = MatchPersistenceService.Restore(save, resolver);
+            using MatchRuntime restored = MatchPersistenceService.RestoreCancellable(save, cancellationToken, resolveComposition: resolver);
 #endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
@@ -448,7 +446,7 @@ internal static class Program
     }
 
     private static int ValidateReplayPlayback(
-        string path, Func<string, MatchComposition> resolver)
+        string path, Func<string, MatchComposition> resolver, CancellationToken cancellationToken)
     {
         try
         {
@@ -459,10 +457,10 @@ internal static class Program
             bool developerData = replay.Configuration.DeveloperInitialProfile is not null || replay.DeveloperModified ||
                 replay.ParameterChanges is not null || replay.Commands.Any(command => command.Kind == ReplayCommandKind.DeveloperAction || command.DeveloperPayload is not null);
             using MatchRuntime playback = developerData
-                ? MatchPersistenceService.PlayDeveloperReplay(replay, DeveloperToolsCapability.Current, resolver)
-                : MatchPersistenceService.PlayReplay(replay, resolver);
+                ? MatchPersistenceService.PlayDeveloperReplayCancellable(replay, DeveloperToolsCapability.Current, cancellationToken, resolveComposition: resolver)
+                : MatchPersistenceService.PlayReplayCancellable(replay, cancellationToken, resolveComposition: resolver);
 #else
-            using MatchRuntime playback = MatchPersistenceService.PlayReplay(replay, resolver);
+            using MatchRuntime playback = MatchPersistenceService.PlayReplayCancellable(replay, cancellationToken, resolveComposition: resolver);
 #endif
             MatchAuthoritativeSnapshot state =
                 MatchAuthoritativeSnapshot.Capture(
