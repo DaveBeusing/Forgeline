@@ -1615,6 +1615,61 @@ public sealed class PlayerActionPanelTests
         Assert.True(controller.TryTakeRequest(out _));
     }
 
+
+    [Theory]
+    [InlineData(8, ForgeLine.Combat.FirePolicy.HoldFire)]
+    [InlineData(9, ForgeLine.Combat.FirePolicy.ReturnFire)]
+    [InlineData(10, ForgeLine.Combat.FirePolicy.FireAtWill)]
+    public void EngagementPolicyMenuItemsRemainActivatableWithDirectShortcuts(int index, ForgeLine.Combat.FirePolicy policy)
+    {
+        var unit = new EntityId(101, 1);
+        var snapshot = CreateSnapshot(tactical: new PlayerTacticalActionReadModel(
+            [unit], 1, 1, 0, 0, 0, false, false, default, default, [], [], firePolicyEligibleCount: 1));
+        var controller = new PlayerActionPanelController();
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Tap(PlatformKey.K);
+        for (int i = 0; i < index; i++) Tap(PlatformKey.Tab);
+        Assert.Equal(index, controller.SelectedIndex);
+        Tap(PlatformKey.Enter);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SetFirePolicy, request.Kind);
+        Assert.Equal(policy, request.FirePolicy);
+        Assert.Equal(new[] { unit }, request.TacticalEntities);
+
+        void Tap(PlatformKey key)
+        {
+            input.BeginFrame(); Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            input.BeginFrame(); Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
+    [Fact]
+    public void DirectShortcutUsesRequestedActionWhileLastEngagementRuleIsSelected()
+    {
+        var unit = new EntityId(101, 1);
+        var snapshot = CreateSnapshot(tactical: new PlayerTacticalActionReadModel(
+            [unit], 1, 1, 0, 0, 0, false, false, default, default, [], [], firePolicyEligibleCount: 1));
+        var bindings = new GameplayBindingRegistry(new GameplayBindings().With(GameplayAction.Stop, PlatformKey.J));
+        var controller = new PlayerActionPanelController(bindings);
+        var input = new InputState();
+        controller.Update(input, snapshot, 1600, 900);
+        Tap(PlatformKey.K);
+        for (int i = 0; i < 10; i++) Tap(PlatformKey.Tab);
+        Assert.Equal(10, controller.SelectedIndex);
+        input.BeginFrame(); Press(input, PlatformKey.J); Release(input, PlatformKey.J);
+        controller.Update(input, snapshot, 1600, 900);
+        Assert.True(controller.TryTakeRequest(out var request));
+        Assert.Equal(PlayerActionRequestKind.SubmitStopCombat, request.Kind);
+        Assert.Equal(new[] { unit }, request.TacticalEntities);
+
+        void Tap(PlatformKey key)
+        {
+            input.BeginFrame(); Press(input, key); controller.Update(input, snapshot, 1600, 900);
+            input.BeginFrame(); Release(input, key); controller.Update(input, snapshot, 1600, 900);
+        }
+    }
+
     private static PlayerConstructionActionReadModel Construction(
         BuildingId buildingId,
         string name) =>

@@ -30859,6 +30859,12 @@
     },
     {
       "domain": "PlayerActionRequestKind",
+      "member": "SetFirePolicy",
+      "role": "command.hold",
+      "availability": "runtime_required"
+    },
+    {
+      "domain": "PlayerActionRequestKind",
       "member": "RequestResupply",
       "role": "command.supply",
       "availability": "runtime_required"

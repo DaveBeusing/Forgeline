@@ -109,7 +109,7 @@ internal sealed partial class PlayerActionRingHudRenderer
             {
                 if (!participants.MatchesSelection(tactical.SelectedEntities)) value.Append("Updating");
                 else if (!PlayerActionDockHudModel.ResolveItemState(panel.Mode,target.ItemIndex,actions,false).CanActivate) value.Append("Blocked");
-                else { value.Append(target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
+                else { value.Append(target.ItemIndex >= 8 ? tactical.FirePolicyEligibleCount : target.ItemIndex is 5 or 6 ? tactical.Artillery.Count : tactical.CombatEligibleCount); value.Append("/");
                     value.Append(participants.SelectedCount); value.Append(geometry.LabelHalfWidth < 38 * scale ? " elig" : " eligible"); }
             }
             else if (orderDetail && actions?.Logistics is { } details)
@@ -212,7 +212,9 @@ internal sealed partial class PlayerActionRingHudRenderer
                 var state = PlayerActionDockHudModel.ResolveItemState(panel.Mode, target.ItemIndex, actions,
                     panel.ContextualPending && panel.ContextualActivationTick == actions?.Tick);
                 value.Append(state.CanActivate
-                    ? (panel.Bindings ?? GameplayBindingRegistry.Default).TacticalShortcut(target.ItemIndex)
+                    ? (target.ItemIndex < 8
+                        ? (panel.Bindings ?? GameplayBindingRegistry.Default).TacticalShortcut(target.ItemIndex)
+                        : (panel.Bindings ?? GameplayBindingRegistry.Default).Prompt(GameplayAction.Activate))
                     : state.DisabledReason);
             }
             else if (item)

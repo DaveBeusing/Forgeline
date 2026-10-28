@@ -633,6 +633,7 @@ public static class MatchPersistenceService
             save.SchemaVersion);
         MatchPersistenceValidation.Configuration(save.Configuration);
         ValidateScenarioIdentity(save.SchemaVersion, save.Configuration);
+        PlayerControlGroupSaveData.Validate(save.ControlGroups, save.Configuration, save.SchemaVersion);
         MatchPersistenceValidation.Commands(save.Commands, save.SchemaVersion);
         MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
 
