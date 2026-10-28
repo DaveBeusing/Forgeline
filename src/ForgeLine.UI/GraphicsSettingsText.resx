@@ -61,4 +61,6 @@
   <data name="StandardTooltipText" xml:space="preserve"><value>STANDARD</value></data>
   <data name="LargeTooltipText" xml:space="preserve"><value>LARGE</value></data>
   <data name="ExtraLargeTooltipText" xml:space="preserve"><value>EXTRA LARGE</value></data>
+  <data name="NotificationMode" xml:space="preserve"><value>NOTIFICATIONS</value></data>
+  <data name="InformationalAlerts" xml:space="preserve"><value>INFORMATIONAL ALERTS</value></data>
 </root>

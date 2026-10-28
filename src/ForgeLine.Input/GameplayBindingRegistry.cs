@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ForgeLine.Input;
 
-public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish }
+public enum GameplayAction : byte { Build, Process, Units, Logistics, Supply, Combat, Technology, NextItem, PrimarySetting, SecondarySetting, Decrease, Increase, Activate, CancelJob, FocusBase, Formation, Overlay, Minimap, Pause, CorePlacement, PowerPlacement, ExtractorPlacement, StoragePlacement, SmelterPlacement, RotatePlacement, Demolish, NextAlert }
 public enum GameplayBindingScope : byte { Global, Dock }
 public readonly record struct GameplayBindingDefinition(GameplayAction Action, PlatformKey DefaultKey, string Label, GameplayBindingScope Scope);
 public readonly record struct GameplayBindingOverride(GameplayAction Action, PlatformKey Key);
@@ -65,7 +65,8 @@ public sealed class GameplayBindingRegistry
         new(GameplayAction.StoragePlacement, PlatformKey.Unknown, "PLACE STORAGE / CTRL TEMPLATE", GameplayBindingScope.Global),
         new(GameplayAction.SmelterPlacement, PlatformKey.Unknown, "PLACE SMELTER / CTRL TEMPLATE", GameplayBindingScope.Global),
         new(GameplayAction.RotatePlacement, PlatformKey.Unknown, "ROTATE BUILDING", GameplayBindingScope.Global),
-        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global)
+        new(GameplayAction.Demolish, PlatformKey.Delete, "DEMOLISH BUILDING", GameplayBindingScope.Global),
+        new(GameplayAction.NextAlert, PlatformKey.Unknown, "NEXT ALERT", GameplayBindingScope.Global)
     ];
     public static IReadOnlyList<GameplayBindingDefinition> Definitions { get; } = Array.AsReadOnly(DefinitionsArray);
     public static GameplayBindingRegistry Default { get; } = new(new());

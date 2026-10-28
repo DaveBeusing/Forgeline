@@ -45,6 +45,7 @@ internal sealed record ClientUserSettings
 
     public WorldAudioSettings WorldAudio { get; init; } = WorldAudioSettings.Default;
 
+    public NotificationPreferences Notifications { get; init; } = NotificationPreferences.Default;
     public HoverTooltipSettings Tooltips { get; init; } = HoverTooltipSettings.Default;
 
     public bool EdgeScrollEnabled { get; init; } = true;
@@ -106,6 +107,8 @@ internal sealed record ClientUserSettings
         WorldAudio.Validate();
         ArgumentNullException.ThrowIfNull(Tooltips);
         Tooltips.Validate();
+        ArgumentNullException.ThrowIfNull(Notifications);
+        Notifications.Validate();
         ArgumentNullException.ThrowIfNull(CameraBindings);
         SceneAtmosphere.Validate();
         Particles.Validate();

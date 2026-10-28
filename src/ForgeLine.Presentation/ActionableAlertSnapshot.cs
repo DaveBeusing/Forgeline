@@ -173,6 +173,7 @@ public sealed class AlertLifecycleTracker
         Prepare(session, experience.Player, context.Tick);
         int rate = extraction.Scenario.Simulation.Clock.TicksPerSecond;
         Span<EntityId> targets = stackalloc EntityId[8];
+        targets.Clear();
         ulong productionCause = 0, powerCause = 0, supplyCause = 0;
         foreach (var entity in context.Entities.Query<ControllableEntity>(QueryIterationOrder.StableByEntityIndex))
         {

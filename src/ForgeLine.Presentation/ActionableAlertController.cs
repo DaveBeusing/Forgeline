@@ -24,7 +24,7 @@ public readonly record struct NotificationExpansion(AlertNotification Item, Aler
 /// <summary>Navigation only; retains short clicks, rejects lifecycle edges and never emits simulation commands.</summary>
 public sealed class ActionableAlertController
 {
-    private ulong _press;
+    private ulong _press, _keyPress;
     private SimulationSessionId _session;
     private PlayerId _player;
     private SimulationTick _tick;
@@ -60,13 +60,17 @@ public sealed class ActionableAlertController
     public void Unavailable() { Feedback = "TARGET UNAVAILABLE - OPEN OPERATIONS"; _feedbackSeconds = 3; }
     public void CancelInput(InputState input) { _press = input.MousePressSequence(PlatformMouseButton.Left); _pending = false; }
     public AlertActivation Update(InputState input, PresentationSnapshot? snapshot, in GameplayHudLayout layout, bool blocked = false, double seconds = 0, bool dockExpanded = false, string localFeedback = "",
-        bool animateDetails = true)
+        bool animateDetails = true, GameplayBindingRegistry? bindings = null)
     {
         if (_session.IsSpecified && snapshot?.SessionId is { IsSpecified: true } incoming &&
             (incoming.Value < _session.Value || incoming == _session && snapshot.Tick.Value < _tick.Value))
         { CancelInput(input); ResetTransient(); return default; }
         _feedbackSeconds = Math.Max(0, _feedbackSeconds - Math.Max(0, seconds));
         if (_feedbackSeconds == 0) Feedback = string.Empty;
+        PlatformKey key = (bindings ?? GameplayBindingRegistry.Default).Key(GameplayAction.NextAlert);
+        ulong keyPress = input.KeyPressSequence(key);
+        bool nextAlert = input.WasKeyPressed(key) && keyPress != _keyPress;
+        _keyPress = keyPress;
         ulong press = input.MousePressSequence(PlatformMouseButton.Left); bool fresh = press != _press; _press = press;
         PlayerId currentPlayer = snapshot?.PlayerExperience?.Player ?? default;
         bool changed = _initialized && (_layout != layout || _session != snapshot?.SessionId ||
@@ -81,6 +85,7 @@ public sealed class ActionableAlertController
         { _pending = false; _expansionPosition = _expansion.Open ? 1 : 0; return default; }
         var plain = ActionableAlertLayout.Resolve(snapshot, layout, dockExpanded, localFeedback);
         var alerts = ActionableAlertSnapshot.Resolve(snapshot);
+        experience = alerts?.Preferences.Apply(experience) ?? experience;
         var causes = OperationsCauseSnapshot.Resolve(snapshot);
         if ((_expansion.Open || _expansionPosition > 0) &&
             (!HasExpandedCard(plain) || _expandedStackRevision != plain.Revision ||
@@ -98,6 +103,12 @@ public sealed class ActionableAlertController
         bool originValid = input.TryGetMousePressPosition(PlatformMouseButton.Left, out var origin);
         bool captured = _pending || input.HasPointerPosition && stack.Contains(input.PointerPosition) || fresh && originValid && stack.Contains(origin);
         if (changed) { _pending = false; return new(captured); }
+        if (nextAlert && !input.IsKeyDown(PlatformKey.LeftControl) && !input.IsKeyDown(PlatformKey.RightControl) &&
+            !input.IsKeyDown(PlatformKey.LeftShift) && !input.IsKeyDown(PlatformKey.RightShift) && !input.WasKeyPressedWithShift(key))
+        {
+            _pending = false;
+            return NextAlert(experience, alerts, plain.Revision);
+        }
         if (fresh)
         {
             _pending = false; _identity = default;
@@ -208,6 +219,29 @@ public sealed class ActionableAlertController
         _hasFocusCursor = false;
         Unavailable();
         return new(true, OpenOperations: true, Category: AlertLifecycleTracker.Category(item.Kind));
+    }
+
+    private AlertActivation NextAlert(in PlayerExperienceSnapshot experience, ActionableAlertSnapshot? alerts, int revision)
+    {
+        if (alerts is null) { Unavailable(); return new(false, OpenOperations: true); }
+        int count = ResourcePowerHudModel.ResolveNotificationCount(experience), start = 0;
+        if (count == 0) { Feedback = "NO ACTIVE ALERTS"; _feedbackSeconds = 3; return default; }
+        if (_hasFocusCursor && _focusRevision == revision)
+            for (int i = 0; i < count; i++)
+                if (ActionableAlertLayout.Ordered(experience, i).Kind == _focusCursor.Kind) { start = (i + 1) % count; break; }
+        for (int offset = 0; offset < count; offset++)
+        {
+            var candidate = ActionableAlertLayout.Ordered(experience, (start + offset) % count);
+            if (candidate.Feedback) continue;
+            foreach (var alert in alerts.Alerts)
+                if (alert.Identity.Kind == candidate.Kind && alert.Target.IsValid)
+                {
+                    _focusCursor = alert.Identity; _hasFocusCursor = true; _focusRevision = revision;
+                    return new(false, alert.Target, Category: alert.Operations);
+                }
+        }
+        Unavailable();
+        return new(false, OpenOperations: true, NotificationDetails: true);
     }
 
     private bool HasExpandedCard(in NotificationStackLayout stack)
