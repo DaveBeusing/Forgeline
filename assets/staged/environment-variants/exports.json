@@ -1,0 +1,49 @@
+{
+  "assets": [
+    {
+      "exportSha256": "232158dc424ba7a7362baca8df5ba0f27416f38cfc1400667024769ffefdda6d",
+      "id": "mesh.world.vegetation.conifer_swept",
+      "inputSha256": "b4bfc9ada02ab9ffec49d79861d34d5ca331741e372e4a4169aa99a882752a55",
+      "sourceId": "mesh.world.vegetation.conifer",
+      "triangles": 80
+    },
+    {
+      "exportSha256": "b9934abdafc213ced0f7b2027af06f9b8281c57b455dfc0ba7e9a6b797b33a02",
+      "id": "mesh.world.vegetation.conifer_swept_lod1",
+      "inputSha256": "f21b8d2da452db79329773c37280f5aae3ba340a34b63705ec992e0a1aae3ec5",
+      "sourceId": "mesh.world.vegetation.conifer_lod1",
+      "triangles": 48
+    },
+    {
+      "exportSha256": "e18268d43f46e91efce82732fcefc899f26a75f2b9b4d48f125f8da512aa5efc",
+      "id": "mesh.world.vegetation.broadleaf_asymmetric",
+      "inputSha256": "bdde4a4db95bcd13fe5c80692a23715e377c69c1e1ee56b7febb1f8162f365c1",
+      "sourceId": "mesh.world.vegetation.broadleaf",
+      "triangles": 624
+    },
+    {
+      "exportSha256": "4db29315b45ec3b707272ec916485f2fe63a68a23db6f49feedad082f38b5bcc",
+      "id": "mesh.world.vegetation.broadleaf_asymmetric_lod1",
+      "inputSha256": "0c819336bc68a7b5fe8c099d5c6dc1105517de002c75480588301a065a827e9f",
+      "sourceId": "mesh.world.vegetation.broadleaf_lod1",
+      "triangles": 152
+    },
+    {
+      "exportSha256": "7a5903b6d33cc08199ae2c172ef8c3bf2fa6347cd9746bf4ef4083d876a6ce15",
+      "id": "mesh.world.prop.rock_leaning",
+      "inputSha256": "f2641f033007333a6314eecc7fd58b23ede133d86fb2f47be42a0d148356462b",
+      "sourceId": "mesh.world.prop.rock",
+      "triangles": 16
+    },
+    {
+      "exportSha256": "a43e17bf2dc9344f4b16aa45b84fac620aa5d4b97c07376e9360386f28197b2a",
+      "id": "mesh.world.prop.rock_leaning_lod1",
+      "inputSha256": "80add2ea5db7995a1f726f52b4812fcedefc290e531ed76d3b387d52c690a2fe",
+      "sourceId": "mesh.world.prop.rock_lod1",
+      "triangles": 12
+    }
+  ],
+  "newMaterials": 0,
+  "newTextures": 0,
+  "schemaVersion": 1
+}
