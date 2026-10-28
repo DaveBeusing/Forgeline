@@ -421,6 +421,7 @@ internal sealed class ClientApplication
         var combatGroupInput =
             new CombatGroupInputController();
         var operationsController = new OperationsController(_gameplayBindings);
+        var logisticsCapacityInteraction = new StrategicLogisticsCapacityInteraction();
         var transientMenus = new TransientHudMenuController();
         var alertController = new ActionableAlertController();
         var memberFocusSelection = new SelectionSet();
@@ -1373,9 +1374,21 @@ internal sealed class ClientApplication
                 if (alertResult.NotificationDetails) operationsController.OpenNotifications(inputSnapshot.SessionId, presentationInteraction);
                 else operationsController.OpenCategory(alertResult.Category, inputSnapshot.SessionId, presentationInteraction);
             }
+            bool logisticsCaptured = logisticsCapacityInteraction.Update(inputState, inputSnapshot, camera, interactionLayout,
+                informationLayer.OverlayMode, modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
+                buildingPlacementController.IsActive || tacticalTargetingController.IsActive || hudInteraction.PointerCaptured ||
+                actionPanel.HasKeyboardFocus || operationsController.ContainsSurface(inputState.PointerPosition, interactionLayout) ||
+                HudInteractionContext.CapturesWorldPointer(inputState, interactionLayout, informationLayer.MinimapEnabled,
+                    actionPanel.DockExpanded, guidanceVisible: false, includeActionDock: true,
+                    onboarding: guidanceInteraction.View, includePrimaryCommands: !actionPanel.ObjectActions), out var logisticsTarget);
+            hudInteraction.CapturePointer(logisticsCaptured);
+            if (logisticsTarget.IsValid && operationsController.OpenEntity(inputSnapshot, logisticsTarget, presentationInteraction, selectionController.Selection))
+            {
+                selectionController.CancelPointerInteraction(); minimapInteraction.Reset(); actionPanel.Close();
+            }
             var operationsResult = operationsController.Update(inputState, inputSnapshot, interactionLayout, presentationInteraction,
                 blocked: modalFrame || simulationPaused || !window.IsFocused || inputMatchTerminal ||
-                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured,
+                    buildingPlacementController.IsActive || tacticalTargetingController.IsActive, inputCaptured: alertResult.Captured || logisticsCaptured,
                 selection: selectionController.Selection);
             hudInteraction.CapturePointer(operationsResult.Captured);
             hudInteraction.CaptureKeyboard(operationsController.HasKeyboardFocus);
@@ -1501,10 +1514,10 @@ internal sealed class ClientApplication
             if (minimapInteraction.TryTakeOverlaySelection(
                     out StrategicOverlayMode selectedOverlay))
             {
-                informationLayer.SetOverlay(
-                    selectedOverlay);
-                presentationInteraction.SetStrategicOverlay(
-                    selectedOverlay);
+                informationLayer.SetOverlay(selectedOverlay == StrategicOverlayMode.Logistics &&
+                    StrategicLogisticsCapacityFilters.IsLogistics(informationLayer.OverlayMode)
+                        ? StrategicLogisticsCapacityFilters.Next(informationLayer.OverlayMode) : selectedOverlay);
+                presentationInteraction.SetStrategicOverlay(informationLayer.OverlayMode);
             }
 
             if (!hudInteraction.KeyboardCaptured)
