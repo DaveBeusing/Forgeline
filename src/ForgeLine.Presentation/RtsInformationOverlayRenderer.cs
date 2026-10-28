@@ -1352,7 +1352,7 @@ public sealed class RtsInformationOverlayRenderer : IDisposable
         }
         Span<char> buffer = stackalloc char[96];
         var label = new HudTextBuilder(buffer);
-        label.Append("SECTION "); label.Append(view.Guidance.Section + 1); label.Append(" / "); label.Append(EarlyGameGuidanceCatalog.Steps.Length);
+        label.Append("SECTION "); label.Append(view.Guidance.Section + 1); label.Append(" / "); label.Append(view.Guidance.SectionCount);
         label.Append("   PAGE "); label.Append(view.Guidance.Page + 1); label.Append(" / "); label.Append(view.Guidance.PageCount);
         if (!_text.Add(label.Written, panel.X + 10, panel.Bottom - 15, 14, GameplayHudVisualStyle.TextPrimary, width, height, MathF.Max(1, panel.Width - 20)))
             EmitText(label.Written, panel.X + 10, panel.Bottom - 15, panel.Right - 10,

@@ -138,6 +138,8 @@ internal sealed class ClientApplication
         var newGame =
             new NewGameModel(InspectScenarios());
         if (scenario is "split-basin" or SplitBasinBattlefield.CompositionKey) newGame.MoveScenario(1);
+        else if(PracticeLessons.TryGet(scenario??"",out _))
+            for(int i=0;i<newGame.Scenarios.Count&&newGame.SelectedScenario.Key!=scenario;i++)newGame.MoveScenario(1);
         RuntimeAssetCatalog runtimeAssets;
         IReadOnlyList<LoadGameEntry> startupSaves;
         string? splashBypassReason = ClientStartupLoop.SplashBypassReason(
@@ -582,6 +584,7 @@ internal sealed class ClientApplication
 #endif
         bool developerSessionActive = DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled;
         var pauseMenu = new PauseMenuModel(developerSessionActive);
+        pauseMenu.SetPracticeAvailable(scenario.Practice is not null);
         string saveDirectory =
             ResolveSaveDirectory();
         bool restartHeld = false;
@@ -1110,6 +1113,11 @@ internal sealed class ClientApplication
                 throw new InvalidOperationException("Simulation pause ownership could not be updated.");
             if (!developerOwnsPause) simulationPaused = shouldPauseSimulation;
 
+            if(pauseMenuCommand==PauseMenuCommand.RetryPractice&&scenario.Practice is not null)
+            {
+                _pendingRestart=ClientSessionRequest.Restart(scenario.RuntimeSettings);
+                return RestartRequestedExitCode;
+            }
             if (pauseMenuCommand ==
                 PauseMenuCommand.ReturnToMenu)
             {
