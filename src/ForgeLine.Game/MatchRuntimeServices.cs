@@ -134,5 +134,5 @@ public sealed class MatchRuntimeServices
 
     public CombatDebugSnapshotSystem CombatDebugSnapshots { get; }
 
-    public IReadOnlyList<Type> RegisteredSystemTypes { get; }
+    public IReadOnlyList<Type> RegisteredSystemTypes { get; internal set; }
 }

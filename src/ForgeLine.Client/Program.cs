@@ -21,6 +21,8 @@ internal static class Program
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2],engagementOnly:true);
         if (args.Length == 3 && args[0] == "--action-ring-capture")
             return ObjectActionRingRuntimeCapture.Run(args[1],args[2]);
+        if(args.Length==3&&args[0]=="--practice-guidance-capture")
+            return OnboardingCapture.Run(args[1],args[2],practice:true);
         if (args.Length == 3 && args[0] == "--onboarding-lessons-capture")
             return OnboardingCapture.Run(args[1], args[2], lessons: true);
         if (args.Length == 3 && args[0] == "--onboarding-capture")
@@ -126,7 +128,7 @@ internal static class Program
 
             if (string.Equals(argument, "--scenario", StringComparison.OrdinalIgnoreCase))
             {
-                if (index + 1 >= args.Length || args[++index] is not ("central-divide" or "split-basin" or ForgeLine.Game.CentralDivideScenario.CompositionKey or ForgeLine.Game.SplitBasinBattlefield.CompositionKey))
+                if (index + 1 >= args.Length || args[++index] is not ("central-divide" or "split-basin" or ForgeLine.Game.CentralDivideScenario.CompositionKey or ForgeLine.Game.SplitBasinBattlefield.CompositionKey or ForgeLine.Game.PracticeLessons.ReconKey or ForgeLine.Game.PracticeLessons.IndustryKey or ForgeLine.Game.PracticeLessons.SupplyKey))
                 {
                     Console.Error.WriteLine("--scenario requires central-divide, split-basin or its registered composition key.");
                     return false;

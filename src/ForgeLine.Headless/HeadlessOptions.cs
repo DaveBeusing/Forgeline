@@ -86,7 +86,7 @@ internal readonly record struct HeadlessOptions(
                     scenarioWasSpecified = true;
                     string selected = GetValue(args, ref index, argument);
                     scenario = ParseScenario(selected);
-                    scenarioKey = selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
+                    scenarioKey = PracticeLessons.TryGet(selected.ToLowerInvariant(),out _) ? selected.ToLowerInvariant() : selected.ToLowerInvariant() is "split-basin" or SplitBasinBattlefield.CompositionKey
                         ? SplitBasinBattlefield.CompositionKey : CentralDivideScenario.CompositionKey;
                     break;
 
@@ -444,6 +444,7 @@ internal readonly record struct HeadlessOptions(
         {
             "lightweight" =>
                 HeadlessScenarioKind.Lightweight,
+            PracticeLessons.ReconKey or PracticeLessons.IndustryKey or PracticeLessons.SupplyKey or
             "central-divide" or "vertical-slice" or CentralDivideScenario.CompositionKey or "split-basin" or SplitBasinBattlefield.CompositionKey =>
                 HeadlessScenarioKind.Match,
             _ =>

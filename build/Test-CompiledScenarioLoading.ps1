@@ -11,7 +11,7 @@ function Invoke-Headless([string[]]$Arguments) {
     & dotnet run --project $project --configuration $Configuration --no-build -- @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Compiled scenario command failed: $Arguments" }
 }
-foreach ($key in @('central-divide.directorate.v1', 'split-basin.directorate.v1')) {
+foreach ($key in @('central-divide.directorate.v1', 'split-basin.directorate.v1', 'practice.command-recon.v1', 'practice.build-production.v1', 'practice.supply-recovery.v1')) {
     $save = Join-Path $output "$key.save.json"
     $replay = Join-Path $output "$key.replay.json"
     Invoke-Headless @('--scenario', $key, '--profile', 'validation', '--ticks', '20', '--seed', '2026', '--save-output', $save, '--replay-output', $replay)

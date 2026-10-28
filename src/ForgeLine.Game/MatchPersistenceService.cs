@@ -30,7 +30,7 @@ public static class MatchPersistenceService
             scenario.Simulation.Random.State,
             scenario.Replay.CaptureCommands(),
             state,
-            stateHash) { DeveloperModified = CaptureModified(scenario), ParameterChanges = CaptureParameterChanges(scenario) };
+            stateHash) { PracticeProgress=scenario.Practice?.Capture(new(1),scenario.Simulation.CurrentTick), DeveloperModified = CaptureModified(scenario), ParameterChanges = CaptureParameterChanges(scenario) };
     }
 
     public static MatchReplayData CaptureReplay(
@@ -78,7 +78,7 @@ public static class MatchPersistenceService
         RequireRecoveryCapability(save.Configuration, save.Commands, save.ParameterChanges, save.State.Domains, capability);
         cancellationToken.ThrowIfCancellationRequested();
 
-        return Reconstruct(
+        var restored = Reconstruct(
             save.Configuration,
             save.SavedTick,
             save.RandomState,
@@ -86,6 +86,18 @@ public static class MatchPersistenceService
             save.StateSha256,
             save.State,
             resolveComposition, reportProgress, capability, save.ParameterChanges, cancellationToken);
+        try
+        {
+            if(save.PracticeProgress is {} expected)
+            {
+                var actual=restored.Practice?.Capture(new(1),restored.Simulation.CurrentTick);
+                if(actual is null||expected.LessonKey!=actual.LessonKey||expected.Status!=actual.Status||
+                    expected.Failure!=actual.Failure||!expected.CompletedAtTicks.SequenceEqual(actual.CompletedAtTicks))
+                    throw new MatchPersistenceException(MatchPersistenceFailureReason.StateMismatch,"Practice objective reconstruction differs from the saved result.");
+            }
+            return restored;
+        }
+        catch { restored.Dispose();throw; }
     }
 
     public static MatchRuntime PlayReplay(MatchReplayData replay, Func<string, MatchComposition>? resolveComposition = null) =>
@@ -633,6 +645,7 @@ public static class MatchPersistenceService
             save.SchemaVersion);
         MatchPersistenceValidation.Configuration(save.Configuration);
         ValidateScenarioIdentity(save.SchemaVersion, save.Configuration);
+        PracticePersistence.Validate(save);
         PlayerControlGroupSaveData.Validate(save.ControlGroups, save.Configuration, save.SchemaVersion);
         MatchPersistenceValidation.Commands(save.Commands, save.SchemaVersion);
         MatchPersistenceValidation.Require(save.State is not null, "Missing authoritative checkpoint.");
@@ -689,6 +702,7 @@ public static class MatchPersistenceService
                 $"Replay state schema {replay.AuthoritativeSchemaVersion} is incompatible with state schema {MatchAuthoritativeSnapshot.CurrentSchemaVersion}.");
         MatchPersistenceValidation.Configuration(replay.Configuration);
         ValidateScenarioIdentity(replay.SchemaVersion, replay.Configuration);
+        MatchPersistenceValidation.Require(!PracticeLessons.TryGet(replay.Configuration.CompositionKey,out _)||replay.SchemaVersion>=12,"Practice replays require payload 12.");
         MatchPersistenceValidation.Commands(replay.Commands, replay.SchemaVersion);
         MatchPersistenceValidation.Lifecycle(replay.FinalMatchState);
         DeveloperPersistenceGuard.Validate(replay.SchemaVersion, replay.Configuration, replay.Commands, replay.ParameterChanges, developerModified: replay.DeveloperModified);

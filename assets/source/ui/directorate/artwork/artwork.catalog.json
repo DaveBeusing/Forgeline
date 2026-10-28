@@ -31634,6 +31634,12 @@
       "dynamicLabelRequired": true
     },
     {
+      "domain": "PauseMenuCommand",
+      "member": "RetryPractice",
+      "role": "utility.play",
+      "availability": "runtime_required"
+    },
+    {
       "domain": "StrategicOverlayMode",
       "member": "Conveyors",
       "role": "unit_role.logistics",

@@ -13,7 +13,7 @@ public sealed class ScenarioRegistry
     private readonly ScenarioDescriptor[] _descriptors;
 
     public static ScenarioRegistry Default => new(Path.Combine(AppContext.BaseDirectory, "maps"),
-        [CentralDivideDescriptor, SplitBasinDescriptor]);
+        new[] { CentralDivideDescriptor, SplitBasinDescriptor }.Concat(PracticeLessons.All.Select(PracticeLessons.Descriptor)).ToArray());
 
     public static ScenarioDescriptor CentralDivideDescriptor => new(
         CentralDivideScenario.CompositionKey, "Central Divide", CentralDivideMapPath,
@@ -54,6 +54,13 @@ public sealed class ScenarioRegistry
     {
         var descriptor = _descriptors.SingleOrDefault(d => string.Equals(d.Key, key, StringComparison.Ordinal)) ??
             throw new InvalidOperationException($"Unknown scenario '{key}'.");
+        if (PracticeLessons.TryGet(key, out var practice))
+        {
+            var expected = PracticeLessons.Descriptor(practice!);
+            if (descriptor.Identity != expected.Identity || descriptor.MapPath != expected.MapPath)
+                throw new InvalidOperationException($"Practice scenario '{key}' has an incompatible registration.");
+            return PracticeLessons.Compose(Resolve(CentralDivideScenario.CompositionKey), practice!);
+        }
         var identity = descriptor.Identity;
         string path = ResolvePath(descriptor.MapPath);
         string integrityPath = ResolvePath(descriptor.MapPath + ".sha256");

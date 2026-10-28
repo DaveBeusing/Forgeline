@@ -1,5 +1,6 @@
 using ForgeLine.Simulation;
 using ForgeLine.Input;
+using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
@@ -7,7 +8,10 @@ public enum GuidanceExplanationState : byte { Offered, Viewed, Deferred }
 public enum GuidanceNavigation : byte { None, PreviousSection, NextSection, PreviousPage, NextPage, Read, Later }
 public readonly record struct EarlyGameGuidanceView(bool Visible, string Objective, string Context, string Binding, string Next,
     SimulationSessionId SessionId = default, string ContentKey = "", int Section = 0, int Page = 0, int PageCount = 1,
-    GuidanceExplanationState ExplanationState = default, bool GoalConfirmed = false);
+    GuidanceExplanationState ExplanationState = default, bool GoalConfirmed = false)
+{
+    public int SectionCount { get; init; } = EarlyGameGuidanceCatalog.Steps.Length;
+}
 
 /// <summary>Advisory copied observations and independent, session-local reading state.</summary>
 public sealed class EarlyGameGuidanceController
@@ -17,6 +21,7 @@ public sealed class EarlyGameGuidanceController
     private PlayerGuidanceMilestone _observed;
     private readonly GuidanceExplanationState[] _reading = new GuidanceExplanationState[EarlyGameGuidanceCatalog.Steps.Length];
     private int _section, _page;
+    private int _sectionCount=EarlyGameGuidanceCatalog.Steps.Length;
     private string _cachedKey = "";
     private GameplayBindingRegistry? _cachedBindings;
     private GameplayHudLayout _cachedLayout;
@@ -41,16 +46,16 @@ public sealed class EarlyGameGuidanceController
         switch (action)
         {
             case GuidanceNavigation.PreviousSection: _section = Math.Max(0, _section - 1); _page = 0; break;
-            case GuidanceNavigation.NextSection: _section = Math.Min(_reading.Length - 1, _section + 1); _page = 0; break;
+            case GuidanceNavigation.NextSection: _section = Math.Min(_sectionCount - 1, _section + 1); _page = 0; break;
             case GuidanceNavigation.PreviousPage: _page = Math.Max(0, _page - 1); break;
             case GuidanceNavigation.NextPage: _page = Math.Min(Math.Max(0, _pages.Count - 1), _page + 1); break;
             case GuidanceNavigation.Read:
                 if (_page + 1 < _pages.Count) { _page++; break; }
                 _reading[_section] = GuidanceExplanationState.Viewed;
-                _section = Math.Min(_reading.Length - 1, _section + 1); _page = 0; break;
+                _section = Math.Min(_sectionCount - 1, _section + 1); _page = 0; break;
             case GuidanceNavigation.Later:
                 _reading[_section] = GuidanceExplanationState.Deferred;
-                _section = Math.Min(_reading.Length - 1, _section + 1); _page = 0; break;
+                _section = Math.Min(_sectionCount - 1, _section + 1); _page = 0; break;
         }
     }
 
@@ -71,6 +76,8 @@ public sealed class EarlyGameGuidanceController
                 if (item.SessionId != snapshot.SessionId || item.Player != experience.Player || item.Tick.Value > snapshot.Tick.Value) return default;
         _tick = snapshot.Tick;
         _observed |= summary.Observed;
+        if(summary.Practice is {} practice) return UpdatePractice(practice,snapshot,enabled&&!blocked,bindings,layout);
+        _sectionCount=EarlyGameGuidanceCatalog.Steps.Length;
         if (!enabled || blocked) return default;
         bindings ??= GameplayBindingRegistry.Default;
         if (layout.SafeArea.IsEmpty) layout = GameplayHudLayout.Create(1920, 1080, 96);
@@ -106,5 +113,32 @@ public sealed class EarlyGameGuidanceController
                 _ => "EXPLANATION OFFERED / NO SIMULATION GOAL"
             } : Status(confirmed, _reading[_section]),
             _session, step.Key, _section, _page, _pages.Count, _reading[_section], confirmed);
+    }
+    private EarlyGameGuidanceView UpdatePractice(PracticeSnapshot practice,PresentationSnapshot snapshot,bool enabled,
+        GameplayBindingRegistry? bindings,GameplayHudLayout layout)
+    {
+        if(practice.Session!=snapshot.SessionId||practice.Tick!=snapshot.Tick||practice.Player!=snapshot.PlayerExperience!.Value.Player||
+            !PracticeLessons.TryGet(practice.LessonKey,out var lesson)||practice.CompletedAtTicks.Count!=lesson!.Objectives.Count)return default;
+        _sectionCount=lesson.Objectives.Count;_section=Math.Clamp(_section,0,_sectionCount-1);
+        if(!enabled)return default;
+        bindings??=GameplayBindingRegistry.Default;
+        if(layout.SafeArea.IsEmpty)layout=GameplayHudLayout.Create(1920,1080,96);
+        var goal=lesson.Objectives[_section];bool confirmed=practice.CompletedAtTicks[_section].HasValue;
+        string key=lesson.Key+":"+_section.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string status=practice.Status+practice.Failure;
+        if(_cachedKey!=key||_cachedHelp!=status||_cachedConfirmed!=confirmed||_cachedLayout!=layout||!ReferenceEquals(_cachedBindings,bindings))
+        {
+            _cachedKey=key;_cachedHelp=status;_cachedConfirmed=confirmed;_cachedLayout=layout;_cachedBindings=bindings;
+            _binding=bindings.Prompt(GameplayAction.Activate)+" READ / "+bindings.Prompt(GameplayAction.NextItem)+" GUIDE FOCUS / ESC PAUSE";
+            _pages=GuidanceCardLayout.Pages(lesson.Title+". "+goal.Hint+" "+goal.Explanation+
+                (confirmed?" CONFIRMED BY COMPLETED SIMULATION OUTCOME.":"")+
+                (practice.Status==PracticeStatus.Failed?" FAILURE: "+practice.Failure:"")+" "+_binding+
+                " Reading or deferring hints never completes an objective. Pause offers Retry Practice and Skip Practice / Menu.",layout);
+        }
+        _page=Math.Clamp(_page,0,Math.Max(0,_pages.Count-1));
+        string next=practice.Status==PracticeStatus.Complete?"PRACTICE COMPLETE / ESC MENU OR RETRY":
+            practice.Status==PracticeStatus.Failed?"FAILED / ESC RETRY":Status(confirmed,_reading[_section]);
+        return new(true,goal.Title,_pages.Count>0?_pages[_page]:"",_binding,next,_session,key,
+            _section,_page,_pages.Count,_reading[_section],confirmed) { SectionCount=_sectionCount };
     }
 }

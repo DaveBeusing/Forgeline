@@ -19,6 +19,8 @@ public readonly record struct GameplayProgressEvent(ulong Identity, SimulationSe
 /// <summary>Bounded completed-action observations. Never controls economy or commands.</summary>
 public sealed partial class GameplayProgressJournal : ISimulationTickObserver, IResourceExtractionSink
 {
+    // Simulation-owned subscribers retain bounded facts; display only after OnTickCompleted.
+    internal event Action<GameplayProgressEvent>? Recorded;
     private readonly EntityRegistry _entities;
     private readonly SimulationSessionId _session;
     private readonly Dictionary<EntityId, double> _productionTotals = [];
@@ -53,6 +55,7 @@ public sealed partial class GameplayProgressJournal : ISimulationTickObserver, I
         if (ledger.TryGetValue(key, out var previous) && previous.Tick == tick && previous.Actor == actor &&
             previous.Source == source && previous.Target == target && previous.OrderIdentity == order && previous.Resource == resource) return;
         ledger[key] = new(++_identity, _session, tick, player, kind, actor, source, target, order, resource, quantity, definition);
+        Recorded?.Invoke(ledger[key]);
         _copies.Remove(player);
         if (!_first.TryGetValue(player, out var first)) _first.Add(player, first = []);
         if (first.TryAdd(key, ledger[key])) _firstCopies.Remove(player);
