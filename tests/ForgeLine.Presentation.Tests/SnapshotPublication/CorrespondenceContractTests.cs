@@ -86,14 +86,14 @@ public sealed class CorrespondenceContractTests
         var buffer = new PresentationSnapshotBuffer();
         var world = new RenderWorld();
         buffer.Publish(before); world.Update(buffer);
-        foreach (var value in prior) Assert.Equal(Find(before, value.Entity) >= 0,
+        foreach (var value in prior) Assert.Equal(FindCurrentReference(before, value.Entity) >= 0,
             world.TryGetInterpolatedInstance(value.Entity, .5f, out _));
         buffer.Publish(after); world.Update(buffer);
         for (int i = 0; i < current.Length; i++)
             Assert.Equal(Find(before, current[i].Entity), index.PreviousIndex(i));
         foreach (var value in current)
         {
-            int slot = Find(after, value.Entity);
+            int slot = FindCurrentReference(after, value.Entity);
             bool present = world.TryGetInterpolatedInstance(value.Entity, .5f, out var found);
             Assert.Equal(slot >= 0, present);
             if (present) Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
@@ -134,7 +134,7 @@ public sealed class CorrespondenceContractTests
         Assert.Equal(receiverPrevious < 0 ? receiver.Transform : RenderTransform.Interpolate(prior[receiverPrevious].Transform, receiver.Transform, .5f), world.GetInterpolatedInstance(3, .5f).Transform);
         for (int i = 0; i < current.Length; i++)
         {
-            int slot = Find(Snapshot(current, 2), current[i].Entity);
+            int slot = FindCurrentReference(Snapshot(current, 2), current[i].Entity);
             bool present = world.TryGetInterpolatedInstance(current[i].Entity, .5f, out var found);
             Assert.Equal(slot >= 0, present);
             if (present) Assert.Equal(world.GetInterpolatedInstance(slot, .5f), found);
@@ -151,7 +151,7 @@ public sealed class CorrespondenceContractTests
     }
 
     [Fact]
-    public void RandomUnorderedAndDuplicateInputsMatchEveryBinarySearchResult()
+    public void RandomUnorderedPredecessorsKeepBinaryPolicyAndUniqueCurrentKeysRemainReachable()
     {
         var random = new Random(6173);
         var mapping = new RenderSnapshotIndex(false);
@@ -166,7 +166,7 @@ public sealed class CorrespondenceContractTests
             var before = Snapshot(prior, 1); var after = Snapshot(current, 2);
             mapping.Rebuild(after, before);
             for (int i = 0; i < current.Length; i++) Assert.Equal(Find(before, current[i].Entity), mapping.PreviousIndex(i));
-            foreach (var instance in current) Assert.Equal(Find(after, instance.Entity), mapping.FindCurrent(instance.Entity));
+            foreach (var instance in current) Assert.Equal(FindCurrentReference(after, instance.Entity), mapping.FindCurrent(instance.Entity));
         }
     }
 
@@ -178,6 +178,18 @@ public sealed class CorrespondenceContractTests
             new(1 + value / 100, 2, 3)), new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
         UnitFeature: default(UnitFeaturePresentationMetadata) with { AimYawRadians = value % 2 == 0 ? 3.13f : -3.13f },
         MechanicalPose: new(true, value, value / 2, value / 10, value / 20, value / 100, value / 200));
+
+    private static int FindCurrentReference(PresentationSnapshot snapshot, EntityId entity)
+    {
+        int result = -1;
+        for (int i = 0; i < snapshot.InstanceCount; i++)
+            if (snapshot.Instances[i].Entity == entity)
+            {
+                if (result >= 0) return Find(snapshot, entity);
+                result = i;
+            }
+        return result;
+    }
 
     internal static int Find(PresentationSnapshot snapshot, EntityId entity)
     {
