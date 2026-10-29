@@ -77,7 +77,7 @@ public sealed class RenderWorld
 
         RenderInstance currentInstance = current.GetInstance(index);
 
-        if (currentInstance.VfxFeature.IsSpecified || currentInstance.DecalFeature.IsSpecified && currentInstance.DecalFeature.Surface == DecalSurface.Ground)
+        if (currentInstance.Decoration.IsSpecified || currentInstance.VfxFeature.IsSpecified || currentInstance.DecalFeature.IsSpecified && currentInstance.DecalFeature.Surface == DecalSurface.Ground)
         {
             return currentInstance;
         }

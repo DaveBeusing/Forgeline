@@ -69,3 +69,10 @@ Exact final-head CI supplies repository-wide checks. Physical-monitor readabilit
 
 
 Short live tracks now use the shared presentation decal pool for vehicles owned by the viewing faction. They use existing movement history and eight-tick sampling, without regenerating terrain control maps or authoring enemy movement trails. Broad public surface wear remains owned by ITerrainSurfaceMarkSource. Impact marks align their plane with the sampled terrain normal; they do not deform height or navigation. See [combat and industrial rendering](CombatIndustrialRendering.md).
+
+
+## Chunk decoration rendering
+
+The opt-in [chunk decoration render connection](ChunkDecorationRendering.md) consumes
+copied public scatter snapshots through the existing Windows instancing, LOD, wind and
+shadow paths. Separate bounded render residency preserves gameplay and authored inputs.

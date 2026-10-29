@@ -21,4 +21,8 @@ public readonly record struct RenderInstance(
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     ConveyorFeaturePresentationMetadata ConveyorFeature = default,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    ResourceDepositField? ResourceField = null);
+    ResourceDepositField? ResourceField = null)
+{
+    [System.Text.Json.Serialization.JsonIgnore]
+    public DecorationRenderMetadata Decoration { get; init; }
+}

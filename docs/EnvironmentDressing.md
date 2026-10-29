@@ -156,3 +156,10 @@ bridge mesh ends rather than its passage envelope. See the
 headless generator over biome fields and frozen gameplay clearances. Its compact
 chunk sets, reference plots and fingerprints do not change authored dressing,
 scenario artifacts, ECS allocation, rendering or persistence.
+
+
+## Chunk decoration rendering
+
+The opt-in [chunk decoration render connection](ChunkDecorationRendering.md) consumes
+copied public scatter snapshots through the existing Windows instancing, LOD, wind and
+shadow paths. Separate bounded render residency preserves gameplay and authored inputs.

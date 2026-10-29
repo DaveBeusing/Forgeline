@@ -28,6 +28,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
     private readonly RuntimeAssetCatalog? _runtimeAssets;
     private readonly Dictionary<EntityId, (WorldVisualId Visual, ResourceDepositVariantSelection Selection, Vector3 Tint)> _resourceVariants = [];
     private readonly ResourceDepositFieldComposer? _resourceFields;
+    private readonly IChunkDecorationProvider? _decorations;
     private readonly RenderInstance[] _staticDressing = [];
     private readonly CrossingVisualLayout? _crossingLayout;
     private readonly EntityId[] _visualCrossingEntities = [];
@@ -58,7 +59,8 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         FactionId viewingFaction = default,
         AxisAlignedBounds? intelligenceWorldBounds = null,
         RuntimeAssetCatalog? runtimeAssets = null,
-        ITerrainQuery? resourceTerrain = null)
+        ITerrainQuery? resourceTerrain = null,
+        IChunkDecorationProvider? decorations = null)
     {
         _buffer =
             buffer ??
@@ -67,6 +69,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         _viewingFaction = viewingFaction;
         _intelligenceWorldBounds = intelligenceWorldBounds;
         _runtimeAssets = runtimeAssets;
+        _decorations = decorations;
         _resourceFields = resourceTerrain is null ? null : new(resourceTerrain, runtimeAssets);
 
         if (_intelligence is not null &&
@@ -81,7 +84,8 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
     public PresentationExtractor(
         PresentationSnapshotBuffer buffer,
         PresentationExtractionContext extraction,
-        RuntimeAssetCatalog? runtimeAssets = null)
+        RuntimeAssetCatalog? runtimeAssets = null,
+        IChunkDecorationProvider? decorations = null)
         : this(
             buffer,
             extraction?.Scenario.Intelligence ??
@@ -89,7 +93,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
             new FactionId(
                 checked((uint)extraction.Player.Value)),
             extraction.Scenario.Terrain.WorldBounds,
-            runtimeAssets)
+            runtimeAssets, decorations: decorations)
     {
         _extraction = extraction;
         _resourceVariants = ResourceDepositVariantSeed.CreateMap(extraction.Scenario);
@@ -286,7 +290,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 _extraction is null ? null : PlayerGuidanceSummaryFactory.Capture(context, _extraction, intelligenceSnapshot),
                 _extraction is not null && interaction.OperationsOpen ? OperationsSnapshotFactory.Capture(context, _extraction, instances,
                     interaction.SelectedEntities.Count == 1 ? interaction.SelectedEntities[0] : default, interaction.SelectedEntities) : null,
-                actionableAlerts) { Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses, MatchDebrief = CaptureMatchDebrief(playerExperience),
+                actionableAlerts) { ChunkDecorations = _decorations?.Capture(), Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses, MatchDebrief = CaptureMatchDebrief(playerExperience),
                     NavigationDiagnosis = interaction.NavigationDiagnosticsOpen ? CaptureNavigationDiagnostics(context, instances) : null,
                     ConstructionTemplate = _extraction is null ? null : ConstructionTemplatePreviewFactory.Capture(context, _extraction),
                     Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
