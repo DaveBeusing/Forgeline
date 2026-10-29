@@ -46,7 +46,10 @@ try {
     dotnet $headless --generated-map $first --generated-asset-sha256 ('b' * 64) --ticks 1
     if ($LASTEXITCODE -ne 1) { throw 'Asset conflict must return a controlled failure (exit 1).' }
     dotnet $compiler --generate-map --seed invalid --output (Join-Path $runRoot 'invalid') --asset-sha256 $assetIdentity
-    if ($LASTEXITCODE -eq 0) { throw 'Invalid seed was accepted.' }
+    if ($LASTEXITCODE -ne 1) { throw 'Invalid seed must return a controlled failure (exit 1).' }
     Write-Host "Generated map contracts passed: $runRoot; manifest=$manifest."
 }
 finally { Pop-Location }
+
+# Expected native rejection codes have been asserted; report overall script success.
+exit 0
