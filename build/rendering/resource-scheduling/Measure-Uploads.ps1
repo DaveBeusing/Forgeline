@@ -3,7 +3,9 @@
 param(
     [Parameter(Mandatory)][string]$ClientDirectory,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceSha
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceSha,
+    [ValidateSet('Texture','StaticGeometry')][string]$Workload = 'Texture',
+    [switch]$StaticBufferUploadFallback
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -16,6 +18,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $client 'ForgeLine.Graphics.dll'))) 
 foreach ($name in @('FORGELINE_DRED','FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK')) {
     if ([Environment]::GetEnvironmentVariable($name) -eq '1') { throw "Disable $name for the paired production baseline." }
 }
+if ($StaticBufferUploadFallback -and $Workload -ne 'StaticGeometry') { throw 'The fallback comparison applies only to static geometry.' }
 [void][IO.Directory]::CreateDirectory($root)
 $references = foreach ($path in Get-ChildItem -LiteralPath $client -Filter '*.dll') {
     try { [void][Reflection.AssemblyName]::GetAssemblyName($path.FullName) } catch { continue }
@@ -32,6 +35,13 @@ try {
 }
 # The exact frozen managed/native dependencies must accompany the measurement host.
 Copy-Item -Path (Join-Path $client '*.dll') -Destination (Join-Path $root 'bin') -Force
-& dotnet (Join-Path $root 'bin/UploadProbe.dll') (Join-Path $root 'measurement.json') $SourceSha *> (Join-Path $root 'measurement.log')
-if ($LASTEXITCODE -ne 0) { throw 'Native upload measurement failed; inspect measurement.log.' }
+$previousFallback = [Environment]::GetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK')
+try {
+    [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $(if ($StaticBufferUploadFallback) {'1'} else {$null}))
+    $probeWorkload = if ($Workload -eq 'StaticGeometry') {'static-geometry'} else {'texture'}
+    & dotnet (Join-Path $root 'bin/UploadProbe.dll') (Join-Path $root 'measurement.json') $SourceSha $probeWorkload *> (Join-Path $root 'measurement.log')
+    if ($LASTEXITCODE -ne 0) { throw 'Native upload measurement failed; inspect measurement.log.' }
+} finally {
+    [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $previousFallback)
+}
 Get-Content -LiteralPath (Join-Path $root 'measurement.json') -Raw
