@@ -5,6 +5,7 @@ param(
     [string]$OutputRoot = 'artifacts/rts-reference',
     [switch]$Capture,
     [switch]$Software,
+    [ValidateSet('Inherit','Default','Upload')][string]$StaticUploadFallback = 'Inherit',
     [string[]]$Scenes = @('DaylightTerrain','IndustrialBase','FormationConvoy','LogisticsCorridor','DamageDestruction','BattlefieldCombat'),
     [string[]]$Profiles = @('Low','Medium','High','Ultra'),
     [string[]]$Zooms = @('CloseTactical','NormalGameplay','Strategic'),
@@ -81,6 +82,10 @@ if ($Capture) {
     $stream = [IO.File]::Open($requestPath, [IO.FileMode]::CreateNew)
     try { $bytes = [Text.Encoding]::UTF8.GetBytes(($request | ConvertTo-Json -Depth 8)); $stream.Write($bytes) }
     finally { $stream.Dispose() }
+    $oldFallback = [Environment]::GetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', 'Process')
+    try {
+        if ($StaticUploadFallback -eq 'Default') { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $null, 'Process') }
+        elseif ($StaticUploadFallback -eq 'Upload') { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', '1', 'Process') }
     if ($ClientPath) {
         # A GUI apphost invoked outside a pipeline can return before its process exits.
         & ([IO.Path]::GetFullPath($ClientPath)) --reference-capture-request $requestPath | Out-Host
@@ -89,10 +94,12 @@ if ($Capture) {
             --configuration $Configuration --no-build -- --reference-capture-request $requestPath
     }
     if ($LASTEXITCODE -ne 0) { throw "Native reference capture failed; inspect $referenceRoot/failure.json and client output." }
+    } finally { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $oldFallback, 'Process') }
+
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return
 }
-if ($null -ne $MechanicalSeconds -or $Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath -or $CinematicFrontend -or ($UiScenarios -join ',') -ne 'World' -or ($UiScales -join ',') -ne '1') { throw 'Capture options require explicit -Capture mode.' }
+if ($StaticUploadFallback -ne 'Inherit' -or $null -ne $MechanicalSeconds -or $Software -or $BaselineRoot -or $RasterDpi -or $YawDegrees -ne 45 -or $InspectionDistanceMeters -ne 0 -or $RunProfile -ne 'Warm' -or $CameraPath -ne 'Fixed' -or $RuntimeAssetRoot -or $ClientPath -or $CinematicFrontend -or ($UiScenarios -join ',') -ne 'World' -or ($UiScales -join ',') -ne '1') { throw 'Capture options require explicit -Capture mode.' }
 $displays = @(@(1920, 1080), @(2560, 1440), @(3840, 2160), @(3440, 1440))
 foreach ($display in $displays) {
     foreach ($zoom in @('CloseTactical', 'NormalGameplay', 'Strategic')) {
