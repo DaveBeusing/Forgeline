@@ -229,3 +229,13 @@ Portable local deliverables, retained independently of repository source scope:
 The first archive preserves original native/comparator schemas and raw data, not
 a competing collector. The second preserves the full-resolution PNGs for review.
 Neither is an automatically accepted golden or a claim of whole-match throughput.
+
+## PR integration after measurement
+
+Before publication, master advanced to f4a5e8c573f13c3eea43ce94d61c8035ddaec6aa
+(version 0.1.533), integrating the separate instancing, static-geometry and snapshot-
+correspondence qualification PRs. This branch merges that source and allocates
+version 0.1.534. The 64-capture evidence above remains attributed to e01365a5
+(version 0.1.531); it does not qualify this later combined source or claim a
+combined optimization gain. Native combined-source qualification remains a
+separate integration step.
