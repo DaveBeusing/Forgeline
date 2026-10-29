@@ -344,3 +344,8 @@ See [committed inbound admission](adr/CommittedInboundStorageAdmission.md).
 ## Cooperative replay verification
 
 Headless load and replay now use the existing shutdown token. PlayReplayCancellable and PlayDeveloperReplayCancellable retain isolated reconstruction, capability and final full-hash checks, with optional completed-tick progress and bounded intermediate comparison samples. See [Deterministic command replay](DeterministicCommandReplay.md) for command admission semantics, sample normalization, stop behavior and determinism limits. Envelope 1, payload 11 and authoritative schema 18 remain unchanged.
+
+
+## Generated map package identity
+
+Explicit generated-map hosts first validate a GeneratedMapPackage with their expected asset content signature, then pass its CreateComposition result through the existing resolver. ScenarioIdentity.Generated binds generator version, map seed, gameplay/visual hashes, canonical manifest hash and asset identity. The complete identity is captured in saves/replays and compared before terrain/runtime allocation. Generated keys require this record; the default authored registry does not resolve them. No saved path, type or script is executed, and no fallback map is selected. Authored identities omit the optional field, retaining their existing bytes and compatibility gates. See [generated battlefield maps](GeneratedBattlefieldMaps.md) for package limits and CLI recovery examples.
