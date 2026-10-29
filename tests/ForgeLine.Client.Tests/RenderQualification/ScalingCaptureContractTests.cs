@@ -55,7 +55,7 @@ public sealed class ScalingCaptureContractTests
         Assert.Equal(1, timing.GetProperty("zeroDurationObservations").GetInt64());
         Assert.Equal(1, timing.GetProperty("missingFrequencyObservations").GetInt64());
         Assert.Equal(1, timing.GetProperty("duplicateOrOlderObservations").GetInt64());
-        Assert.Equal(0, root.GetProperty("cpuPasses").GetProperty("preparation").GetProperty("samples").GetInt32());
+        Assert.False(root.GetProperty("cpuPasses").TryGetProperty("preparation", out _));
         Assert.Equal(1000000UL, root.GetProperty("gpuFrames")[0].GetProperty("timestampFrequencyHz").GetUInt64());
     }
 

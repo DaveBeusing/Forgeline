@@ -69,8 +69,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
         {
             world = CpuValues(x => x.WorldMilliseconds), overlay = CpuValues(x => x.OverlayMilliseconds),
             composite = CpuValues(x => x.CompositeMilliseconds), shadows = CpuValues(x => x.ShadowMilliseconds),
-            present = CpuValues(x => x.PresentMilliseconds), frameReuseWait = CpuValues(x => x.FrameWaitMilliseconds),
-            preparation = VisualReferenceCapture.Distribution([])
+            present = CpuValues(x => x.PresentMilliseconds), frameReuseWait = CpuValues(x => x.FrameWaitMilliseconds)
         },
         gpu = VisualReferenceCapture.Distribution(_gpu.Select(x => x.FrameMilliseconds).ToArray()),
         gpuPasses = new
@@ -85,7 +84,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             zeroDurationObservations = _zero, missingFrequencyObservations = _missingFrequency,
             unobservedFenceValues = _unobservedFenceValues,
             unavailableReason = _gpu.Count > 0 ? null : diagnostics.Frame?.GpuTimingUnavailableReason ?? "No distinct completed GPU samples observed.",
-            method = "Direct-queue ticks * 1000 / frequency; readback only after submission fence completion. Warmup fences excluded. Latest completed diagnostics may skip intermediate fences; sample counts are explicit. Fence-value gaps are not a count of lost rendered frames: other queue submissions may occupy values. Passes can overlap and must not be summed. Present/reuse waits are subsets of RenderFrame. Preparation is unavailable until separately instrumented." }
+            method = "Direct-queue ticks * 1000 / frequency; readback only after submission fence completion. Warmup fences excluded. Latest completed diagnostics may skip intermediate fences; sample counts are explicit. Fence-value gaps are not a count of lost rendered frames: other queue submissions may occupy values. Passes can overlap and must not be summed. Present/reuse waits are subsets of RenderFrame. Existing preparation/recording phase timings remain in cpuFrames[].submission.assetPreparation." }
     };
 
     private static int ValidateCapacity(int capacity)

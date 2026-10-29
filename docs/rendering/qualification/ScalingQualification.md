@@ -100,8 +100,10 @@ remain authoritative. Zero samples produce null distributions, never zero cost.
 RenderFrame CPU includes preparation performed inside that existing bracket,
 recording/submission, Present and slot reuse waits. Present/reuse are overlapping
 subsets, not additions. Current-thread allocation excludes workers/native heaps.
-Standalone preparation timing remains an explicitly unavailable/null scope until
-serial host instrumentation is provided. Renderer initialization/startup and
+Preparation/recording/submit/retire phase timings already exist in each raw
+cpuFrames[].submission.assetPreparation record and are reused without another
+host instrument. Their render-session boundary is distinct from whole-match
+throughput. Renderer initialization/startup and
 readback/PNG/hash/export remain separate from steady state. GPU world, overlays,
 composite, shadows, particles and atmosphere can overlap and must not be summed.
 
