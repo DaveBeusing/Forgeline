@@ -1,0 +1,9 @@
+# Snapshot correspondence package
+
+Technical owner: `SnapshotCorrespondenceQualification`. Own only RenderWorld, RenderSnapshotIndex, SnapshotIdentityOrder, exact correspondence tests, the planned dedicated CPU benchmark and the new qualification document. [Ownership.json](Ownership.json) deliberately excludes extraction, publication/mailbox lifetime, visibility indexing, renderer/Graphics, host wiring and benchmark dispatch.
+
+The O(n+m) preparation and O(1) per-index predecessor mapping already exist. Validate instead of rebuilding that foundation. Repair the demonstrated unsorted-current FindCurrent mismatch with reference-result tests so per-index and by-entity access agree for valid supported identities. Keep generation-aware matching and the established predecessor duplicate policy; never reorder published arrays or interpolate a recycled index/new session against old state.
+
+Cover alpha endpoints/intermediate values, empty/first snapshots, additions/removals, generation churn, sorted/reversed current order, skipped/stale/equal ticks and session changes. Preserve transform/mechanical/aim interpolation and existing VFX/decal/decoration exceptions. Use two distinct populated immutable states as defined by [Protocol.json](Protocol.json); first-snapshot-only work is not a correspondence benchmark.
+
+Measure accepted Update/preparation and capacity growth separately from repeated per-index/by-entity frame lookup at ratios 1/3/7 and 1k/10k/100k. Record allocations and retained capacity, with churn separately named. Improvements require a named same-work parent/reference; CPU/null-context evidence has no GPU timings. Pooling, copy elimination and simulation threading require another lifecycle decision. Deliver CorrespondenceQualification, exact checks and reproducible CPU data before requesting serial integration.

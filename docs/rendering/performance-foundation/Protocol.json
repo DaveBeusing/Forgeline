@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "fixtureVersion": 1,
+  "status": "frozen-definition-for-dependent-implementation",
+  "sourceCheckpoint": "63d63a3d8d2977dfff37a851d30ee4e3428b7843",
+  "baselineCatalogContentSignature": "135b44877d4882ac539073738a43af7b4794ff35819cc2c1f55c353771743020",
+  "native": {
+    "rootCounts": [
+      1000,
+      10000,
+      100000
+    ],
+    "visibility": [
+      "High",
+      "Low"
+    ],
+    "cameraPaths": [
+      "Fixed",
+      "Sweep"
+    ],
+    "cameraPathVersion": 1,
+    "zoom": "NormalGameplay",
+    "distanceMeters": 420,
+    "resolution": [
+      1920,
+      1080
+    ],
+    "quality": "Medium",
+    "resolutionScale": 1,
+    "vsync": false,
+    "debugLayer": false,
+    "overlays": "Existing World reference UI held constant; report overlay scope separately.",
+    "warmupFrames": 128,
+    "samples": 512,
+    "independentProcessesPerVariant": 2,
+    "pairedOrder": [
+      "baseline-a",
+      "candidate-a",
+      "candidate-b",
+      "baseline-b"
+    ],
+    "repeatReadbacks": 2,
+    "renderAlpha": 1,
+    "terrainModes": [
+      "CanonicalTerrainWithObjects",
+      "CanonicalTerrainOnly"
+    ],
+    "shadowPolicy": "Resolved Medium budgets unchanged; count actual expanded casters and parts, not source roots."
+  },
+  "snapshotPair": {
+    "previousTick": 31,
+    "currentTick": 32,
+    "tickMilliseconds": 50,
+    "session": 1,
+    "entityIdentity": "EntityId((uint)(i+1),1), i=0..N-1. Current generation increments to 2 on i%10==0 only in the separate GenerationChurn CPU cohort.",
+    "ownership": "Independent immutable PresentationSnapshot instances; preserve arrays and reader lifetime. ReferenceSnapshotHistory creates correspondence before timing.",
+    "maximumRoots": 100000
+  },
+  "placement": {
+    "seed": 2026,
+    "target": "(650, canonical terrain height at 650/520, 520)",
+    "side": "ceil(sqrt(N))",
+    "grid": "x=(i%side-(side-1)/2f)*0.1f; z=(i/side-(side-1)/2f)*0.1f",
+    "hash": "unchecked uint h=(uint)i+2026; h^=h>>16; h*=0x7feb352d; h^=h>>15; h*=0x846ca68b; h^=h>>16",
+    "jitter": "x+=((int)(h&1023)-512)/1024f*.01f; z+=((int)((h>>10)&1023)-512)/1024f*.01f",
+    "previous": "Position=target+(x,0,z); yaw=0; scale=(.1,.12,.1)",
+    "current": "Position=previous+(.02,0,.03); yaw=.01 radians; scale unchanged",
+    "lowVisibility": "For i%10!=0 add (4000,0,0) to BOTH states. This is a render-only off-frustum control, not gameplay geography.",
+    "geometry": "One resolved compiled crate mesh/LOD and material binding for every synthetic root, no skin/mechanical expansion or wind. Use existing production vertex and 112-byte instance streams. Record resolved mesh/material identities and verify one compatible visible batch per pass, subject to current shadow budgets.",
+    "caveat": "High/Low name the intended distribution, not an invented exact visible count. Retain actual candidates, visible roots and expanded parts for every frame."
+  },
+  "cpu": {
+    "counts": [
+      1000,
+      10000,
+      100000
+    ],
+    "renderFramesPerTick": [
+      1,
+      3,
+      7
+    ],
+    "alphas": [
+      0,
+      0.25,
+      0.5,
+      1
+    ],
+    "orders": [
+      "Sorted",
+      "CurrentReversed"
+    ],
+    "populations": [
+      "Stable",
+      "GenerationChurn",
+      "OneRemovalOneAddition"
+    ],
+    "churn": "GenerationChurn follows snapshotPair. OneRemovalOneAddition changes current IDs to 2..N+1, keeps N roots, preserves generation-aware matching.",
+    "separation": "Measure correspondence Update/preparation, capacity growth and retained bytes separately from repeated per-index and by-entity interpolation. Null-context/CPU results never acquire GPU milliseconds."
+  },
+  "isolation": {
+    "submission": "Current indexed instancing is the baseline. Historical/diagnostic alternatives require an explicitly named same-work reference; no unimplemented legacy-mode flag is assumed.",
+    "staticMemory": "Default behavior versus FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK=1, captured at process creation; restore unset afterwards.",
+    "correspondence": "Compare a named parent build or test-only reference with identical populated histories; never first-snapshot-only work.",
+    "combined": "Only after each isolated comparison and serial integration."
+  },
+  "metrics": {
+    "cpu": "Prepare, RenderFrame/recording, Present/reuse waits and caller allocation scopes separately. Existing native CPU bracket is RenderFrame, not simulation time.",
+    "gpu": "Actual direct-queue frequency and distinct completed fence IDs. Drain warmup and final results outside timing. Latest-completion diagnostics may skip completions; preserve actual sample counts and null unavailable scopes.",
+    "counts": "Source roots, expanded mechanical parts, visible/candidate roots, compatible batches/draws and main/shadow submissions separately.",
+    "memory": "Instance traffic/capacity, logical texture/mesh bytes, native upload arena destination/staging bytes, peaks/pressure waits and DXGI usage are distinct, overlapping categories.",
+    "limits": "SkinUploadBytes currently reports retained skin-buffer bytes; do not label it per-frame traffic. Missing counters/UMA query results stay explicitly unavailable and return to the serial owner if a shared API is needed.",
+    "statistics": "Preserve per-frame chronology plus mean/p50/p95/p99 and allocation distributions. Existing native collector lower-median/nearest-rank definitions remain unchanged."
+  },
+  "acceptance": {
+    "performanceGate": "Existing opt-in 15% comparator, no automatic baseline adoption or universal CI threshold.",
+    "images": "Existing exact repeated readbacks and reviewed cross-run pixel comparator. Structural equality is not human art acceptance.",
+    "unavailable": "WARP/null contexts, missing GPU samples, mismatched source/payload/hardware/settings or unimplemented fixture controls cannot qualify as hardware performance.",
+    "implementation": "This file defines the future scaling matrix. Current executable workloads are Representative/Vehicles1000; NativeScalingQualification implements and validates the new fixture within its exact scope."
+  }
+}
