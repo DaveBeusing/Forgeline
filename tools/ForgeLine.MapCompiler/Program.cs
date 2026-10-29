@@ -18,6 +18,7 @@ internal static class Program
     {
         try
         {
+            if (args.Contains("--generate-terrain", StringComparer.Ordinal)) return ProceduralTerrainCommand.Run(args);
             if (args.Contains("--audit-all", StringComparer.Ordinal)) return StrategicMapAuditCommand.Run(args);
 
             CompilerOptions options =
