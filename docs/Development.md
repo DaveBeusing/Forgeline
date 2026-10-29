@@ -54,12 +54,15 @@ pwsh ./build/Test-RuntimeAssetPipeline.ps1
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
-dotnet test --solution ForgeLine.sln --configuration Release --no-build
+dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
 pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/match.json
 ```
 
 The GitHub Actions CI workflow executes this sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
+
+
+The solution test command uses the existing CI limit of one test module at a time. Native desktop consumers and bounded client/simulation waits share machine resources; independently parallel modules can exhaust those waits. This schedules the complete suite without changing test filters, assertions, time limits or the natural terminal-match gate.
 
 ## Pull Requests and Required Check
 
