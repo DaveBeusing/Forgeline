@@ -44,12 +44,6 @@ public static class GeneratedMapCompiler
         if (result.Layout is not { } layout)
             throw new InvalidDataException("Generated map qualification failed: " + string.Join("; ", result.Attempts.Select(a => a.Code + ": " + a.Message)));
         var map = WithTacticalAreas(layout.Definition);
-        // The complete gameplay geography passes the same gates after tactical composition.
-        BattlefieldValidator.ValidateDefinition(map);
-        var geography = BattlefieldOperationalGeographyValidator.Validate(map, terrain);
-        var audit = StrategicMapAudit.Analyze(map, terrain, cancellationToken: cancellationToken);
-        if (audit.ErrorCount != 0 || audit.WarningCount != 0)
-            throw new InvalidDataException("Generated map failed the complete strategic audit.");
 
         byte[] geographyBytes = Serialize(new
         {
@@ -89,6 +83,12 @@ public static class GeneratedMapCompiler
             recipe.ScatterDensityPermille, recipe.MaximumScatterInstances,
             AssetSha256 = assetSha256, BiomeSha256 = biomeSha, DecorationSha256 = decorationSha
         }));
+        // The complete gameplay geography passes the same gates after all generation stages.
+        BattlefieldValidator.ValidateDefinition(map);
+        var geography = BattlefieldOperationalGeographyValidator.Validate(map, terrain);
+        var audit = StrategicMapAudit.Analyze(map, terrain, cancellationToken: cancellationToken);
+        if (audit.ErrorCount != 0 || audit.WarningCount != 0)
+            throw new InvalidDataException("Generated map failed the complete strategic audit.");
         var manifest = new GeneratedMapManifest(1, recipe, assetSha256, contentSha, gameplay, visual,
             biomeSha, decorationSha, instances, geographyBlob, terrainBlob);
         return new(manifest, map, terrain, biomes, clearance, geographyBytes, terrainBytes, geography, audit);
