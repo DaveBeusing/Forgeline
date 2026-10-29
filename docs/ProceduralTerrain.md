@@ -151,3 +151,29 @@ CI after the Release build. Existing authored-map hashes, full tests, headless,
 asset, package and natural terminal-match gates remain unchanged. Full required
 `build-test` and physical graphics acceptance are separate from local World
 qualification. There is no graphics, gameplay-map or balance acceptance claim.
+
+## Current integration and required CI
+
+The branch also integrates master `fd551f265375c73f75f131b96d289de0dbc6c106`,
+preserving biome fields, environment variants, strategic geography and their
+existing CI gates. The combined World suite passes all 75 Release cases locally.
+The final PR version is one PATCH above this master's 0.1.522.
+
+On terrain head `33724a46d2a78db8c68e9a517e2c9b5b9e6668b9`, the
+[complete CI run](https://github.com/DaveBeusing/Forgeline/actions/runs/40787933032/job/123165829010)
+passed the full Release build, terrain export, both authored map qualifications,
+compiled scenario recovery, runtime assets, WARP/headless and save/replay smoke
+steps. Its solution test step finished with 4,616 passed, one failed and 76
+conditional skips. The failure was
+`BattlefieldStatusNativeTests.NativeStatusIsRepeatableAndHiddenOrStaleFactsDoNotPaint`
+at distance 1000, DPI 192, scale 2: expected one status marker, actual zero,
+line 26 of the unchanged presentation test.
+
+The [unchanged master CI](https://github.com/DaveBeusing/Forgeline/actions/runs/40833193453/job/123311852436)
+on `fd551f2` reproduces that exact test, parameter set, line and assertion
+(4,613 passed, one failed, 76 skipped). This establishes an independent native
+HUD baseline failure. The new terrain factory is not called by that fixture.
+Keep the PR unmerged while the required check is red. Subsequent package and
+natural terminal-match steps did not execute after the failed solution test;
+their success is not claimed. Fresh CI on the final synchronized head is still
+required, and physical graphics qualification remains separate.
