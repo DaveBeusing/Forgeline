@@ -293,7 +293,7 @@ public sealed class NativeUploadSchedulingTests
             format == GraphicsTextureFormat.Bc7Unorm ? 4 : 7, format, GraphicsTextureColorSpace.Linear, 3) { DeferUploadWait = defer }, mips);
     }
 
-    private sealed class NativeFixture : IDisposable
+    internal sealed class NativeFixture : IDisposable
     {
         private readonly WindowsPlatform _platform = new();
         private readonly IWindow _window;
