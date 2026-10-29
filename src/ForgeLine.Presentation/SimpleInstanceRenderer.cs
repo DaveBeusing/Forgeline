@@ -272,7 +272,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         LastShadowDiagnostics = LastDiagnostics;
         if (world.CurrentSnapshot?.ChunkDecorations is not null)
             (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).RenderShadow(context, camera, world, frame,
-                Math.Max(0, maximumCasters - LastDiagnostics.VisibleInstances), Math.Max(0, maximumDraws - LastDiagnostics.DrawCalls), presentationSeconds);
+                Math.Max(0, maximumCasters - WorkMetrics.DrawnParts), Math.Max(0, maximumDraws - LastDiagnostics.DrawCalls), presentationSeconds);
         LastDiagnostics = prior;
         ResourceDiagnostics = priorResources;
     }
