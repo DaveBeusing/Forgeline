@@ -63,32 +63,57 @@ internal static class FrontendPresentationAdapter
         return FrontendSurfaceView.PauseMenu(entries);
     }
 
-    internal static FrontendSurfaceView NewGame(
-        NewGameModel model) =>
-        FrontendSurfaceView.Detail(
-            "NEW GAME",
-            [
-                new FrontendDetailLineView(
-                    "BATTLEFIELD",
-                    model.Configuration.MapName),
-                .. (string.IsNullOrEmpty(model.SelectedScenario.Description) ? Array.Empty<FrontendDetailLineView>()
-                    : [new FrontendDetailLineView("GEOGRAPHY", model.SelectedScenario.Description)]),
-                new FrontendDetailLineView(
-                    "FACTION",
-                    model.Configuration.FactionName),
-                new FrontendDetailLineView(
-                    "SEED",
-                    model.Configuration.Seed.ToString(
-                        System.Globalization.CultureInfo.InvariantCulture),
-                    IsFocused: true,
-                    CanDecrease: model.Configuration.Seed > 0,
-                    CanIncrease: model.Configuration.Seed < ulong.MaxValue)
-            ],
-            model.CanStartSelectedScenario
-                ? "UP/DOWN  SCENARIO     LEFT/RIGHT  SEED     ENTER  START     ESC  BACK"
-                : model.SelectedScenario.Error ?? "SCENARIO UNAVAILABLE",
-            model.CanStartSelectedScenario ? "START" : string.Empty)
-        with { DisabledPrimaryAction = model.CanStartSelectedScenario ? string.Empty : "START" };
+    internal static FrontendSurfaceView NewGame(NewGameModel model)
+    {
+        string Text(string key) => SeededSkirmishText.Get(key);
+        var lines = new List<FrontendDetailLineView>();
+        void Add(string label, string value, bool selectable = false, bool decrease = false, bool increase = false,
+            bool warning = false, FrontendValueKind kind = FrontendValueKind.Text) => lines.Add(new(label, value, warning,
+                IsFocused: lines.Count == model.FocusedRow, CanDecrease: decrease, CanIncrease: increase,
+                IsSelectable: selectable, ValueKind: kind));
+        bool generated = model.MapKind == SkirmishMapKind.Generated;
+        bool busy = generated && model.Generated.Busy;
+        if (generated) Add(Text("MapKind"), Text("Generated"), !busy, !busy, !busy, kind: FrontendValueKind.Choice);
+        if (!generated)
+        {
+            Add("BATTLEFIELD", model.Configuration.MapName);
+            if (!string.IsNullOrEmpty(model.SelectedScenario.Description)) Add("GEOGRAPHY", model.SelectedScenario.Description);
+            Add("FACTION", model.Configuration.FactionName);
+            Add("SEED", model.Configuration.Seed.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                decrease: model.Configuration.Seed > 0, increase: model.Configuration.Seed < ulong.MaxValue);
+            Add(Text("MapKind"), Text("Authored"), true, true, true, kind: FrontendValueKind.Choice);
+            return FrontendSurfaceView.Detail("NEW GAME", lines.Skip(model.VisibleStart).Take(model.VisibleCapacity).ToArray(),
+                model.CanStartSelectedScenario ? "TAB  MAP SOURCE     UP/DOWN  SCENARIO     LEFT/RIGHT  SEED     ENTER  START" : model.SelectedScenario.Error ?? "SCENARIO UNAVAILABLE",
+                model.CanStartSelectedScenario ? "START" : string.Empty)
+                with { DisabledPrimaryAction = model.CanStartSelectedScenario ? string.Empty : "START", TotalDetailRows = lines.Count, DetailRowOffset = model.VisibleStart };
+        }
+        var draft = model.Generated;
+        string seed = draft.SeedText;
+        if (model.FocusedRow == 1 && !busy) seed = model.SeedSelectAll ? "[" + seed + "]" : seed + "|";
+        Add(Text("Seed"), seed, !busy);
+        Add(Text("Size"), $"{draft.SizeInChunks * 256} X {draft.SizeInChunks * 256} M", !busy,
+            !busy && draft.SizeInChunks > 8, !busy && draft.SizeInChunks < 16, kind: FrontendValueKind.Choice);
+        Add(Text("Profile"), Text(draft.Profile == SeededSkirmishProfile.Temperate ? "Temperate" : "Sparse"), !busy, !busy, !busy, kind: FrontendValueKind.Choice);
+        Add(Text("Players"), draft.Players.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        Add(Text("Randomize"), Text("Action"), !busy);
+        Add(Text("Copy"), Text("Action"), !busy);
+        Add(Text("Paste"), Text("Action"), !busy);
+        Add(Text("State"), Text(draft.State.ToString()), warning: draft.State == SeededSkirmishState.Failed);
+        Add(Text("Generator"), GeneratedMapRecipe.CurrentVersion.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        for (int part = 0; part < 4; part++) Add($"GAMEPLAY SHA-256 {part + 1}/4", draft.Identity is { } identity ? identity.GameplaySha256.Substring(part * 16, 16) : "-");
+        for (int part = 0; part < 4; part++) Add($"VISUAL SHA-256 {part + 1}/4", draft.Identity is { } identity ? identity.VisualSha256.Substring(part * 16, 16) : "-");
+        bool valid = draft.TryCreateRecipe(out _);
+        string footer = !string.IsNullOrEmpty(draft.Feedback) ? draft.Feedback : busy ? Text(draft.State.ToString()) :
+            draft.Ready ? $"V{draft.Identity!.Value.GeneratorVersion} / SHA-256 {draft.Identity.Value.GameplaySha256[..16]} / " + Text("GeneratedFooter") :
+            Text(model.FocusedRow == 1 ? "SeedFooter" : "GeneratedFooter");
+        return FrontendSurfaceView.Detail("NEW GAME", lines.Skip(model.VisibleStart).Take(model.VisibleCapacity).ToArray(), footer,
+            busy || !valid ? string.Empty : Text(draft.Ready ? "Start" : "Validate"), Text(busy ? "Cancel" : "Back")) with
+        {
+            DisabledPrimaryAction = busy || !valid ? Text("Validate") : string.Empty,
+            TotalDetailRows = lines.Count, DetailRowOffset = model.VisibleStart,
+            IsError = draft.State == SeededSkirmishState.Failed || !valid
+        };
+    }
 
     internal static FrontendSurfaceView LoadGame(
         LoadGameModel model, int visibleRows = FrontendDesign.MaximumVisibleDetailRows)
