@@ -107,6 +107,14 @@ jobs:
         run: |
           dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BiomeTerrainMaterialTests ForgeLine.Presentation.Tests.BiomeTerrainMaterialNativeTests ForgeLine.Presentation.Tests.TerrainSplatMapTests ForgeLine.Presentation.Tests.TerrainTransitionTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Chunk decoration rendering contracts
+        shell: pwsh
+        env:
+          FORGELINE_DECORATION_CAPTURE: artifacts/chunk-decoration
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.ChunkDecorationTests ForgeLine.Presentation.Tests.ChunkDecorationNativeTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Fair opponent profiles and legal counterplay
         shell: pwsh
         run: |
@@ -562,6 +570,7 @@ jobs:
             artifacts/maps/*.json
             artifacts/procedural-terrain/**
             artifacts/environment-scatter/**
+            artifacts/chunk-decoration/**
             artifacts/pacing-quick/**
             artifacts/pacing-contracts/**
             artifacts/visual-reference-warp/**
