@@ -49,3 +49,9 @@ The final rendering/package source is 703aaf89f092e832e8d6830a023074fa3169d026. 
 The clean-source development package passes two-publish reproducibility, qualifies 492 assets, starts from an extracted install with 1,000 extra development instances, and produces two scaled Medium reference images matching the prior source pixel/PNG hashes. The separate headless run completes 16 ticks with 10,000 lightweight entities and no pending commands; it has no active gameplay systems, so it is not a large battle simulation test. Hardware cohorts contain eight-repeat native reference captures across Medium camera sweeps and Low/High/Ultra zooms. Software requests Ultra/75% resolve to Low/Quarter textures with native overlays and two matching readbacks.
 
 Scaled Medium composition observations are 0.769 ms for repeated units versus 0.697 ms in the baseline, and 0.368 versus 0.366 ms for the industrial scene. This single pair is a cost observation rather than a performance gate or art approval. Depth weighting uses a 5% remaining-depth tolerance with a 0.00001 normalized-depth floor; shallow distant depth discontinuities and transparent content can still blend. No additional target or history payload is allocated.
+
+## Chunk decoration rendering
+
+The opt-in [chunk decoration render connection](ChunkDecorationRendering.md) consumes
+copied public scatter snapshots through the existing Windows instancing, LOD, wind and
+shadow paths. Separate bounded render residency preserves gameplay and authored inputs.
