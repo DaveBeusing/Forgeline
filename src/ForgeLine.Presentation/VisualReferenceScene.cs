@@ -18,6 +18,10 @@ public enum VisualReferenceSceneKind { DaylightTerrain, IndustrialBase, Formatio
 public sealed record VisualReferenceScene(VisualReferenceSceneKind Kind, Vector3 Target,
     PresentationSnapshot Snapshot, EntityId HiddenEnemy, string Fingerprint)
 {
+    // Optional immutable history for reference fixtures that exercise correspondence.
+    // Existing scenes keep their single-snapshot behavior and identity.
+    public PresentationSnapshot? PreviousSnapshot { get; init; }
+
     private static readonly JsonSerializerOptions FingerprintOptions = new() { IncludeFields = true };
     public const ulong Seed = 2026;
     public const int FixedTick = 32;

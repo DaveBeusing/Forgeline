@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "repository": "DaveBeusing/Forgeline",
+  "analysisBaseSha": "63d63a3d8d2977dfff37a851d30ee4e3428b7843",
+  "sourceVersion": "0.1.529",
+  "status": "scopes-defined-pending-foundation-integration",
+  "parallelReleased": false,
+  "parallelStartCondition": "Integrate this foundation and its shared snapshot-history prerequisite first; recheck current master, required build-test and overlapping work. This is a technical write-scope release, not acceptance of historical performance or a waiver of required checks.",
+  "legacyManifest": "docs/rendering/parallelization/ParallelRenderOwnership.json",
+  "legacyManifestBlobSha": "7b52eec8896de6e235118a7a2575091a21ab80fd",
+  "legacyRelationship": "These narrower scopes coordinate a new bounded qualification effort. They do not release the historical eight lanes concurrently or modify their historical acceptance records.",
+  "frozenParallelExact": [
+    "Directory.Build.props",
+    "Directory.Packages.props",
+    "global.json",
+    "ForgeLine.sln",
+    "ForgeLine.slnx",
+    ".github/workflows/ci.yml",
+    ".github/workflows/frame-hotpaths.yml",
+    ".github/workflows/scalability.yml",
+    "src/ForgeLine.Client/ClientRenderHost.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/Program.cs",
+    "src/ForgeLine.Graphics/IGraphicsDevice.cs",
+    "src/ForgeLine.Graphics/IGraphicsCommandContext.cs",
+    "src/ForgeLine.Graphics/GraphicsDiagnostics.cs",
+    "src/ForgeLine.Graphics/GraphicsTextureData.cs",
+    "src/ForgeLine.Graphics/GraphicsBufferDescription.cs",
+    "src/ForgeLine.Graphics/GraphicsPipelineDescription.cs",
+    "src/ForgeLine.Graphics/GraphicsFramePlan.cs",
+    "src/ForgeLine.Graphics/GraphicsConfiguration.cs",
+    "src/ForgeLine.Graphics/GraphicsPostProcessingSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsSceneOutputSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsDirectionalShadowSettings.cs",
+    "src/ForgeLine.Graphics/GraphicsAtmosphereSettings.cs",
+    "README.md",
+    "docs/Development.md",
+    "docs/Architecture.md",
+    "docs/GraphicsReferencePerformance.md",
+    "docs/AssetPipeline.md",
+    "src/ForgeLine.Client/VisualReferenceCapture.cs",
+    "src/ForgeLine.Assets/RuntimeSkinData.cs",
+    "src/ForgeLine.Assets/RuntimeAnimationData.cs",
+    "src/ForgeLine.Presentation/TerrainRenderer.cs",
+    "src/ForgeLine.Presentation/InstanceSubmissionMetrics.cs",
+    "src/ForgeLine.Presentation/RenderAssetSession.cs",
+    "src/ForgeLine.Presentation/RuntimeWorldAssetResources.cs",
+    "src/ForgeLine.Presentation/SkinFrameCache.cs",
+    "src/ForgeLine.Presentation/InstanceMaterialPipeline.cs",
+    "src/ForgeLine.Presentation/DirectionalShadowCasterPipeline.cs",
+    "src/ForgeLine.Client/ReferenceSnapshotHistory.cs",
+    "tests/ForgeLine.Client.Tests/RenderParallelization/ReferenceSnapshotHistoryTests.cs",
+    "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+    "src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs",
+    "src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs",
+    "src/ForgeLine.Graphics/D3D12GraphicsTexture.cs",
+    "src/ForgeLine.Graphics/D3D12GraphicsPipeline.cs",
+    "src/ForgeLine.Graphics/GraphicsResourceRetirement.cs",
+    "src/ForgeLine.Graphics/GraphicsSurfaceLifecycleState.cs",
+    "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+    "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+    "tests/ForgeLine.Presentation.Tests/RenderParallelization/ContractGraphicsDevice.cs",
+    "tests/ForgeLine.Graphics.Tests/RenderParallelization/InitializedStaticBufferTests.cs",
+    "tests/ForgeLine.Client.Tests/ClientRenderCompositionTests.cs",
+    "tests/ForgeLine.Client.Tests/ClientWorldPassSequenceTests.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/PresentationBenchmarks.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/TerrainBenchmarks.cs"
+  ],
+  "frozenParallelPrefixes": [
+    "src/ForgeLine.Graphics/RenderContracts/",
+    "src/ForgeLine.Presentation/RenderContracts/",
+    ".github/workflows/",
+    "src/ForgeLine.Presentation/TerrainResidency/"
+  ],
+  "frozenParallelSuffixes": [
+    ".csproj",
+    ".fsproj",
+    ".sln",
+    ".slnx"
+  ],
+  "serializedVersionException": {
+    "path": "Directory.Build.props",
+    "onePatchPerPr": true,
+    "duringParallelImplementation": false
+  },
+  "lanes": [
+    {
+      "name": "RenderingPerformanceFoundation",
+      "phase": "foundation",
+      "dependsOn": [],
+      "writeExact": [
+        "src/ForgeLine.Presentation/VisualReferenceScene.cs",
+        "src/ForgeLine.Client/VisualReferenceCapture.cs",
+        "src/ForgeLine.Client/ReferenceSnapshotHistory.cs",
+        "tests/ForgeLine.Client.Tests/RenderParallelization/ReferenceSnapshotHistoryTests.cs"
+      ],
+      "writePrefixes": [
+        "docs/rendering/performance-foundation/"
+      ]
+    },
+    {
+      "name": "InstancedSubmissionQualification",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderingPerformanceFoundation"
+      ],
+      "legacyOwner": "InstanceVisibilityBatchingAndSubmission",
+      "writeExact": [
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.Resources.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.Decorations.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.PreparationReuse.cs",
+        "src/ForgeLine.Presentation/InstanceVisibilityIndex.cs",
+        "src/ForgeLine.Presentation/RenderSubmission/PooledSubmissionList.cs",
+        "src/ForgeLine.Presentation/RenderSubmission/ShadowRootBudget.cs",
+        "src/ForgeLine.Presentation/RenderSubmission/SpatialSubmissionIndex.cs",
+        "src/ForgeLine.Presentation/RenderSubmission/SubmissionFrameCache.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/SubmissionGraphics.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/SubmissionReferenceTests.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/SubmissionSafetyTests.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/InstancingScalingTests.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/InstancingFrameReuseTests.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/InstanceSubmissionScalingBenchmarks.cs",
+        "docs/rendering/instance-submission/ScalingQualification.md"
+      ],
+      "writePrefixes": []
+    },
+    {
+      "name": "StaticGeometryQualification",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderingPerformanceFoundation"
+      ],
+      "legacyOwner": "GraphicsResourceLifetimeAndUploadScheduling",
+      "writeExact": [
+        "src/ForgeLine.Graphics/ResourceScheduling/D3D12UploadArena.cs",
+        "src/ForgeLine.Graphics/ResourceScheduling/UploadArenaLimits.cs",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/NativeUploadSchedulingTests.cs",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/UploadArenaLimitsTests.cs",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/StaticGeometryLifecycleTests.cs",
+        "build/rendering/resource-scheduling/Measure-Uploads.ps1",
+        "build/rendering/resource-scheduling/UploadProbe.cs",
+        "build/rendering/resource-scheduling/Retain-Evidence.py",
+        "docs/rendering/resource-scheduling/StaticGeometryQualification.md"
+      ],
+      "writePrefixes": []
+    },
+    {
+      "name": "SnapshotCorrespondenceQualification",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderingPerformanceFoundation"
+      ],
+      "legacyOwner": "RenderSnapshotPublicationAndAllocationControl",
+      "writeExact": [
+        "src/ForgeLine.Presentation/RenderWorld.cs",
+        "src/ForgeLine.Presentation/RenderSnapshotIndex.cs",
+        "src/ForgeLine.Presentation/SnapshotPublication/SnapshotIdentityOrder.cs",
+        "tests/ForgeLine.Presentation.Tests/SnapshotPublication/CorrespondenceContractTests.cs",
+        "tests/ForgeLine.Presentation.Tests/SnapshotPublication/CorrespondenceLookupTests.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/SnapshotCorrespondenceBenchmarks.cs",
+        "docs/rendering/snapshot-publication/CorrespondenceQualification.md"
+      ],
+      "writePrefixes": []
+    },
+    {
+      "name": "NativeScalingQualification",
+      "phase": "parallel",
+      "dependsOn": [
+        "RenderingPerformanceFoundation"
+      ],
+      "legacyOwner": "RenderPerformanceAndVisualQualification",
+      "writeExact": [
+        "build/Invoke-ReferencePerformance.ps1",
+        "build/Invoke-RtsReferenceQualification.ps1",
+        "build/Compare-ReferencePerformance.ps1",
+        "src/ForgeLine.Client/ReferencePerformanceSamples.cs",
+        "src/ForgeLine.Presentation/VisualReferenceScene.cs",
+        "src/ForgeLine.Presentation/RenderScalingReferenceScene.cs",
+        "tests/ForgeLine.Client.Tests/ReferencePerformanceSamplesTests.cs",
+        "tests/ForgeLine.Client.Tests/RenderQualification/ScalingCaptureContractTests.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderQualification/ScalingReferenceFixtureTests.cs",
+        "docs/rendering/qualification/ScalingQualification.md"
+      ],
+      "writePrefixes": []
+    },
+    {
+      "name": "RenderingPerformanceIntegration",
+      "phase": "integration",
+      "dependsOn": [
+        "InstancedSubmissionQualification",
+        "StaticGeometryQualification",
+        "SnapshotCorrespondenceQualification",
+        "NativeScalingQualification"
+      ],
+      "writeExact": [
+        "Directory.Build.props",
+        "Directory.Packages.props",
+        "global.json",
+        "ForgeLine.sln",
+        "ForgeLine.slnx",
+        ".github/workflows/ci.yml",
+        ".github/workflows/frame-hotpaths.yml",
+        ".github/workflows/scalability.yml",
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/Program.cs",
+        "src/ForgeLine.Graphics/IGraphicsDevice.cs",
+        "src/ForgeLine.Graphics/IGraphicsCommandContext.cs",
+        "src/ForgeLine.Graphics/GraphicsDiagnostics.cs",
+        "src/ForgeLine.Graphics/GraphicsTextureData.cs",
+        "src/ForgeLine.Graphics/GraphicsBufferDescription.cs",
+        "src/ForgeLine.Graphics/GraphicsPipelineDescription.cs",
+        "src/ForgeLine.Graphics/GraphicsFramePlan.cs",
+        "src/ForgeLine.Graphics/GraphicsConfiguration.cs",
+        "src/ForgeLine.Graphics/GraphicsPostProcessingSettings.cs",
+        "src/ForgeLine.Graphics/GraphicsSceneOutputSettings.cs",
+        "src/ForgeLine.Graphics/GraphicsDirectionalShadowSettings.cs",
+        "src/ForgeLine.Graphics/GraphicsAtmosphereSettings.cs",
+        "README.md",
+        "docs/Development.md",
+        "docs/Architecture.md",
+        "docs/GraphicsReferencePerformance.md",
+        "docs/AssetPipeline.md",
+        "src/ForgeLine.Client/VisualReferenceCapture.cs",
+        "src/ForgeLine.Assets/RuntimeSkinData.cs",
+        "src/ForgeLine.Assets/RuntimeAnimationData.cs",
+        "src/ForgeLine.Presentation/TerrainRenderer.cs",
+        "src/ForgeLine.Presentation/InstanceSubmissionMetrics.cs",
+        "src/ForgeLine.Presentation/RenderAssetSession.cs",
+        "src/ForgeLine.Presentation/RuntimeWorldAssetResources.cs",
+        "src/ForgeLine.Presentation/SkinFrameCache.cs",
+        "src/ForgeLine.Presentation/InstanceMaterialPipeline.cs",
+        "src/ForgeLine.Presentation/DirectionalShadowCasterPipeline.cs",
+        "src/ForgeLine.Client/ReferenceSnapshotHistory.cs",
+        "tests/ForgeLine.Client.Tests/RenderParallelization/ReferenceSnapshotHistoryTests.cs",
+        "docs/Graphics.md",
+        "docs/PresentationExtractionAndDebugging.md",
+        "build/Compare-VisualReferenceEvidence.ps1",
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsTexture.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsPipeline.cs",
+        "src/ForgeLine.Graphics/GraphicsResourceRetirement.cs",
+        "src/ForgeLine.Graphics/GraphicsSurfaceLifecycleState.cs",
+        "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "tests/ForgeLine.Presentation.Tests/RenderParallelization/ContractGraphicsDevice.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderParallelization/InitializedStaticBufferTests.cs",
+        "tests/ForgeLine.Client.Tests/ClientRenderCompositionTests.cs",
+        "tests/ForgeLine.Client.Tests/ClientWorldPassSequenceTests.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/PresentationBenchmarks.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/TerrainBenchmarks.cs"
+      ],
+      "writePrefixes": [
+        "docs/rendering/performance-integration/"
+      ]
+    }
+  ],
+  "serialDelegations": [
+    {
+      "package": "InstancedSubmissionQualification",
+      "reason": "Explicitly assigns current renderer partials and its dedicated CPU benchmark; no GPU layout or shared metric-shape changes."
+    },
+    {
+      "package": "StaticGeometryQualification",
+      "reason": "Only the upload-arena implementation and its limits/tests/probe are delegated; global device/context/lifetime files remain serial."
+    },
+    {
+      "package": "SnapshotCorrespondenceQualification",
+      "reason": "Correspondence files are a strict subset of the historical snapshot lane. Publication/extraction/lifetimes remain read-only."
+    },
+    {
+      "package": "NativeScalingQualification",
+      "reason": "Dedicated reference scripts/collector and fixture registration are explicitly delegated. VisualReferenceCapture and ReferenceSnapshotHistory stay serial; new scene enums append after existing values and preserve existing fixtures."
+    }
+  ],
+  "plannedNewExact": [
+    "tests/ForgeLine.Presentation.Tests/RenderSubmission/InstancingScalingTests.cs",
+    "tests/ForgeLine.Presentation.Tests/RenderSubmission/InstancingFrameReuseTests.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/InstanceSubmissionScalingBenchmarks.cs",
+    "docs/rendering/instance-submission/ScalingQualification.md",
+    "tests/ForgeLine.Graphics.Tests/ResourceScheduling/StaticGeometryLifecycleTests.cs",
+    "docs/rendering/resource-scheduling/StaticGeometryQualification.md",
+    "tests/ForgeLine.Presentation.Tests/SnapshotPublication/CorrespondenceLookupTests.cs",
+    "benchmarks/ForgeLine.Rendering.Benchmarks/SnapshotCorrespondenceBenchmarks.cs",
+    "docs/rendering/snapshot-publication/CorrespondenceQualification.md",
+    "src/ForgeLine.Presentation/RenderScalingReferenceScene.cs",
+    "tests/ForgeLine.Client.Tests/RenderQualification/ScalingCaptureContractTests.cs",
+    "tests/ForgeLine.Presentation.Tests/RenderQualification/ScalingReferenceFixtureTests.cs",
+    "docs/rendering/qualification/ScalingQualification.md"
+  ],
+  "plannedNewPrefixes": [],
+  "sharedDoubles": {
+    "policy": "All unassigned test doubles are read-only. These cross-surface contracts are reserved for serial changes; lane-local SubmissionGraphics remains with instancing.",
+    "exact": [
+      "tests/ForgeLine.Presentation.Tests/RenderParallelization/ContractGraphicsDevice.cs",
+      "tests/ForgeLine.Graphics.Tests/RenderParallelization/InitializedStaticBufferTests.cs",
+      "tests/ForgeLine.Client.Tests/ClientRenderCompositionTests.cs",
+      "tests/ForgeLine.Client.Tests/ClientWorldPassSequenceTests.cs",
+      "benchmarks/ForgeLine.Rendering.Benchmarks/PresentationBenchmarks.cs",
+      "benchmarks/ForgeLine.Rendering.Benchmarks/TerrainBenchmarks.cs"
+    ]
+  }
+}
