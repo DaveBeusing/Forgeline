@@ -225,3 +225,10 @@ diagnostics and bounded caching; rendering/scatter integration remains separate.
 The opt-in [seeded landform factory](ProceduralTerrain.md) implements a separate
 versioned height evaluator, flat/drainage masks and headless diagnostics on those
 contracts. Existing authored maps continue to use their original recipes.
+
+
+## Biome terrain materials
+
+The opt-in [biome terrain material profile](BiomeTerrainMaterials.md) blends the existing
+four-layer palette from environment fields and infrastructure masks. Authored renderer
+defaults remain compatible; generated scenes explicitly select the new profile ID.
