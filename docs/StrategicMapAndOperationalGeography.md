@@ -1,5 +1,9 @@
 # Strategic Map and Operational Geography
 
+The offline [procedural strategic layout stage](ProceduralStrategicGeography.md)
+uses the same definition, navigation and qualification boundaries. It does not
+change the authored maps or their runtime registration.
+
 ## Purpose
 
 Central Divide is the canonical FORGELINE Vertical Slice battlefield. It exists to validate economy, expansion, logistics, combat, intelligence, strategic infrastructure, hierarchical navigation, and opponent behavior on one shared operational geography.
