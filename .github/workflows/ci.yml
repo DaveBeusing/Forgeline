@@ -111,6 +111,16 @@ jobs:
           dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.SeededSkirmishTests ForgeLine.Client.Tests.SeededSkirmishNativeTests ForgeLine.Client.Tests.PracticeEntryTests --parallel none
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Procedural map golden seeds and headless recovery
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.GeneratedMapGoldenTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet tools/ForgeLine.MapCompiler/bin/Release/net10.0-windows/ForgeLine.MapCompiler.dll --qualify-generated-maps docs/qualification/procedural-map-seeds.json --output artifacts/procedural-map-qualification
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.TerrainRoadSegmentTests ForgeLine.Presentation.Tests.ChunkDecorationShadowBudgetTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Environment scatter placement contracts
         shell: pwsh
         run: |
@@ -587,6 +597,7 @@ jobs:
             artifacts/procedural-terrain/**
             artifacts/environment-scatter/**
             artifacts/generated-maps/**
+            artifacts/procedural-map-qualification/**
             artifacts/seeded-skirmish/**
             artifacts/chunk-decoration/**
             artifacts/pacing-quick/**
