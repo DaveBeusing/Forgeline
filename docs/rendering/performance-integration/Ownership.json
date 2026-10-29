@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "phase": "serial-integration",
+  "base": "af8aaac0f9425b077d3a4497271495c1fce00d87",
+  "integratedPullRequests": [439, 440, 441, 442, 443],
+  "concurrentPackagePullRequests": [],
+  "historicalManifest": "docs/rendering/performance-foundation/Ownership.json",
+  "resolution": "All four parallel packages are merged. Their historical manifests and measurements stay unchanged. This serial scope accepts the explicit static-particle-index handoff and the demonstrated reference-script environment-restoration defect; it does not reopen concurrent lane ownership.",
+  "writeExact": [
+    "Directory.Build.props",
+    "src/ForgeLine.Graphics/GpuParticleRenderer.cs",
+    "build/Invoke-RtsReferenceQualification.ps1",
+    "tests/ForgeLine.Graphics.Tests/ResourceScheduling/ParticleStaticGeometryIntegrationTests.cs",
+    "tests/ForgeLine.Client.Tests/RenderQualification/StaticUploadControlIntegrationTests.cs",
+    "docs/Graphics.md",
+    "docs/PresentationExtractionAndDebugging.md",
+    "docs/Development.md",
+    "docs/GraphicsReferencePerformance.md"
+  ],
+  "writePrefixes": ["docs/rendering/performance-integration/"],
+  "frozenContracts": [
+    "Graphics interfaces and GPU layouts",
+    "Prepare/Record/Submit/Retire and render-owner affinity",
+    "Separate main/shadow instance buffers and actual-frame retirement",
+    "Snapshot publication, identity, visibility and simulation authority",
+    "Existing optimized defaults, queues, budgets and acceptance thresholds"
+  ],
+  "validation": "Full canonical validation and focused lifecycle/correspondence/submission/collector checks; performance collection runs separately with validation disabled. The unchanged named master and frozen compiled clients retain their actual source identities."
+}
