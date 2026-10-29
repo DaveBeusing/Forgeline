@@ -40,7 +40,7 @@ try {
         & dotnet build ForgeLine.sln -c Release --no-restore "-p:SourceRevisionId=$SourceRevision"
         if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
     }
-    & dotnet tools/ForgeLine.MapCompiler/bin/Release/net10.0-windows/ForgeLine.MapCompiler.dll --qualify-generated-maps docs/qualification/procedural-map-seeds.json --output $OutputRoot
+    & dotnet tools/ForgeLine.MapCompiler/bin/Release/net10.0/ForgeLine.MapCompiler.dll --qualify-generated-maps docs/qualification/procedural-map-seeds.json --output $OutputRoot
     if ($LASTEXITCODE -ne 0) { throw 'Golden seed qualification failed.' }
     @{revision=$SourceRevision;mode=$sourceMode;sourceManifestSha256=$(if($SourceManifest){(Get-FileHash -LiteralPath $SourceManifest -Algorithm SHA256).Hash.ToLowerInvariant()}else{$null})} |
         ConvertTo-Json | Set-Content -LiteralPath (Join-Path $OutputRoot 'source.json') -Encoding utf8
