@@ -99,6 +99,10 @@ Final source checks: 46 project references with no cycles; nine ownership/factor
 
 Concurrent-work recheck: [PR #440](https://github.com/DaveBeusing/Forgeline/pull/440) contains only its instancing tests, CPU benchmark and qualification document plus Directory.Build.props. No delegated geometry path overlaps. Central version preparation remains serialized at integration; the PR merged second must rebase and allocate its one PATCH against the then-current master. Master is still a761969668136f32ce99438e4b6a407094c9567e; its full build-test is running at this recheck, with navigation and conveyor successful. No historical failure or partial result is represented as successful complete CI.
 
+## Integration refresh
+
+Master `92acfc9dbf15adf18274227301196940c2630db7` integrates PR #440 at version 0.1.531. This branch merges that master and prepares **0.1.532**, exactly one PATCH above the new base. The concurrent-work/version statements above describe the earlier qualification checkpoint. Measured source/build identities and the 53-record raw archive remain unchanged; historical measurements are not relabelled as the merge build.
+
 <!-- static-geometry-evidence-v1 -->
 
 ## Retained raw evidence
