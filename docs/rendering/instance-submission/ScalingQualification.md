@@ -76,9 +76,11 @@ The original master full build-test has the documented HUD status-marker failure
 
 ## Reproduction and retained evidence
 
-Run the normal Release build, then the Presentation test executable with -namespace ForgeLine.Presentation.Tests.RenderSubmission. BenchmarkDotNet discovers InstanceSubmissionScalingBenchmarks automatically; FORGELINE_RUNTIME_ROOT optionally selects a sealed runtime catalog. For chronological output call InstanceSubmissionScalingBenchmarks.RunQualification(runtimeRoot, outputPath, sourceRevision, 128, 512) from a local driver referencing the benchmark assembly. The native run uses the unchanged Invoke-RtsReferenceQualification script and the baseline directory above.
+Run the normal Release build, then the Presentation test executable with -namespace ForgeLine.Presentation.Tests.RenderSubmission. Set FORGELINE_INSTANCING_SCALING=1 to include InstanceSubmissionScalingBenchmarks in BenchmarkDotNet discovery; the class-level filter leaves ordinary wildcard CI runs unchanged. FORGELINE_RUNTIME_ROOT optionally selects a sealed runtime catalog. This opt-in only controls discovery; it does not change the measured submission routine or the direct chronological sampler. For chronological output call InstanceSubmissionScalingBenchmarks.RunQualification(runtimeRoot, outputPath, sourceRevision, 128, 512) from a local driver referencing the benchmark assembly. The native run uses the unchanged Invoke-RtsReferenceQualification script and the baseline directory above.
 
 Only this document is an assigned new documentation path. Its appendix therefore retains the lossless machine-readable CPU chronology, native candidate/baseline manifests, comparison and validation outputs as gzip/base64, rather than adding unassigned evidence paths. Native images remain in the local capture directory and have the exact hashes of the already retained foundation images. Extract the embedded payload, decode base64, decompress gzip and parse JSON. The envelope records source and input hashes. This is evidence storage, not executable content.
+
+The final 0.1.531 solution build also passes with zero warnings/errors. A direct BenchmarkConverter discovery check verifies zero scaling cases by default and all 36 parameter combinations when explicitly enabled; no CI or benchmark-host file is changed.
 
 Raw JSON SHA-256: b91afb572fa0a5c36715ab16ebf67f00695ab78270223e2699304f94fff83e49. Raw bytes: 12092849; gzip bytes: 571556.
 

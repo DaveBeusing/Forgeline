@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text.Json;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Filters;
 using ForgeLine.Assets;
 using ForgeLine.Core;
 using ForgeLine.Game;
@@ -14,8 +16,16 @@ namespace ForgeLine.Rendering.Benchmarks;
 
 /// <summary>CPU submission qualification. The null backend never supplies GPU durations.</summary>
 [MemoryDiagnoser]
+[Config(typeof(OptInConfig))]
 public class InstanceSubmissionScalingBenchmarks : IDisposable
 {
+    // The repository CI uses --filter "*". Full scaling is an explicit qualification workload.
+    public sealed class OptInConfig : ManualConfig
+    {
+        public OptInConfig() => AddFilter(new SimpleFilter(_ =>
+            Environment.GetEnvironmentVariable("FORGELINE_INSTANCING_SCALING") == "1"));
+    }
+
     private PresentationBenchmarks.NullGraphicsDevice _graphics = null!;
     private SimpleInstanceRenderer _renderer = null!;
     private RenderWorld _world = null!;
