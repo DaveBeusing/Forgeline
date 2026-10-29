@@ -26,6 +26,16 @@ internal static class MatchPersistenceValidation
                 !string.IsNullOrWhiteSpace(identity.ContentKey) && Hash(identity.ContentSha256) &&
                 !string.IsNullOrWhiteSpace(identity.StartRule) && !string.IsNullOrWhiteSpace(identity.ObjectiveRule),
                 "Invalid saved scenario identity.");
+        if (value.CompositionKey.StartsWith("generated.skirmish.", StringComparison.Ordinal))
+        {
+            var generated = value.Identity?.Generated;
+            Require(generated is not null && generated.GeneratorVersion == GeneratedMapRecipe.CurrentVersion &&
+                Hash(generated.GameplaySha256) && Hash(generated.VisualSha256) &&
+                Hash(generated.ManifestSha256) && Hash(generated.AssetSha256) &&
+                value.Identity!.MapSha256 == generated.GameplaySha256 &&
+                value.CompositionKey == "generated.skirmish." + generated.GameplaySha256,
+                "Invalid or unsupported generated scenario identity.");
+        }
         Require(value.InitialEntityCapacity is > 0 and <= MaximumRecoveryEntityCapacity,
             $"Initial entity capacity must be between 1 and {MaximumRecoveryEntityCapacity} for recovery.");
         Require(value.Participants!.Count >= 2 && value.Participants.All(p => p is not null), "Invalid participants.");

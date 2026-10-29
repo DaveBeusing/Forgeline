@@ -71,6 +71,10 @@ public sealed record PersistedMatchConfiguration(
         ArgumentNullException.ThrowIfNull(Scenario);
         ArgumentNullException.ThrowIfNull(Participants);
 
+        if (CompositionKey.StartsWith("generated.skirmish.", StringComparison.Ordinal) && Identity?.Generated is null)
+            throw new MatchPersistenceException(MatchPersistenceFailureReason.IncompatibleVersion,
+                "Generated scenarios require their complete saved package identity.");
+
         var settings =
             new MatchRuntimeSettings
             {
