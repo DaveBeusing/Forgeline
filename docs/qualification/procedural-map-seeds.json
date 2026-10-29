@@ -1,0 +1,196 @@
+{
+  "SchemaVersion": 1,
+  "AssetSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "Cases": [
+    {
+      "Id": "small-17",
+      "Seed": "17",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "ccf7cf843e79fe0de3a8732fdc864af4941ec3425730a5572c4d5ac300f0203f"
+    },
+    {
+      "Id": "small-0",
+      "Seed": "0",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "19a40232e46b9a9fe575cadca2e231cef7cdad7b57ed595b5db929e2c0a9d5cb"
+    },
+    {
+      "Id": "small-1",
+      "Seed": "1",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "47ada5952c411a721c7139e0bc14b5a7773a63340b71fea88d18e230f246bbdd"
+    },
+    {
+      "Id": "small-2",
+      "Seed": "2",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "d30e442b7f3298af419c6d8bb52a27b26d756b8b74d4af0cad78123db0928f0b"
+    },
+    {
+      "Id": "small-7",
+      "Seed": "7",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "a0f1bd1bd598996a8fb390883bbcfe17454a7fb16a47af15a0ad04414dc263aa"
+    },
+    {
+      "Id": "small-42",
+      "Seed": "42",
+      "Side": 8,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "rejected",
+      "Fingerprints": {},
+      "ErrorSha256": "a77f2411d09d1e56c1e9aa8f35ca0e0ccdecb1181c79274e8232b37d03208573"
+    },
+    {
+      "Id": "medium-17",
+      "Seed": "17",
+      "Side": 12,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "aad370bbf04af35fdfd64e1a5fde03784a99b6944a2935bd044e61056f007779",
+        "Geography": "22cc21f338ad714f37a8a7ad2817e6987e88c346580e3c87e4d285421e6605d7",
+        "Terrain": "0248da251fdd53e74c984159907aebd769e03e8bb48cb58822b368781c827b4d",
+        "Gameplay": "c26e98269417b171c8b6d5d1edf64db36741c3d02bf0bf63d9e44e9fe949314b",
+        "Visual": "505b77923202e35253ecf9be05002401a3a124e72f2d158d0281a897d800d2fb",
+        "Manifest": "56bed96a1a3fe27b67907050d6a2de8a5a52f145b6dc143330a5a402fadede78",
+        "Decoration": "384112037a824f5269bd7bc9a2fb860ae02e45f0da63b95cbeaf10988b54f77e"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "medium-18",
+      "Seed": "18",
+      "Side": 12,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "caea73dd315695a550eaea2fc5663cb39aceacb58a73155cae86c5770af39c5f",
+        "Geography": "8fa24f5ce857f46dab12c573fa6f8f1646472cff9e3051c5aa92f01600bfbc93",
+        "Terrain": "f07598cc46c4807731cc7a8f735773265de466ab22418cfd3989455c5813e62d",
+        "Gameplay": "c3317aa5965f5a5913e183b9827facfa4f1d6e2865b9471f61a51c4d63537ca9",
+        "Visual": "d52372a5d641704f8a37f0a27d5be25a0b74db9df752e7659f90a62854fbbd23",
+        "Manifest": "f788f48b095fbeed5fa6c49e85ae7d2f7942a928ee8d2931ac354f0d149286e2",
+        "Decoration": "77f23bb5d0172476a922e5fbde2631738e3e0f3ef3bb07694ab73a6ac2426104"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "medium-0",
+      "Seed": "0",
+      "Side": 12,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "6f218caa5aac2c64cce7c5b9b735d1c89061b50d805206a1320c77e4d7c34387",
+        "Geography": "3a135690f05dd1a9a3836818e225a9d45e61af94ea076bcbfd08c27712e59326",
+        "Terrain": "4dfec6056b56b99d9f7eb32232c96185106f7d060a8398d8629ee26c84d050e2",
+        "Gameplay": "124a9ca25f94f7886a21dd7fcd5f186eda2843636843d48792183e2cef79006b",
+        "Visual": "9395f5342ed4edb637e00a55c54888c2b784c637ce17463ce909eaf65a5e1e5b",
+        "Manifest": "6cc63c5529946bf4583cd18e13cf97672c1f8b6d76afbbacc614c8ca0332de17",
+        "Decoration": "d97addb7024ee9efdcc59fe2d99f45003bf2648453cec28c4ffdd1a36688a106"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "medium-42",
+      "Seed": "42",
+      "Side": 12,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "e02b64d8bc1a4f9cdba7cafa090269b593bd39e89a8db38b31fe2679e3129f2b",
+        "Geography": "c4bc2efdedbd6cecea1438ac2286e9eaa791bba18dbac2bc90c24b42e0ef47f1",
+        "Terrain": "5a0ec89ea8edceaa7df45cf70549da6d7b9ef343b794fecee78a744d5fdc275c",
+        "Gameplay": "bdbefa7e5fb4eecab3d09a4ad80c4667423a46fce39f24b094aedb1759e52412",
+        "Visual": "b236630b12a32b71a7c68d8410012a8279cdb124445b45b62edaf452722a8a6a",
+        "Manifest": "6fd1af5b459ed690334073cc1dfc9caabb3ec5e406fe49686ab0709880cac540",
+        "Decoration": "c249eeed8a76e94b09a88f8a8989fb464eaa36740c0287453187a4aece4760fd"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "reference-17",
+      "Seed": "17",
+      "Side": 16,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "8b58e78cdc9a9024349a55e5312557281238cc277dacce778ec618acde4e8a68",
+        "Geography": "0862ac83f1e281a8f71306c9ae0a294f3056fd9977a13ddcf75c65d4a3d8babc",
+        "Terrain": "2a55f993f074169c84abfb123ef97f867d2cb5c691ad2353d7948b2bd1226309",
+        "Gameplay": "d2a882ceac4313407c12f4c9ae229c230632d8fad0f6e7413bb86fe03e97a3cc",
+        "Visual": "41108e19ba3c53226a15e7bf3b5b6050e05748ee66a3e7cb6866b21dea292ff4",
+        "Manifest": "f17a208dc50f8cc4b0df9365706a3dbe914ef4b2aeee01853190df573d67df3c",
+        "Decoration": "5c9b28c72f8f18598d84a98371f4c6b256a7b66e966ed8fa3ca580f1bf541f59"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "boundary-max",
+      "Seed": "18446744073709551615",
+      "Side": 12,
+      "BaseHeightMillimeters": 20000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "549f1e6c51917bc75aa44e536e8d2358bde0a7906b54b7a7aeae05cf41b28457",
+        "Geography": "33a48a24bcbbe0f08a0c729c6115e054dd4f184912b80f35ba8f39e2ebddb70c",
+        "Terrain": "4212340abc7bb20dde7d79f4edbe890f1fe95c4320c1ae07897153321399c644",
+        "Gameplay": "9047b0492caa571fa6f8054cb6f2bfa6df1ddd24e293cca9cba16e316b4f545f",
+        "Visual": "33588b3d3795bec96d0b8e70fd40ec500611ac117e702dbd61ba3c54497e1d9f",
+        "Manifest": "eb1e7a8a0463b4eb39d4e818e804208e700f8dd0b6dab80785640cc06c579cf5",
+        "Decoration": "deea7a9e30a544b66607d0f6dc3f2d324a4dd100bc1710ec07740d34f17cc0d1"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "lowland-extreme",
+      "Seed": "17",
+      "Side": 12,
+      "BaseHeightMillimeters": -100000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "dfac8d49014fd0a706f04bb183dc19dcc6a0bafe3a522e71a3725dd63c1da0a9",
+        "Geography": "6b20815283f9cd2b96cfd142b5c869caceb8c4e95a0dd03f185ad006cf9479b6",
+        "Terrain": "c1be63c5e5e32c15fd9de5d35103cbbe2d7c10883175b33294eeb4de6c90bf91",
+        "Gameplay": "0e85071276ef0c42d6534cd88eb04394c1acdaa1b500ed201e87df50d0129490",
+        "Visual": "0b67fbb6dd5a047733c621b96f81ca7d589095e350edcd5c07c3f353a82c5538",
+        "Manifest": "b8fba1f7bc73a65e663b5d3ffdb30bac11f0dfa722b7446a3db17fb427520823",
+        "Decoration": "d03239d19f40dd3046a81b4046e054e0397fa3b004dcae7f13259a5dbf2408fe"
+      },
+      "ErrorSha256": null
+    },
+    {
+      "Id": "upland-extreme",
+      "Seed": "17",
+      "Side": 12,
+      "BaseHeightMillimeters": 100000,
+      "ExpectedOutcome": "qualified",
+      "Fingerprints": {
+        "Biome": "7b6ff66de55505c5837bce6b0be800c7376d976974832f8790a79049b41b99e8",
+        "Geography": "0121990929808965d59cc5806f393f7802debd25f9238e46a39a56e445592b43",
+        "Terrain": "7b1fc15d0a956ccb1db189b6709d182be3cf60affce670696859a790dc08da11",
+        "Gameplay": "c335cc306b39415c6be72e83ff2b364d835a60c9199a6baa4d0780f7978e4c88",
+        "Visual": "b412a42a9a4c4f4ef89e7eef1dc39340e1a9d9de2fb7e2235be0eaec279dd325",
+        "Manifest": "f6e16a165f5bc6300fb1edb598361914965041849eb704046199c0fdfd77603a",
+        "Decoration": "a6dfc1f14fe3757b86dcb215f91c3eb26818e74760c4b2000661db96f38b7b13"
+      },
+      "ErrorSha256": null
+    }
+  ]
+}
