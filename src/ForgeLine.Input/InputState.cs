@@ -5,6 +5,9 @@ namespace ForgeLine.Input;
 
 public sealed class InputState
 {
+    private readonly char[] _textInput = new char[64];
+    private int _textCount;
+    public ReadOnlySpan<char> TextInput => _textInput.AsSpan(0, _textCount);
     private readonly HashSet<PlatformKey> _keysDown = [];
     private readonly ulong[] _keyPressSequences = new ulong[Enum.GetValues<PlatformKey>().Length];
     private readonly bool[] _keyPressed = new bool[Enum.GetValues<PlatformKey>().Length];
@@ -38,6 +41,7 @@ public sealed class InputState
 
     public void BeginFrame()
     {
+        _textCount = 0;
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
         Array.Clear(_controlKeyPressed);
@@ -52,6 +56,10 @@ public sealed class InputState
     {
         switch (inputEvent.Kind)
         {
+            case PlatformInputEventKind.TextInput:
+                if (_suppressedKeys.Count == 0 && _textCount < _textInput.Length) _textInput[_textCount++] = inputEvent.TextCharacter;
+                break;
+
             case PlatformInputEventKind.KeyDown:
                 if (inputEvent.Key != PlatformKey.Unknown && !_suppressedKeys.Contains(inputEvent.Key))
                 {
@@ -164,6 +172,7 @@ public sealed class InputState
 
     public void Reset()
     {
+        _textCount = 0;
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
         Array.Clear(_controlKeyPressed);
@@ -181,6 +190,7 @@ public sealed class InputState
 
     public void SuppressHeldInput()
     {
+        _textCount = 0;
         Array.Clear(_keyPressed);
         Array.Clear(_shiftKeyPressed);
         Array.Clear(_controlKeyPressed);

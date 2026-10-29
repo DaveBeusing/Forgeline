@@ -9,7 +9,8 @@ public enum PlatformInputEventKind
     PointerMoved = 4,
     MouseWheel = 5,
     FocusLost = 6,
-    PointerLeft = 7
+    PointerLeft = 7,
+    TextInput = 8
 }
 
 public readonly record struct PlatformInputEvent(
@@ -20,6 +21,10 @@ public readonly record struct PlatformInputEvent(
     int PointerY,
     int WheelDelta)
 {
+    public char TextCharacter { get; init; }
+    public static PlatformInputEvent Text(char character) => new(PlatformInputEventKind.TextInput,
+        PlatformKey.Unknown, PlatformMouseButton.None, 0, 0, 0) { TextCharacter = character };
+
     public static PlatformInputEvent KeyChanged(PlatformInputEventKind kind, PlatformKey key) =>
         new(kind, key, PlatformMouseButton.None, 0, 0, 0);
 
