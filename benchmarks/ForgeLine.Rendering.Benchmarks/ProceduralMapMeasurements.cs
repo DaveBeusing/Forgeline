@@ -40,6 +40,7 @@ internal static class ProceduralMapMeasurements
         public bool Software { get; init; }
         public bool RequireSourceStamp { get; init; }=true;
         public bool AuthoredControl { get; init; }
+        public int AuthoredTraversalTicks { get; init; }
         public bool EagerTerrain { get; init; }
         public string[] Scenes { get; init; }=["yard","corridor","forest"];
         public float[] Distances { get; init; }=[120,420,1000];
@@ -51,7 +52,7 @@ internal static class ProceduralMapMeasurements
         using var input=File.OpenRead(requestPath);
         if(input.Length is <1 or >65536)throw new InvalidDataException("Native request exceeds its input budget.");
         var request=JsonSerializer.Deserialize<Request>(input,Json) ?? throw new InvalidDataException("Missing qualification request.");
-        if(request.Side is <8 or >16 || request.Width is <320 or >3840 || request.Height is <200 or >2160 ||
+        if(request.AuthoredTraversalTicks is <0 or >12000 || request.AuthoredTraversalTicks>0 && !request.AuthoredControl || request.Side is <8 or >16 || request.Width is <320 or >3840 || request.Height is <200 or >2160 ||
             request.Warmups is <3 or >512 || request.Samples is <8 or >1024 || request.MotionFrames is <2 or >64 ||
             request.Scenes.Length is <1 or >3 || request.Scenes.Any(s=>s is not ("yard" or "corridor" or "crossing" or "forest")) ||
             request.Distances.Length is <1 or >3 || request.Distances.Any(d=>d is not (120 or 420 or 1000)) ||
@@ -83,7 +84,9 @@ internal static class ProceduralMapMeasurements
             var masks=request.AuthoredControl ? null : TerrainInfrastructureMask.FromRoadSegments(
                 definition.RoadEdges.Select(e=>(nodes[e.SourceNodeKey],nodes[e.DestinationNodeKey])),8,4);
             var environment=request.AuthoredControl ? null : TerrainVisualProfileResolver.CreateEnvironment(terrain,recipe.Terrain.Generation);
-            using var match=MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation,2026,composition:composition));
+            var matchSettings=CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation,2026,composition:composition);
+            if(request.AuthoredTraversalTicks>0)matchSettings=matchSettings with {Participants=CentralDivideScenario.CreateDefaultParticipants(false,false)};
+            using var match=MatchRuntime.Create(matchSettings);
             var gateway=new PlayerCommandGateway(match.Simulation,match.Services.BuildingCommands,match.BattlefieldRuntime.MatchStateEntity);
             var extraction=new PresentationExtractionContext(match,new(1),new PresentationInteractionState(),gateway);
             var buffer=new PresentationSnapshotBuffer();
@@ -113,6 +116,19 @@ internal static class ProceduralMapMeasurements
                         prior.Instances.ToArray().Append(probe).ToArray(),prior.Intelligence,prior.SessionId){ChunkDecorations=decorations});
                     world.Update(buffer);renderProbeAdded=true;
                 }
+            }
+                        if(request.AuthoredTraversalTicks>0)
+            {
+                var crossing=definition.Crossings[0].Position;
+                var destination=crossing-new Vector3(60,0,0);
+                terrain.TrySampleHeight(destination.X,destination.Z,out destination.Y);
+                var receipt=gateway.SubmitMovement(new(1),[match.GetBase(new(1)).StartingUnits[0]],destination,
+                    match.Simulation.CurrentTick,FormationTemplate.Compact);
+                if(!receipt.Accepted)throw new InvalidDataException("Authored crossing reconnaissance command was rejected.");
+                match.Simulation.RunTicks((ulong)request.AuthoredTraversalTicks);
+                world.Update(buffer);
+                if(!world.CurrentSnapshot!.Instances.ToArray().Any(i=>i.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadBridge))
+                    throw new InvalidDataException("Authored crossing is not visible to the authorized viewer after traversal.");
             }
             string sourceSnapshot=Hash(JsonSerializer.SerializeToUtf8Bytes(world.CurrentSnapshot!.Instances.ToArray(),Json));
             var annotations=new DebugDraw {Enabled=true};
@@ -275,7 +291,7 @@ internal static class ProceduralMapMeasurements
                 generationMilliseconds=generationMs,map=map?.Manifest,manifestSha256=mapFingerprint,sourceSnapshot,
                 mapKind=request.AuthoredControl ? "authored-control" : "generated",crossingCount=definition.Crossings.Count,
                 roadEdgeCount=definition.RoadEdges.Count,roadMaskRegions=masks?.Regions.Length ?? 0,yardPermission,renderProbeAdded,buildAreaAnnotationLines=annotations.Lines.Length,
-                simulationTick=20,simulationFrozenDuringRender=true,sourceDecorationInstances=decorations.InstanceCount,
+                simulationTick=match.Simulation.CurrentTick.Value,authoredTraversalTicks=request.AuthoredTraversalTicks,visibleBridgeInstances=world.CurrentSnapshot!.Instances.ToArray().Count(i=>i.InfrastructureFeature.Kind==InfrastructurePresentationKind.RoadBridge),simulationFrozenDuringRender=true,sourceDecorationInstances=decorations.InstanceCount,
                 captures,artAcceptance="pending",performanceTargetAcceptance="pending",
                 interpretation="Native generated-map scene using production assets and existing client render paths; frozen viewer-authorized simulation. Timed traversals exclude readback/event pumping; CPU includes Prepare/submission/Present, GPU uses distinct completed fences. No live-match, physical-monitor, win-rate or 60 FPS acceptance."
             };
