@@ -484,6 +484,10 @@ internal sealed class WindowsWindow : IWindow
                 EnqueueEvent(WindowEventKind.FocusLost);
                 return 0;
 
+            case 0x0102: // WM_CHAR preserves text order, layout and normal key repeat.
+                if (_isFocused) _inputEvents.Enqueue(PlatformInputEvent.Text((char)wParam));
+                return 0;
+
             case WindowsNative.WmKeyDown:
                 if (TryMapKey(wParam, lParam, out PlatformKey keyDown))
                 {

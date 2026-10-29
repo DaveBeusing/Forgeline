@@ -61,3 +61,8 @@ All three captures remain Running; saved/restored authoritative hashes and RNG m
 The retained recovery/loading and startup documents define no numeric restore-time product gate; therefore this is not reported as a passed or failed latency target. The observed roughly 41-second reconstruction for a 20-minute match is a concrete cost requiring product follow-up. Direct checkpoint reconstruction or a separate bounded-history/compression design would be a later architectural task. This change preserves complete deterministic reconstruction and does not claim a speedup.
 
 Earlier loading-test counts above describe their historical implementation checkpoint, not current complete acceptance. Current source-specific results and final-head mandatory CI are recorded in the PR. Physical D3D12, live Pause/Help/Minimize overlap, input/graphics lifetime and human visual review remain separate evidence classes.
+
+
+## Generated skirmish preparation
+
+New Game validates generated maps on a separate instance of the existing construction coordinator before requesting a gameplay session. The frontend remains interactive and exposes cooperative Cancel, copied indeterminate stage state and actionable failures. A qualified result requires a separate Start action. Session reconstruction resolves the exact manifest identity from the host-owned package cache, checks current asset identity and builds CPU terrain/decoration presentation data before match allocation. Existing New/Load/Restart, scheduler, presentation and cancellation ownership remains in force. See [seeded skirmish selection](SeededSkirmishSelection.md) for input, cache, qualification and visual-acceptance limits.

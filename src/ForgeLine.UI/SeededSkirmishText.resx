@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<data name="MapKind" xml:space="preserve"><value>MAP SOURCE</value></data>
+<data name="Authored" xml:space="preserve"><value>AUTHORED MAP</value></data>
+<data name="Generated" xml:space="preserve"><value>GENERATED MAP</value></data>
+<data name="Seed" xml:space="preserve"><value>SEED (DECIMAL / 0x HEX)</value></data>
+<data name="Size" xml:space="preserve"><value>MAP SIZE</value></data>
+<data name="Profile" xml:space="preserve"><value>PROFILE</value></data>
+<data name="Temperate" xml:space="preserve"><value>TEMPERATE</value></data>
+<data name="Sparse" xml:space="preserve"><value>TEMPERATE / SPARSE</value></data>
+<data name="Players" xml:space="preserve"><value>PLAYERS</value></data>
+<data name="Randomize" xml:space="preserve"><value>RANDOMIZE SEED</value></data>
+<data name="Copy" xml:space="preserve"><value>COPY SEED</value></data>
+<data name="Paste" xml:space="preserve"><value>PASTE SEED</value></data>
+<data name="Action" xml:space="preserve"><value>ENTER / CLICK</value></data>
+<data name="State" xml:space="preserve"><value>VALIDATION</value></data>
+<data name="Draft" xml:space="preserve"><value>NOT VALIDATED</value></data>
+<data name="Generating" xml:space="preserve"><value>GENERATING MAP...</value></data>
+<data name="Verifying" xml:space="preserve"><value>VERIFYING PACKAGE...</value></data>
+<data name="Cancelling" xml:space="preserve"><value>CANCELLING...</value></data>
+<data name="Ready" xml:space="preserve"><value>READY</value></data>
+<data name="Failed" xml:space="preserve"><value>MAP UNAVAILABLE</value></data>
+<data name="Generator" xml:space="preserve"><value>GENERATOR VERSION</value></data>
+<data name="Validate" xml:space="preserve"><value>VALIDATE MAP</value></data>
+<data name="Start" xml:space="preserve"><value>START</value></data>
+<data name="Cancel" xml:space="preserve"><value>CANCEL</value></data>
+<data name="Back" xml:space="preserve"><value>BACK</value></data>
+<data name="SeedError" xml:space="preserve"><value>ENTER 0..18446744073709551615 OR 0x + 1..16 HEX DIGITS</value></data>
+<data name="QualificationError" xml:space="preserve"><value>MAP DID NOT QUALIFY. CHANGE SEED OR SIZE.</value></data>
+<data name="PreparationError" xml:space="preserve"><value>MAP COULD NOT BE VERIFIED. CHECK ASSETS AND MAP CACHE.</value></data>
+<data name="Copied" xml:space="preserve"><value>SEED COPIED</value></data>
+<data name="ClipboardError" xml:space="preserve"><value>CLIPBOARD UNAVAILABLE OR SEED TOO LONG</value></data>
+<data name="Cancelled" xml:space="preserve"><value>GENERATION CANCELLED</value></data>
+<data name="GeneratedFooter" xml:space="preserve"><value>TAB / UP / DOWN  FOCUS   LEFT / RIGHT  CHANGE   ENTER  VALIDATE / START</value></data>
+<data name="SeedFooter" xml:space="preserve"><value>TAB NEXT   TYPE SEED   CTRL+A  REPLACE   CTRL+C / V  COPY / PASTE   BACKSPACE  ERASE</value></data>
+</root>

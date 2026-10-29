@@ -102,6 +102,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./build/Test-GeneratedMaps.ps1
 
+      - name: Seeded skirmish selection and session contracts
+        shell: pwsh
+        env:
+          FORGELINE_SEEDED_CAPTURE_ROOT: artifacts/seeded-skirmish
+          FORGELINE_QUALIFICATION_SOURCE: ${{ github.sha }}
+        run: |
+          dotnet test --project tests/ForgeLine.Client.Tests/ForgeLine.Client.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Client.Tests.SeededSkirmishTests ForgeLine.Client.Tests.SeededSkirmishNativeTests ForgeLine.Client.Tests.PracticeEntryTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Environment scatter placement contracts
         shell: pwsh
         run: |
@@ -578,6 +587,7 @@ jobs:
             artifacts/procedural-terrain/**
             artifacts/environment-scatter/**
             artifacts/generated-maps/**
+            artifacts/seeded-skirmish/**
             artifacts/chunk-decoration/**
             artifacts/pacing-quick/**
             artifacts/pacing-contracts/**

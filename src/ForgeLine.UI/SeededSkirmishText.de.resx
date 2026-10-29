@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<data name="MapKind" xml:space="preserve"><value>KARTENQUELLE</value></data>
+<data name="Authored" xml:space="preserve"><value>ERSTELLTE KARTE</value></data>
+<data name="Generated" xml:space="preserve"><value>GENERIERTE KARTE</value></data>
+<data name="Seed" xml:space="preserve"><value>SEED (DEZIMAL / 0x HEX)</value></data>
+<data name="Size" xml:space="preserve"><value>KARTENGROESSE</value></data>
+<data name="Profile" xml:space="preserve"><value>PROFIL</value></data>
+<data name="Temperate" xml:space="preserve"><value>GEMAESSIGT</value></data>
+<data name="Sparse" xml:space="preserve"><value>GEMAESSIGT / LOCKER</value></data>
+<data name="Players" xml:space="preserve"><value>SPIELER</value></data>
+<data name="Randomize" xml:space="preserve"><value>ZUFALLS-SEED</value></data>
+<data name="Copy" xml:space="preserve"><value>SEED KOPIEREN</value></data>
+<data name="Paste" xml:space="preserve"><value>SEED EINFUEGEN</value></data>
+<data name="Action" xml:space="preserve"><value>ENTER / KLICK</value></data>
+<data name="State" xml:space="preserve"><value>VALIDIERUNG</value></data>
+<data name="Draft" xml:space="preserve"><value>NICHT VALIDIERT</value></data>
+<data name="Generating" xml:space="preserve"><value>KARTE WIRD GENERIERT...</value></data>
+<data name="Verifying" xml:space="preserve"><value>PAKET WIRD GEPRUEFT...</value></data>
+<data name="Cancelling" xml:space="preserve"><value>WIRD ABGEBROCHEN...</value></data>
+<data name="Ready" xml:space="preserve"><value>BEREIT</value></data>
+<data name="Failed" xml:space="preserve"><value>KARTE NICHT VERFUEGBAR</value></data>
+<data name="Generator" xml:space="preserve"><value>GENERATORVERSION</value></data>
+<data name="Validate" xml:space="preserve"><value>KARTE VALIDIEREN</value></data>
+<data name="Start" xml:space="preserve"><value>STARTEN</value></data>
+<data name="Cancel" xml:space="preserve"><value>ABBRECHEN</value></data>
+<data name="Back" xml:space="preserve"><value>ZURUECK</value></data>
+<data name="SeedError" xml:space="preserve"><value>0..18446744073709551615 ODER 0x + 1..16 HEX-ZIFFERN EINGEBEN</value></data>
+<data name="QualificationError" xml:space="preserve"><value>KARTE NICHT QUALIFIZIERT. SEED ODER GROESSE AENDERN.</value></data>
+<data name="PreparationError" xml:space="preserve"><value>KARTE NICHT PRUEFBAR. ASSETS UND KARTENCACHE PRUEFEN.</value></data>
+<data name="Copied" xml:space="preserve"><value>SEED KOPIERT</value></data>
+<data name="ClipboardError" xml:space="preserve"><value>ZWISCHENABLAGE NICHT VERFUEGBAR ODER SEED ZU LANG</value></data>
+<data name="Cancelled" xml:space="preserve"><value>GENERIERUNG ABGEBROCHEN</value></data>
+<data name="GeneratedFooter" xml:space="preserve"><value>TAB / HOCH / RUNTER  FOKUS   LINKS / RECHTS  AENDERN   ENTER  PRUEFEN / STARTEN</value></data>
+<data name="SeedFooter" xml:space="preserve"><value>TAB WEITER   SEED EINGEBEN   STRG+A  ERSETZEN   STRG+C / V  KOPIEREN / EINFUEGEN   RUECKTASTE  LOESCHEN</value></data>
+</root>

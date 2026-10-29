@@ -156,6 +156,7 @@ internal sealed class ClientRenderHost : IDisposable
     private readonly object _faultWaitGate = new();
     private readonly GraphicsWindowTarget? _initialTarget;
     private readonly TerrainWorld? _terrain;
+    private readonly TerrainPresentationProfile? _terrainProfile;
     private readonly PresentationSnapshotBuffer? _snapshots;
     private readonly RtsCameraSettings? _cameraSettings;
     private readonly RuntimeAssetCatalog? _runtimeAssets;
@@ -194,7 +195,8 @@ internal sealed class ClientRenderHost : IDisposable
         Func<ClientSimulationTelemetry>? simulationTelemetry = null,
         SceneAtmosphereSettings? sceneAtmosphere = null,
         ParticleSettings? particles = null,
-        RenderQualitySettings? renderQuality = null)
+        RenderQualitySettings? renderQuality = null,
+        TerrainPresentationProfile? terrainProfile = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -216,6 +218,7 @@ internal sealed class ClientRenderHost : IDisposable
             throw new ArgumentNullException(nameof(cameraSettings));
         _runtimeAssets =
             runtimeAssets;
+        _terrainProfile = terrainProfile;
         _sceneLighting =
             sceneLighting ??
             SceneLightingSettings.Default;
@@ -441,7 +444,7 @@ internal sealed class ClientRenderHost : IDisposable
                 graphics.WaitForIdle();
                 graphics.Resize(initialTarget.Suspended ? 0 : initialTarget.Width, initialTarget.Suspended ? 0 : initialTarget.Height);
             }
-            using var terrainRenderer = new TerrainRenderer(graphics, terrain, runtimeAssets: _runtimeAssets,
+            using var terrainRenderer = new TerrainRenderer(graphics, terrain, presentationProfile: _terrainProfile, runtimeAssets: _runtimeAssets,
                 lighting: lighting, surfaceDetail: qualityProfile.TerrainDetail, textureDetail: qualityProfile.Textures,
                 residency: qualityProfile.TerrainResidency, environment: qualityProfile.Environment);
             using var instanceRenderer = new SimpleInstanceRenderer(graphics, _runtimeAssets, lighting,

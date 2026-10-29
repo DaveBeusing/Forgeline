@@ -199,6 +199,8 @@ internal sealed class ClientApplication
             frontendLoading.Complete("Command interface ready");
         }
 
+        var generatedMaps = new ClientGeneratedMapStore(Path.Combine(ResolveSaveDirectory(), "generated-maps"),
+            runtimeAssets.Manifest.ContentSignature, runtimeAssets);
         bool bootRendererAvailable = true;
         string sessionFeedback = string.Empty;
         while (window.IsOpen)
@@ -214,7 +216,7 @@ internal sealed class ClientApplication
             else
             {
                 FrontendSessionSelectionResult selection = RunFrontendSessionSelection(window,
-                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback, menuSmoke, bootRendererAvailable ? bootRenderer : null, runtimeAssets);
+                    new GameFrontendShell(), newGame, startupSaves, sessionFeedback, menuSmoke, bootRendererAvailable ? bootRenderer : null, runtimeAssets, generatedMaps);
                 if (selection.RestartRequested) return RestartRequestedExitCode;
                 if (selection.Session is not ClientSessionRequest selected) return 0;
                 sessionRequest = selected;
@@ -224,7 +226,7 @@ internal sealed class ClientApplication
             try
             {
                 int result = RunMatchSession(window, runtimeAssets, sessionRequest, smokeTest,
-                    renderInstanceCount, visualQualificationOutput, qualificationWindow);
+                    renderInstanceCount, visualQualificationOutput, qualificationWindow, generatedMaps);
                 if (result == SessionRestartExitCode) continue;
                 if (result != SessionReturnToMenuExitCode || smokeTest) return result;
                 sessionFeedback = "SESSION LOAD CANCELLED";
@@ -243,7 +245,7 @@ internal sealed class ClientApplication
 
     private int RunMatchSession(IWindow window, RuntimeAssetCatalog runtimeAssets,
         ClientSessionRequest sessionRequest, bool smokeTest, int renderInstanceCount,
-        string? visualQualificationOutput, ClientWindowQualificationSnapshot qualificationWindow)
+        string? visualQualificationOutput, ClientWindowQualificationSnapshot qualificationWindow, ClientGeneratedMapStore generatedMaps)
     {
         bool activated = false;
         ClientSessionLoadPhase loadingPhase = ClientSessionLoadPhase.Configuration;
@@ -285,7 +287,7 @@ internal sealed class ClientApplication
             ValidateGameplayAssets(runtimeAssets, token);
             _startup.Mark(StartupPhase.GameplayAssetsReady, sessionId);
             ClientLoadedSession result = _startup.Measure(StartupPhase.SessionReconstruction,
-                () => ClientSessionFactory.CreateOwned(sessionRequest, Track, token), sessionId);
+                () => ClientSessionFactory.CreateOwned(sessionRequest, Track, token, generatedMaps: generatedMaps), sessionId);
             try
             {
                 if (renderInstanceCount > 0)
@@ -381,7 +383,7 @@ internal sealed class ClientApplication
             new PresentationExtractor(
                 snapshotBuffer,
                 presentationExtraction,
-                runtimeAssets));
+                runtimeAssets, loadedSession.Decorations));
 
         sessionTransitionRenderer.Publish(ClientSessionLoadingLoop.Surface(new(loadingPhase)));
         if (!PumpSessionLoadingEvents(window, loadingInput) || loadingInput.IsKeyDown(PlatformKey.Escape))
@@ -517,7 +519,7 @@ internal sealed class ClientApplication
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
                 transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
-                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings());
+                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings(), terrainProfile: loadedSession.TerrainProfile);
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -3305,7 +3307,7 @@ internal sealed class ClientApplication
         GameFrontendShell shell,
         NewGameModel newGame,
         IReadOnlyList<LoadGameEntry> startupSaves,
-        string initialFeedback = "", bool menuSmoke = false, ClientFrontendRenderHost? initialRenderer = null, RuntimeAssetCatalog? menuAssets = null)
+        string initialFeedback = "", bool menuSmoke = false, ClientFrontendRenderHost? initialRenderer = null, RuntimeAssetCatalog? menuAssets = null, ClientGeneratedMapStore? generatedMaps = null)
     {
         _startup.Begin(StartupPhase.Frontend);
         shell.Dispatch(
@@ -3313,6 +3315,9 @@ internal sealed class ClientApplication
 
         var loadGame =
             new LoadGameModel(startupSaves);
+        using var newGameSelection = new NewGameSelectionController(newGame, generatedMaps ??
+            new ClientGeneratedMapStore(Path.Combine(ResolveSaveDirectory(), "generated-maps"), menuAssets?.Manifest.ContentSignature ?? string.Empty, menuAssets),
+            new WindowsSeedClipboard(window.NativeHandle.Value));
         var settingsInteraction =
             new SettingsInteractionModel();
         var settings = new SettingsModel(ClientSettingsFrontendAdapter.ToSnapshot(_settings));
@@ -3487,63 +3492,9 @@ internal sealed class ClientApplication
             }
             else if (shell.Screen == GameFrontendScreen.NewGame)
             {
-                if (ConsumeKeyPress(input, PlatformKey.Up, ref upHeld)) newGame.MoveScenario(-1);
-                if (ConsumeKeyPress(input, PlatformKey.Down, ref downHeld)) newGame.MoveScenario(1);
-                if (primaryPointerPressed && input.HasPointerPosition &&
-                    FrontendHitTesting.DetailRow(input.PointerPosition.X, input.PointerPosition.Y, frontendLayout, 3) == 0)
-                    newGame.MoveScenario(1);
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Left,
-                        ref leftHeld))
-                {
-                    newGame.SetSeed(
-                        newGame.Configuration.Seed == 0
-                            ? 0
-                            : newGame.Configuration.Seed - 1);
-                }
-
-                if (ConsumeKeyPress(
-                        input,
-                        PlatformKey.Right,
-                        ref rightHeld))
-                {
-                    newGame.SetSeed(
-                        newGame.Configuration.Seed == ulong.MaxValue
-                            ? ulong.MaxValue
-                            : newGame.Configuration.Seed + 1);
-                }
-
-                if (primaryPointerPressed &&
-                    input.HasPointerPosition &&
-                    FrontendHitTesting.DetailAdjust(
-                        input.PointerPosition.X,
-                        input.PointerPosition.Y,
-                            frontendLayout,
-                        FrontendPresentationAdapter.NewGame(newGame)) is int seedDirection)
-                {
-                    newGame.SetSeed(
-                        seedDirection < 0
-                            ? newGame.Configuration.Seed == 0
-                                ? 0
-                                : newGame.Configuration.Seed - 1
-                            : newGame.Configuration.Seed == ulong.MaxValue
-                                ? ulong.MaxValue
-                                : newGame.Configuration.Seed + 1);
-                }
-
-                if (newGame.CanStartSelectedScenario && (enter ||
-                    (primaryPointerPressed &&
-                     input.HasPointerPosition &&
-                     FrontendHitTesting.PrimaryAction(
-                         input.PointerPosition.X,
-                         input.PointerPosition.Y,
-                        frontendLayout))))
-                {
-                    return FrontendSessionSelectionResult.Start(
-                        ClientSessionRequest.NewGame(
-                            newGame.Configuration.Seed, newGame.SelectedScenario.Key));
-                }
+                var selected = newGameSelection.Handle(input, frontendLayout, enter, escape, primaryPointerPressed);
+                if (newGameSelection.ConsumedBack) { escape = false; primaryPointerPressed = false; }
+                if (selected is { } request) return FrontendSessionSelectionResult.Start(request);
             }
             else if (shell.Screen == GameFrontendScreen.LoadGame)
             {
