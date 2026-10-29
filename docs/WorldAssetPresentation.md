@@ -239,3 +239,10 @@ Live impact marks and short owned-vehicle tracks reuse the authored decal quad/m
 
 
 RuntimeMaterialDiagnostics now reports unique LoadedMeshCount and logical ResidentMeshBytes. LOD buffers remain loaded on first admitted use and cached for the compiled-catalog session; this is not asynchronous eviction or a physical-residency guarantee. Conservative copied-snapshot groups can skip offscreen instance/asset work before normal individual admission. See [scalable rendering](ScalableRendering.md).
+
+
+## Biome terrain materials
+
+The opt-in [biome terrain material profile](BiomeTerrainMaterials.md) blends the existing
+four-layer palette from environment fields and infrastructure masks. Authored renderer
+defaults remain compatible; generated scenes explicitly select the new profile ID.

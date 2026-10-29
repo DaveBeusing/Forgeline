@@ -46,6 +46,7 @@ public sealed class TerrainPresentationProfile
     private readonly Dictionary<TerrainMaterialSlot, TerrainMaterialDefinition> _materials;
     private readonly TerrainBlendRegion[] _regions;
     private readonly TerrainBlendRegion[] _surfaceMarks = [];
+    private readonly BiomeTerrainMaterialSource? _biome;
 
     public TerrainPresentationProfile(
         IEnumerable<TerrainMaterialDefinition> materials,
@@ -93,15 +94,22 @@ public sealed class TerrainPresentationProfile
 
     public TerrainMaterialDefinition FallbackMaterial { get; }
 
-    private TerrainPresentationProfile(IEnumerable<TerrainMaterialDefinition> materials,
-        IEnumerable<TerrainBlendRegion> regions, TerrainBlendRegion[] surfaceMarks) : this(materials, regions) =>
+    internal TerrainPresentationProfile(IEnumerable<TerrainMaterialDefinition> materials,
+        IEnumerable<TerrainBlendRegion> regions, TerrainBlendRegion[] surfaceMarks, BiomeTerrainMaterialSource? biome = null) : this(materials, regions)
+    {
         _surfaceMarks = surfaceMarks;
+        _biome = biome?.Copy();
+        _biome?.Initialize(this);
+    }
+
+    internal TerrainChunkSplatData? BuildBiomeSplat(TerrainChunk chunk) => _biome?.Build(chunk);
+    public TerrainBiomePaletteDiagnostics? CaptureBiomePalette(ChunkCoordinate coordinate) => _biome?.Diagnostics(coordinate);
 
     public int SurfaceMarkCount => _surfaceMarks.Length;
 
     internal uint SurfaceMarkPriority(AxisAlignedBounds bounds)
     {
-        uint mask = 0;
+        uint mask = _biome?.InfrastructurePriority(bounds) ?? 0;
         foreach (var region in _surfaceMarks)
         {
             if (region.Strength == 0) continue;
@@ -126,7 +134,7 @@ public sealed class TerrainPresentationProfile
         _surfaceMarks.CopyTo(priority, 0);
         for (int index = 0; index < marks.Length; index++)
             regions[_regions.Length + index] = priority[_surfaceMarks.Length + index] = marks[index].ToBlendRegion();
-        return new(_materials.Values, regions, priority);
+        return new(_materials.Values, regions, priority, _biome);
     }
 
     public TerrainMaterialDefinition GetMaterial(
@@ -153,6 +161,9 @@ public sealed class TerrainPresentationProfile
             destination[..MaterialSlotCount];
         weights.Clear();
 
+        if (_biome is not null) _biome.Calculate(position, weights);
+        else
+        {
         Vector3 normalized =
             normal.LengthSquared() > 0.0001f
                 ? Vector3.Normalize(normal)
@@ -203,6 +214,8 @@ public sealed class TerrainPresentationProfile
         weights[(int)TerrainMaterialSlot.Rock] +=
             rockBlend;
 
+        }
+
         Vector2 point =
             new(
                 position.X,
@@ -245,6 +258,16 @@ public sealed class TerrainPresentationProfile
         Vector3 position,
         Vector3 normal)
     {
+        if (_biome is not null)
+        {
+            Span<float> weights = stackalloc float[MaterialSlotCount];
+            CalculateMaterialWeights(position, normal, weights);
+            Vector3 proceduralColor = Vector3.Zero;
+            for (int slot = 0; slot < MaterialSlotCount; slot++)
+                proceduralColor += SampleMaterialColor(GetMaterial((TerrainMaterialSlot)slot), position) * weights[slot];
+            return new(Vector3.Clamp(proceduralColor, Vector3.Zero, Vector3.One), 1);
+        }
+
         Vector3 normalized =
             normal.LengthSquared() > 0.0001f
                 ? Vector3.Normalize(normal)

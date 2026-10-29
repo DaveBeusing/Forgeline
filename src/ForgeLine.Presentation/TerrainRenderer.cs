@@ -4,6 +4,7 @@ using ForgeLine.Graphics.RenderContracts;
 using System.Diagnostics;
 using System.Numerics;
 using ForgeLine.Assets;
+using ForgeLine.Game;
 using ForgeLine.Graphics;
 using ForgeLine.World;
 
@@ -71,6 +72,19 @@ public sealed class TerrainRenderer : IDisposable
     private double _meshMilliseconds, _splatMilliseconds, _uploadMilliseconds, _materialMilliseconds;
     private readonly int _owner = Environment.CurrentManagedThreadId;
     private bool _disposed;
+
+    public TerrainRenderer(
+        BattlefieldTerrainVisualDefinition visual, IGraphicsDevice graphics, TerrainWorld world,
+        IEnvironmentQuery? environmentQuery = null, TerrainInfrastructureMask? infrastructure = null,
+        TerrainMeshSettings? meshSettings = null, RuntimeAssetCatalog? runtimeAssets = null,
+        SceneLightingSettings? lighting = null, TerrainSurfaceDetailSettings? surfaceDetail = null,
+        TextureDetailQuality textureDetail = TextureDetailQuality.Full, TerrainResidencySettings? residency = null,
+        WorldEnvironmentSettings? environment = null, TerrainPreparationSettings? preparation = null)
+        : this(graphics, world, meshSettings,
+            TerrainVisualProfileResolver.Resolve(visual, world, environmentQuery, infrastructure, runtimeAssets),
+            runtimeAssets, lighting, surfaceDetail, textureDetail, residency, environment, preparation)
+    {
+    }
 
     public TerrainRenderer(
         IGraphicsDevice graphics,

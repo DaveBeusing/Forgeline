@@ -72,6 +72,8 @@ public static class TerrainSplatMapBuilder
         ArgumentNullException.ThrowIfNull(chunk);
         ArgumentNullException.ThrowIfNull(profile);
 
+        if (profile.BuildBiomeSplat(chunk) is { } biomeSplat) return biomeSplat;
+
         var totals =
             new double[
                 TerrainPresentationProfile.MaterialSlotCount];
@@ -368,10 +370,11 @@ public static class TerrainSplatMapBuilder
         return pixels;
     }
 
-    private static GraphicsTextureMipData[] BuildMipChain(
+    internal static GraphicsTextureMipData[] BuildMipChain(
         int width,
         int height,
-        byte[] pixels)
+        byte[] pixels,
+        uint preserveChannels = 0)
     {
         var mips =
             new List<GraphicsTextureMipData>();
@@ -489,6 +492,20 @@ public static class TerrainSplatMapBuilder
                         next.AsSpan(
                             destinationOffset,
                             TerrainChunkSplatData.LayerCount));
+                    // Procedural required features retain at least one byte when their footprint
+                    // contributed to this mip texel. Authored profiles keep the original zero-mask path.
+                    if (preserveChannels != 0)
+                    {
+                        for (int channel = 0; channel < 4; channel++)
+                        {
+                            if ((preserveChannels & (1u << channel)) == 0 || sums[channel] <= 0 || next[destinationOffset + channel] != 0) continue;
+                            int donor = 0;
+                            for (int candidate = 1; candidate < 4; candidate++)
+                                if (next[destinationOffset + candidate] > next[destinationOffset + donor]) donor = candidate;
+                            next[destinationOffset + donor]--;
+                            next[destinationOffset + channel] = 1;
+                        }
+                    }
                 }
             }
 
