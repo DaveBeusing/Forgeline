@@ -3,7 +3,7 @@ using System.Numerics;
 namespace ForgeLine.Presentation;
 
 /// <summary>Immutable public infrastructure footprints; never changes collision or construction permission.</summary>
-public sealed class TerrainInfrastructureMask
+public sealed partial class TerrainInfrastructureMask
 {
     public const int MaximumRegions = 4096;
     internal const int MaximumRegionsPerChunk = 64;

@@ -7,6 +7,11 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
+        if (args is ["--procedural-native", string request])
+        {
+            ProceduralMapMeasurements.Run(request);
+            return;
+        }
         // Exact allocation guards require stable counter accounting. Keep this
         // opt-in local to these synthetic modes; native/CPU timing modes retain
         // the caller's production GC policy (dotnet/runtime#134724).

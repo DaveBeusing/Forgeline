@@ -18,6 +18,7 @@ internal static class Program
     {
         try
         {
+            if (args.Contains("--qualify-generated-maps", StringComparer.Ordinal)) return GeneratedMapQualificationCommand.Run(args);
             if (args.Contains("--generate-map", StringComparer.Ordinal) || args.Contains("--load-generated-map", StringComparer.Ordinal)) return GeneratedMapCommand.Run(args);
             if (args.Contains("--scatter-diagnostics", StringComparer.Ordinal)) return EnvironmentScatterCommand.Run(args);
             if (args.Contains("--generate-terrain", StringComparer.Ordinal)) return ProceduralTerrainCommand.Run(args);
