@@ -95,6 +95,13 @@ jobs:
         shell: pwsh
         run: ./build/Test-ProceduralTerrain.ps1
 
+      - name: Environment scatter placement contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.BattlefieldScatterClearanceTests ForgeLine.Game.Tests.EnvironmentDressingTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-EnvironmentScatter.ps1
+
       - name: Fair opponent profiles and legal counterplay
         shell: pwsh
         run: |
@@ -549,6 +556,7 @@ jobs:
             artifacts/*.json
             artifacts/maps/*.json
             artifacts/procedural-terrain/**
+            artifacts/environment-scatter/**
             artifacts/pacing-quick/**
             artifacts/pacing-contracts/**
             artifacts/visual-reference-warp/**
