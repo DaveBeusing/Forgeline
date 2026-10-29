@@ -42,6 +42,12 @@ scale follow the frozen protocol. Both states are populated independently;
 prepared history is built outside timing, while the native host still renders
 alpha=1. CPU intermediate-alpha correspondence belongs to its separate lane.
 
+When invoking the underlying script directly, pass real PowerShell arrays, for
+example `-Scenes @('IndustrialBase','BattlefieldCombat')`. Comma-containing scalar
+scene/profile/zoom/UI arguments are rejected before capture: .NET enum parsing
+can otherwise combine such names and silently select a different valid value.
+The Scaling preset builds its typed list internally and avoids that ambiguity.
+
 Low shifts i%10!=0 by +4000 m X in both states. High/Low describe intended
 distributions, not invented measured visibility. A SHA-256 binds version, scene,
 bindings, target and every previous/current entity/transform. Existing scene enum
@@ -108,8 +114,9 @@ readback/PNG/hash/export remain separate from steady state. GPU world, overlays,
 composite, shadows, particles and atmosphere can overlap and must not be summed.
 
 Existing submission/resource records distinguish instance upload traffic and
-capacity, retained textures, native upload arena bytes/pressure, retirement and
-fence waits. SkinUploadBytes is retained skin-buffer capacity, not measured frame
+capacity, retained textures, retirement and fence waits. Native upload-arena
+destination/staging bytes and pressure belong to the separately owned upload
+probe and are unavailable in this host. SkinUploadBytes is retained skin-buffer capacity, not measured frame
 traffic. These and DXGI usage overlap; no fabricated total VRAM is reported.
 UMA/cache-coherent UMA and PIX captures remain unavailable unless independently
 observed. Keep raw sample count, invalid reasons and each repeat's p50/p95/p99.
@@ -129,3 +136,96 @@ schema/image contracts. Synthetic contracts are not native performance evidence.
 Executed source/build, hardware/payload identities, raw cohort paths and measured
 results are recorded below after qualification. Incomplete rows remain explicitly
 unqualified; they must not be replaced by historical foundation acceptance.
+
+## Executed hardware characterization
+
+Unchanged baseline: `a761969668136f32ce99438e4b6a407094c9567e`, product 0.1.530.
+Scaling/static-memory/production-regression measurement source:
+`e01365a5062556546011b8fffe38f45bb54e5b50`, product 0.1.531. Both used clean Git
+status, pinned SDK 10.0.402 and a complete Release build with zero warnings/errors.
+Later argument-validation and evidence-documentation changes do not relabel those
+binaries. Native fixture, collector and renderer source blobs retain that identity.
+
+Windows 10.0.26300 x64; Intel Core Ultra 9 285HX, 24 logical processors,
+68,137,205,760 bytes physical RAM; physical NVIDIA RTX PRO 5000 Blackwell Generation
+Laptop GPU, 25,309,478,912 dedicated bytes, driver 32.0.15.9653. The secondary Intel
+adapter was not selected. VSync/debug/software mode were off; actual queue
+frequency was 1,000,000,000 Hz. The Balanced power scheme was observed. Background
+load and thermals were not traced or actively controlled. No PIX installation
+was found; UMA/coherent-UMA queries and physical-monitor/human art approval remain
+unavailable. These limits are not silently converted into acceptance.
+
+All runs used the same sealed 2055-asset catalog, content signature
+`135b44877d4882ac539073738a43af7b4794ff35819cc2c1f55c353771743020`, runtime directory
+fingerprint `55827DADD0271F6F74F0FB66E2B2774C924C38FC106B6EA351C43BF9A694EBBA`.
+Every request, manifest, complete CPU/fence chronology, comparison and command
+setting is retained under `artifacts/native-scaling/`; the portable index is
+`artifacts/native-scaling/summary.md`. Source/build/assembly/payload identities and
+every manifest SHA-256 are recorded there without normalizing away repeat variance.
+
+The planned evidence contains **64 captures in 17 complete native manifests**:
+28 unchanged production baselines, 28 full synthetic scaling cases, four isolated
+static-memory cases in Default-A/Upload-A/Upload-B/Default-B order, and four
+post-change production cases. All native manifests are structural-pass. All requested
+timing comparisons reported zero unqualified entries. All 20 cross-cohort image comparisons are exact
+file matches, including the four old production images. Repeated image readbacks
+remain exact. Human visual acceptance is still pending. One additional scalar-
+argument invocation selected only one production case; its request/result are
+retained but excluded from this four-case protocol count. That ambiguity is now
+rejected and covered by a failure-exit test.
+
+All nonempty scaling cases retain one compatible main-object draw at the fixed
+pose. The 100k High fixed case records 100,000 visible/submitted roots and
+11,200,000 instance-upload bytes per frame. Draw reduction alone does not make
+its CPU preparation/recording cheap:
+
+| 100k High independent repeat | CPU frame p95 ms | GPU frame p95 ms |
+|---|---:|---:|
+| Fixed 1 | 874.891 | 17.275 |
+| Fixed 2 | 502.630 | 12.542 |
+| Sweep 1 | 617.941 | 15.600 |
+| Sweep 2 | 887.680 | 18.735 |
+
+This is a substantial CPU scaling limit in the existing renderer, not an FPS
+improvement claim. All roots, expanded submissions, visible ranges, phase and
+allocation distributions, resource counters and actual GPU completion counts
+remain visible in the raw files. Reported last-observation shadow counts are not
+relabelled as window peaks. The reference World UI/terrain contribution remains
+part of the frame, separate from the same-binding object draw.
+
+The two matched static-memory pairs observed Upload fallback GPU mean regressions
+of **26.94% and 51.03%**, and CPU mean regressions of **20.91% and 41.19%**, versus
+Default. Both pairs retained exact images. All eight reported timing statistics
+in each pair exceeded the optional +15% threshold. No statistic in either
+within-mode repeat comparison exceeded that positive regression threshold; the
+complete signed deltas remain in JSON. This characterizes paths honoring the
+existing diagnostic flag on this workload/hardware, not proof that every mesh
+already uses GPU-local geometry or a new optimization introduced here.
+
+Unchanged baseline repeat comparisons recorded 3/1/9/0 positive-threshold
+exceedances for warm Sweep/warm Fixed/RendererCold/Vehicles1000 respectively.
+Synthetic Fixed/Sweep repeats recorded 9/41. Those are statistics, not case counts;
+all advisory reports remain unmodified. Large independent variance prevents a
+general performance-acceptance claim. No new timing gate, threshold adjustment,
+baseline adoption, renderer optimization or combined-feature speedup is asserted.
+Optimized submission/correspondence cohorts still require their package builds;
+the combined comparison remains serial integration scope.
+
+Validation: 11 fixture/old-prop cases and 24 collector/history/script cases pass,
+including the actual ambiguous-argument regression. Existing unmodified
+Test-ReferencePerformance contracts pass. The unchanged 46-project architecture
+and the exact nine-file native-scaling ownership check pass; the single PATCH
+uses the separately serialized version exception and real repository version
+scripts. The base commit's full CI run was cancelled, not green; required final
+PR build-test and the normal terminal gate remain mandatory and unchanged.
+
+Portable local deliverables, retained independently of repository source scope:
+
+- `artifacts/native-scaling-raw-v2.zip`, SHA-256
+  `31ebf5f93ad864489ca01dbcef2a02475e3d267826a9438526b2888b91498c25`.
+- `artifacts/native-scaling-images.zip`, SHA-256
+  `6186dbd1e3e49ab159ffee220d0195df93ca14292abe804e8ac75527a62ff3a7`.
+
+The first archive preserves original native/comparator schemas and raw data, not
+a competing collector. The second preserves the full-resolution PNGs for review.
+Neither is an automatically accepted golden or a claim of whole-match throughput.
