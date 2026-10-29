@@ -4,7 +4,7 @@ The generator-v1 golden and headless contracts pass. Native production-asset cap
 
 ## Versioned seed contract
 
-[`qualification/procedural-map-seeds.json`](qualification/procedural-map-seeds.json) pins manifest, gameplay, visual, terrain, geography, biome and decoration SHA-256 identities. Its fixed `a…a` asset identity is a portable compiler fixture, not an actual asset catalog.
+[`procedural-map-seeds.json`](../tests/ForgeLine.Game.Tests/Fixtures/procedural-map-seeds.json) pins manifest, gameplay, visual, terrain, geography, biome and decoration SHA-256 identities. Its fixed `a…a` asset identity is a portable compiler fixture, not an actual asset catalog.
 
 | Cases | Extent | Expected result |
 | --- | --- | --- |

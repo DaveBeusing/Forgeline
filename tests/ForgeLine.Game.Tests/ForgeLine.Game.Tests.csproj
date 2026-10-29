@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Update="Fixtures/schema-1-central-divide.replay.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="../../docs/qualification/procedural-map-seeds.json" Link="Fixtures/procedural-map-seeds.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures/procedural-map-seeds.json" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="xunit.v3.mtp-v2" />
     <ProjectReference Include="../../src/ForgeLine.Game/ForgeLine.Game.csproj" />
   </ItemGroup>
