@@ -95,6 +95,13 @@ jobs:
         shell: pwsh
         run: ./build/Test-ProceduralTerrain.ps1
 
+      - name: Generated map compiler and persistence contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Game.Tests.GeneratedMapTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./build/Test-GeneratedMaps.ps1
+
       - name: Environment scatter placement contracts
         shell: pwsh
         run: |
@@ -570,6 +577,7 @@ jobs:
             artifacts/maps/*.json
             artifacts/procedural-terrain/**
             artifacts/environment-scatter/**
+            artifacts/generated-maps/**
             artifacts/chunk-decoration/**
             artifacts/pacing-quick/**
             artifacts/pacing-contracts/**

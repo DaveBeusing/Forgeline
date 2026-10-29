@@ -14,7 +14,7 @@ internal static class Program
     public static int Main(string[] args)
     {
         try { return Run(args); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Text.Json.JsonException)
+        catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Text.Json.JsonException)
         {
             Console.Error.WriteLine($"Scenario loading failed: {error.Message}");
             return 1;
@@ -72,6 +72,12 @@ internal static class Program
         }
 #endif
 
+        GeneratedMapPackage? generated = options.GeneratedMap is null ? null :
+            GeneratedMapPackage.Load(options.GeneratedMap, options.GeneratedAssetSha256!, options.GeneratedManifestSha256);
+        Func<string, MatchComposition> resolver = key => generated is not null && key == generated.CompositionKey
+            ? generated.CreateComposition() : registry.Resolve(key);
+        if (generated is not null) options = options with { ScenarioKey = generated.CompositionKey };
+
         using var shutdown =
             new CancellationTokenSource();
         ConsoleCancelEventHandler cancelHandler =
@@ -87,9 +93,9 @@ internal static class Program
         try
         {
             if (options.LoadInput is not null)
-                return ValidateSaveRecovery(options.LoadInput, registry.Resolve, shutdown.Token);
+                return ValidateSaveRecovery(options.LoadInput, resolver, shutdown.Token);
             if (options.ReplayInput is not null)
-                return ValidateReplayPlayback(options.ReplayInput, registry.Resolve, shutdown.Token);
+                return ValidateReplayPlayback(options.ReplayInput, resolver, shutdown.Token);
 
             return options.Scenario switch
             {
@@ -99,7 +105,7 @@ internal static class Program
                         shutdown.Token),
                 HeadlessScenarioKind.Match =>
                     RunMatch(
-                        options, registry,
+                        options, registry, resolver,
                         shutdown.Token),
                 _ =>
                     throw new InvalidOperationException(
@@ -179,7 +185,7 @@ internal static class Program
     }
 
     private static int RunMatch(
-        HeadlessOptions options, ScenarioRegistry registry,
+        HeadlessOptions options, ScenarioRegistry registry, Func<string, MatchComposition> resolver,
         CancellationToken cancellationToken)
     {
 #if FORGELINE_DEVELOPER_TOOLS
@@ -209,7 +215,7 @@ internal static class Program
                 checked(
                     options.Seed +
                     (ulong)matchIndex);
-            MatchComposition composition = registry.Resolve(options.ScenarioKey);
+            MatchComposition composition = resolver(options.ScenarioKey);
 #if FORGELINE_DEVELOPER_TOOLS
             MatchRuntimeSettings runtimeSettings = presetPlan is not null
                 ? presetPlan.Settings with
@@ -695,6 +701,9 @@ internal static class Program
         writer.WriteLine("  --scenario <lightweight|central-divide|split-basin|registered composition key>");
         writer.WriteLine("                               Scenario to execute (default: lightweight).");
         writer.WriteLine("  --scenario-root <path>         Registered compiled-map root (default: executable/maps).");
+        writer.WriteLine("  --generated-map <directory>   Opt in to a validated generated map package.");
+        writer.WriteLine("  --generated-asset-sha256 <sha> Host asset content signature (required for generated maps).");
+        writer.WriteLine("  --generated-manifest-sha256 <sha> Optional expected package identity.");
         writer.WriteLine("  --profile <gameplay|validation>");
         writer.WriteLine("                               Match balance profile (default: gameplay).");
 #if FORGELINE_DEVELOPER_TOOLS
