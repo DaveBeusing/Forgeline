@@ -197,8 +197,8 @@ internal static class VisualReferenceCapture
                         display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
                     var (snapshot, panel) = UiReferenceStates.Hud(fixture.Snapshot, uiScenario, display.Width, display.Height, rasterDpi, uiScale);
                     FrontendSurfaceView? frontendView = frontend is null ? null : UiReferenceStates.Frontend(uiScenario, display.Width, display.Height, rasterDpi, uiScale);
-                    var buffer = new PresentationSnapshotBuffer(); buffer.Publish(snapshot);
-                    var world = new RenderWorld(); world.Update(buffer);
+                    var world = ReferenceSnapshotHistory.Create(snapshot, fixture.PreviousSnapshot);
+                    string fixtureFingerprint = ReferenceSnapshotHistory.Fingerprint(fixture.Fingerprint, fixture.PreviousSnapshot);
                     if (ObjectActionRingCapture.IsRing(uiScenario))
                         panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale),rasterDpi,uiScale);
                     else if (panel.IsOpen)
@@ -442,7 +442,7 @@ internal static class VisualReferenceCapture
                     object[] regions = uiScenario == UiReferenceScenario.World ? [] : UiReferenceStates.Regions(rgba, display.Width, display.Height,
                         frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen);
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
-                        pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixture.Fingerprint,
+                        pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixtureFingerprint,
                         ui = new { scenario = uiScenario, fixtureVersion = 3, layoutContract = GameplayHudLayout.ContractVersion,
                             notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
                                 GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
