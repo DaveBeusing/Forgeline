@@ -91,6 +91,34 @@ public sealed class ScalingCaptureContractTests
         JsonDocument.Parse(JsonSerializer.Serialize(samples.Report(Diagnostics(16, 4)), VisualReferenceCapture.JsonOptions));
 
     [Fact]
+    public async Task WrapperRejectsCommaScalarsBeforeWritingCaptureRequests()
+    {
+        string? repository = AppContext.BaseDirectory;
+        while (repository is not null && !File.Exists(Path.Combine(repository, "build", "Invoke-RtsReferenceQualification.ps1")))
+            repository = Path.GetDirectoryName(repository.TrimEnd(Path.DirectorySeparatorChar));
+        Assert.NotNull(repository);
+        string outputPath = Path.Combine(Path.GetTempPath(), "forgeline-ambiguous-" + Guid.NewGuid().ToString("N"));
+        var start = new ProcessStartInfo("pwsh") { UseShellExecute = false, CreateNoWindow = true,
+            RedirectStandardOutput = true, RedirectStandardError = true };
+        foreach (string argument in new[] { "-NoProfile", "-File", Path.Combine(repository, "build", "Invoke-RtsReferenceQualification.ps1"),
+            "-Capture", "-Scenes", "IndustrialBase,BattlefieldCombat", "-RuntimeAssetRoot", "unused",
+            "-ClientPath", Path.Combine(outputPath, "missing.exe"), "-OutputRoot", outputPath })
+            start.ArgumentList.Add(argument);
+        try
+        {
+            using var process = Process.Start(start)!;
+            Task<string> stdout = process.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
+            Task<string> stderr = process.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
+            await process.WaitForExitAsync(TestContext.Current.CancellationToken);
+            string[] output = await Task.WhenAll(stdout, stderr);
+            Assert.NotEqual(0, process.ExitCode);
+            Assert.Contains("Scenes", string.Concat(output), StringComparison.Ordinal);
+            Assert.False(File.Exists(outputPath + ".request.json"));
+        }
+        finally { File.Delete(outputPath + ".request.json"); }
+    }
+
+    [Fact]
     public async Task ComparatorRetainsBaselineAndFailsChangedPayloadOrZeroTiming()
     {
         string? repository = AppContext.BaseDirectory;
