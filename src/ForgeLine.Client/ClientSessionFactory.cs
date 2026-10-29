@@ -18,6 +18,7 @@ internal readonly record struct ClientSessionRequest(
     internal MatchRuntimeSettings? RuntimeSettings { get; init; }
     internal string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
     internal ScenarioIdentity? Identity { get; init; }
+    internal string? GeneratedManifestSha256 { get; init; }
     internal bool ReloadScenario { get; init; }
 
     internal static ClientSessionRequest Restart(MatchRuntimeSettings settings) =>
@@ -26,7 +27,7 @@ internal readonly record struct ClientSessionRequest(
     internal static ClientSessionRequest NewGame(MatchRuntimeSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        return NewGame(settings.Seed, settings.Composition.Key) with { RuntimeSettings = settings, Identity = settings.Composition.Identity };
+        return NewGame(settings.Seed, settings.Composition.Key) with { RuntimeSettings = settings, Identity = settings.Composition.Identity, GeneratedManifestSha256 = settings.Composition.Identity?.Generated?.ManifestSha256 };
     }
 
     internal static ClientSessionRequest NewGame(
@@ -93,8 +94,16 @@ internal static class ClientSessionFactory
     internal static ClientLoadedSession CreateOwned(
         ClientSessionRequest request, Action<ClientSessionLoadProgress> reportProgress,
         CancellationToken cancellationToken,
-        Func<string, MatchComposition>? resolveComposition = null)
+        Func<string, MatchComposition>? resolveComposition = null,
+        ClientGeneratedMapStore? generatedMaps = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        GeneratedMapPackage? generated = generatedMaps?.Resolve(request, cancellationToken);
+        if (generated is not null)
+            resolveComposition = key => key == generated.CompositionKey ? generated.CreateComposition() :
+                throw new InvalidOperationException("Generated map composition differs from the requested identity.");
+        var decorations = generated is null ? null : ClientGeneratedMapStore.CreateDecorations(generated, cancellationToken);
+        var terrainProfile = generated is null ? null : ClientGeneratedMapStore.CreateTerrainProfile(generated, generatedMaps?.Assets);
         cancellationToken.ThrowIfCancellationRequested();
         JobScheduler? scheduler = request.Kind == ClientSessionRequestKind.NewGame ? new JobScheduler() : null;
         MatchRuntime? runtime = null;
@@ -102,7 +111,8 @@ internal static class ClientSessionFactory
         {
             runtime = CreateCancellable(request, scheduler, cancellationToken, reportProgress, resolveComposition);
             cancellationToken.ThrowIfCancellationRequested();
-            return new ClientLoadedSession(runtime, scheduler);
+            cancellationToken.ThrowIfCancellationRequested();
+            return new ClientLoadedSession(runtime, scheduler) { GeneratedMap = generated, Decorations = decorations, TerrainProfile = terrainProfile };
         }
         catch
         {
@@ -196,6 +206,9 @@ internal sealed class ClientLoadedSession(MatchRuntime runtime, JobScheduler? sc
 {
     private int _disposed;
     internal MatchRuntime Runtime { get; } = runtime;
+    internal GeneratedMapPackage? GeneratedMap { get; init; }
+    internal ForgeLine.Presentation.IChunkDecorationProvider? Decorations { get; init; }
+    internal ForgeLine.Presentation.TerrainPresentationProfile? TerrainProfile { get; init; }
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;

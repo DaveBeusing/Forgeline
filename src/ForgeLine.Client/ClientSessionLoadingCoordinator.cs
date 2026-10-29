@@ -16,7 +16,7 @@ internal readonly record struct ClientSessionLoadProgress(
 
 internal enum ClientSessionLoadError
 {
-    Configuration, CorruptSave, IncompatibleSave, Replay, StateVerification, Presentation, Renderer
+    Configuration, CorruptSave, IncompatibleSave, Replay, StateVerification, Presentation, Renderer, GeneratedMap
 }
 
 internal sealed class ClientSessionLoadingException : Exception
@@ -26,6 +26,7 @@ internal sealed class ClientSessionLoadingException : Exception
     internal ClientSessionLoadError Category { get; }
     internal string UserMessage => Category switch
     {
+        ClientSessionLoadError.GeneratedMap => "GENERATED MAP IS MISSING OR INCOMPATIBLE",
         ClientSessionLoadError.CorruptSave => "SAVE DATA IS CORRUPT",
         ClientSessionLoadError.IncompatibleSave => "SAVE VERSION IS INCOMPATIBLE",
         ClientSessionLoadError.StateVerification => "SAVED STATE DOES NOT MATCH",
@@ -37,7 +38,7 @@ internal sealed class ClientSessionLoadingException : Exception
 
     internal static ClientSessionLoadingException From(Exception error, ClientSessionLoadPhase phase)
     {
-        ClientSessionLoadError category = error is MatchPersistenceException persistence
+        ClientSessionLoadError category = error is ClientGeneratedMapException ? ClientSessionLoadError.GeneratedMap : error is MatchPersistenceException persistence
             ? persistence.Reason switch
             {
                 MatchPersistenceFailureReason.IncompatibleVersion => ClientSessionLoadError.IncompatibleSave,
