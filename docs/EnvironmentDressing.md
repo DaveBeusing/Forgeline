@@ -149,3 +149,10 @@ allocation. Yard/natural modules keep the existing exclusions; thin road drains
 and bridge approaches use documented corridor exceptions. Aprons follow actual
 bridge mesh ends rather than its passage envelope. See the
 [kit catalog, reproducibility and measured acceptance limits](ModularEnvironmentKit.md).
+
+## Procedural decoration sets
+
+[Deterministic environment scatter](EnvironmentScatter.md) adds a separate bounded
+headless generator over biome fields and frozen gameplay clearances. Its compact
+chunk sets, reference plots and fingerprints do not change authored dressing,
+scenario artifacts, ECS allocation, rendering or persistence.
