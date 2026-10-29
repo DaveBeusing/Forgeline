@@ -196,6 +196,23 @@ public sealed class SeededSkirmishTests
     }
 
     [Fact]
+    public async Task QueuedEnterCannotSkipTheFirstReadyPresentation()
+    {
+        using var directory = new TemporaryMaps(); var model = new NewGameModel(); model.SelectMapKind(SkirmishMapKind.Generated);
+        using var controller = new NewGameSelectionController(model,directory.Store,new Clipboard(),(_,_,_) => Package.Value);
+        Assert.Null(controller.Primary());
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(Token); timeout.CancelAfter(TimeSpan.FromSeconds(45));
+        while (!controller.PreparationFinished) await Task.Delay(10,timeout.Token);
+        var input = new InputState(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.Enter));
+        var layout = FrontendDesign.ResolveLayout(1920,1080);
+        Assert.Null(controller.Handle(input,layout,true,false,false));
+        Assert.True(model.Generated.Ready); Assert.NotEmpty(FrontendPresentationAdapter.NewGame(model).PrimaryAction);
+        input.BeginFrame(); input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp,PlatformKey.Enter));
+        input.Apply(PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown,PlatformKey.Enter));
+        Assert.NotNull(controller.Handle(input,layout,true,false,false));
+    }
+
+    [Fact]
     public void NewTextResourcesResolveInEnglishAndGerman()
     {
         var before = CultureInfo.CurrentUICulture;

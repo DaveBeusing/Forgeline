@@ -37,6 +37,7 @@ internal sealed class NewGameSelectionController : IDisposable
     internal bool SelectAll { get => _model.SeedSelectAll; private set => _model.SeedSelectAll = value; }
     internal bool ConsumedBack { get; private set; }
     internal bool Busy => _worker is not null;
+    internal bool PreparationFinished => _worker?.Completed == true;
 
     internal NewGameSelectionController(NewGameModel model, ClientGeneratedMapStore maps, ISeedClipboard clipboard,
         Func<GeneratedMapRecipe, Action, CancellationToken, GeneratedMapPackage>? prepare = null)
@@ -79,7 +80,12 @@ internal sealed class NewGameSelectionController : IDisposable
 
     internal ClientSessionRequest? Handle(InputState input, FrontendLayout layout, bool enter, bool escape, bool pointerPressed)
     {
+        bool wasPreparing = Busy;
         Poll();
+        _model.VisibleCapacity = layout.Geometry.VisibleDetailRows;
+        ConsumedBack = false;
+        // Publish readiness/hash before a new input action may start a session.
+        if (wasPreparing && !Busy) return null;
         enter |= input.WasKeyPressed(PlatformKey.Enter);
         escape |= input.WasKeyPressed(PlatformKey.Escape);
         ConsumedBack = false;
