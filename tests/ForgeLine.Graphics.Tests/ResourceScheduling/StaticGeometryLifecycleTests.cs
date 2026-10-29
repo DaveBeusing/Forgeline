@@ -87,11 +87,20 @@ public sealed class StaticGeometryLifecycleTests
         var native = Field<ID3D12Device>(device, "_device");
         var queue = Field<ID3D12CommandQueue>(device, "_commandQueue");
         using var gate = native.CreateFence(0);
-        using var release = new ManualResetEventSlim();
+        using var finish = new ManualResetEventSlim();
         // Hold real GPU work, rather than assuming that this adapter copies slowly.
         queue.Wait(gate, 1).CheckError();
         Exception? signalingFailure = null;
-        var signal = new Thread(() => { try { release.Wait(); Thread.Sleep(250); gate.Signal(1); } catch (Exception error) { signalingFailure = error; } }) { IsBackground = true };
+        var signal = new Thread(() =>
+        {
+            try
+            {
+                // Release only after the owner actually enters pressure, regardless of scheduling speed.
+                while (!finish.Wait(1))
+                    if (Field<long>(device, "_uploadBackpressureWaits") > 0) { gate.Signal(1); return; }
+            }
+            catch (Exception error) { signalingFailure = error; }
+        }) { IsBackground = true };
         signal.Start();
         var buffers = new List<IGraphicsBuffer>();
         try
@@ -100,7 +109,6 @@ public sealed class StaticGeometryLifecycleTests
             for (int i = 0; i < 3; i++)
                 buffers.Add(device.CreateInitializedStaticBuffer(new((ulong)bytes.Length, StaticGraphicsBufferUsage.Vertex), bytes));
             Assert.Equal(3, device.UploadDiagnostics.Slots);
-            release.Set();
             buffers.Add(device.CreateInitializedStaticBuffer(new((ulong)bytes.Length, StaticGraphicsBufferUsage.Vertex), bytes));
             Assert.True(device.UploadDiagnostics.BackpressureWaits >= 1);
             Assert.Equal(3, device.UploadDiagnostics.Allocations);
@@ -112,7 +120,7 @@ public sealed class StaticGeometryLifecycleTests
         }
         finally
         {
-            release.Set(); gate.Signal(1); Assert.True(signal.Join(5000)); Assert.Null(signalingFailure);
+            finish.Set(); gate.Signal(1); Assert.True(signal.Join(5000)); Assert.Null(signalingFailure);
             foreach (var buffer in buffers) buffer.Dispose();
         }
         device.WaitForIdle();
