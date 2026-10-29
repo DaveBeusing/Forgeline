@@ -1,0 +1,609 @@
+{
+  "SchemaVersion": 1,
+  "GeneratorVersion": 1,
+  "MatrixSha256": "40db504ffa559ec95fea5a180cb73b144629a31c4bcbc1061e90dd03957cfbe7",
+  "AssetSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "Repetitions": 2,
+  "SchedulingMaximumParallelism": [
+    1,
+    4
+  ],
+  "Framework": ".NET 10.0.13",
+  "OS": "Microsoft Windows 10.0.26300",
+  "Architecture": "X64",
+  "Build": "0.1.0.0",
+  "Cases": [
+    {
+      "Id": "small-17",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.",
+          "ErrorSha256": "ccf7cf843e79fe0de3a8732fdc864af4941ec3425730a5572c4d5ac300f0203f",
+          "GenerationMilliseconds": 1674.9275,
+          "AllocatedBytes": 85005320,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.; QualificationRejected: Operational geography validation failed:\r\n- Terrain does not provide enough elevation variation for defensible positions.",
+          "ErrorSha256": "ccf7cf843e79fe0de3a8732fdc864af4941ec3425730a5572c4d5ac300f0203f",
+          "GenerationMilliseconds": 452.2704,
+          "AllocatedBytes": 84816264,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "small-0",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "19a40232e46b9a9fe575cadca2e231cef7cdad7b57ed595b5db929e2c0a9d5cb",
+          "GenerationMilliseconds": 1290.721,
+          "AllocatedBytes": 622711872,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "19a40232e46b9a9fe575cadca2e231cef7cdad7b57ed595b5db929e2c0a9d5cb",
+          "GenerationMilliseconds": 844.6124,
+          "AllocatedBytes": 622667136,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "small-1",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.293, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "47ada5952c411a721c7139e0bc14b5a7773a63340b71fea88d18e230f246bbdd",
+          "GenerationMilliseconds": 960.4384,
+          "AllocatedBytes": 645609576,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.293, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "47ada5952c411a721c7139e0bc14b5a7773a63340b71fea88d18e230f246bbdd",
+          "GenerationMilliseconds": 1022.9991,
+          "AllocatedBytes": 645651000,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "small-2",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "d30e442b7f3298af419c6d8bb52a27b26d756b8b74d4af0cad78123db0928f0b",
+          "GenerationMilliseconds": 863.1591,
+          "AllocatedBytes": 631868688,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=800.666, maximum=1033.568; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "d30e442b7f3298af419c6d8bb52a27b26d756b8b74d4af0cad78123db0928f0b",
+          "GenerationMilliseconds": 966.7511,
+          "AllocatedBytes": 631867304,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "small-7",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "a0f1bd1bd598996a8fb390883bbcfe17454a7fb16a47af15a0ad04414dc263aa",
+          "GenerationMilliseconds": 800.041,
+          "AllocatedBytes": 631931056,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "a0f1bd1bd598996a8fb390883bbcfe17454a7fb16a47af15a0ad04414dc263aa",
+          "GenerationMilliseconds": 1013.317,
+          "AllocatedBytes": 631933232,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "small-42",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "a77f2411d09d1e56c1e9aa8f35ca0e0ccdecb1181c79274e8232b37d03208573",
+          "GenerationMilliseconds": 751.1099,
+          "AllocatedBytes": 617166416,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        },
+        {
+          "Outcome": "rejected",
+          "Fingerprints": {},
+          "Error": "Generated map qualification failed: AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: ExpansionDistance|Baseline|Infantry|0|resource:1: Across starts: minimum=791.294, maximum=1042.94; exceeds ratio 1.25. Review deliberate asymmetry; this is not a fairness certificate.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.; AuditRejected: MissingVitalOpening|Baseline|Infantry|1|resource:1: No reachable non-contested vital reserve within the configured route-distance limit.",
+          "ErrorSha256": "a77f2411d09d1e56c1e9aa8f35ca0e0ccdecb1181c79274e8232b37d03208573",
+          "GenerationMilliseconds": 905.9075,
+          "AllocatedBytes": 617166304,
+          "SchedulingEqual": false,
+          "MatchStateSha256": null,
+          "SchedulingWorkers": 0,
+          "AuditErrors": null,
+          "AuditWarnings": null
+        }
+      ]
+    },
+    {
+      "Id": "medium-17",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "56bed96a1a3fe27b67907050d6a2de8a5a52f145b6dc143330a5a402fadede78",
+            "Gameplay": "c26e98269417b171c8b6d5d1edf64db36741c3d02bf0bf63d9e44e9fe949314b",
+            "Visual": "505b77923202e35253ecf9be05002401a3a124e72f2d158d0281a897d800d2fb",
+            "Terrain": "0248da251fdd53e74c984159907aebd769e03e8bb48cb58822b368781c827b4d",
+            "Geography": "22cc21f338ad714f37a8a7ad2817e6987e88c346580e3c87e4d285421e6605d7",
+            "Biome": "aad370bbf04af35fdfd64e1a5fde03784a99b6944a2935bd044e61056f007779",
+            "Decoration": "384112037a824f5269bd7bc9a2fb860ae02e45f0da63b95cbeaf10988b54f77e"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 2313.127,
+          "AllocatedBytes": 453387176,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "222C48EC946C01326DB9F8AB594DF29C0D760C381C649FA539583A331FBB04D2",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "56bed96a1a3fe27b67907050d6a2de8a5a52f145b6dc143330a5a402fadede78",
+            "Gameplay": "c26e98269417b171c8b6d5d1edf64db36741c3d02bf0bf63d9e44e9fe949314b",
+            "Visual": "505b77923202e35253ecf9be05002401a3a124e72f2d158d0281a897d800d2fb",
+            "Terrain": "0248da251fdd53e74c984159907aebd769e03e8bb48cb58822b368781c827b4d",
+            "Geography": "22cc21f338ad714f37a8a7ad2817e6987e88c346580e3c87e4d285421e6605d7",
+            "Biome": "aad370bbf04af35fdfd64e1a5fde03784a99b6944a2935bd044e61056f007779",
+            "Decoration": "384112037a824f5269bd7bc9a2fb860ae02e45f0da63b95cbeaf10988b54f77e"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1408.2624,
+          "AllocatedBytes": 450070224,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "222C48EC946C01326DB9F8AB594DF29C0D760C381C649FA539583A331FBB04D2",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "medium-18",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f788f48b095fbeed5fa6c49e85ae7d2f7942a928ee8d2931ac354f0d149286e2",
+            "Gameplay": "c3317aa5965f5a5913e183b9827facfa4f1d6e2865b9471f61a51c4d63537ca9",
+            "Visual": "d52372a5d641704f8a37f0a27d5be25a0b74db9df752e7659f90a62854fbbd23",
+            "Terrain": "f07598cc46c4807731cc7a8f735773265de466ab22418cfd3989455c5813e62d",
+            "Geography": "8fa24f5ce857f46dab12c573fa6f8f1646472cff9e3051c5aa92f01600bfbc93",
+            "Biome": "caea73dd315695a550eaea2fc5663cb39aceacb58a73155cae86c5770af39c5f",
+            "Decoration": "77f23bb5d0172476a922e5fbde2631738e3e0f3ef3bb07694ab73a6ac2426104"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1382.4001,
+          "AllocatedBytes": 459017232,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "AEEC2E3669DD69710EFA67DE8A4E85F4CD0774A4CCA4F2B075CF169946187B11",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f788f48b095fbeed5fa6c49e85ae7d2f7942a928ee8d2931ac354f0d149286e2",
+            "Gameplay": "c3317aa5965f5a5913e183b9827facfa4f1d6e2865b9471f61a51c4d63537ca9",
+            "Visual": "d52372a5d641704f8a37f0a27d5be25a0b74db9df752e7659f90a62854fbbd23",
+            "Terrain": "f07598cc46c4807731cc7a8f735773265de466ab22418cfd3989455c5813e62d",
+            "Geography": "8fa24f5ce857f46dab12c573fa6f8f1646472cff9e3051c5aa92f01600bfbc93",
+            "Biome": "caea73dd315695a550eaea2fc5663cb39aceacb58a73155cae86c5770af39c5f",
+            "Decoration": "77f23bb5d0172476a922e5fbde2631738e3e0f3ef3bb07694ab73a6ac2426104"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1297.928,
+          "AllocatedBytes": 459028560,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "AEEC2E3669DD69710EFA67DE8A4E85F4CD0774A4CCA4F2B075CF169946187B11",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "medium-0",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "6cc63c5529946bf4583cd18e13cf97672c1f8b6d76afbbacc614c8ca0332de17",
+            "Gameplay": "124a9ca25f94f7886a21dd7fcd5f186eda2843636843d48792183e2cef79006b",
+            "Visual": "9395f5342ed4edb637e00a55c54888c2b784c637ce17463ce909eaf65a5e1e5b",
+            "Terrain": "4dfec6056b56b99d9f7eb32232c96185106f7d060a8398d8629ee26c84d050e2",
+            "Geography": "3a135690f05dd1a9a3836818e225a9d45e61af94ea076bcbfd08c27712e59326",
+            "Biome": "6f218caa5aac2c64cce7c5b9b735d1c89061b50d805206a1320c77e4d7c34387",
+            "Decoration": "d97addb7024ee9efdcc59fe2d99f45003bf2648453cec28c4ffdd1a36688a106"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1446.03,
+          "AllocatedBytes": 609558968,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "E2CE01040454B56B68B2CE0FFBD1ACF4D15E2B84308181BC24C8B09C126CEFA7",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "6cc63c5529946bf4583cd18e13cf97672c1f8b6d76afbbacc614c8ca0332de17",
+            "Gameplay": "124a9ca25f94f7886a21dd7fcd5f186eda2843636843d48792183e2cef79006b",
+            "Visual": "9395f5342ed4edb637e00a55c54888c2b784c637ce17463ce909eaf65a5e1e5b",
+            "Terrain": "4dfec6056b56b99d9f7eb32232c96185106f7d060a8398d8629ee26c84d050e2",
+            "Geography": "3a135690f05dd1a9a3836818e225a9d45e61af94ea076bcbfd08c27712e59326",
+            "Biome": "6f218caa5aac2c64cce7c5b9b735d1c89061b50d805206a1320c77e4d7c34387",
+            "Decoration": "d97addb7024ee9efdcc59fe2d99f45003bf2648453cec28c4ffdd1a36688a106"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1992.9849,
+          "AllocatedBytes": 609554072,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "E2CE01040454B56B68B2CE0FFBD1ACF4D15E2B84308181BC24C8B09C126CEFA7",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "medium-42",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "6fd1af5b459ed690334073cc1dfc9caabb3ec5e406fe49686ab0709880cac540",
+            "Gameplay": "bdbefa7e5fb4eecab3d09a4ad80c4667423a46fce39f24b094aedb1759e52412",
+            "Visual": "b236630b12a32b71a7c68d8410012a8279cdb124445b45b62edaf452722a8a6a",
+            "Terrain": "5a0ec89ea8edceaa7df45cf70549da6d7b9ef343b794fecee78a744d5fdc275c",
+            "Geography": "c4bc2efdedbd6cecea1438ac2286e9eaa791bba18dbac2bc90c24b42e0ef47f1",
+            "Biome": "e02b64d8bc1a4f9cdba7cafa090269b593bd39e89a8db38b31fe2679e3129f2b",
+            "Decoration": "c249eeed8a76e94b09a88f8a8989fb464eaa36740c0287453187a4aece4760fd"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1535.91,
+          "AllocatedBytes": 601243120,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "E96835DD3B0DC1042C7257D12F9B9A33FFA25615DB7CE1C9396C90C9B756C8F2",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "6fd1af5b459ed690334073cc1dfc9caabb3ec5e406fe49686ab0709880cac540",
+            "Gameplay": "bdbefa7e5fb4eecab3d09a4ad80c4667423a46fce39f24b094aedb1759e52412",
+            "Visual": "b236630b12a32b71a7c68d8410012a8279cdb124445b45b62edaf452722a8a6a",
+            "Terrain": "5a0ec89ea8edceaa7df45cf70549da6d7b9ef343b794fecee78a744d5fdc275c",
+            "Geography": "c4bc2efdedbd6cecea1438ac2286e9eaa791bba18dbac2bc90c24b42e0ef47f1",
+            "Biome": "e02b64d8bc1a4f9cdba7cafa090269b593bd39e89a8db38b31fe2679e3129f2b",
+            "Decoration": "c249eeed8a76e94b09a88f8a8989fb464eaa36740c0287453187a4aece4760fd"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1198.5608,
+          "AllocatedBytes": 601243552,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "E96835DD3B0DC1042C7257D12F9B9A33FFA25615DB7CE1C9396C90C9B756C8F2",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "reference-17",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f17a208dc50f8cc4b0df9365706a3dbe914ef4b2aeee01853190df573d67df3c",
+            "Gameplay": "d2a882ceac4313407c12f4c9ae229c230632d8fad0f6e7413bb86fe03e97a3cc",
+            "Visual": "41108e19ba3c53226a15e7bf3b5b6050e05748ee66a3e7cb6866b21dea292ff4",
+            "Terrain": "2a55f993f074169c84abfb123ef97f867d2cb5c691ad2353d7948b2bd1226309",
+            "Geography": "0862ac83f1e281a8f71306c9ae0a294f3056fd9977a13ddcf75c65d4a3d8babc",
+            "Biome": "8b58e78cdc9a9024349a55e5312557281238cc277dacce778ec618acde4e8a68",
+            "Decoration": "5c9b28c72f8f18598d84a98371f4c6b256a7b66e966ed8fa3ca580f1bf541f59"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 2482.5495,
+          "AllocatedBytes": 832982856,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "613FF35EA77DB1991E29ADFD3628B65314A11C7A596C503518F7944650E53850",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f17a208dc50f8cc4b0df9365706a3dbe914ef4b2aeee01853190df573d67df3c",
+            "Gameplay": "d2a882ceac4313407c12f4c9ae229c230632d8fad0f6e7413bb86fe03e97a3cc",
+            "Visual": "41108e19ba3c53226a15e7bf3b5b6050e05748ee66a3e7cb6866b21dea292ff4",
+            "Terrain": "2a55f993f074169c84abfb123ef97f867d2cb5c691ad2353d7948b2bd1226309",
+            "Geography": "0862ac83f1e281a8f71306c9ae0a294f3056fd9977a13ddcf75c65d4a3d8babc",
+            "Biome": "8b58e78cdc9a9024349a55e5312557281238cc277dacce778ec618acde4e8a68",
+            "Decoration": "5c9b28c72f8f18598d84a98371f4c6b256a7b66e966ed8fa3ca580f1bf541f59"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 2503.3906,
+          "AllocatedBytes": 832961744,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "613FF35EA77DB1991E29ADFD3628B65314A11C7A596C503518F7944650E53850",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "boundary-max",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "eb1e7a8a0463b4eb39d4e818e804208e700f8dd0b6dab80785640cc06c579cf5",
+            "Gameplay": "9047b0492caa571fa6f8054cb6f2bfa6df1ddd24e293cca9cba16e316b4f545f",
+            "Visual": "33588b3d3795bec96d0b8e70fd40ec500611ac117e702dbd61ba3c54497e1d9f",
+            "Terrain": "4212340abc7bb20dde7d79f4edbe890f1fe95c4320c1ae07897153321399c644",
+            "Geography": "33a48a24bcbbe0f08a0c729c6115e054dd4f184912b80f35ba8f39e2ebddb70c",
+            "Biome": "549f1e6c51917bc75aa44e536e8d2358bde0a7906b54b7a7aeae05cf41b28457",
+            "Decoration": "deea7a9e30a544b66607d0f6dc3f2d324a4dd100bc1710ec07740d34f17cc0d1"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1443.3043,
+          "AllocatedBytes": 467410080,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "C379B9450438FA55AADF03242B706493872F9CB102D3F5042FA2A21F3BF11516",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "eb1e7a8a0463b4eb39d4e818e804208e700f8dd0b6dab80785640cc06c579cf5",
+            "Gameplay": "9047b0492caa571fa6f8054cb6f2bfa6df1ddd24e293cca9cba16e316b4f545f",
+            "Visual": "33588b3d3795bec96d0b8e70fd40ec500611ac117e702dbd61ba3c54497e1d9f",
+            "Terrain": "4212340abc7bb20dde7d79f4edbe890f1fe95c4320c1ae07897153321399c644",
+            "Geography": "33a48a24bcbbe0f08a0c729c6115e054dd4f184912b80f35ba8f39e2ebddb70c",
+            "Biome": "549f1e6c51917bc75aa44e536e8d2358bde0a7906b54b7a7aeae05cf41b28457",
+            "Decoration": "deea7a9e30a544b66607d0f6dc3f2d324a4dd100bc1710ec07740d34f17cc0d1"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1057.174,
+          "AllocatedBytes": 467399016,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "C379B9450438FA55AADF03242B706493872F9CB102D3F5042FA2A21F3BF11516",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "lowland-extreme",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "b8fba1f7bc73a65e663b5d3ffdb30bac11f0dfa722b7446a3db17fb427520823",
+            "Gameplay": "0e85071276ef0c42d6534cd88eb04394c1acdaa1b500ed201e87df50d0129490",
+            "Visual": "0b67fbb6dd5a047733c621b96f81ca7d589095e350edcd5c07c3f353a82c5538",
+            "Terrain": "c1be63c5e5e32c15fd9de5d35103cbbe2d7c10883175b33294eeb4de6c90bf91",
+            "Geography": "6b20815283f9cd2b96cfd142b5c869caceb8c4e95a0dd03f185ad006cf9479b6",
+            "Biome": "dfac8d49014fd0a706f04bb183dc19dcc6a0bafe3a522e71a3725dd63c1da0a9",
+            "Decoration": "d03239d19f40dd3046a81b4046e054e0397fa3b004dcae7f13259a5dbf2408fe"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 785.925,
+          "AllocatedBytes": 414682048,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "6CD82D27B3A838281AD7322CD4669676D74BC3B751051A83CAC90FD3AEAC1D1F",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "b8fba1f7bc73a65e663b5d3ffdb30bac11f0dfa722b7446a3db17fb427520823",
+            "Gameplay": "0e85071276ef0c42d6534cd88eb04394c1acdaa1b500ed201e87df50d0129490",
+            "Visual": "0b67fbb6dd5a047733c621b96f81ca7d589095e350edcd5c07c3f353a82c5538",
+            "Terrain": "c1be63c5e5e32c15fd9de5d35103cbbe2d7c10883175b33294eeb4de6c90bf91",
+            "Geography": "6b20815283f9cd2b96cfd142b5c869caceb8c4e95a0dd03f185ad006cf9479b6",
+            "Biome": "dfac8d49014fd0a706f04bb183dc19dcc6a0bafe3a522e71a3725dd63c1da0a9",
+            "Decoration": "d03239d19f40dd3046a81b4046e054e0397fa3b004dcae7f13259a5dbf2408fe"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 916.7467,
+          "AllocatedBytes": 414683048,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "6CD82D27B3A838281AD7322CD4669676D74BC3B751051A83CAC90FD3AEAC1D1F",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    },
+    {
+      "Id": "upland-extreme",
+      "Passed": true,
+      "Failures": [],
+      "Runs": [
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f6e16a165f5bc6300fb1edb598361914965041849eb704046199c0fdfd77603a",
+            "Gameplay": "c335cc306b39415c6be72e83ff2b364d835a60c9199a6baa4d0780f7978e4c88",
+            "Visual": "b412a42a9a4c4f4ef89e7eef1dc39340e1a9d9de2fb7e2235be0eaec279dd325",
+            "Terrain": "7b1fc15d0a956ccb1db189b6709d182be3cf60affce670696859a790dc08da11",
+            "Geography": "0121990929808965d59cc5806f393f7802debd25f9238e46a39a56e445592b43",
+            "Biome": "7b6ff66de55505c5837bce6b0be800c7376d976974832f8790a79049b41b99e8",
+            "Decoration": "a6dfc1f14fe3757b86dcb215f91c3eb26818e74760c4b2000661db96f38b7b13"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1000.2462,
+          "AllocatedBytes": 450661224,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "20F8C3A9A29224164FC89F1A24A7CC97B1E18463FBBCC29725F33BD2F7DC4183",
+          "SchedulingWorkers": 1,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        },
+        {
+          "Outcome": "qualified",
+          "Fingerprints": {
+            "Manifest": "f6e16a165f5bc6300fb1edb598361914965041849eb704046199c0fdfd77603a",
+            "Gameplay": "c335cc306b39415c6be72e83ff2b364d835a60c9199a6baa4d0780f7978e4c88",
+            "Visual": "b412a42a9a4c4f4ef89e7eef1dc39340e1a9d9de2fb7e2235be0eaec279dd325",
+            "Terrain": "7b1fc15d0a956ccb1db189b6709d182be3cf60affce670696859a790dc08da11",
+            "Geography": "0121990929808965d59cc5806f393f7802debd25f9238e46a39a56e445592b43",
+            "Biome": "7b6ff66de55505c5837bce6b0be800c7376d976974832f8790a79049b41b99e8",
+            "Decoration": "a6dfc1f14fe3757b86dcb215f91c3eb26818e74760c4b2000661db96f38b7b13"
+          },
+          "Error": null,
+          "ErrorSha256": null,
+          "GenerationMilliseconds": 1319.8734,
+          "AllocatedBytes": 450658904,
+          "SchedulingEqual": true,
+          "MatchStateSha256": "20F8C3A9A29224164FC89F1A24A7CC97B1E18463FBBCC29725F33BD2F7DC4183",
+          "SchedulingWorkers": 4,
+          "AuditErrors": 0,
+          "AuditWarnings": 0
+        }
+      ]
+    }
+  ],
+  "Passed": true,
+  "Qualification": "Technical generated-package, scheduling and headless evidence; synthetic fixed asset identity, no renderer or art acceptance."
+}

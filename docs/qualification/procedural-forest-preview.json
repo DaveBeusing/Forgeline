@@ -1,0 +1,336 @@
+{
+  "sourceCommit": "94e63996143b71e65258893574d106191fea3efb",
+  "quality": "Medium",
+  "imageSha256": "01f708e8af869479a0ef4d464e13c63d6b76319ad77d0b758917443ef0fbb090",
+  "encoding": "Lossless APNG repack of native PNG IDAT streams; no resampling",
+  "runtimeFingerprint": "135b44877d4882ac539073738a43af7b4794ff35819cc2c1f55c353771743020",
+  "schemaVersion": 1,
+  "framesPerSecond": 8,
+  "motion": [
+    {
+      "frame": 0,
+      "name": "frame-000.png",
+      "pose": {
+        "target": {
+          "x": 286.458,
+          "y": 33.815983,
+          "z": 2817.788
+        },
+        "yawRadians": 0.7853982,
+        "pitchRadians": -0.9599311,
+        "distance": 120,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "9734ad161a302cb319b890d1bb87ab3f6d51530ed3efc5971133274a9f606e88"
+    },
+    {
+      "frame": 1,
+      "name": "frame-001.png",
+      "pose": {
+        "target": {
+          "x": 442.6449,
+          "y": 31.642416,
+          "z": 2839.9204
+        },
+        "yawRadians": 0.9074192,
+        "pitchRadians": -0.9599311,
+        "distance": 137.83548,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "f9cbbb0bbc16031bec4e79d9055a08bf9b4718a576d6fa977cebbdc5c3744c4e"
+    },
+    {
+      "frame": 2,
+      "name": "frame-002.png",
+      "pose": {
+        "target": {
+          "x": 571.8256,
+          "y": 29.06761,
+          "z": 2902.4907
+        },
+        "yawRadians": 1.0083417,
+        "pitchRadians": -0.9599311,
+        "distance": 143.86853,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "cc29555faaade8caa6c19af579dfd0f24a6012d2de8eaefc396b1b2aaca257c4"
+    },
+    {
+      "frame": 3,
+      "name": "frame-003.png",
+      "pose": {
+        "target": {
+          "x": 651.6637,
+          "y": 27.675968,
+          "z": 2994.6797
+        },
+        "yawRadians": 1.0707152,
+        "pitchRadians": -0.9599311,
+        "distance": 134.10684,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "cce0f4cba8418570dfdfe41eae862cd745aa18aeb547c3ca336765dd17d56916"
+    },
+    {
+      "frame": 4,
+      "name": "frame-004.png",
+      "pose": {
+        "target": {
+          "x": 668.3544,
+          "y": 27.388002,
+          "z": 3008
+        },
+        "yawRadians": 1.0837548,
+        "pitchRadians": -0.9599311,
+        "distance": 115.01011,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "6323d7fc53abc29097cd57e9f289dd9cce17c865f872eb8ea7780839e50f832c"
+    },
+    {
+      "frame": 5,
+      "name": "frame-005.png",
+      "pose": {
+        "target": {
+          "x": 619.0117,
+          "y": 28.297295,
+          "z": 3008
+        },
+        "yawRadians": 1.0452058,
+        "pitchRadians": -0.9599311,
+        "distance": 99.21539,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "7087085212bca2c06c79388d08eef4f928053701a0b0c6740a50703131502682"
+    },
+    {
+      "frame": 6,
+      "name": "frame-006.png",
+      "pose": {
+        "target": {
+          "x": 512.1675,
+          "y": 30.12911,
+          "z": 3008
+        },
+        "yawRadians": 0.96173376,
+        "pitchRadians": -0.9599311,
+        "distance": 97.174644,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "28d13b2a84b71f1055a363af7e950dd63e9cf516e840366d80cc7a647e846c83"
+    },
+    {
+      "frame": 7,
+      "name": "frame-007.png",
+      "pose": {
+        "target": {
+          "x": 366.29608,
+          "y": 32.77685,
+          "z": 3008
+        },
+        "yawRadians": 0.84777164,
+        "pitchRadians": -0.9599311,
+        "distance": 110.23833,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "6f7c5aab549c8606e0605c8e672832264fa952506d3e2c35b825845b5af66a95"
+    },
+    {
+      "frame": 8,
+      "name": "frame-008.png",
+      "pose": {
+        "target": {
+          "x": 206.6198,
+          "y": 34.542282,
+          "z": 3008
+        },
+        "yawRadians": 0.7230246,
+        "pitchRadians": -0.9599311,
+        "distance": 129.76169,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "aa5e98ccbd0c1f3902bd91ffdfb7cd40ba7e2f9940d7392a71ebb8b5717df525"
+    },
+    {
+      "frame": 9,
+      "name": "frame-009.png",
+      "pose": {
+        "target": {
+          "x": 64,
+          "y": 35.479,
+          "z": 3008
+        },
+        "yawRadians": 0.60906255,
+        "pitchRadians": -0.9599311,
+        "distance": 142.82535,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "309a6499ed47f592d7470ccc32bfe31cdfbd2e26e9dba5470edd1ac9df87a473"
+    },
+    {
+      "frame": 10,
+      "name": "frame-010.png",
+      "pose": {
+        "target": {
+          "x": 64,
+          "y": 35.479,
+          "z": 3008
+        },
+        "yawRadians": 0.52559054,
+        "pitchRadians": -0.9599311,
+        "distance": 140.7846,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "d432373571523049cd605637e384203dd3abfeaca5e69838b25714d3df3df290"
+    },
+    {
+      "frame": 11,
+      "name": "frame-011.png",
+      "pose": {
+        "target": {
+          "x": 64,
+          "y": 35.479,
+          "z": 3008
+        },
+        "yawRadians": 0.4870416,
+        "pitchRadians": -0.9599311,
+        "distance": 124.98988,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "f3a5d6b9f9f1bebdc377dc430d408124a2c5f3ada54d4d0d4269f2e353bdffac"
+    },
+    {
+      "frame": 12,
+      "name": "frame-012.png",
+      "pose": {
+        "target": {
+          "x": 64,
+          "y": 35.400738,
+          "z": 2994.6797
+        },
+        "yawRadians": 0.50008124,
+        "pitchRadians": -0.9599311,
+        "distance": 105.89315,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "d29025fa09ebc43c9c1f433dfde041efea9d241d85e1ea6ff485e62bea9a9942"
+    },
+    {
+      "frame": 13,
+      "name": "frame-013.png",
+      "pose": {
+        "target": {
+          "x": 64,
+          "y": 35.23702,
+          "z": 2902.4907
+        },
+        "yawRadians": 0.56245476,
+        "pitchRadians": -0.9599311,
+        "distance": 96.13147,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "4a6f2f48205736b52ef63801fef97a82611ab08d9d29842b13a9bf70c81f4d6f"
+    },
+    {
+      "frame": 14,
+      "name": "frame-014.png",
+      "pose": {
+        "target": {
+          "x": 130.2712,
+          "y": 35.023705,
+          "z": 2839.9204
+        },
+        "yawRadians": 0.6633772,
+        "pitchRadians": -0.9599311,
+        "distance": 102.16453,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "b64da77dee04a974bae1adaf033fee586fd0ba920c9228f0e181edcb190ef5ae"
+    },
+    {
+      "frame": 15,
+      "name": "frame-015.png",
+      "pose": {
+        "target": {
+          "x": 286.45807,
+          "y": 33.81598,
+          "z": 2817.788
+        },
+        "yawRadians": 0.78539824,
+        "pitchRadians": -0.9599311,
+        "distance": 120.000015,
+        "hasPointerPosition": false,
+        "pointerPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "pixelSha256": "7936bae5587c0284373066aac395db32d7dcae727856d0586ef36ec3f4280772"
+    }
+  ],
+  "surface": {
+    "width": 320,
+    "height": 200
+  },
+  "frameCount": 16
+}
