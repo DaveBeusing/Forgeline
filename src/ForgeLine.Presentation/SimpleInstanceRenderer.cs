@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Buffers;
 using ForgeLine.Presentation.RenderSubmission;
@@ -82,6 +83,9 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         _vegetation = vegetation ?? new();
         _vegetation.Validate();
 
+        _decorationCatalog = runtimeAssets;
+        _decorationFactory = () => new SimpleInstanceRenderer(graphics, runtimeAssets, lighting, lodDiameterScale, textureDetail,
+            vegetationMotion, environment, vegetation, clusterCulling) { _decorationPass = true };
         _graphics = graphics;
         try
         {
@@ -170,6 +174,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(diagnostics);
         _runtimeAssets?.ObserveFrameDiagnostics(diagnostics);
+        _decorations?.Observe(diagnostics);
     }
 
     public void Prepare(RtsCamera camera, RenderWorld world, in RenderPreparationRequest request, ParticleVfxRenderer? particles = null)
@@ -179,6 +184,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         ArgumentNullException.ThrowIfNull(world);
         if (_graphics.IsRecording) throw new InvalidOperationException("Prepare assets before command recording.");
         if (request.Width < 1 || request.Height < 1) throw new ArgumentOutOfRangeException(nameof(request));
+        PrepareDecorations(camera, world, request);
         if (_runtimeAssets is null) return;
         _runtimeAssets.MetricsEnabled = request.MetricsEnabled;
         _runtimeAssets.BeginPrepare(world.CurrentSnapshot?.SessionId ?? default, world.CurrentSnapshot?.Tick.Value ?? 0);
@@ -198,12 +204,14 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
     }
     public void Submit()
     {
+        _decorations?.Submit();
         // A suspended/occluded device can skip the recording callback entirely.
         if (_runtimeAssets?.IsPrepared == true) { _runtimeAssets.AbortPrepare(); return; }
         if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Submit();
     }
-    public void Retire() { if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Retire(); }
+    public void Retire() { _decorations?.Retire(); if (_runtimeAssets?.FrameActive == true) _runtimeAssets.Retire(); }
 
+    public InstanceRenderDiagnostics LastShadowDiagnostics { get; private set; }
     public InstanceRenderDiagnostics LastDiagnostics { get; private set; }
 
     public InstanceSubmissionMetrics SubmissionMetrics
@@ -238,9 +246,13 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         ParticleVfxRenderer? particles = null)
     {
         ArgumentNullException.ThrowIfNull(context);
+        if (world.CurrentSnapshot?.ChunkDecorations is not null)
+            (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).Validate(context, camera, world);
         _runtimeAssets?.BeginRecord();
         try { RenderCore(context, camera, world, alpha, presentationSeconds: presentationSeconds, particles: particles); }
         finally { _runtimeAssets?.EndRecord(); }
+        if (world.CurrentSnapshot?.ChunkDecorations is not null)
+            (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).Render(context, camera, world, presentationSeconds);
     }
 
     public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,
@@ -252,9 +264,15 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         InstanceRenderDiagnostics prior = LastDiagnostics;
         ResourceDepositRenderDiagnostics priorResources = ResourceDiagnostics;
         ArgumentNullException.ThrowIfNull(context);
+        if (world.CurrentSnapshot?.ChunkDecorations is not null)
+            (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).Validate(context, camera, world, frame.ViewProjection);
         _runtimeAssets?.BeginRecord();
         try { RenderCore(context, camera, world, alpha, frame.ViewProjection, maximumCasters, maximumDraws, presentationSeconds); }
         finally { _runtimeAssets?.EndRecord(); }
+        LastShadowDiagnostics = LastDiagnostics;
+        if (world.CurrentSnapshot?.ChunkDecorations is not null)
+            (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).RenderShadow(context, camera, world, frame,
+                Math.Max(0, maximumCasters - LastDiagnostics.VisibleInstances), Math.Max(0, maximumDraws - LastDiagnostics.DrawCalls), presentationSeconds);
         LastDiagnostics = prior;
         ResourceDiagnostics = priorResources;
     }
@@ -264,6 +282,8 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         double? presentationSeconds = null, ParticleVfxRenderer? particles = null, int prepareWidth = 0, int prepareHeight = 0)
     {
         ThrowIfDisposed();
+        long cullingStarted = _decorationPass ? Stopwatch.GetTimestamp() : 0;
+        if (_decorationPass) { DecorationCullingMilliseconds = 0; DecorationUploadMilliseconds = 0; }
         bool preparing = context is null;
         int viewportWidth = context?.Width ?? prepareWidth;
         int viewportHeight = context?.Height ?? prepareHeight;
@@ -584,6 +604,24 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
                         else highLod++;
                     }
                 }
+                else if (instance.Decoration.IsSpecified)
+                {
+                    WorldAssetLod lod = ScreenSpaceLod.Select(projectedDiameter, previousLod, 65.0f, 18.0f, _lodDiameterScale) > 0
+                        ? WorldAssetLod.Reduced : WorldAssetLod.High;
+                    string mesh = DecorationMesh(instance.Decoration, lod == WorldAssetLod.Reduced);
+                    usesRuntimeMesh = _runtimeAssets is not null && TryGetMesh(mesh, out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                    if (_runtimeAssets is not null && !usesRuntimeMesh)
+                    {
+                        mesh = instance.Decoration.MeshAssetId!;
+                        usesRuntimeMesh = TryGetMesh(mesh, out runtimeMesh, out runtimeMeshId) && runtimeMesh.IsValid;
+                    }
+                    if (_runtimeAssets is not null && !usesRuntimeMesh) continue;
+                    _ = DecorationNormalization(instance.Decoration, runtimeMeshId);
+                    if (hasLodIdentity && !shadowProjection.HasValue && !preparing) _currentLods[lodKey] = lod == WorldAssetLod.Reduced ? 1 : 0;
+                    if (lod == WorldAssetLod.Reduced) { lod1Instances++; reducedLod++; } else highLod++;
+                    materialAssetId = usesRuntimeMesh && runtimeMesh.HasMaterial ? runtimeMesh.MaterialId.Value :
+                        WorldPresentationCatalog.Get(instance.WorldFeature.Visual).MaterialAssetId;
+                }
                 else if (instance.WorldFeature.IsSpecified)
                 {
                     materialAssetId =
@@ -668,6 +706,12 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
                     presentationSeconds.HasValue ? VegetationVisualMotion.Transform(instance, projectedDiameter, presentationSeconds.Value) :
                         fieldCluster.HasValue ? instance.Transform.ToMatrix() : preparedRoot.Transform;
                 if (presentationSeconds.HasValue && projectedDiameter > 18 && VegetationVisualMotion.Applies(instance)) animatedVegetation++;
+
+                if (instance.Decoration.IsSpecified)
+                {
+                    worldMatrix = DecorationNormalization(instance.Decoration, runtimeMeshId) * worldMatrix;
+                    color *= new Vector4(instance.Decoration.Tint, instance.Decoration.Tint, instance.Decoration.Tint, 1);
+                }
 
                 if (instance.InfrastructureFeature.IsSpecified)
                 {
@@ -757,6 +801,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         WorkMetrics = new(world.InstanceCount, candidates, _preparedRoots.Interpolations, _preparedRoots.Hits,
             instanceTests, _meshResolutions, _materialResolutions, visible, 0, 0, 0, 0)
         { PreparedRootBytes = _preparedRoots.RetainedBytes, SpatialIndexBytes = _spatialVisibility.RetainedBytes };
+        if (_decorationPass) DecorationCullingMilliseconds = Stopwatch.GetElapsedTime(cullingStarted).TotalMilliseconds;
         if (context is null) return;
 
         int preparedParts = 0;
@@ -847,6 +892,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
             LastDiagnostics = new(world.InstanceCount, visible, world.InstanceCount - visible, 0) { ResourceDeposits = ResourceDiagnostics };
             return;
         }
+        long uploadStarted = _decorationPass ? Stopwatch.GetTimestamp() : 0;
         IGraphicsBuffer instanceBuffer =
             GetFrameInstanceBuffer(
                 context.FrameIndex,
@@ -879,6 +925,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
 
         instanceBuffer.SetData<InstanceRenderData>(
             instanceData.AsSpan(0, submittedInstances));
+        if (_decorationPass) DecorationUploadMilliseconds = Stopwatch.GetElapsedTime(uploadStarted).TotalMilliseconds;
 
         Span<float> constants =
             stackalloc float[RootConstantCount];
@@ -1031,6 +1078,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         _preparedRoots.Clear(); _passMeshes.Clear(); _passMaterials.Clear();
         _previousLods.Clear();
         _currentLods.Clear(); _worldLods.Clear(); _activeLodHistory = null;
+        _decorations?.Dispose(); _decorations = null;
         _skinFrames?.Dispose(); _skinFrames = null;
         _runtimeAssets?.Dispose();
         _indexBuffer.Dispose();

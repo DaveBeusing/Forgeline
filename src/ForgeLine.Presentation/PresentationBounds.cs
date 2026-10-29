@@ -78,6 +78,11 @@ public static class PresentationBounds
     public static AxisAlignedBounds ResolveAxisAlignedBounds(
         in RenderInstance instance)
     {
+        if (instance.Decoration.IsSpecified)
+        {
+            float radius = Vector3.Abs(instance.Transform.Scale).Length() * (1 + VegetationVisualMotion.MaximumAngle);
+            return new(instance.Transform.Position - new Vector3(radius), instance.Transform.Position + new Vector3(radius));
+        }
         if (instance.ConveyorFeature.IsSpecified) return instance.ConveyorFeature.Placement.Bounds;
         Vector3 extents =
             ResolveWorldAxisAlignedHalfExtents(

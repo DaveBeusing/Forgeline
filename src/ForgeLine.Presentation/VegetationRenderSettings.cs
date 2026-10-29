@@ -22,6 +22,14 @@ public readonly record struct VegetationRenderSettings
         if (Vector3.DistanceSquared(instance.Transform.Position, cameraPosition) > MaximumDistanceMeters * MaximumDistanceMeters) return false;
         if (Density == 1) return true;
         if (Density == 0) return false;
+        if (instance.Decoration.IsSpecified)
+        {
+            ulong hash64 = instance.Decoration.StableId + 0x9e3779b97f4a7c15UL;
+            hash64 = unchecked((hash64 ^ (hash64 >> 30)) * 0xbf58476d1ce4e5b9UL);
+            hash64 = unchecked((hash64 ^ (hash64 >> 27)) * 0x94d049bb133111ebUL);
+            hash64 ^= hash64 >> 31;
+            return (hash64 >> 11) * (1.0 / 9007199254740992.0) < Density;
+        }
         uint identity = unchecked(instance.Entity.Index * 0x85ebca6bu ^ instance.DebugIdentity * 0xc2b2ae35u ^ (uint)instance.WorldFeature.Visual);
         uint hash = unchecked(identity * 0x9e3779b9u);
         hash ^= hash >> 16;
