@@ -37,11 +37,13 @@ try {
 Copy-Item -Path (Join-Path $client '*.dll') -Destination (Join-Path $root 'bin') -Force
 $previousFallback = [Environment]::GetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK')
 try {
-    [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $(if ($StaticBufferUploadFallback) {'1'} else {$null}))
+    if ($StaticBufferUploadFallback) { $env:FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK = '1' }
+    else { Remove-Item Env:FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK -ErrorAction SilentlyContinue }
     $probeWorkload = if ($Workload -eq 'StaticGeometry') {'static-geometry'} else {'texture'}
     & dotnet (Join-Path $root 'bin/UploadProbe.dll') (Join-Path $root 'measurement.json') $SourceSha $probeWorkload *> (Join-Path $root 'measurement.log')
     if ($LASTEXITCODE -ne 0) { throw 'Native upload measurement failed; inspect measurement.log.' }
 } finally {
-    [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $previousFallback)
+    if ($null -eq $previousFallback) { Remove-Item Env:FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK -ErrorAction SilentlyContinue }
+    else { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $previousFallback) }
 }
 Get-Content -LiteralPath (Join-Path $root 'measurement.json') -Raw
