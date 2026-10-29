@@ -102,6 +102,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./build/Test-EnvironmentScatter.ps1
 
+      - name: Biome terrain material contracts
+        shell: pwsh
+        run: |
+          dotnet test --project tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj --configuration Release --no-build -- --filter-class ForgeLine.Presentation.Tests.BiomeTerrainMaterialTests ForgeLine.Presentation.Tests.BiomeTerrainMaterialNativeTests ForgeLine.Presentation.Tests.TerrainSplatMapTests ForgeLine.Presentation.Tests.TerrainTransitionTests --parallel none
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Fair opponent profiles and legal counterplay
         shell: pwsh
         run: |
