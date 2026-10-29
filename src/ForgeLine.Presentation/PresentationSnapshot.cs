@@ -8,6 +8,9 @@ public sealed class PresentationSnapshot
 {
     private readonly RenderInstance[] _instances;
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ChunkDecorationSnapshot? ChunkDecorations { get; init; }
+
     public NavigationDiagnosticSnapshot? NavigationDiagnosis { get; init; }
     public MatchDebriefSummary? MatchDebrief { get; init; }
 
