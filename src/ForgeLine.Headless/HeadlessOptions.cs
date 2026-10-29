@@ -31,6 +31,9 @@ internal readonly record struct HeadlessOptions(
     public ulong DebriefPlayer { get; init; } = 1;
     public string ScenarioKey { get; init; } = CentralDivideScenario.CompositionKey;
     public string? ScenarioRoot { get; init; }
+    public string? GeneratedMap { get; init; }
+    public string? GeneratedAssetSha256 { get; init; }
+    public string? GeneratedManifestSha256 { get; init; }
     public string? PacingThresholdsInput { get; init; }
     public string? DeveloperPresetInput { get; init; }
     public string? ReproductionId { get; init; }
@@ -69,6 +72,7 @@ internal readonly record struct HeadlessOptions(
         string? replayInput = null;
         bool showHelp = false;
         string? scenarioRoot = null;
+        string? generatedMap = null, generatedAsset = null, generatedManifest = null;
         string? pacingThresholdsInput = null;
         string scenarioKey = CentralDivideScenario.CompositionKey;
         string? developerPresetInput = null;
@@ -94,6 +98,15 @@ internal readonly record struct HeadlessOptions(
                     pacingThresholdsInput = GetValue(args, ref index, argument);
                     break;
 
+                case "--generated-map":
+                    generatedMap = GetValue(args, ref index, argument);
+                    break;
+                case "--generated-asset-sha256":
+                    generatedAsset = GetValue(args, ref index, argument);
+                    break;
+                case "--generated-manifest-sha256":
+                    generatedManifest = GetValue(args, ref index, argument);
+                    break;
                 case "--scenario-root":
                     scenarioRoot = GetValue(args, ref index, argument);
                     break;
@@ -274,6 +287,15 @@ internal readonly record struct HeadlessOptions(
                 throw new ArgumentException("--pacing-thresholds requires --telemetry-output.");
             if (telemetryOutput is not null && matchCount > 128)
                 throw new ArgumentException("Telemetry benchmark batches support at most 128 matches.");
+            if (generatedMap is not null)
+            {
+                if (scenarioWasSpecified || scenarioRoot is not null || developerPresetInput is not null)
+                    throw new ArgumentException("--generated-map conflicts with authored scenarios, roots and developer presets.");
+                if (generatedAsset is null) throw new ArgumentException("--generated-map requires --generated-asset-sha256 from the host.");
+                scenario = HeadlessScenarioKind.Match;
+            }
+            else if (generatedAsset is not null || generatedManifest is not null)
+                throw new ArgumentException("Generated identities require --generated-map.");
             if (scenarioRoot is not null && scenario != HeadlessScenarioKind.Match)
                 throw new ArgumentException("--scenario-root requires a registered match scenario.");
             ValidateCombination(
@@ -311,7 +333,7 @@ internal readonly record struct HeadlessOptions(
             replayOutput,
             loadInput,
             replayInput,
-            showHelp) { DebriefOutput = debriefOutput, DebriefPlayer = debriefPlayer, ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey, PacingThresholdsInput = pacingThresholdsInput,
+            showHelp) { GeneratedMap = generatedMap, GeneratedAssetSha256 = generatedAsset, GeneratedManifestSha256 = generatedManifest, DebriefOutput = debriefOutput, DebriefPlayer = debriefPlayer, ScenarioRoot = scenarioRoot, ScenarioKey = scenarioKey, PacingThresholdsInput = pacingThresholdsInput,
                 DeveloperPresetInput = developerPresetInput, ReproductionId = reproductionId, ReproductionOutput = reproductionOutput,
                 ScenarioWasSpecified = scenarioWasSpecified, ProfileWasSpecified = profileWasSpecified, SeedWasSpecified = seedWasSpecified };
     }
