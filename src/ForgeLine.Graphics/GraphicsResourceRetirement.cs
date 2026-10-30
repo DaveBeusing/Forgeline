@@ -12,10 +12,14 @@ internal sealed class GraphicsResourceRetirement
     internal int LiveCount => _live.Count;
     internal int PeakPendingCount { get; private set; }
     internal long ReleasedCount { get; private set; }
+    internal long LiveBytes { get; private set; }
+    internal long PendingBytes { get; private set; }
 
-    internal Resource Register(Action release)
+    internal Resource Register(Action release, long logicalBytes = 0)
     {
-        var resource = new Resource(release);
+        ArgumentOutOfRangeException.ThrowIfNegative(logicalBytes);
+        var resource = new Resource(release, logicalBytes);
+        LiveBytes = checked(LiveBytes + logicalBytes);
         _live.Add(resource);
         return resource;
     }
@@ -58,6 +62,7 @@ internal sealed class GraphicsResourceRetirement
         }
         resource.IsDisposed = true;
         _pending.Add(resource);
+        PendingBytes = checked(PendingBytes + resource.LogicalBytes);
         PeakPendingCount = Math.Max(PeakPendingCount, _pending.Count);
     }
 
@@ -72,6 +77,7 @@ internal sealed class GraphicsResourceRetirement
                 continue;
             }
             _pending.RemoveAt(index);
+            PendingBytes -= resource.LogicalBytes;
             Release(resource);
         }
     }
@@ -86,6 +92,7 @@ internal sealed class GraphicsResourceRetirement
             ReleasedCount++;
         }
         _live.Clear();
+        LiveBytes = PendingBytes = 0;
         _pending.Clear();
         _recording.Clear();
     }
@@ -93,12 +100,14 @@ internal sealed class GraphicsResourceRetirement
     private void Release(Resource resource)
     {
         _live.Remove(resource);
+        LiveBytes -= resource.LogicalBytes;
         resource.Release();
         ReleasedCount++;
     }
 
-    internal sealed class Resource(Action release)
+    internal sealed class Resource(Action release, long logicalBytes = 0)
     {
+        internal long LogicalBytes { get; } = logicalBytes;
         internal ulong LastUseFence { get; set; }
         internal bool Recording { get; set; }
         internal bool IsDisposed { get; set; }

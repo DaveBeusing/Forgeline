@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "kind": "render-upgrade-ownership",
+  "baselineSha": "f34d695fcaa813616da8747a49d030e418081e04",
+  "serializedVersionException": "Directory.Build.props",
+  "packages": [
+    {
+      "id": "0_CompleteRenderTelemetry",
+      "wave": 0,
+      "dependsOn": [],
+      "owns": [
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "src/ForgeLine.Client/VisualReferenceCapture.cs",
+        "src/ForgeLine.Client/ReferencePerformanceSamples.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/GraphicsDiagnostics.cs",
+        "src/ForgeLine.Graphics/GraphicsResourceRetirement.cs",
+        "src/ForgeLine.Graphics/ResourceScheduling/D3D12UploadArena.cs",
+        "src/ForgeLine.Presentation/RenderContracts/RenderAssetFrameMetrics.cs",
+        "tests/ForgeLine.Client.Tests/ReferencePerformanceSamplesTests.cs",
+        "tests/ForgeLine.Client.Tests/RenderQualification/",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/",
+        "tests/ForgeLine.Graphics.Tests/GraphicsResourceRetirementTests.cs",
+        "build/rendering/qualification/",
+        "docs/rendering/render-engine-upgrade/Telemetry.md",
+        "docs/rendering/render-engine-upgrade/Ownership.json",
+        "src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/",
+        "src/ForgeLine.Client/RenderTelemetry/",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Client/ClientApplication.cs"
+      ]
+    },
+    {
+      "id": "1_EstablishRepeatableBaseline",
+      "wave": 1,
+      "dependsOn": [
+        "0_CompleteRenderTelemetry"
+      ],
+      "owns": [
+        "build/rendering/render-engine-upgrade/",
+        "docs/rendering/render-engine-upgrade/Baseline.md",
+        "docs/rendering/render-engine-upgrade/MeasurementProtocol.md",
+        "docs/rendering/render-engine-upgrade/evidence/baseline/"
+      ]
+    },
+    {
+      "id": "2_ReduceCpuSubmissionCost",
+      "wave": 2,
+      "dependsOn": [
+        "1_EstablishRepeatableBaseline"
+      ],
+      "owns": [
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.PreparationReuse.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.Resources.cs",
+        "src/ForgeLine.Presentation/RenderSubmission/",
+        "tests/ForgeLine.Presentation.Tests/RenderSubmission/",
+        "tests/ForgeLine.Presentation.Tests/SimpleInstanceRendererTests.cs",
+        "benchmarks/ForgeLine.Rendering.Benchmarks/InstanceSubmissionScalingBenchmarks.cs",
+        "docs/rendering/render-engine-upgrade/CpuSubmission.md"
+      ]
+    },
+    {
+      "id": "2_QualifyGpuCompositionCost",
+      "wave": 2,
+      "dependsOn": [
+        "1_EstablishRepeatableBaseline"
+      ],
+      "owns": [
+        "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+        "src/ForgeLine.Graphics/SceneCompositeShader.cs",
+        "tests/ForgeLine.Graphics.Tests/SceneComposition/",
+        "tests/ForgeLine.Graphics.Tests/D3D12SceneCompositionTests.cs",
+        "tests/ForgeLine.Graphics.Tests/ResolutionScaleTests.cs",
+        "build/rendering/composition-effects/",
+        "docs/rendering/render-engine-upgrade/GpuComposition.md"
+      ]
+    },
+    {
+      "id": "3_HardenRenderLifecycle",
+      "wave": 3,
+      "dependsOn": [
+        "2_ReduceCpuSubmissionCost",
+        "2_QualifyGpuCompositionCost"
+      ],
+      "owns": [
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "src/ForgeLine.Client/ClientRenderSurface.cs",
+        "src/ForgeLine.Client/ClientRenderPublication.cs",
+        "src/ForgeLine.Client/ClientWorldPassSequence.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/GraphicsSurfaceLifecycleState.cs",
+        "src/ForgeLine.Graphics/GraphicsResourceRetirement.cs",
+        "src/ForgeLine.Graphics/ResourceScheduling/",
+        "tests/ForgeLine.Client.Tests/RenderParallelization/",
+        "tests/ForgeLine.Client.Tests/ClientWorldPassSequenceTests.cs",
+        "tests/ForgeLine.Graphics.Tests/D3D12GraphicsResizeIntegrationTests.cs",
+        "tests/ForgeLine.Graphics.Tests/D3D12ResourceLifetimeIntegrationTests.cs",
+        "tests/ForgeLine.Graphics.Tests/ResourceScheduling/",
+        "build/rendering/render-engine-upgrade/",
+        "docs/rendering/render-engine-upgrade/Lifecycle.md"
+      ]
+    },
+    {
+      "id": "4_QualifyIntegratedRenderer",
+      "wave": 4,
+      "dependsOn": [
+        "3_HardenRenderLifecycle"
+      ],
+      "owns": [
+        "build/rendering/render-engine-upgrade/",
+        "docs/rendering/render-engine-upgrade/Qualification.md",
+        "docs/rendering/render-engine-upgrade/evidence/final/",
+        "docs/Architecture.md",
+        "docs/Development.md",
+        "docs/ScalableRendering.md",
+        "docs/RendererFeatureInventory.md"
+      ]
+    }
+  ]
+}

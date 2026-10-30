@@ -16,7 +16,7 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
         Owner = owner;
         Description = description;
         _resource = resource;
-        Lifetime = owner.RegisterResource(resource.Dispose);
+        Lifetime = owner.RegisterResource(resource.Dispose, checked((long)description.SizeInBytes));
     }
 
     public GraphicsBufferDescription Description { get; }

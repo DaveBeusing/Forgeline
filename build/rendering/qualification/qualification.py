@@ -8,6 +8,7 @@ open or failed gates. No input, baseline, threshold, or image is rewritten.
 from __future__ import annotations
 
 import argparse
+import base64
 from datetime import datetime, timezone
 import hashlib
 import itertools
@@ -350,6 +351,8 @@ def validate_native(manifest: dict, root: Path, run: dict, plan: dict, expected_
             for name, value in frame.items():
                 if name.endswith("Milliseconds") and value is not None:
                     number(value, name)
+        if "rawGpuTiming" in performance:
+            validate_raw_gpu_timing(performance["rawGpuTiming"], gpu)
         require(len(gpu) <= count, "More GPU observations than measured submitted frames")
         confirm_summary(case.get("gpu"), gpu_values, "GPU distribution")
         confirm_summary(performance.get("gpu"), gpu_values, "nested GPU distribution")
@@ -368,7 +371,7 @@ def validate_native(manifest: dict, root: Path, run: dict, plan: dict, expected_
                          runtimeFingerprint=runtime_hash, fixtureFingerprint=fingerprint, profile=case["profile"], workload=workload,
                          imageSha256=digest(case.get("imageSha256"), "image hash"),
                          binaryIdentity=[manifest["clientAssemblySha256"].lower(), manifest["presentationAssemblySha256"].lower()],
-                         hardwareIdentitySha256=hardware_id, software=software, gpuFrequencyHz=timing["timestampFrequencyHz"],
+                         hardwareIdentitySha256=hardware_id, actualDevice=device, software=software, gpuFrequencyHz=timing["timestampFrequencyHz"],
                          motionImageCount=len(motions), setupMilliseconds=capture_run["setupMilliseconds"],
                          cpuScope="PrepareTerrain and RenderFrame including Present/frame reuse; excludes live host/event/camera work",
                          rawCpuCount=len(cpu), rawGpuCount=len(gpu))
@@ -376,14 +379,95 @@ def validate_native(manifest: dict, root: Path, run: dict, plan: dict, expected_
     return rows, sorted(capture_keys(plan, run["runProfile"], run["cameraPath"]) - rows.keys())
 
 
+def validate_physical_run_conditions(conditions: dict, actual_identity: str, command_start: float, command_end: float, *, after: bool) -> None:
+    if "hardwareObservations" not in conditions:
+        return  # Historical/unavailable conditions cannot close the hardware gate.
+    from telemetry_contracts import hardware_conditions
+    require(digest(conditions.get("hardwareIdentitySha256"), "physical hardware identity") == actual_identity, "Physical samples belong to a different actual native adapter/driver/SDK")
+    objects = {}
+    for label, raw_key, hash_key in (("hardwareObservations", "rawHardwareObservationBase64", "hardwareObservationSha256"),
+                                      ("hardwarePolicy", "rawHardwarePolicyBase64", "hardwarePolicySha256")):
+        try:
+            raw = base64.b64decode(text(conditions.get(raw_key), raw_key), validate=True)
+            decoded = json.loads(raw)
+        except (ValueError, TypeError) as error:
+            raise ValidationError("Invalid preserved physical observation bytes") from error
+        require(hashlib.sha256(raw).hexdigest() == digest(conditions.get(hash_key), hash_key) and decoded == conditions.get(label), "Physical observation/policy bytes were changed")
+        objects[label] = decoded
+    observed = utc(conditions.get("observedAtUtc"), "physical condition time")
+    require(observed.timestamp() >= command_end if after else observed.timestamp() <= command_start, "Physical condition snapshot lies on the wrong side of its native command")
+    result = hardware_conditions(objects["hardwareObservations"], objects["hardwarePolicy"], actual_identity, observed,
+                                 datetime.fromtimestamp(command_start, timezone.utc) if after else None)
+    require(result["thermalState"] == conditions.get("thermalState") and result["powerSource"] == conditions.get("powerSource"), "Physical condition summary contradicts raw observations")
+    if after:
+        last = utc(objects["hardwareObservations"]["samples"][-1]["observedAtUtc"], "physical trace end").timestamp()
+        require(last >= command_end - 5, "Physical trace ends before the actual measured command")
+
+
+def validate_raw_gpu_timing(value: Any, derived: list | None = None) -> dict:
+    value = obj(value, "raw GPU export")
+    require(value.get("overflowed") is False, "Raw GPU observation storage overflowed")
+    require(value.get("scope") == "native-reference-direct-queue" and value.get("worldIntervalIncludesShadow") is True, "Raw native GPU scope is invalid")
+    seen, frequencies, by_fence = set(), {}, {}
+    for sample in items(value.get("completions"), "raw GPU completions"):
+        sample = obj(sample, "raw GPU completion")
+        generation = integer(sample.get("generation"), "device generation", 1)
+        resource = integer(sample.get("resourceGeneration"), "resource generation", 1)
+        require(sample.get("queue") == "direct", "Unexpected GPU queue")
+        fence = integer(sample.get("submittedFence"), "raw submitted fence", 1)
+        completed = integer(sample.get("completedFence"), "raw completed fence", 1)
+        require(fence <= completed < 2**64 - 1 and (generation, fence) not in seen, "Invalid, incomplete or duplicate raw GPU submission")
+        seen.add((generation, fence))
+        frequency = integer(sample.get("frequencyHz"), "raw GPU frequency", 1)
+        require(generation not in frequencies or frequencies[generation] == frequency, "GPU frequency changes within a queue generation")
+        frequencies[generation] = frequency
+        a, b = integer(sample.get("startTick"), "GPU start"), integer(sample.get("endTick"), "GPU end")
+        w, o = integer(sample.get("worldEndTick"), "world end"), integer(sample.get("overlayStartTick"), "overlay start")
+        require(a < b and a <= w <= o <= b, "Raw frame/pass endpoints are invalid")
+        for name in ("shadow", "particle"):
+            start, end = sample.get(name + "StartTick"), sample.get(name + "EndTick")
+            require((start is None) == (end is None), "Raw pass endpoint pair is incomplete")
+            if start is not None:
+                require(a <= integer(start, name + " start") <= integer(end, name + " end") <= b, "Raw pass lies outside its frame")
+        require(fence not in by_fence, "A native reference cannot reuse fence numbering across device generations")
+        by_fence[fence] = (b-a)*1000/frequency
+    if derived is not None:
+        for sample in derived:
+            fence = sample["fence"]
+            require(fence in by_fence and math.isclose(by_fence[fence], sample["frameMilliseconds"], rel_tol=1e-9, abs_tol=1e-9), "Raw GPU ticks disagree with derived native duration")
+    return dict(samples=len(seen), generations=len(frequencies))
+
+
 def validate_frame_envelope(value: Any) -> dict:
     """Validate a supplemental measured enclosing frame without adding overlaps."""
     value = obj(value, "frame envelope")
     require(type(value.get("schemaVersion")) is int and value["schemaVersion"] == 1 and value.get("kind") == "frame-envelope" and value.get("scope") == "live-client", "Invalid live frame envelope contract")
+    return validate_frame_samples(value)
+
+
+def validate_live_owner_telemetry(value: Any) -> dict:
+    value = obj(value, "live render-owner telemetry")
+    require(type(value.get("schemaVersion")) is int and value["schemaVersion"] == 1 and
+            value.get("kind") == "live-render-owner-telemetry" and value.get("scope") == "live-client", "Invalid live owner telemetry contract")
+    require(value.get("nativeFixtureBindingAvailable") is False, "Ordinary live gameplay must not claim native fixture identity")
+    result = validate_frame_samples(value)
+    return dict(**result, nativeFixtureAcceptance="open", scope="active-render-owner; independent platform/simulation work excluded")
+
+
+def validate_frame_samples(value: dict) -> dict:
     require(value.get("gpuStreamScope") == "independent-live-client", "Live GPU samples must declare their independent client stream, not masquerade as frozen native fences")
     text(value.get("streamId"), "live client stream identity")
+    require(value.get("overflowed", False) is False, "Live telemetry overflow invalidates the declared window")
     frequency = integer(value.get("frequencyHz"), "CPU frequency", 1)
     require(items(value.get("includes"), "frame includes") == list(PHASES), "Frame envelope must explicitly include every required phase")
+    if "window" in value:
+        window = obj(value["window"], "measurement window")
+        require(window.get("completed") is True and window.get("contiguous") is True and window.get("arm") == "first-gameplay-iteration", "Live window is incomplete or undeclared")
+        integer(window.get("warmups"), "live warmups")
+        require(integer(window.get("samples"), "live sample count", 1) == len(items(value.get("frames"), "live frames")), "Declared live sampling count differs")
+    if "gpuCompletions" in value:
+        validate_raw_gpu_timing(dict(overflowed=value.get("overflowed"), scope="native-reference-direct-queue",
+                                    worldIntervalIncludesShadow=True, completions=value["gpuCompletions"]))
     times, process_bytes, thread_bytes, gpu_times = [], [], [], []
     fences: dict[tuple, int] = {}
     frequencies: dict[tuple, int] = {}
@@ -391,6 +475,7 @@ def validate_frame_envelope(value: Any) -> dict:
     for index, frame in enumerate(items(value.get("frames"), "enclosing frames", nonempty=True)):
         frame = obj(frame, "enclosing frame")
         require(integer(frame.get("index"), "frame index") == index, "Enclosing frame sequence is incomplete")
+        require(frame.get("state", "gameplay") == "gameplay", "Non-gameplay observations cannot qualify a gameplay frame window")
         start, end = integer(frame.get("startTick"), "frame start"), integer(frame.get("endTick"), "frame end")
         require(previous_end <= start < end, "Invalid or overlapping enclosing frame timestamps")
         previous_end = end
@@ -409,6 +494,10 @@ def validate_frame_envelope(value: Any) -> dict:
             require(stream[0] == "direct", "Supplemental GPU samples must retain the existing direct queue contract")
             fence = integer(gpu.get("submittedFence"), "GPU submitted fence", 1)
             completed = integer(gpu.get("completedFence"), "GPU completed fence", 1)
+            if "submittedFence" in frame:
+                require(frame["submittedFence"] == fence and frame.get("generation") == gpu["generation"] and
+                        frame.get("resourceGeneration") == integer(gpu.get("resourceGeneration"), "resource generation", 1),
+                        "Live CPU/GPU actual submission identities differ")
             require(fences.get(stream, 0) < fence <= completed < 2**64 - 1, "GPU readback is duplicated, invalid, or not fence completed")
             fences[stream] = fence
             a, b = integer(gpu.get("startTick"), "GPU start"), integer(gpu.get("endTick"), "GPU end")
@@ -679,6 +768,20 @@ def evaluate(cohort: dict, root: Path) -> dict:
     require(cohort.get("comparisonKind") in ("optimization", "visual-candidate"), "Comparison must declare optimization or visual-candidate")
     sources = {key: digest(cohort.get(key), key, 40) for key in
                ("analysisMasterSha", "integratedFoundationSha", "integratedRepairSha", "baselineSha", "candidateSha")}
+    source_sdks, source_pin_commands = {}, set()
+    if cohort.get("sourcePins"):
+        for role in ("baseline", "candidate"):
+            pin = obj(obj(cohort["sourcePins"], "source pins").get(role), role + " source pin")
+            require(pin.get("sourceSha") == sources[role + "Sha"], "SDK pin source mismatch")
+            command_path = evidence(root, pin.get("globalJsonCommand"))
+            command = read_json(command_path)
+            source_pin_commands.add(hashlib.sha256(canonical(command)).hexdigest())
+            args = items(command.get("arguments"), "source pin command arguments")
+            require(command.get("exitCode") == 0 and len(args) == 4 and args[0] == "-C" and args[2:] == ["show", sources[role + "Sha"] + ":global.json"], "SDK pin is not read from the exact Git source")
+            global_path = evidence(command_path.parent, command.get("stdout"))
+            source_sdks[role] = text(obj(read_json(global_path).get("sdk"), "SDK pin").get("version"), "pinned SDK")
+            provenance = read_json(evidence(root, pin.get("provenance")))
+            require(provenance.get("sourceRevision") == sources[role + "Sha"] and provenance.get("sdk") == source_sdks[role], "Package SDK provenance differs from exact source")
     plan = validate_plan(cohort.get("plan"))
     plan_path = evidence(root, cohort.get("planEvidence"))
     require(read_json(plan_path) == plan, "Executed plan differs from immutable predeclared plan")
@@ -697,6 +800,7 @@ def evaluate(cohort: dict, root: Path) -> dict:
         journalled_commands.add(hashlib.sha256(canonical(record)).hexdigest())
         if record["exitCode"] != 0:
             other_command_failures.append(reference["path"])
+    require(source_pin_commands <= journalled_commands, "SDK source-pin commands must belong to the immutable executed command journal")
     gates: dict[str, dict] = {}
     def gate(name: str, status: str, reason: str) -> None:
         gates[name] = dict(status=status, reason=reason)
@@ -730,7 +834,7 @@ def evaluate(cohort: dict, root: Path) -> dict:
         if command["exitCode"] != 0:
             command_failures.append(dict(pair=pair, role=role, variant=list(variant), exitCode=command["exitCode"]))
             continue
-        require(text(run.get("sdk"), "SDK") == "10.0.401", "SDK differs from the current qualified pin")
+        require(text(run.get("sdk"), "SDK") == source_sdks.get(role, "10.0.401"), "SDK differs from its source-pinned package evidence (legacy cohorts retain their original qualified SDK)")
         conditions = obj(run.get("conditions"), "run conditions")
         for key in ("powerPlan", "powerSource", "thermalState"):
             text(conditions.get(key), "conditions." + key)
@@ -749,6 +853,13 @@ def evaluate(cohort: dict, root: Path) -> dict:
         paths.add(normalized_path)
         hashes.add(file_hash)
         rows, absent = validate_native(read_json(path), path.parent, run, plan, sources[role + "Sha"])
+        actual_identity = next(iter(rows.values()))["hardwareIdentitySha256"] if rows else None
+        if actual_identity is not None:
+            validate_physical_run_conditions(conditions, actual_identity, command_start, command_start + elapsed / 1000, after=False)
+            if "conditionsAfter" in run:
+                validate_physical_run_conditions(after_conditions, actual_identity, command_start, command_start + elapsed / 1000, after=True)
+                if "hardwarePolicySha256" in conditions:
+                    require(conditions["hardwarePolicySha256"] == after_conditions.get("hardwarePolicySha256"), "Hardware policy changed during the native run")
         missing.extend(dict(pair=pair, role=role, key=key) for key in absent)
         for key, row in rows.items():
             source_identity = (row["runtimeFingerprint"], row["binaryIdentity"])
@@ -832,8 +943,15 @@ def evaluate(cohort: dict, root: Path) -> dict:
             lookup = (integer(record.get("pair"), "supplemental pair", 1), role, text(record.get("caseKey"), "supplemental case"))
             require(lookup in observations and lookup not in full_frames, "Supplemental frames have no unique matching native case")
             native = observations[lookup]
+            if "actualDevice" in record:
+                require(record["actualDevice"] == native["actualDevice"], "Live output adapter differs from native case")
             require(digest(record.get("runtimeFingerprint"), "supplemental runtime") == native["runtimeFingerprint"] and
                     text(record.get("fixtureFingerprint"), "supplemental fixture") == native["fixtureFingerprint"], "Supplemental workload does not match native case")
+            if "rawTelemetry" in record:
+                original = read_json(evidence(path.parent, record["rawTelemetry"]))
+                context = read_json(evidence(path.parent, record.get("bindingContext")))
+                require(all(original.get(name) == record.get(name) for name in ("sourceSha", "runtimeFingerprint", "actualDevice", "frames", "gpuCompletions", "streamId", "frequencyHz", "window", "overflowed")), "Bound live measurements differ from the immutable original stream")
+                require(all(context.get(name) == record.get(name) for name in ("sourceSha", "role", "pair", "caseKey", "runtimeFingerprint", "hardwareIdentitySha256", "fixtureFingerprint")), "Bound live workload context was changed")
             result = validate_frame_envelope(record)
             require(record["streamId"] not in stream_ids, "One live-client stream cannot be relabelled as independent repetitions/cases")
             stream_ids.add(record["streamId"])

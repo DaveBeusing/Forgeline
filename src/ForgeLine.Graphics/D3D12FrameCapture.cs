@@ -34,7 +34,7 @@ internal sealed partial class D3D12GraphicsDevice
         ID3D12Resource readback = _device.CreateCommittedResource(HeapType.Readback,
             ResourceDescription.Buffer(bytes), ResourceStates.CopyDest);
         GraphicsResourceRetirement.Resource lifetime;
-        try { lifetime = RegisterResource(readback.Dispose); }
+        try { lifetime = RegisterResource(readback.Dispose, checked((long)bytes)); }
         catch { readback.Dispose(); throw; }
         _captureTarget = readback;
         _captureLifetime = lifetime;
@@ -53,7 +53,7 @@ internal sealed partial class D3D12GraphicsDevice
                 _captureShadowFootprint = footprints[0];
                 ID3D12Resource shadowReadback = _device.CreateCommittedResource(HeapType.Readback,
                     ResourceDescription.Buffer(shadowBytes), ResourceStates.CopyDest);
-                try { _captureShadowLifetime = RegisterResource(shadowReadback.Dispose); }
+                try { _captureShadowLifetime = RegisterResource(shadowReadback.Dispose, checked((long)shadowBytes)); }
                 catch { shadowReadback.Dispose(); throw; }
                 _captureShadowTarget = shadowReadback;
             }

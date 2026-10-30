@@ -173,6 +173,8 @@ internal sealed class ClientRenderHost : IDisposable
     private ClientVisualQualificationSnapshot? _latestQualification;
     private ExceptionDispatchInfo? _failure;
     private int _stopping;
+    private int _telemetryWindowPending = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_OUTPUT")) ? 0 : 1;
+    internal bool TelemetryWindowCompleted => Volatile.Read(ref _telemetryWindowPending) == 0;
     private int _terrainPreparing;
     internal bool IsPreparingTerrain => Volatile.Read(ref _terrainPreparing) != 0;
     internal bool NeedsFramePublication => _publication.NeedsFramePublication;
@@ -427,6 +429,7 @@ internal sealed class ClientRenderHost : IDisposable
             using IGraphicsDevice? ownedGraphics = existingDevice is null
                 ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
+            using var liveTelemetry = LiveRenderTelemetry.FromEnvironment(graphics, _runtimeAssets);
             var qualitySettings = ClientGraphicsOverrides.Read(_renderQuality with
             {
                 Atmosphere = _renderQuality.Atmosphere ?? (_sceneAtmosphere.Quality != AtmosphereQuality.Disabled ? _sceneAtmosphere.Quality : null),
@@ -532,11 +535,13 @@ internal sealed class ClientRenderHost : IDisposable
                     break;
                 }
 
+                LiveTelemetryStart liveStart = liveTelemetry?.Begin() ?? default;
                 ClientRenderFrame? frame =
                     TakeLatestFrame();
 
                 if (!frame.HasValue)
                 {
+                    CompleteLiveTelemetry(liveTelemetry, liveStart, "empty");
                     continue;
                 }
 
@@ -548,6 +553,7 @@ internal sealed class ClientRenderHost : IDisposable
                 {
                     dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
+                    CompleteLiveTelemetry(liveTelemetry, liveStart, "suspended");
                     continue;
                 }
 
@@ -591,6 +597,7 @@ internal sealed class ClientRenderHost : IDisposable
                             frontendRenderer.Render(context, loading, current.UiScale);
                     });
                     presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > loadingPresented;
+                    CompleteLiveTelemetry(liveTelemetry, liveStart, "loading");
                     continue;
                 }
 
@@ -694,7 +701,8 @@ internal sealed class ClientRenderHost : IDisposable
                     ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null;
                 long terrainStarted = Stopwatch.GetTimestamp();
                 bool terrainReady = terrainRenderer.PrepareStep(renderCamera, worldWidth, worldHeight, preparedShadow);
-                double terrainPrepareMs = Stopwatch.GetElapsedTime(terrainStarted).TotalMilliseconds;
+                long terrainEndedAt = Stopwatch.GetTimestamp();
+                double terrainPrepareMs = Stopwatch.GetElapsedTime(terrainStarted, terrainEndedAt).TotalMilliseconds;
                 if (!terrainReady)
                 {
                     Volatile.Write(ref _terrainPreparing, 1);
@@ -721,6 +729,7 @@ internal sealed class ClientRenderHost : IDisposable
                     }
                     Interlocked.Increment(ref _completedFrames);
                     Volatile.Write(ref _lastCompletedFrameAt, Stopwatch.GetTimestamp());
+                    CompleteLiveTelemetry(liveTelemetry, liveStart, "terrain-preparing", terrainStarted, terrainEndedAt);
                     continue;
                 }
                 lastParticleFrame = now;
@@ -730,6 +739,7 @@ internal sealed class ClientRenderHost : IDisposable
                     (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, current.MetricsActive), particleRenderer);
                 double assetPrepareMs = Stopwatch.GetElapsedTime(assetsStarted).TotalMilliseconds;
                 ObjectActionRingView inputRing = default;
+                long livePrepareEndedAt = Stopwatch.GetTimestamp();
                 graphics.RenderFrame(
                     GraphicsColor.ForgeLineClear,
                     context =>
@@ -926,6 +936,7 @@ internal sealed class ClientRenderHost : IDisposable
                     nextDiagnosticAt =
                         renderFinishedAt;
                 }
+                CompleteLiveTelemetry(liveTelemetry, liveStart, "gameplay", terrainStarted, livePrepareEndedAt);
             }
 
             graphics.WaitForIdle();
@@ -952,6 +963,13 @@ internal sealed class ClientRenderHost : IDisposable
             _faulted.Set();
             _started.Set();
         }
+    }
+
+    private void CompleteLiveTelemetry(LiveRenderTelemetry? collector, in LiveTelemetryStart start,
+        string state, long prepareStart = 0, long prepareEnd = 0)
+    {
+        collector?.Complete(start, state, prepareStart, prepareEnd);
+        if (collector?.WindowCompleted == true) Volatile.Write(ref _telemetryWindowPending, 0);
     }
 
     private void RunTestRenderLoop(

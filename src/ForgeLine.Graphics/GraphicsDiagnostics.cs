@@ -35,6 +35,7 @@ public sealed record GraphicsDiagnostics(
     public GraphicsDirectionalShadowDiagnostics? DirectionalShadows { get; init; }
     public GraphicsAtmosphereDiagnostics? Atmosphere { get; init; }
     public GraphicsMemoryDiagnostics? Memory { get; init; }
+    public GraphicsResourceMemoryTelemetry? ResourceMemory { get; init; }
     public GraphicsHealthDiagnostics Health { get; init; } = new(0, 0, 0, 0, 0, 0, null);
     public GraphicsResourceDiagnostics Resources { get; init; } =
         new(

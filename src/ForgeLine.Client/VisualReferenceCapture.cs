@@ -336,6 +336,7 @@ internal static class VisualReferenceCapture
                     graphics.WaitForIdle();
                     var beforeSamples = graphics.Diagnostics;
                     if (warmupFrames > 0) meshes.ObserveFrameDiagnostics(beforeSamples);
+                    (graphics as IGraphicsRenderTelemetry)?.EnableRenderTelemetry(Math.Min(65536, request.Samples + 8));
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
                     var initialCamera = camera.CaptureState();
                     var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;
@@ -350,6 +351,7 @@ internal static class VisualReferenceCapture
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
                         meshes.ObserveFrameDiagnostics(sampleDiagnostics);
+                        performance.DrainRawGpu(graphics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
                             new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
@@ -361,6 +363,7 @@ internal static class VisualReferenceCapture
                     graphics.WaitForIdle();
                     var measured = graphics.Diagnostics;
                     performance.AddGpu(measured);
+                    performance.DrainRawGpu(graphics);
                     if (measured.Frame is { } finalFrame && finalFrame.GpuSubmissionFence > lastFence && measured.GpuFrameMilliseconds is { } finalGpu)
                         gpu.Add(finalGpu);
                     camera.ApplyState(initialCamera);

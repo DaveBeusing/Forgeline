@@ -151,6 +151,9 @@ function Copy-QualificationEvidence {
 }
 
 function Get-QualificationConditions {
+    param([string]$HardwareObservationPath, [string]$HardwarePolicyPath,
+        [string]$ExpectedHardwareIdentitySha256, [string]$RequiredSinceUtc)
+
     $conditions = [ordered]@{ observedAtUtc = [DateTimeOffset]::UtcNow.ToString('o'); powerPlan = 'unavailable'
         powerSource = 'unavailable'; thermalState = 'unavailable'
         thermalReason = 'Portable Windows CIM does not establish physical GPU temperature, clock or throttling stability.' }
@@ -165,6 +168,18 @@ function Get-QualificationConditions {
             $conditions.powerSourceReason = 'No battery enumerated; AC availability is not inferred from absence.'
         } else { $conditions.powerSource = 'battery-or-unknown' }
     } catch { $conditions.observationError = $_.Exception.Message }
+    if ($HardwareObservationPath -or $HardwarePolicyPath -or $ExpectedHardwareIdentitySha256) {
+        if (-not $HardwareObservationPath -or -not $HardwarePolicyPath -or $ExpectedHardwareIdentitySha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw 'Physical observations require samples, a reviewed policy and an exact hardware identity.'
+        }
+        $arguments = @((Join-Path $PSScriptRoot 'telemetry_contracts.py'), 'hardware', '--samples', $HardwareObservationPath,
+            '--policy', $HardwarePolicyPath, '--identity', $ExpectedHardwareIdentitySha256)
+        if ($RequiredSinceUtc) { $arguments += @('--since', $RequiredSinceUtc) }
+        $physical = & python @arguments
+        if ($LASTEXITCODE -ne 0) { throw 'Physical hardware observations are unavailable or invalid; acceptance remains open.' }
+        $observed = ($physical -join "`n") | ConvertFrom-Json -AsHashtable
+        foreach ($key in $observed.Keys) { $conditions[$key] = $observed[$key] }
+    }
     return $conditions
 }
 
