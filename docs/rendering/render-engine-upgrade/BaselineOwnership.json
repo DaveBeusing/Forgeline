@@ -38,7 +38,8 @@
         "docs/DocumentationIndex.md",
         "src/ForgeLine.Presentation/SimpleInstanceRenderer.ContentEvidence.cs",
         "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
-        "tests/ForgeLine.Presentation.Tests/ContentEvidence/"
+        "tests/ForgeLine.Presentation.Tests/ContentEvidence/",
+        "tests/ForgeLine.Presentation.Tests/TerrainResidency/TerrainLifetimeTests.cs"
       ]
     },
     {

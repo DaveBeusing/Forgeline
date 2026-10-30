@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Reflection;
-using System.Buffers.Binary;
 using System.Text.Json;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;
@@ -25,20 +24,10 @@ try
     var file = new FileInfo(input);
     if (file.Length <= 0 || file.Length > 4L * 1024 * 1024 * 1024) throw new InvalidDataException("Trace input outside declared4GiB bound.");
     before = Hash(input); traceLength = file.Length;
-    // Public pinned v6 header; unknown format never borrows the offline parser's Stopwatch frequency.
+    // Pinned original v4/v6 metadata only; independent producer binding is separate.
     using (var stream = File.OpenRead(input))
     {
-        byte[] header = new byte[Math.Min(64, checked((int)Math.Min(stream.Length, 64)))];
-        stream.ReadExactly(header);
-        bool v6 = header.Length == 64 && System.Text.Encoding.ASCII.GetString(header, 0, 8) == "Nettrace" &&
-            BinaryPrimitives.ReadUInt32LittleEndian(header.AsSpan(8)) == 0 && BinaryPrimitives.ReadUInt32LittleEndian(header.AsSpan(12)) == 6 && (BinaryPrimitives.ReadUInt32LittleEndian(header.AsSpan(20)) >> 24) == 1 &&
-            (BinaryPrimitives.ReadUInt32LittleEndian(header.AsSpan(20)) & 0xFFFFFF) >= 40 &&
-            24L + (BinaryPrimitives.ReadUInt32LittleEndian(header.AsSpan(20)) & 0xFFFFFF) <= stream.Length;
-        long? frequency = v6 ? BinaryPrimitives.ReadInt64LittleEndian(header.AsSpan(48)) : null;
-        clock = new { available = v6 && frequency > 0, format = "pinned-nettrace-v6-raw-header", headerBytesBase64 = Convert.ToBase64String(header),
-            headerSha256 = Convert.ToHexStringLower(SHA256.HashData(header)), tickFrequency = frequency,
-            syncTicks = v6 ? BinaryPrimitives.ReadInt64LittleEndian(header.AsSpan(40)) : (long?)null, utcSystemTimeBytesBase64 = v6 ? Convert.ToBase64String(header.AsSpan(24, 16)) : null,
-            correlation = "unavailable until original producer PID/native-thread/source/runtime/session and UTC/QPC anchor compatibility are validated" };
+        clock = NetTraceClockHeader.Read(stream, expectedPid);
     }
     string etlx = Path.Combine(output, "converted.etlx");
     var options = new TraceLogOptions { OnLostEvents = (truncated, lost, total) => losses.Add(new { truncated, lost, total }) };

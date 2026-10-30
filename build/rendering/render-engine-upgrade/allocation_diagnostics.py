@@ -10,19 +10,19 @@ def correlate(trace,owner,*,source_sha,runtime_fingerprint,producer_session):
     try:
         require(trace.get('status')=='diagnostic-pass','Trace is incomplete')
         clock=trace['clock'];anchor=owner['clockAnchor'];thread=owner['ownerThread']
-        import struct
+        from trace_clock_header import decode_clock_header
         header=base64.b64decode(clock['headerBytesBase64'],validate=True)
-        require(len(header)==64 and sha256_bytes(header)==clock['headerSha256'] and header[:8]==b'Nettrace','Original raw trace header bytes/hash unavailable')
-        reserved,major,minor,block=struct.unpack_from('<4I',header,8)
-        require(reserved==0 and major==6 and block>>24==1 and (block&0xffffff)>=40 and 24+(block&0xffffff)<=trace['traceLength'],'Original v6 TraceBlock length/version invalid')
-        sync,raw_frequency=struct.unpack_from('<qq',header,40)
-        require(sync==clock['syncTicks'] and raw_frequency==clock['tickFrequency'] and base64.b64decode(clock['utcSystemTimeBytesBase64'],validate=True)==header[24:40],'Clock summary differs from original trace header')
+        require(sha256_bytes(header)==clock['headerSha256'],'Original raw trace header hash unavailable')
+        decoded=decode_clock_header(header,trace['traceLength'],trace['expectedPid'])
+        for name,value in decoded.items():
+            if name=='headerLength' and name not in clock:continue # Historical v6 evidence did not export this optional field.
+            require(type(clock.get(name)) is type(value) and clock[name]==value,'Clock summary differs from independently decoded original header: '+name)
         binding=trace.get('producerBinding')
         require(type(binding) is dict,'Independent original trace command/image/process/source/session binding unavailable; clock compatibility alone cannot attest interval attribution')
         from baseline_contracts import canonical
         require(binding.get('ownerSha256')==sha256_bytes(canonical(owner)) and binding.get('traceSha256')==trace.get('traceSha256Before')==trace.get('traceSha256After'),'Trace/owner immutable run binding unavailable')
         require(binding.get('sourceSha')==source_sha and binding.get('runtimeFingerprint')==runtime_fingerprint and binding.get('sessionId')==producer_session and binding.get('processId')==trace['expectedPid'] and binding.get('processStartedFileTimeUtc')==owner['adapterIdentity']['processStartedFileTimeUtc'],'Original traced producer identity differs')
-        require(clock.get('available') is True and clock.get('format')=='pinned-nettrace-v6-raw-header','Original supported trace clock unavailable')
+        require(clock.get('available') is True and clock.get('format') in ('pinned-nettrace-v6-raw-header','pinned-nettrace-fastserialization-trace-v4'),'Original supported trace clock unavailable')
         frequency=clock['tickFrequency']
         require(type(frequency) is int and frequency>0 and frequency==anchor['frequencyHz'],'Original trace and owner frequencies differ')
         require(owner['sourceSha']==source_sha and owner['runtimeFingerprint']==runtime_fingerprint and owner['adapterIdentity']['sessionId']==producer_session,'Original producer source/runtime/session differs')

@@ -323,7 +323,9 @@ def validate_sampled_owner_diagnostic(root,ref,source,runtime,client_image_hash)
     import hashlib
     digestor=hashlib.sha256()
     with trace.open('rb') as stream:
-        header=stream.read(64);digestor.update(header)
+        reported_prefix=base64.b64decode(report.get('clock',{}).get('headerBytesBase64',''),validate=True)
+        require(12<=len(reported_prefix)<=512,'Original reported trace clock prefix outside bound')
+        header=stream.read(len(reported_prefix));digestor.update(header)
         for block in iter(lambda:stream.read(1024*1024),b''):digestor.update(block)
     actual_trace=digestor.hexdigest()
     require(actual_trace==digest(wrapper['trace']['sha256'],'original trace')==report.get('traceSha256Before')==report.get('traceSha256After'),'Actual original trace bytes differ from parser/command evidence')
