@@ -1,0 +1,1580 @@
+{
+  "schemaVersion": 1,
+  "kind": "baseline-admission-delivery-evidence",
+  "qualified": false,
+  "baselineControlsAccepted": false,
+  "wave2Ready": false,
+  "baseSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+  "version": "0.1.538",
+  "runs": [
+    {
+      "label": "canonical-5e6",
+      "sourceSha": "5e6faeb52a784799e4d177363bcff1092ac1472f",
+      "provenance": {
+        "sourceSha": "5e6faeb52a784799e4d177363bcff1092ac1472f",
+        "baseSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+        "sdk": "10.0.402",
+        "publicationRoot": "C:\\Users\\david.beusing\\.codex\\worktrees\\render-baseline-wave1\\Forgeline\\artifacts\\render-baseline-admission-canonical-01-publication",
+        "startedAtUtc": "2026-10-30T20:39:32.6017495+00:00",
+        "completedAtUtc": null,
+        "cleanAtStart": true,
+        "sourceUnchanged": null,
+        "settingsChanged": false
+      },
+      "commands": [
+        {
+          "name": "version",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Validate-SemVer.ps1",
+            "-BaseRef",
+            "origin/master",
+            "-HeadRef",
+            "HEAD"
+          ],
+          "startedAtUtc": "2026-10-30T20:39:32.6870050+00:00",
+          "completedAtUtc": "2026-10-30T20:39:35.0592671+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\version.log",
+          "retainedLog": "canonical-5e6/version.log",
+          "logSha256": "c6f1338b06c5350c9ecbd50b93f2afae406a4c06fe17b723e81d5bc72bf30e5f"
+        },
+        {
+          "name": "version-contracts",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Test-Versioning.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:39:35.0639974+00:00",
+          "completedAtUtc": "2026-10-30T20:39:36.7664278+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\version-contracts.log",
+          "retainedLog": "canonical-5e6/version-contracts.log",
+          "logSha256": "c13d4356e2eaeb1a11dea208a155cdddde155cccc2114e0284af35c02e86672a"
+        },
+        {
+          "name": "version-allocation",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Test-VersionAllocation.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:39:36.7702055+00:00",
+          "completedAtUtc": "2026-10-30T20:39:48.8593817+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\version-allocation.log",
+          "retainedLog": "canonical-5e6/version-allocation.log",
+          "logSha256": "1bc89a7495a8cf062c489dfdd62c0521a39b2bd8dab507e53c202a13cfa91ca2"
+        },
+        {
+          "name": "qualification-python",
+          "executable": "python",
+          "arguments": [
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "build/rendering/qualification",
+            "-p",
+            "test_*.py",
+            "-q"
+          ],
+          "startedAtUtc": "2026-10-30T20:39:48.8612405+00:00",
+          "completedAtUtc": "2026-10-30T20:41:15.9570751+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\qualification-python.log",
+          "retainedLog": "canonical-5e6/qualification-python.log",
+          "logSha256": "3038f162ac7e79b1d5b5930184c84829de78806084843270da2fde49b76d06c7"
+        },
+        {
+          "name": "baseline-toolkit-python",
+          "executable": "python",
+          "arguments": [
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "build/rendering/render-engine-upgrade",
+            "-p",
+            "test_*.py",
+            "-q"
+          ],
+          "startedAtUtc": "2026-10-30T20:41:15.9598748+00:00",
+          "completedAtUtc": "2026-10-30T20:41:31.6490553+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\baseline-toolkit-python.log",
+          "retainedLog": "canonical-5e6/baseline-toolkit-python.log",
+          "logSha256": "c7b1b2d3201eaa39570b98ff4d13aec5d4961493ebc1fefd413b3f9bda2ed553"
+        },
+        {
+          "name": "qualification-powershell",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/rendering/qualification/Test-RenderQualification.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:41:31.6509018+00:00",
+          "completedAtUtc": "2026-10-30T20:41:39.0247189+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\qualification-powershell.log",
+          "retainedLog": "canonical-5e6/qualification-powershell.log",
+          "logSha256": "f5ef1367822126590c34fef0e4f0223897478dc999de7d8cb2fee5685d447e54"
+        },
+        {
+          "name": "restore",
+          "executable": "dotnet",
+          "arguments": [
+            "restore",
+            "ForgeLine.sln"
+          ],
+          "startedAtUtc": "2026-10-30T20:41:39.0272135+00:00",
+          "completedAtUtc": "2026-10-30T20:41:45.8254939+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\restore.log",
+          "retainedLog": "canonical-5e6/restore.log",
+          "logSha256": "e9e4fe574fc71955f8017760a98c214f8b5fb0bd676dca2d57bdc1c7b12492fc"
+        },
+        {
+          "name": "references",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Validate-ProjectReferences.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:41:45.8309726+00:00",
+          "completedAtUtc": "2026-10-30T20:41:47.4641308+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\references.log",
+          "retainedLog": "canonical-5e6/references.log",
+          "logSha256": "daede3682a9232c12c02e513aae7613e66d1c1969e186fece6533ef8123f3185"
+        },
+        {
+          "name": "build",
+          "executable": "dotnet",
+          "arguments": [
+            "build",
+            "ForgeLine.sln",
+            "--configuration",
+            "Release",
+            "--no-restore"
+          ],
+          "startedAtUtc": "2026-10-30T20:41:47.4661803+00:00",
+          "completedAtUtc": "2026-10-30T20:42:24.5583007+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\build.log",
+          "retainedLog": "canonical-5e6/build.log",
+          "logSha256": "4f62ec9ff6fb7db1c88c80fff9f443464930debc886862067779dd226aa7c352"
+        },
+        {
+          "name": "map-central",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\central-divide.flmap.json",
+            "--qualification-output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\central-map-qualification.json"
+          ],
+          "startedAtUtc": "2026-10-30T20:42:24.6015843+00:00",
+          "completedAtUtc": "2026-10-30T20:42:28.7834750+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\map-central.log",
+          "retainedLog": "canonical-5e6/map-central.log",
+          "logSha256": "c34f91785e183abe31703694741ed7409b55c764256aa0b1fa013100dd4f81d6"
+        },
+        {
+          "name": "map-split",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--scenario",
+            "split-basin",
+            "--output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\split-basin.flmap.json",
+            "--qualification-output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\split-map-qualification.json"
+          ],
+          "startedAtUtc": "2026-10-30T20:42:28.7861404+00:00",
+          "completedAtUtc": "2026-10-30T20:42:31.7697398+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\map-split.log",
+          "retainedLog": "canonical-5e6/map-split.log",
+          "logSha256": "9b75a4c48dc744bc2bb7e38063492ce8b22c89c3ad2225705c96a87efa9c6196"
+        },
+        {
+          "name": "scenario-contracts",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Test-CompiledScenarioLoading.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:42:31.7730585+00:00",
+          "completedAtUtc": "2026-10-30T20:43:20.4150380+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\scenario-contracts.log",
+          "retainedLog": "canonical-5e6/scenario-contracts.log",
+          "logSha256": "93423a1ce6e95e1341e6b31710bd7f705512afe093e802137cc6329ed60a09ac"
+        },
+        {
+          "name": "runtime-assets",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Build-RuntimeAssets.ps1",
+            "-Mode",
+            "build",
+            "-ForceRebuild",
+            "-NoBuild"
+          ],
+          "startedAtUtc": "2026-10-30T20:43:20.4181514+00:00",
+          "completedAtUtc": "2026-10-30T20:50:05.1111276+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\runtime-assets.log",
+          "retainedLog": "canonical-5e6/runtime-assets.log",
+          "logSha256": "a75650565d7a24c9aad3764e027fd5e4c728357826701be2b4c5614692ba0d69"
+        },
+        {
+          "name": "asset-contracts",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Test-RuntimeAssetPipeline.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T20:50:05.1135596+00:00",
+          "completedAtUtc": "2026-10-30T20:50:13.0267403+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\asset-contracts.log",
+          "retainedLog": "canonical-5e6/asset-contracts.log",
+          "logSha256": "78b7850bce66e47fd3a003d56c63469df52232266c49e3f39be6c059054b54d6"
+        },
+        {
+          "name": "client-smoke",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "src/ForgeLine.Client/ForgeLine.Client.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--smoke-test",
+            "--render-stress",
+            "1000"
+          ],
+          "startedAtUtc": "2026-10-30T20:50:13.0289129+00:00",
+          "completedAtUtc": "2026-10-30T20:50:28.2212091+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\client-smoke.log",
+          "retainedLog": "canonical-5e6/client-smoke.log",
+          "logSha256": "eab9cf8a7135d089cb7818c0b4326f687072462867aac1e5582b353ffa646208"
+        },
+        {
+          "name": "headless-smoke",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--ticks",
+            "64",
+            "--seed",
+            "12345",
+            "--tick-rate",
+            "20",
+            "--entities",
+            "1000",
+            "--diagnostics-output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\headless-smoke.json"
+          ],
+          "startedAtUtc": "2026-10-30T20:50:28.2238252+00:00",
+          "completedAtUtc": "2026-10-30T20:50:30.0700619+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\headless-smoke.log",
+          "retainedLog": "canonical-5e6/headless-smoke.log",
+          "logSha256": "648c053d2dc935dee274fc4b1edd629d9982fc0f9aa0b8f6a5157bbb6fdccc41"
+        },
+        {
+          "name": "headless-stress",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--ticks",
+            "16",
+            "--seed",
+            "67890",
+            "--tick-rate",
+            "20",
+            "--entities",
+            "10000",
+            "--diagnostics-output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\headless-stress.json"
+          ],
+          "startedAtUtc": "2026-10-30T20:50:30.0729727+00:00",
+          "completedAtUtc": "2026-10-30T20:50:31.9317574+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\headless-stress.log",
+          "retainedLog": "canonical-5e6/headless-stress.log",
+          "logSha256": "634c34f2255951e98c409015e182a98136b15cd9e5589319b2bc126458cd5498"
+        },
+        {
+          "name": "solution-tests",
+          "executable": "dotnet",
+          "arguments": [
+            "test",
+            "--solution",
+            "ForgeLine.sln",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--max-parallel-test-modules",
+            "1"
+          ],
+          "startedAtUtc": "2026-10-30T20:50:31.9342364+00:00",
+          "completedAtUtc": "2026-10-30T21:17:08.7083500+00:00",
+          "exitCode": 2,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-canonical-01\\solution-tests.log",
+          "retainedLog": "canonical-5e6/solution-tests.log",
+          "logSha256": "1f54ec21700faa2887a8d91d73678295864046d3447600f719f01510272a22e4"
+        }
+      ],
+      "completedStages": 18,
+      "passedStages": 17
+    },
+    {
+      "label": "followup-05a1",
+      "sourceSha": "05a1aeddd019400b7de835bbb836442fd3bb9700",
+      "provenance": {
+        "sourceSha": "05a1aeddd019400b7de835bbb836442fd3bb9700",
+        "baseSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+        "sdk": "10.0.402",
+        "publicationRoot": "C:\\Users\\david.beusing\\.codex\\worktrees\\render-baseline-wave1\\Forgeline\\artifacts\\render-baseline-admission-followup-01-publication",
+        "startedAtUtc": "2026-10-30T21:26:27.6563897+00:00",
+        "completedAtUtc": "2026-10-30T22:08:51.7190696+00:00",
+        "cleanAtStart": true,
+        "sourceUnchanged": true,
+        "settingsChanged": false
+      },
+      "commands": [
+        {
+          "name": "version",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Validate-SemVer.ps1",
+            "-BaseRef",
+            "origin/master",
+            "-HeadRef",
+            "HEAD"
+          ],
+          "startedAtUtc": "2026-10-30T21:26:27.7345041+00:00",
+          "completedAtUtc": "2026-10-30T21:26:30.6543049+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\version.log",
+          "retainedLog": "followup-05a1/version.log",
+          "logSha256": "c6f1338b06c5350c9ecbd50b93f2afae406a4c06fe17b723e81d5bc72bf30e5f"
+        },
+        {
+          "name": "qualification-python",
+          "executable": "python",
+          "arguments": [
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "build/rendering/qualification",
+            "-p",
+            "test_*.py",
+            "-q"
+          ],
+          "startedAtUtc": "2026-10-30T21:26:30.6624081+00:00",
+          "completedAtUtc": "2026-10-30T21:28:15.6574434+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\qualification-python.log",
+          "retainedLog": "followup-05a1/qualification-python.log",
+          "logSha256": "1ce47237c340931d24268a0921a3cb05130438723cb022985f4d0d9b9e41f43d"
+        },
+        {
+          "name": "baseline-toolkit-python",
+          "executable": "python",
+          "arguments": [
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "build/rendering/render-engine-upgrade",
+            "-p",
+            "test_*.py",
+            "-q"
+          ],
+          "startedAtUtc": "2026-10-30T21:28:15.6601754+00:00",
+          "completedAtUtc": "2026-10-30T21:28:31.5246638+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\baseline-toolkit-python.log",
+          "retainedLog": "followup-05a1/baseline-toolkit-python.log",
+          "logSha256": "d9bc033b67a510527893acbef8626c417896e3747dd6b2def5a906bbd42f0dd6"
+        },
+        {
+          "name": "qualification-powershell",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/rendering/qualification/Test-RenderQualification.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T21:28:31.5274051+00:00",
+          "completedAtUtc": "2026-10-30T21:28:39.6498932+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\qualification-powershell.log",
+          "retainedLog": "followup-05a1/qualification-powershell.log",
+          "logSha256": "f5ef1367822126590c34fef0e4f0223897478dc999de7d8cb2fee5685d447e54"
+        },
+        {
+          "name": "references",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Validate-ProjectReferences.ps1"
+          ],
+          "startedAtUtc": "2026-10-30T21:28:39.6531810+00:00",
+          "completedAtUtc": "2026-10-30T21:28:41.1341630+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\references.log",
+          "retainedLog": "followup-05a1/references.log",
+          "logSha256": "daede3682a9232c12c02e513aae7613e66d1c1969e186fece6533ef8123f3185"
+        },
+        {
+          "name": "build",
+          "executable": "dotnet",
+          "arguments": [
+            "build",
+            "ForgeLine.sln",
+            "--configuration",
+            "Release",
+            "--no-restore"
+          ],
+          "startedAtUtc": "2026-10-30T21:28:41.1360697+00:00",
+          "completedAtUtc": "2026-10-30T21:29:37.6105206+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\build.log",
+          "retainedLog": "followup-05a1/build.log",
+          "logSha256": "683a6dac2546e32b854ab9442c4d00b44caa29048291657a7b368b9f45da38df"
+        },
+        {
+          "name": "solution-tests",
+          "executable": "dotnet",
+          "arguments": [
+            "test",
+            "--solution",
+            "ForgeLine.sln",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--max-parallel-test-modules",
+            "1"
+          ],
+          "startedAtUtc": "2026-10-30T21:29:37.6158644+00:00",
+          "completedAtUtc": "2026-10-30T21:58:09.8580365+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\solution-tests.log",
+          "retainedLog": "followup-05a1/solution-tests.log",
+          "logSha256": "4f59eebe36a883591e5f6bc18afc31242c54273f1b0ac62a5c1227e81c95e350"
+        },
+        {
+          "name": "publish",
+          "executable": "pwsh",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./build/Publish-PreAlpha.ps1",
+            "-Configuration",
+            "Release",
+            "-VerifyReproducible",
+            "-RuntimeAssetRoot",
+            "assets/runtime",
+            "-OutputRoot",
+            "artifacts/render-baseline-admission-followup-01-publication"
+          ],
+          "startedAtUtc": "2026-10-30T21:58:09.8609400+00:00",
+          "completedAtUtc": "2026-10-30T22:02:12.5336207+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\publish.log",
+          "retainedLog": "followup-05a1/publish.log",
+          "logSha256": "8ec1c62543ace2b0311bef3ca62524fec9528c8af25b8196a3f6aee86dbf000f"
+        },
+        {
+          "name": "terminal-match",
+          "executable": "dotnet",
+          "arguments": [
+            "run",
+            "--project",
+            "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+            "--configuration",
+            "Release",
+            "--no-build",
+            "--",
+            "--scenario",
+            "central-divide",
+            "--profile",
+            "validation",
+            "--ticks",
+            "80000",
+            "--seed",
+            "2026",
+            "--require-terminal",
+            "--diagnostics-output",
+            "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\terminal-match.json"
+          ],
+          "startedAtUtc": "2026-10-30T22:02:12.5371944+00:00",
+          "completedAtUtc": "2026-10-30T22:08:51.7150028+00:00",
+          "exitCode": 0,
+          "log": "D:\\Code\\Forgeline\\artifacts\\render-baseline-admission-followup-01\\terminal-match.log",
+          "retainedLog": "followup-05a1/terminal-match.log",
+          "logSha256": "9d6fe15a85e39f656ed35d40c9ed86bb24264fc903b32e05fdc717755bd693e0"
+        }
+      ],
+      "completedStages": 9,
+      "passedStages": 9
+    }
+  ],
+  "archive": {
+    "bytes": 66203277,
+    "sha256": "e82e6d05ede5874392a92f1ef13884a39aa14caba99bde74b0caf2395ad8c4da",
+    "retainedLocally": true
+  },
+  "rawBundle": {
+    "path": "raw-records.json.gz",
+    "bytes": 2238889,
+    "sha256": "48260d32570e6f8b4e6759e29a4dd784987f85789c4eb22dba4fd1cbb7354d22",
+    "decompressedSha256": "42676642c59d1b7a8803acd3f7315d456115bb0f9295361e652dff3f1f3e9e42",
+    "format": "JSON records keyed by logical path; values are Base64 of exact original bytes"
+  },
+  "records": [
+    {
+      "path": "canonical-5e6/asset-contracts.log",
+      "bytes": 183,
+      "sha256": "78b7850bce66e47fd3a003d56c63469df52232266c49e3f39be6c059054b54d6"
+    },
+    {
+      "path": "canonical-5e6/baseline-toolkit-python.log",
+      "bytes": 239,
+      "sha256": "c7b1b2d3201eaa39570b98ff4d13aec5d4961493ebc1fefd413b3f9bda2ed553"
+    },
+    {
+      "path": "canonical-5e6/build.log",
+      "bytes": 7819,
+      "sha256": "4f62ec9ff6fb7db1c88c80fff9f443464930debc886862067779dd226aa7c352"
+    },
+    {
+      "path": "canonical-5e6/central-divide.flmap.json",
+      "bytes": 204154,
+      "sha256": "0f64c67943ddd0e399f7cc7579f65c43feded449e6bb43182de3bdd9ff4d0682"
+    },
+    {
+      "path": "canonical-5e6/central-divide.flmap.json.sha256",
+      "bytes": 65,
+      "sha256": "13c7cbff87ffc10adddeca3487ff290e4f0169ee9866ecbca8a5b264ba0f6794"
+    },
+    {
+      "path": "canonical-5e6/central-map-qualification.json",
+      "bytes": 211776,
+      "sha256": "754dd18d6b3b5fee9bc2339d8a6c13c50513dcdd168289e4078464b790bc86e7"
+    },
+    {
+      "path": "canonical-5e6/central-map-qualification.md",
+      "bytes": 7060,
+      "sha256": "f839aa43080292d5c443c66b55549e5e211102f331cc2f321aeeffc1a37ca3be"
+    },
+    {
+      "path": "canonical-5e6/client-smoke.log",
+      "bytes": 4222,
+      "sha256": "eab9cf8a7135d089cb7818c0b4326f687072462867aac1e5582b353ffa646208"
+    },
+    {
+      "path": "canonical-5e6/headless-smoke.json",
+      "bytes": 1432,
+      "sha256": "e8399ff003b43eb86b1060294888b28f6697cf034a68b13e29db6814e9a5af4b"
+    },
+    {
+      "path": "canonical-5e6/headless-smoke.log",
+      "bytes": 265,
+      "sha256": "648c053d2dc935dee274fc4b1edd629d9982fc0f9aa0b8f6a5157bbb6fdccc41"
+    },
+    {
+      "path": "canonical-5e6/headless-stress.json",
+      "bytes": 1437,
+      "sha256": "91788c131f298d179eff9e9629f450dfd1db2fe4dd35801dac2f5b1b02703660"
+    },
+    {
+      "path": "canonical-5e6/headless-stress.log",
+      "bytes": 266,
+      "sha256": "634c34f2255951e98c409015e182a98136b15cd9e5589319b2bc126458cd5498"
+    },
+    {
+      "path": "canonical-5e6/map-central.log",
+      "bytes": 483,
+      "sha256": "c34f91785e183abe31703694741ed7409b55c764256aa0b1fa013100dd4f81d6"
+    },
+    {
+      "path": "canonical-5e6/map-split.log",
+      "bytes": 475,
+      "sha256": "9b75a4c48dc744bc2bb7e38063492ce8b22c89c3ad2225705c96a87efa9c6196"
+    },
+    {
+      "path": "canonical-5e6/provenance.json",
+      "bytes": 474,
+      "sha256": "1d027883a11c96d69e33567a4b375dbf0ee1f534b08be362ba5004583ba310dd"
+    },
+    {
+      "path": "canonical-5e6/qualification-powershell.log",
+      "bytes": 90,
+      "sha256": "f5ef1367822126590c34fef0e4f0223897478dc999de7d8cb2fee5685d447e54"
+    },
+    {
+      "path": "canonical-5e6/qualification-python.log",
+      "bytes": 311,
+      "sha256": "3038f162ac7e79b1d5b5930184c84829de78806084843270da2fde49b76d06c7"
+    },
+    {
+      "path": "canonical-5e6/references.log",
+      "bytes": 95,
+      "sha256": "daede3682a9232c12c02e513aae7613e66d1c1969e186fece6533ef8123f3185"
+    },
+    {
+      "path": "canonical-5e6/restore.log",
+      "bytes": 7314,
+      "sha256": "e9e4fe574fc71955f8017760a98c214f8b5fb0bd676dca2d57bdc1c7b12492fc"
+    },
+    {
+      "path": "canonical-5e6/results.json",
+      "bytes": 9994,
+      "sha256": "f049f3844777d7f52a992fba3050937fbe4b349a030cc3a5541deeb6b52d1783"
+    },
+    {
+      "path": "canonical-5e6/runtime-assets.log",
+      "bytes": 12428006,
+      "sha256": "a75650565d7a24c9aad3764e027fd5e4c728357826701be2b4c5614692ba0d69"
+    },
+    {
+      "path": "canonical-5e6/scenario-contracts.log",
+      "bytes": 6764,
+      "sha256": "93423a1ce6e95e1341e6b31710bd7f705512afe093e802137cc6329ed60a09ac"
+    },
+    {
+      "path": "canonical-5e6/solution-tests.log",
+      "bytes": 75209,
+      "sha256": "1f54ec21700faa2887a8d91d73678295864046d3447600f719f01510272a22e4"
+    },
+    {
+      "path": "canonical-5e6/split-basin.flmap.json",
+      "bytes": 33253,
+      "sha256": "635ca23e5fa63285c4bb6b7e4b00b8615804af67cf638ee48e36dda21573a36e"
+    },
+    {
+      "path": "canonical-5e6/split-basin.flmap.json.sha256",
+      "bytes": 65,
+      "sha256": "b1acddbf759f2c6a99ba97ef9bb1666be116d568f2514f79a940420c071809d7"
+    },
+    {
+      "path": "canonical-5e6/split-map-qualification.json",
+      "bytes": 157360,
+      "sha256": "47f9eca52a13ccad2d49c81be1f8a687c5be61c1dfc7520227c48a64aaa3d54d"
+    },
+    {
+      "path": "canonical-5e6/split-map-qualification.md",
+      "bytes": 6068,
+      "sha256": "6ecafe5674225b276aa6511e8b3f7af31809e811df609c3e87d98b84e91ec85e"
+    },
+    {
+      "path": "canonical-5e6/version-allocation.log",
+      "bytes": 1126,
+      "sha256": "1bc89a7495a8cf062c489dfdd62c0521a39b2bd8dab507e53c202a13cfa91ca2"
+    },
+    {
+      "path": "canonical-5e6/version-contracts.log",
+      "bytes": 71,
+      "sha256": "c13d4356e2eaeb1a11dea208a155cdddde155cccc2114e0284af35c02e86672a"
+    },
+    {
+      "path": "canonical-5e6/version.log",
+      "bytes": 60,
+      "sha256": "c6f1338b06c5350c9ecbd50b93f2afae406a4c06fe17b723e81d5bc72bf30e5f"
+    },
+    {
+      "path": "followup-05a1/baseline-toolkit-python.log",
+      "bytes": 239,
+      "sha256": "d9bc033b67a510527893acbef8626c417896e3747dd6b2def5a906bbd42f0dd6"
+    },
+    {
+      "path": "followup-05a1/build.log",
+      "bytes": 7819,
+      "sha256": "683a6dac2546e32b854ab9442c4d00b44caa29048291657a7b368b9f45da38df"
+    },
+    {
+      "path": "followup-05a1/provenance.json",
+      "bytes": 504,
+      "sha256": "e65e41a2f87e413c0837aef5fe87160a4c257f2f1d982d4ad2c107be8ee4970a"
+    },
+    {
+      "path": "followup-05a1/publish.log",
+      "bytes": 5031,
+      "sha256": "8ec1c62543ace2b0311bef3ca62524fec9528c8af25b8196a3f6aee86dbf000f"
+    },
+    {
+      "path": "followup-05a1/qualification-powershell.log",
+      "bytes": 90,
+      "sha256": "f5ef1367822126590c34fef0e4f0223897478dc999de7d8cb2fee5685d447e54"
+    },
+    {
+      "path": "followup-05a1/qualification-python.log",
+      "bytes": 312,
+      "sha256": "1ce47237c340931d24268a0921a3cb05130438723cb022985f4d0d9b9e41f43d"
+    },
+    {
+      "path": "followup-05a1/references.log",
+      "bytes": 95,
+      "sha256": "daede3682a9232c12c02e513aae7613e66d1c1969e186fece6533ef8123f3185"
+    },
+    {
+      "path": "followup-05a1/results.json",
+      "bytes": 4942,
+      "sha256": "1f70b2aa63eafa1b0dbb9c83b487531e98a449c66bf5f1c6b92399b9d4abf90a"
+    },
+    {
+      "path": "followup-05a1/solution-tests.log",
+      "bytes": 41110,
+      "sha256": "4f59eebe36a883591e5f6bc18afc31242c54273f1b0ac62a5c1227e81c95e350"
+    },
+    {
+      "path": "followup-05a1/terminal-match.json",
+      "bytes": 6280,
+      "sha256": "c4ba1880bd697c0b507d1518292993de42e39c95db81241601f916a8f8eb45d0"
+    },
+    {
+      "path": "followup-05a1/terminal-match.log",
+      "bytes": 206297,
+      "sha256": "9d6fe15a85e39f656ed35d40c9ed86bb24264fc903b32e05fdc717755bd693e0"
+    },
+    {
+      "path": "followup-05a1/terminal-match.progression-1.json",
+      "bytes": 2840820,
+      "sha256": "eac9d8d26f97af4ec74e641525f218dff6ee179e7da05cebe9abd6fc3ecaa153"
+    },
+    {
+      "path": "followup-05a1/version.log",
+      "bytes": 60,
+      "sha256": "c6f1338b06c5350c9ecbd50b93f2afae406a4c06fe17b723e81d5bc72bf30e5f"
+    },
+    {
+      "path": "publication-05a1/FORGELINE-0.1.538-dev-win-x64.zip.provenance.json",
+      "bytes": 1194,
+      "sha256": "5c83c2ce28789434d788264e94e17dd86c8b0f991ad7e5a7004e7aa2236a2e7b"
+    },
+    {
+      "path": "publication-05a1/FORGELINE-0.1.538-dev-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "841399dd8ac6bfb52ec65a9a54334296bb2be6430be4601a7dc8a53a497275e5"
+    },
+    {
+      "path": "publication-05a1/win-x64/publish/build-provenance.json",
+      "bytes": 1194,
+      "sha256": "5c83c2ce28789434d788264e94e17dd86c8b0f991ad7e5a7004e7aa2236a2e7b"
+    },
+    {
+      "path": "publication-05a1/win-x64/publish/manifest.sha256",
+      "bytes": 312291,
+      "sha256": "62f2ea163b89478da56b78c643630c0c435e8569b1bdf2f83aacb767d3276b43"
+    },
+    {
+      "path": "publication-05a1/win-x64/publish/assets/runtime/manifest.json",
+      "bytes": 2598661,
+      "sha256": "b29e581eb4afd5c264b1450630bda55d1b1f4d5fe26ce04e8b5332d9d72821c3"
+    },
+    {
+      "path": "functional-01/core-build.log",
+      "bytes": 3361,
+      "sha256": "4ed0d9a95f2fb979f9ba55e71cf4c94618a0521e047a29799631080de6bc29b4"
+    },
+    {
+      "path": "functional-01/launcher-native.log",
+      "bytes": 1059,
+      "sha256": "7970c22796877d4a0696f795cfb5cd9016784b63b30f667f34c7c6e8a90e1839"
+    },
+    {
+      "path": "functional-01/native/actual-request.json",
+      "bytes": 907,
+      "sha256": "49baa43f454d23be2dd1c523bf772a12af416439113c09be030fe6d05cafd27e"
+    },
+    {
+      "path": "functional-01/native/attempt.json",
+      "bytes": 1709,
+      "sha256": "2d840f48f35a7945f38699c17080df72db9f9f3299586cd9818a19469dd77d61"
+    },
+    {
+      "path": "functional-01/native/capture/failure.json",
+      "bytes": 4685,
+      "sha256": "e1cd0f121b3c0aabfc78c68662c6aa957e837a8539746c775401250aa5bdd35b"
+    },
+    {
+      "path": "functional-01/native/identity/binding-provider-version.command.json",
+      "bytes": 597,
+      "sha256": "15fd3561657f784d0715a2847bf69ae7ce74689533d3f1fd9b7051352a3a6a30"
+    },
+    {
+      "path": "functional-01/native/identity/binding-provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-01/native/identity/binding-provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-01/native/identity/binding-sensor-inventory.command.json",
+      "bytes": 751,
+      "sha256": "b02ec3637e09b61c639159d85c6148940f55e5a8a20f95c7141eab5193987899"
+    },
+    {
+      "path": "functional-01/native/identity/binding-sensor-inventory.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-01/native/identity/binding-sensor-inventory.stdout",
+      "bytes": 157,
+      "sha256": "91627e81ebae7a0ef6d559fd35386d2b9262e6d07359666b232cac8fcdf8af9d"
+    },
+    {
+      "path": "functional-01/native/identity/binding.json",
+      "bytes": 3340,
+      "sha256": "263d37367a185da7f14cacb9eb11a1525425ec181bd59e82f4f3a48214b00a5a"
+    },
+    {
+      "path": "functional-01/native/identity/checkpoint.json",
+      "bytes": 895,
+      "sha256": "7fc92e6c62b85b29e3fa1dc46f331ece29ec58503ee4556ad06b989e4e8d66b3"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-inventory.json",
+      "bytes": 1200,
+      "sha256": "0eac38b035de4d35f9e98b7b6d097a665992e98544262b4625eb60a63e0ac3ae"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-probe-source.json",
+      "bytes": 306,
+      "sha256": "f93084a353f802dffd79167ed08506e9085da4ad85cc6ce5a0322ac4488688f7"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-probe.command.json",
+      "bytes": 990,
+      "sha256": "e69472cf088f1e4534a2bfcadced9c2f7906fa5abfe1be4f0bf97cf988d17f1e"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-probe.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-probe.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-01/native/identity/cuda-query-result.json",
+      "bytes": 1200,
+      "sha256": "0eac38b035de4d35f9e98b7b6d097a665992e98544262b4625eb60a63e0ac3ae"
+    },
+    {
+      "path": "functional-01/native/pre-window-control.json",
+      "bytes": 394,
+      "sha256": "3f3e13df710ae5a611bf6d89f274a5d67888ada4165b29181bf6e7fb118e58fb"
+    },
+    {
+      "path": "functional-01/native/provider-version.command.json",
+      "bytes": 581,
+      "sha256": "08c8f4c02410579376f94ebdd201035b5b0e1c93337b188ab1d3a08a21db10e5"
+    },
+    {
+      "path": "functional-01/native/provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-01/native/provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-01/native/sensors/final.json",
+      "bytes": 196,
+      "sha256": "4e493e6726c9b26a43bfd7d7c2552ebe04dbefc18cea440b804f7d3c4f55d639"
+    },
+    {
+      "path": "functional-01/native/sensors/latest.json",
+      "bytes": 1684,
+      "sha256": "b11ec955682d4e3c9d7a950680a47a3928abde4c3a89b264dcee5bd1aa2b9eee"
+    },
+    {
+      "path": "functional-01/native/sensors/observations.jsonl",
+      "bytes": 7792,
+      "sha256": "72671abccda61199bf728b59a97ca5067bd859f2c535eca8b60c9b56616cf47e"
+    },
+    {
+      "path": "functional-01/native/stderr.log",
+      "bytes": 362,
+      "sha256": "aaa7fa1f23428bdc574330bfb58de9884cb2aa1eac3db559f25f00f52d830796"
+    },
+    {
+      "path": "functional-01/native/stdout.log",
+      "bytes": 511,
+      "sha256": "2ba5947447064c55e9b4a14999d74938350e11dc5eeccdc4640657f71b152f4f"
+    },
+    {
+      "path": "functional-01/plan.json",
+      "bytes": 2083,
+      "sha256": "0156dedf41437384a30406f9175f3264b41c55bc68e06f8106d0e8e279e44b74"
+    },
+    {
+      "path": "functional-01/request.json",
+      "bytes": 645,
+      "sha256": "92b6ed3fe06eeb5513b55a5a986287828adfd14a8a6aca51a9d653d21472b364"
+    },
+    {
+      "path": "functional-01/run_pilot.py",
+      "bytes": 546,
+      "sha256": "58cc1198db9f418b032467892734101f9b879b2b37816ae7e547b60cc8f41a01"
+    },
+    {
+      "path": "functional-02/core-build.log",
+      "bytes": 3361,
+      "sha256": "1397759fc4ae755165c6cabcd28c305d0b04980eecbee868522e0b353e6573df"
+    },
+    {
+      "path": "functional-02/launcher-native.log",
+      "bytes": 1059,
+      "sha256": "d7ec0ac2c7b10923af0e508698269c7731fb685cc7bd17c116a8b6cd5972b082"
+    },
+    {
+      "path": "functional-02/native/actual-request.json",
+      "bytes": 907,
+      "sha256": "e5449fbfa287efd08f11d29e9ba215f0d648ddb63bfd5e368d6e1a70b096f6bf"
+    },
+    {
+      "path": "functional-02/native/attempt.json",
+      "bytes": 1709,
+      "sha256": "893a4e294c8524b901afb3f84f6c249f99d3fd92433fdc76d03db6111b4a94c8"
+    },
+    {
+      "path": "functional-02/native/capture/failure.json",
+      "bytes": 1500,
+      "sha256": "c356ee174ef86437bc8261ad036378ba78c97f4a17ba03cfaf80592658332003"
+    },
+    {
+      "path": "functional-02/native/identity/binding-provider-version.command.json",
+      "bytes": 596,
+      "sha256": "4c4938d1d7ee4df4c293b059981c56e82f3bea01d4dbfb4eaed7438b5c21d5ff"
+    },
+    {
+      "path": "functional-02/native/identity/binding-provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-02/native/identity/binding-provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-02/native/identity/binding-sensor-inventory.command.json",
+      "bytes": 751,
+      "sha256": "e41d57387c5d021cb4c320562c4e18426406039992b829b387b322302336caa9"
+    },
+    {
+      "path": "functional-02/native/identity/binding-sensor-inventory.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-02/native/identity/binding-sensor-inventory.stdout",
+      "bytes": 157,
+      "sha256": "ead0f068bcf22e89fe410be0a40152a0eea15692c33993b0d338789035e4ef1f"
+    },
+    {
+      "path": "functional-02/native/identity/binding.json",
+      "bytes": 3340,
+      "sha256": "6954f63ece8b3ae9b308e1df08d21809767fae4b97c7539daea13617185d6c29"
+    },
+    {
+      "path": "functional-02/native/identity/checkpoint.json",
+      "bytes": 895,
+      "sha256": "04378c234159ad4fcee95e686dfa5cd3550884eb86e7cf6ea87a1f4ce402f6df"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-inventory.json",
+      "bytes": 1200,
+      "sha256": "1f0978744ea3372f4bff8ec465a273f7333b4d5faeaaf9d76a3a2a3013645bc6"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-probe-source.json",
+      "bytes": 306,
+      "sha256": "f93084a353f802dffd79167ed08506e9085da4ad85cc6ce5a0322ac4488688f7"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-probe.command.json",
+      "bytes": 990,
+      "sha256": "1df70d809ae719547dabd43c102ed4529d34eee7372e4ffbae1d9e78989b40da"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-probe.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-probe.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-02/native/identity/cuda-query-result.json",
+      "bytes": 1200,
+      "sha256": "1f0978744ea3372f4bff8ec465a273f7333b4d5faeaaf9d76a3a2a3013645bc6"
+    },
+    {
+      "path": "functional-02/native/pre-window-control.json",
+      "bytes": 392,
+      "sha256": "0b57254fbe2a0699055d1aa475ccf6339f184ecacdef26430949edb3ba3f84bd"
+    },
+    {
+      "path": "functional-02/native/provider-version.command.json",
+      "bytes": 581,
+      "sha256": "0b637560f9007c64ed767ba34d15e6f78ba955c58848a4b1d2c3409937d426d1"
+    },
+    {
+      "path": "functional-02/native/provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-02/native/provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-02/native/sensors/final.json",
+      "bytes": 198,
+      "sha256": "07de0da56d84c7c2804caa5b84deec22d48230e08466b04625da32c98e835d33"
+    },
+    {
+      "path": "functional-02/native/sensors/latest.json",
+      "bytes": 1501,
+      "sha256": "4f0563695249ba1dfddec0bdfad0fbcc69279bfac93668a9141d8da832abb74c"
+    },
+    {
+      "path": "functional-02/native/sensors/observations.jsonl",
+      "bytes": 32252,
+      "sha256": "96dcfa573e99551a65a486f561c8b250f0dba8e4e49fc0e434e602e3276767ce"
+    },
+    {
+      "path": "functional-02/native/stderr.log",
+      "bytes": 153,
+      "sha256": "346e4606990106222bec9122aff875b42e11c9bcb8f7daada0b18f98110ff21c"
+    },
+    {
+      "path": "functional-02/native/stdout.log",
+      "bytes": 585,
+      "sha256": "1b7f86dab1be522e69f147d2f6d203c2643a05c5a81fccd4edb887a17e330775"
+    },
+    {
+      "path": "functional-02/pixel-difference.json",
+      "bytes": 705,
+      "sha256": "0c8931fbc578b7ede63e73671e0a4d5edd4b9612398f85e4400b2b74c2765560"
+    },
+    {
+      "path": "functional-02/plan.json",
+      "bytes": 2313,
+      "sha256": "a388fd449deb08c9cabc1a275dd57ee8a4d086fc81371bf720f5a232933e3439"
+    },
+    {
+      "path": "functional-02/request.json",
+      "bytes": 645,
+      "sha256": "74b82df2acf14284a81d267958631fea9d0456d7a95710103a3a6f488dd075a6"
+    },
+    {
+      "path": "functional-02/run_pilot.py",
+      "bytes": 546,
+      "sha256": "58cc1198db9f418b032467892734101f9b879b2b37816ae7e547b60cc8f41a01"
+    },
+    {
+      "path": "functional-03/capacity-preflight.json",
+      "bytes": 518,
+      "sha256": "f895776484bf78bb87da66cb6802b0b9f25ebab443a51c09bf7caa44695cff85"
+    },
+    {
+      "path": "functional-03/launcher-stderr.log",
+      "bytes": 1059,
+      "sha256": "23deb7eecbdea58819147b85e05dae62791338c7cfd9fd23b269f053a4f4d0f8"
+    },
+    {
+      "path": "functional-03/launcher-stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/actual-request.json",
+      "bytes": 976,
+      "sha256": "023e33b3abf6fcf95ca68e0b57509f339c9f83f9b78e4274314a3cc2433b1e8f"
+    },
+    {
+      "path": "functional-03/native/attempt.json",
+      "bytes": 1760,
+      "sha256": "3d6aca9dbc11b06559d4f8e17f72ec641e04cdd6d7fcd40cc86b492b3557b846"
+    },
+    {
+      "path": "functional-03/native/identity/binding-provider-version.command.json",
+      "bytes": 597,
+      "sha256": "379727157d140fe1f5ad06a72bcabe1195843816e3b3d8b39f138dc1dc15b014"
+    },
+    {
+      "path": "functional-03/native/identity/binding-provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/identity/binding-provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-03/native/identity/binding-sensor-inventory.command.json",
+      "bytes": 751,
+      "sha256": "400ed3caa8f65e83ac0b5ad8632ba54fa4d609bbec3d5696d70faa759c9d40f7"
+    },
+    {
+      "path": "functional-03/native/identity/binding-sensor-inventory.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/identity/binding-sensor-inventory.stdout",
+      "bytes": 157,
+      "sha256": "046fd85062e8b77070f5412e0e8eae754665f54c9a17c6b335e29cc9d6baa51e"
+    },
+    {
+      "path": "functional-03/native/identity/checkpoint.json",
+      "bytes": 893,
+      "sha256": "e6739d24c4128faf9acc4e2ad925a745f79aeb1b0866b2a32706a643c3eceebf"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-inventory.json",
+      "bytes": 1200,
+      "sha256": "63fa9d167a99682cd7bbd18e46aee785d46cf76f18d85e1f4f8ac6f27abbc503"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-probe-source.json",
+      "bytes": 306,
+      "sha256": "f93084a353f802dffd79167ed08506e9085da4ad85cc6ce5a0322ac4488688f7"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-probe.command.json",
+      "bytes": 990,
+      "sha256": "6057224a79b8918d44951627030f82fb57fff007130b5e22b700d44f2b741fa7"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-probe.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-probe.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/identity/cuda-query-result.json",
+      "bytes": 1200,
+      "sha256": "63fa9d167a99682cd7bbd18e46aee785d46cf76f18d85e1f4f8ac6f27abbc503"
+    },
+    {
+      "path": "functional-03/native/pre-window-control.json",
+      "bytes": 417,
+      "sha256": "0f8a916b6cdcf8e9c7509261cf3be51c64418df51029b3d6b1ffe25579cd574e"
+    },
+    {
+      "path": "functional-03/native/provider-version.command.json",
+      "bytes": 581,
+      "sha256": "4ef3b1d3259d65b0f156435eb07890904a3ec34a6da7214658b7dae811db9ae1"
+    },
+    {
+      "path": "functional-03/native/provider-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/provider-version.stdout",
+      "bytes": 118,
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    {
+      "path": "functional-03/native/sensors/final.json",
+      "bytes": 198,
+      "sha256": "53c217b5c73f476fa4839c366b127d1b9beb13d79ff2ca761dfdcae34d9d0b5c"
+    },
+    {
+      "path": "functional-03/native/sensors/latest.json",
+      "bytes": 1501,
+      "sha256": "b88ba4d8acdaf40f224ca9271a9ef5f176476c4110189b99c6bfcdee1af2a3eb"
+    },
+    {
+      "path": "functional-03/native/sensors/observations.jsonl",
+      "bytes": 19778,
+      "sha256": "7ab76ea84b7bcdd00bb3787f1196bf1a237398b1503b7d05c3ff6f62736d696b"
+    },
+    {
+      "path": "functional-03/native/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "functional-03/native/stdout.log",
+      "bytes": 221,
+      "sha256": "b70f5746d6b8a2be3dbb98a1c03937d4e30e46be6d93bcce09be17dc63f6ab25"
+    },
+    {
+      "path": "functional-03/plan.json",
+      "bytes": 3183,
+      "sha256": "5cf19501c51cf22cd3bd7401b1df62adf99bf79884cd34d6cbc447624d33f3c3"
+    },
+    {
+      "path": "functional-03/request.json",
+      "bytes": 748,
+      "sha256": "e8feeef847185f2c0119f89ac7395ec664d2570859318dbf385dacbb0890cc70"
+    },
+    {
+      "path": "functional-03/run_pilot.py",
+      "bytes": 557,
+      "sha256": "d1bb096fd3031d8e25b86fdd2b4364303b6ad8cec132bb6fc7e490886662d56a"
+    },
+    {
+      "path": "trace-original-5e6/allocations.nettrace",
+      "bytes": 269158,
+      "sha256": "83c1a63de92dde842eee9e2bd0a362cf407efc0a9b821f7db27a1709d96c9d00"
+    },
+    {
+      "path": "trace-original-5e6/collect.command.json",
+      "bytes": 1146,
+      "sha256": "af79484728ee444f395942b37cd7b057676f454f30afdc04df92d966b7ce596c"
+    },
+    {
+      "path": "trace-original-5e6/collect.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/collect.stdout",
+      "bytes": 662,
+      "sha256": "791809def9807a39a21bf8d7294564626dbe3391b7004cc5312065bb83b714c9"
+    },
+    {
+      "path": "trace-original-5e6/execution-provenance.json",
+      "bytes": 2186,
+      "sha256": "f2d7974ac6b561b9b92a63381f08f1591107f09386074d67629dce6cffe2f671"
+    },
+    {
+      "path": "trace-original-5e6/fixture.pid",
+      "bytes": 5,
+      "sha256": "18304a135f96adad31448bee4de0f8c0aa91c51a6e48d26fcd6853ecbe6a0cac"
+    },
+    {
+      "path": "trace-original-5e6/integration.json",
+      "bytes": 3267,
+      "sha256": "37ac6ce3cf3f1cf32aa820c1d9131a551d0e651b7587114938536d68e679df14"
+    },
+    {
+      "path": "trace-original-5e6/invalid.nettrace",
+      "bytes": 11,
+      "sha256": "82ca8ca8aab422a841d9ed71b3b6e9c191dbb5bd60a7240796a51648b6bedd6d"
+    },
+    {
+      "path": "trace-original-5e6/invalid.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/invalid.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/negative-checks.json",
+      "bytes": 1819,
+      "sha256": "99da8cc1eac664a12eca1f3662e42b8aaac7661940e22228183999ea805090e7"
+    },
+    {
+      "path": "trace-original-5e6/negative-invalid/allocation-stacks.json",
+      "bytes": 2605,
+      "sha256": "4b2eadb5b35595403c389d7cce5a83c9cd3d868b4dcc452d39ef1a7ed5c8d6c7"
+    },
+    {
+      "path": "trace-original-5e6/negative-truncated/allocation-stacks.json",
+      "bytes": 2874,
+      "sha256": "63c24bca34843609ee37ee3544e59aeab318c6550b4115fc5bf87712202deacc"
+    },
+    {
+      "path": "trace-original-5e6/negative-wrong-pid/allocation-stacks.json",
+      "bytes": 2138,
+      "sha256": "5db91e22183ea5f41dfe2abb32d2cbe2d277854dfa6aaeb965282e6cb88d97fb"
+    },
+    {
+      "path": "trace-original-5e6/parse.command.json",
+      "bytes": 879,
+      "sha256": "49acbb2f5f771459a45ee1904cb80771ca28ededcb2c33e08bfdfd22f4e768ca"
+    },
+    {
+      "path": "trace-original-5e6/parse.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/parse.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/parsed/allocation-stacks.json",
+      "bytes": 316335,
+      "sha256": "93c9491ebe2b42ebd49597093f17b707a405df0c1ffecdd423a6ec268cbd5a3b"
+    },
+    {
+      "path": "trace-original-5e6/parser-dependencies.json",
+      "bytes": 4038,
+      "sha256": "27fca525c6319bc8c0abcca689f47da2baeb4bad11ea3ccdd7513e2d14c0c322"
+    },
+    {
+      "path": "trace-original-5e6/parser-payload-after.json",
+      "bytes": 2790,
+      "sha256": "75c9e0d2e2075090666cc1f0081c2947cc9ae9b30aa860b5456c6f8436de5064"
+    },
+    {
+      "path": "trace-original-5e6/parser-payload-before.json",
+      "bytes": 2790,
+      "sha256": "75c9e0d2e2075090666cc1f0081c2947cc9ae9b30aa860b5456c6f8436de5064"
+    },
+    {
+      "path": "trace-original-5e6/summary.json",
+      "bytes": 987,
+      "sha256": "edf1caea7f3404eb76e1b6a364bdf2f808e715d06683dd0b6ccb9c8321a4d6dd"
+    },
+    {
+      "path": "trace-original-5e6/tool-payload-after.json",
+      "bytes": 14313,
+      "sha256": "6f1fdc0f97d64a5316e735be2c23080c5bc945d1cbefeb8b3a003be5ad690adb"
+    },
+    {
+      "path": "trace-original-5e6/tool-payload-before.json",
+      "bytes": 14313,
+      "sha256": "6f1fdc0f97d64a5316e735be2c23080c5bc945d1cbefeb8b3a003be5ad690adb"
+    },
+    {
+      "path": "trace-original-5e6/tool-profiles.command.json",
+      "bytes": 682,
+      "sha256": "dbcd3ea267cfc94502a618c7428d983721a7112bc0e4d89bc6732511609c14be"
+    },
+    {
+      "path": "trace-original-5e6/tool-profiles.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/tool-profiles.stdout",
+      "bytes": 1032,
+      "sha256": "ce5d4df09f21bd781d257f4ea8e718024b0c3e7613da6dfa8c3af53c3ee9d17b"
+    },
+    {
+      "path": "trace-original-5e6/tool-version.command.json",
+      "bytes": 676,
+      "sha256": "922df3863284e8ea097786ccf48ea86e240323f112e84181b076a2f3c0e1cb0d"
+    },
+    {
+      "path": "trace-original-5e6/tool-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/tool-version.stdout",
+      "bytes": 54,
+      "sha256": "2c9c61e0b04d6003c7ec45853cf901888fc535cd4e3db9376000a40501aad5f7"
+    },
+    {
+      "path": "trace-original-5e6/truncated.nettrace",
+      "bytes": 32,
+      "sha256": "06fab075277611eefa6b43cc7558f2ec069fe784b451d37af873e3abd992ffb5"
+    },
+    {
+      "path": "trace-original-5e6/truncated.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/truncated.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/wrong-pid.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-original-5e6/wrong-pid.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-reparse-05a1/command.json",
+      "bytes": 1337,
+      "sha256": "98f52b80928c0537bc6bd54a45f03617028dc5d7e8f9dbf028f928dd4950ba99"
+    },
+    {
+      "path": "trace-reparse-05a1/parsed/allocation-stacks.json",
+      "bytes": 316591,
+      "sha256": "4f43c2f8c820adc78b7bc01fe0a5391316f9aa19be21855d78d47fb3958cc7d4"
+    },
+    {
+      "path": "trace-reparse-05a1/plan.json",
+      "bytes": 992,
+      "sha256": "c6fcae6ba6d08504ce3a4385b696094f87b180d621211f078754bb320eb23cee"
+    },
+    {
+      "path": "trace-reparse-05a1/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "trace-reparse-05a1/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source-inputs/5e6faeb52a784799e4d177363bcff1092ac1472f/global.json",
+      "bytes": 165,
+      "sha256": "ab4eed8da9aaee0671a10b49fe4ff1b27b3341b264f317ee88785607c0711e9a"
+    },
+    {
+      "path": "source-inputs/5e6faeb52a784799e4d177363bcff1092ac1472f/Directory.Build.props",
+      "bytes": 2637,
+      "sha256": "a267892a920c087a2ed260fe5fa28ef9624e0d5544923c310c4e3d5e7e729e17"
+    },
+    {
+      "path": "source-inputs/5e6faeb52a784799e4d177363bcff1092ac1472f/Directory.Packages.props",
+      "bytes": 710,
+      "sha256": "ae4562aa1155c251cd132a6da0821260df562654cc839d3cadcdbf64d57ddda3"
+    },
+    {
+      "path": "source-inputs/05a1aeddd019400b7de835bbb836442fd3bb9700/global.json",
+      "bytes": 165,
+      "sha256": "ab4eed8da9aaee0671a10b49fe4ff1b27b3341b264f317ee88785607c0711e9a"
+    },
+    {
+      "path": "source-inputs/05a1aeddd019400b7de835bbb836442fd3bb9700/Directory.Build.props",
+      "bytes": 2637,
+      "sha256": "a267892a920c087a2ed260fe5fa28ef9624e0d5544923c310c4e3d5e7e729e17"
+    },
+    {
+      "path": "source-inputs/05a1aeddd019400b7de835bbb836442fd3bb9700/Directory.Packages.props",
+      "bytes": 710,
+      "sha256": "ae4562aa1155c251cd132a6da0821260df562654cc839d3cadcdbf64d57ddda3"
+    }
+  ],
+  "interpretation": "Functional validation and sampled fixture diagnostics only. Prior failed canonical run retained; no accepted physical/pixel/foreground baseline, no owner-frame site attribution, no policy approval or optimization claim.",
+  "externalArtifacts": [
+    {
+      "path": "functional-02/native/capture/failed-IndustrialBase-1920x1080-Medium-NormalGameplay-Dpi96-first.png",
+      "bytes": 5132068,
+      "sha256": "4c73454152158930871998f4224dbb5897578bff8123ad45ddc180942e8bcf57",
+      "retainedLocally": true
+    },
+    {
+      "path": "functional-02/native/capture/failed-IndustrialBase-1920x1080-Medium-NormalGameplay-Dpi96-repeat-02.png",
+      "bytes": 5132067,
+      "sha256": "3c733602eda333438b175296162cd425328edd752cd383de4d9b8484199983aa",
+      "retainedLocally": true
+    },
+    {
+      "path": "trace-original-5e6/negative-wrong-pid/converted.etlx",
+      "bytes": 114512,
+      "sha256": "f2482025ac86327b6ba04d494328fd3156f4885b53d4884f53858ed744fadb3d",
+      "retainedLocally": true
+    },
+    {
+      "path": "trace-original-5e6/parsed/converted.etlx",
+      "bytes": 114512,
+      "sha256": "3761688030e46e0813d83656da8b9b223372b55e491719e911bd30baa047ac6e",
+      "retainedLocally": true
+    },
+    {
+      "path": "trace-reparse-05a1/parsed/converted.etlx",
+      "bytes": 114512,
+      "sha256": "376606386863c1ebbc71c95688b9fd1666fa7eb669043edcf4ef6c307674939c",
+      "retainedLocally": true
+    }
+  ]
+}
