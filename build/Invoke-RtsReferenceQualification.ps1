@@ -84,7 +84,7 @@ if ($Capture) {
     finally { $stream.Dispose() }
     $oldFallback = [Environment]::GetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', 'Process')
     try {
-        if ($StaticUploadFallback -eq 'Default') { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $null, 'Process') }
+        if ($StaticUploadFallback -eq 'Default') { Remove-Item Env:FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK -ErrorAction SilentlyContinue }
         elseif ($StaticUploadFallback -eq 'Upload') { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', '1', 'Process') }
     if ($ClientPath) {
         # A GUI apphost invoked outside a pipeline can return before its process exits.
@@ -94,7 +94,10 @@ if ($Capture) {
             --configuration $Configuration --no-build -- --reference-capture-request $requestPath
     }
     if ($LASTEXITCODE -ne 0) { throw "Native reference capture failed; inspect $referenceRoot/failure.json and client output." }
-    } finally { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $oldFallback, 'Process') }
+    } finally {
+        if ($null -eq $oldFallback) { Remove-Item Env:FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK -ErrorAction SilentlyContinue }
+        else { [Environment]::SetEnvironmentVariable('FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK', $oldFallback, 'Process') }
+    }
 
     & "$PSScriptRoot/Compare-VisualReferenceEvidence.ps1" -CurrentRoot $referenceRoot -BaselineRoot $BaselineRoot
     return

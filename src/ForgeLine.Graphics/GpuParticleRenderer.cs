@@ -1,3 +1,4 @@
+using ForgeLine.Graphics.RenderContracts;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -101,8 +102,9 @@ public sealed class GpuParticleRenderer : IDisposable
                     new("COLOR",0,GraphicsVertexElementFormat.Float4,32,0,GraphicsVertexInputRate.PerInstance,1),
                     new("TEXCOORD",2,GraphicsVertexElementFormat.Float4,48,0,GraphicsVertexInputRate.PerInstance,1)]
             });
-            indices = graphics.CreateBuffer(new(12, GraphicsBufferMemory.Upload));
-            indices.SetData<ushort>([0,1,2,2,1,3]);
+            ReadOnlySpan<ushort> quadIndices = [0, 1, 2, 2, 1, 3];
+            indices = graphics.CreateInitializedStaticBuffer(
+                new(12, StaticGraphicsBufferUsage.Index), MemoryMarshal.AsBytes(quadIndices));
             for (int i = 0; i < _frames.Length; i++) _frames[i] = graphics.CreateBuffer(new(checked((ulong)capacity * 64), GraphicsBufferMemory.Upload));
             _pipeline = pipeline; _indices = indices;
         }

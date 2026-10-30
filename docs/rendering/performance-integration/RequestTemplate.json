@@ -1,0 +1,63 @@
+{
+  "software": false,
+  "uiScenarios": [
+    "World"
+  ],
+  "cameraPath": "Fixed",
+  "outputRoot": "<output>",
+  "rasterDpi": 0,
+  "samples": 8,
+  "warmups": 3,
+  "profiles": [
+    "Medium"
+  ],
+  "scenes": [
+    "Scaling1000High",
+    "Scaling1000Low",
+    "Scaling10000High",
+    "Scaling10000Low",
+    "Scaling100000High",
+    "Scaling100000Low",
+    "ScalingTerrainOnly"
+  ],
+  "repeatCaptures": 2,
+  "runtimeRoot": "<runtime-root>",
+  "mechanicalSeconds": null,
+  "continueAfterMismatch": false,
+  "uiScales": [
+    1
+  ],
+  "graphicsSettings": {
+    "resolutionScale": 1,
+    "environment": {
+      "wetness": 0,
+      "cloudCover": 0,
+      "daylight": 1
+    },
+    "vegetation": {
+      "density": 1,
+      "maximumDistanceMeters": 4000
+    },
+    "terrainResidency": {
+      "maximumResidentChunks": 128,
+      "enabled": true
+    }
+  },
+  "runProfile": "Warm",
+  "inspectionDistanceMeters": 0,
+  "driver": "NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU: 32.0.15.9653; Intel(R) Graphics: 32.0.101.8724",
+  "surfaceMarks": [],
+  "localHaze": null,
+  "cinematicFrontend": false,
+  "yawDegrees": 45,
+  "displays": [
+    {
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "zooms": [
+    "NormalGameplay"
+  ],
+  "commit": "af8aaac0f9425b077d3a4497271495c1fce00d87"
+}
