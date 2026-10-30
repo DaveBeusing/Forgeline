@@ -144,67 +144,97 @@ so default production diagnostic objects retain their existing allocation size.
 
 ## Verification status
 
-During implementation, Client and Client.Tests Release builds passed with zero
-warnings/errors. Focused live tests passed 5/5 before the later aggregate-budget correction;
-new exact-boundary/max-warmup cases require a revised-source rerun. Graphics telemetry tests
-passed 13/13, including real upload-fence separation, raw timing, logical bytes,
-image parity and a same-binary off/on/on/off protocol (64 warmups, 256 samples per
-cohort). Full raw overhead observations are written under artifacts/render-telemetry-overhead.
-They describe the native clear-frame observer, not complete live-host overhead or
-clock/thermal-controlled game speedup. Warm observer allocation guards remain zero.
-Python qualification tests passed 59/59 after the new integrity counterexamples.
+| Exact product source | Observed validation |
+| --- | --- |
+| dead0c5ad23d141b76f10718f75342d62afbe72c | All 17 canonical stages passed; Release build zero warnings/errors; 2055 clean runtime assets/contracts; native and headless smoke/stress; reproducible local publisher; full serial suite 4900 total, 4819 passed, 81 explicit skips, zero failed (28m35.987s). Natural seed-2026 match ended player-1 Victory/CommandCoreDestroyed at tick 59098, 343.382 seconds, within 80000. |
+| ec4f961f2855bebf93774355407eb9c1931d0780 | Aggregate/prefix-budget and default-diagnostic-layout corrections: 20 focused Client/reference cases and 13 Graphics/native cases passed; both builds zero warnings/errors. |
+| 9cf3491256e9ef18718a43af5611054465735f45 | Optional-context environment correction: 24 focused Client/context/window/reference cases passed; build zero warnings/errors. |
+| 02dc24f9549d90748ad3771af54f54214db9b1ec | Observer/service attribution: 25 focused Client cases, 60 Python qualification tests and 36 PowerShell orchestration assertions passed; build zero warnings/errors. Actual live attempt 05 completed the unchanged 64-warmup/512-sample window with 512 CPU and 512 completed GPU observations, no overflow, successful CLI exit and strict diagnostic validation. |
 
-Initial attempts are retained as actual failures: three CA1822 data-property
-analyzer findings were corrected; an early focused test invocation before a final
-explicit build discovered no matching tests (exit 5), then the built tests passed.
-Full canonical validation, exact clean-source live smoke/export validation,
-independent final review and source-specific remote CI are separate required
-execution records. No sustained FPS, complete physical memory, human art approval,
-matched native/live fixture or hardware performance acceptance is claimed here.
+The full canonical run belongs to its original exact revision; it is not relabelled
+as later corrections. The final documentation-only commit changes no product code.
+Final exact-source remote CI is observed separately after PR creation. No extra
+PATCH is allocated against the unchanged origin/master base.
 
-The complete canonical pipeline at product source
-`dead0c5ad23d141b76f10718f75342d62afbe72c` passed all 17 stages:
-version contracts, source references, Release build, both compiled maps/scenario
-contracts, clean runtime assets/contracts (2055 records), native client smoke,
-headless 1000/10000 smoke/stress, serial complete solution, reproducible publisher,
-and the natural terminal match. The full suite reports 4900 total, 4819 passed,
-81 explicit skips, zero failures (28m35.987s). Seed 2026 ended naturally at tick
-59098 with player 1 Victory/CommandCoreDestroyed in 343.382 seconds, within 80000.
-Raw commands/exits/logs are retained under artifacts/wave0-canonical-01/results.json.
+Canonical commands, exits and raw logs are retained under
+artifacts/wave0-canonical-01/results.json. Native observer protocol artifacts retain
+all four same-binary off/on/on/off cohorts (64 warmups, 256 samples each) under the
+Graphics test output artifacts/render-telemetry-overhead directory. They measure
+the native clear-frame observer, not whole live-host overhead or a game speedup.
+Warm observer allocation guards remain zero. Independent read-only reviews passed
+with the explicit remaining qualification warnings below.
 
-Subsequent bounded corrections reject impossible aggregate telemetry settings,
-reserve warmup-prefix headroom, and restore default diagnostic object layout.
-Those changes are not relabelled as the prior full canonical run; revised-source
-focused checks, actual live export, independent review and final exact-source CI
-are recorded separately. No second PATCH is allocated against the same base.
+## Retained live attempts and corrected diagnosis
 
-The first actual corrected-source owner attempt at ec4f961f2855bebf93774355407eb9c1931d0780
-failed before window startup because a cleared optional context environment variable
-arrived as an empty string and was opened as a filename. The failed command/log is
-retained under artifacts/wave0-live-01; it produced no owner output and is not a pass.
-The parser now treats null/empty/whitespace context as absent while retaining strict
-source/runtime checks for any supplied file. Environment-backed regression cases
-cover all absent forms plus correct and mismatched supplied contexts. A fresh clean
-source attempt, rather than an overwritten retry, must validate the real producer.
+All attempts use the declared 64 warmups, 512 samples and unchanged one-minute
+smoke deadline. No samples, workload, image tolerance, fence timeout or CI gate was
+reduced to obtain a pass. Every failed output remains in its original fresh folder.
 
-The second actual owner attempt at 9cf3491256e9ef18718a43af5611054465735f45
-started correctly but hit the unchanged one-minute smoke deadline. It retained
-217 of the required 512 measured frames and 217 GPU completions, with no overflow.
-The window is incomplete and is not a successful qualification. Payload median
-was approximately 10.535 ms while the 217-frame span was 46.866 seconds; work
-outside that old payload bracket requires attribution. Original log/output remain
-under artifacts/wave0-live-02 and are never replaced.
+- Attempt 01, source ec4f961f: a cleared optional context environment variable
+  arrived as an empty string and was opened as a filename. Startup failed and
+  produced no owner output. The later parser treats null/empty/whitespace as
+  absent while preserving supplied-file source/runtime validation. Logs remain
+  under artifacts/wave0-live-01.
+- Attempt 02, source 9cf34912: startup succeeded but the deadline expired with
+  217/512 CPU and GPU samples, no overflow and an incomplete window. The 217-frame
+  span was 46.866 seconds. An initial comparison of median payload 10.535 ms with
+  average cadence was invalid; it did not establish work outside the payload.
+  The original data remains under artifacts/wave0-live-02.
+- Attempt 03, source 02dc24f9: the unchanged deadline expired at 220/512 samples.
+  The added intervals disproved the observer-gap hypothesis. Payload mean/p95
+  were 218.848/738.430 ms; observer-inclusive service mean/p95 were
+  218.896/738.471 ms, with inter-service gaps averaging 0.005 ms. Begin/end precise
+  counter means were 0.010/0.023 ms, memory snapshot 0.011 ms and GPU drain below
+  0.001 ms. Fence-reuse wait mean/p95 were 208.414/661.986 ms; Present p99 was
+  approximately 486.29 ms. Actual GPU work mean/p95 was only 8.586/9.290 ms.
+  Outstanding uploads were zero and logical bytes/descriptors constant. These
+  observations locate the long tails in native reuse/presentation scheduling,
+  not the small observer operations; they do not establish a driver cause.
+  Frame-exact process counting was retained. Data remains under artifacts/wave0-live-03.
+- Attempt 04, same source 02dc24f9: PTY transport alone also timed out. External
+  read-only Win32 observations established Visible=true, Iconic=false and
+  Foreground=false for the actual primary client window at the observed time.
+  Cached focus was not proof of visibility or continuous foreground state.
+  Data remains under artifacts/wave0-live-04.
+- Attempt 05, same source 02dc24f9: the actual window completed after an activation
+  attempt, with CLI exit 0 and strict diagnostic validation. Payload mean/p95
+  were 21.505/30.960 ms; service mean/p95 21.758/31.599 ms; GPU mean/p95
+  8.005/8.946 ms. Exact process and thread series each contain 512 samples.
+  The activation API reported failure after approximately eight seconds, and
+  the retry found the already completed client gone. Continuous foreground was
+  not verified. Environment sensitivity remains uncontrolled; this successful
+  structural collection is not a causal driver fix or selection of a winning
+  performance rerun. All failed attempts remain alongside it under
+  artifacts/wave0-live-01 through artifacts/wave0-live-05.
 
-A separate ignored synthetic .NET 10.0.13 process-counter probe used eight
-allocation/sleeping workers, eight warmups and 64 observations per predetermined
-precise/approximate/approximate/precise cohort. Precise medians were 0.004 ms,
-p95 0.0043/0.0106 ms; approximate medians/p95 were 0.0001 ms. This does not
-reproduce or explain the live engine's approximately 200-ms pacing gap.
+A separate ignored synthetic .NET 10.0.13 counter probe used eight allocation/
+sleeping workers, eight warmups and 64 calls in a predetermined precise/
+approximate/approximate/precise order. Precise medians were 0.004 ms, p95
+0.0043/0.0106 ms; approximate median/p95 was 0.0001 ms. It did not reproduce the
+actual native scheduling tails. No approximate process allocation counter was
+substituted into live observations.
 
-The live observer now retains fixed-storage timing intervals for both precise
-process-counter calls, memory snapshot, GPU drain and native signal wait. Its
-observer-inclusive service interval begins before the first counter and ends
-after the final observation/drain; the existing payload interval is separately
-named. Strict diagnostic reports expose both, component distributions and
-remaining inter-service gaps. Frame-exact counting and all sample/deadline
-requirements remain unchanged until actual operation timings identify the cause.
+The observer retains fixed-storage BeginGC/EndGC/Memory/Drain and signal-wait
+intervals. Service begins before the first precise process query and ends after
+all observation/drain work; payload remains separately named. Reports expose
+both distributions, operation costs and remaining inter-service gaps. Correct
+means and tails, not a median-versus-average comparison, support diagnosis.
+
+Initial implementation failures are also retained as actual failures: three
+CA1822 data-property analyzer findings were corrected; a focused test invocation
+before the final explicit build discovered no matching tests (exit 5), after
+which the built cases passed. Neither attempt is counted as a passing result.
+
+## Remaining acceptance
+
+Native fixture/live workload matching, complete physical GPU allocation coverage,
+controlled hardware clocks/thermals, previously reviewed common budgets,
+30-minute moving lifecycle qualification and human motion/art acceptance remain
+OPEN. The live stream is the real smoke render owner, including development
+stress, not a natural battle or the native IndustrialBase fixture. Per-frame
+process/thread counters are precise observations, not an approved allocation
+budget pass. PhysicalAllocationBytes remains unavailable, not zero.
+
+Exact-source remote build-test remains required before integration. No sustained
+FPS, generic performance improvement, driver/synchronization repair, broader
+hardware support, product release or Product Owner approval is claimed.
