@@ -1,0 +1,37 @@
+{
+  "kind": "unqualified-cpu-diagnostics",
+  "actualBenchmarkSource": "b8c3b79bbaa53ffb8e9961fc2cc9d9815de2b32d",
+  "toolingHead": "01af224f301eefabb4018bbf02410d5622541d5c",
+  "retained": {
+    "frame-hotpaths.json": {
+      "gzip": "frame-hotpaths.json.gz",
+      "originalBytes": 14379,
+      "originalSha256": "b1d6f9d3481050cb7aca80fc993c79fdb4d8b75f2f51e2d6ab3d35fa4cbcc4a8",
+      "gzipSha256": "1493e6b390894a851e110335ae5a13edf331b98355573c85568e5aa7ca11331d"
+    },
+    "scalability.json": {
+      "gzip": "scalability.json.gz",
+      "originalBytes": 486770,
+      "originalSha256": "f8c00813cad0586e186112fb05014376e5e9bbc6ea3d6e05df6a569b8848f61a",
+      "gzipSha256": "26e6b8e087d8c64636021a0513b6779b644949baf6936b3dd43c2a32cb3c9f53"
+    },
+    "inputs-before.json": {
+      "gzip": "inputs-before.json.gz",
+      "originalBytes": 466632,
+      "originalSha256": "f3c759dcfb2a8c3c191c9bdb9e356ca046bec8eab0fb8606c82a4af5294da47c",
+      "gzipSha256": "cc37444ccad9b4d3401768ed497ceb3cfc1174ee624ad870c975646a0f7f8ca5"
+    }
+  },
+  "inputInventoryAfterSha256": "f3c759dcfb2a8c3c191c9bdb9e356ca046bec8eab0fb8606c82a4af5294da47c",
+  "inputInventoryIdentical": true,
+  "allocationGuardPasses": 46,
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "limitations": [
+    "single invocation per diagnostic; no five-pair A/A",
+    "CPU null graphics excludes native uploads, waits and presentation",
+    "frame-hotpaths aggregate samples only; no chronological raw frame array",
+    "scalability fixed scenes max10000roots; sample-count argument512",
+    "no admitted physical sensor or live fixture binding"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "kind": "final-tooling-evidence-checks",
+  "toolingCodeSource": "01af224f301eefabb4018bbf02410d5622541d5c",
+  "pythonTests": 28,
+  "pythonExitCode": 0,
+  "pythonLogSha256": "2d7a28e03a22db9ef4fff196b868b25ae468f4361d411a92cae5aff58b8e8ad3",
+  "checks": [
+    {
+      "check": "provider-readiness-01-raw-byte-hashes",
+      "files": 11,
+      "status": "pass"
+    },
+    {
+      "check": "provider-readiness-02-raw-byte-hashes",
+      "files": 14,
+      "status": "pass"
+    },
+    {
+      "check": "original-cpu-report-and-inventory-bytes",
+      "files": 3,
+      "status": "pass"
+    },
+    {
+      "check": "canonical19-and-postbatch9-exits-log-hashes",
+      "status": "pass"
+    }
+  ],
+  "physicalAcceptance": "open",
+  "wave2Ready": false
+}

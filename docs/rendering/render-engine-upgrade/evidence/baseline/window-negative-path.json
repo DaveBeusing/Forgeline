@@ -1,0 +1,25 @@
+{
+  "kind": "actual-win32-negative-path-check",
+  "toolingSource": "2651bbeb6908b1ba6093b3a5dabac35f32f3bcbf",
+  "subject": "this non-window Python process",
+  "facts": {
+    "status": "failed",
+    "observedAtUtc": "2026-10-30T16:08:07.254173+00:00",
+    "requestedPid": 30080,
+    "hwnd": null,
+    "candidates": [],
+    "ownerPid": null,
+    "foregroundHwnd": 393470,
+    "foregroundOwnerPid": 7504,
+    "visible": false,
+    "iconic": false,
+    "reasons": [
+      "missing-or-ambiguous-client-window",
+      "window-owner-pid-mismatch",
+      "window-hidden",
+      "client-not-foreground"
+    ],
+    "semantics": "WS_VISIBLE is not physical unobscured coverage"
+  },
+  "scope": "actual missing-window API path only; no successful live client control claimed"
+}

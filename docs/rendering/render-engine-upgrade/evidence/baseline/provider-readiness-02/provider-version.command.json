@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "C:\\Windows\\System32\\nvidia-smi.exe",
+    "--version"
+  ],
+  "startedAtUtc": "2026-10-30T16:39:40.905345+00:00",
+  "completedAtUtc": "2026-10-30T16:39:41.115782+00:00",
+  "durationSeconds": 0.2104416000074707,
+  "exitCode": 0,
+  "failure": null,
+  "outputs": {
+    "stdout": {
+      "path": "provider-version.stdout",
+      "sha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c"
+    },
+    "stderr": {
+      "path": "provider-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

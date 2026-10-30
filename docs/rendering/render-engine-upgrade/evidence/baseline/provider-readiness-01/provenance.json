@@ -1,0 +1,25 @@
+{
+  "kind": "diagnostic-readiness-provenance",
+  "toolkitSource": "f7bddc38b56206d31818fc3158410f3c3989a0c2",
+  "executionBaseline": "6b38707e29753bee64a014b7e23ef8bd150e970a",
+  "concurrentActivity": "Orchestrator canonical runtime asset compilation; no controlled performance capture",
+  "sensorObservations": 3,
+  "foreground": "unavailable: no client PID observed; this attempt predates optional foreground helper",
+  "nativeManifestBinding": "unavailable: no native command or adapter-identifier attestation",
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "stableHardwareClaim": false,
+  "files": {
+    "attempt.json": "afa46f18bcbba79808785189039e0af3c1f09c9a498438ecb19039ac5ff5f498",
+    "latest-unbound.json": "bf646ba691fff033e02dd95637bc4977c534d88a01ca96986e05a3211ce96aad",
+    "sensor-00000.command.json": "74d5f30879e5671c54d5fbfe0c86ed4add4f061661d343bbd4538663236993af",
+    "sensor-00000.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00000.stdout": "65836d89075503e2bad829fee71f4f9e1de4faa34c9f2d24e23b8e6318a9c3a4",
+    "sensor-00001.command.json": "b6c672642160510e0061bbb1f5fc538ee741e4996739d5c133b06837af3fc758",
+    "sensor-00001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00001.stdout": "b07c8be673b00051b9212e2def5a81eedb30b5fa665684a83cb558aa19e55ce2",
+    "sensor-00002.command.json": "3835a415658b4a149a347f0b4c7d01de2bd6fd09574201d1c619e0458cc3164d",
+    "sensor-00002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00002.stdout": "ead0f068bcf22e89fe410be0a40152a0eea15692c33993b0d338789035e4ef1f"
+  }
+}

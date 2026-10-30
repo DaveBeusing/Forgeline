@@ -1,0 +1,239 @@
+[
+  {
+    "name": "build-server-shutdown",
+    "executable": "dotnet",
+    "arguments": [
+      "build-server",
+      "shutdown"
+    ],
+    "startedAtUtc": "2026-10-30T16:35:23.3498487+00:00",
+    "elapsedMilliseconds": 1758.5578,
+    "exitCode": 0,
+    "processorCountOverride": null,
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\build-server-shutdown.stdout.log",
+      "sha256": "8205a1b0849f89302d6f74676857d5e869040ce553f6e171c2beaaf1911a2f50"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\build-server-shutdown.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "frame-hotpaths",
+    "executable": "dotnet",
+    "arguments": [
+      "run",
+      "--project",
+      "benchmarks/ForgeLine.Rendering.Benchmarks",
+      "-c",
+      "Release",
+      "--no-build",
+      "--",
+      "--frame-hotpaths",
+      "artifacts\\wave1-diagnostics-01\\frame-hotpaths.json"
+    ],
+    "startedAtUtc": "2026-10-30T16:35:27.5545327+00:00",
+    "elapsedMilliseconds": 58262.9198,
+    "exitCode": 0,
+    "processorCountOverride": null,
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\frame-hotpaths.stdout.log",
+      "sha256": "4f10575f8f0a9e1234b62d9d65b249e4a3ee0e998759736711f196a02c50d25c"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\frame-hotpaths.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "scalability-512",
+    "executable": "dotnet",
+    "arguments": [
+      "run",
+      "--project",
+      "benchmarks/ForgeLine.Rendering.Benchmarks",
+      "-c",
+      "Release",
+      "--no-build",
+      "--",
+      "--scalability",
+      "artifacts\\wave1-diagnostics-01\\scalability.json",
+      "512"
+    ],
+    "startedAtUtc": "2026-10-30T16:36:25.8243209+00:00",
+    "elapsedMilliseconds": 29959.5195,
+    "exitCode": 0,
+    "processorCountOverride": null,
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\scalability-512.stdout.log",
+      "sha256": "f6ae375920ebf72f948d63237f1cba8aa8aae6ae0409e67d1567e4447f5efe1c"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\scalability-512.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "submission-four-processors",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-class",
+      "*SubmissionSafetyTests"
+    ],
+    "startedAtUtc": "2026-10-30T16:36:57.4070488+00:00",
+    "elapsedMilliseconds": 6752.5459,
+    "exitCode": 0,
+    "processorCountOverride": "4",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\submission-four-processors.stdout.log",
+      "sha256": "59b6211a83ca55faba9e99c96139b84984b711406c553d58989115673599671b"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\submission-four-processors.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "tooltip-four-processors",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-method",
+      "*WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations"
+    ],
+    "startedAtUtc": "2026-10-30T16:37:04.1674584+00:00",
+    "elapsedMilliseconds": 3056.4847,
+    "exitCode": 0,
+    "processorCountOverride": "4",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\tooltip-four-processors.stdout.log",
+      "sha256": "60cc4dfa773ee08cdb55eccf450f3d89e0e99d81db313b82efab4873ba6ff04c"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\tooltip-four-processors.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "summary-four-processors",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-method",
+      "*RebuildingSummaryAllocatesBoundedStorageIndependentOfArmySize"
+    ],
+    "startedAtUtc": "2026-10-30T16:37:07.2294078+00:00",
+    "elapsedMilliseconds": 2774.7299,
+    "exitCode": 0,
+    "processorCountOverride": "4",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\summary-four-processors.stdout.log",
+      "sha256": "f3e7fa21fc00aa486b61d823661307714266405de35233a4f281c057a59282d1"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\summary-four-processors.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "submission-normal",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-class",
+      "*SubmissionSafetyTests"
+    ],
+    "startedAtUtc": "2026-10-30T16:37:10.0130112+00:00",
+    "elapsedMilliseconds": 6711.6121,
+    "exitCode": 0,
+    "processorCountOverride": "",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\submission-normal.stdout.log",
+      "sha256": "63935ba5a6019256fb98971008b460262b69483142bee764bb75a7f2ccd4a63b"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\submission-normal.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "tooltip-normal",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-method",
+      "*WarmSelectionStatusUsesRetainedBuffersWithoutManagedAllocations"
+    ],
+    "startedAtUtc": "2026-10-30T16:37:16.7300655+00:00",
+    "elapsedMilliseconds": 2939.1514,
+    "exitCode": 0,
+    "processorCountOverride": "",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\tooltip-normal.stdout.log",
+      "sha256": "13dda565118266e9872b28a26b16e93ce3535a962ea7fb0b75a8b1bb201d26b1"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\tooltip-normal.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "summary-normal",
+    "executable": "dotnet",
+    "arguments": [
+      "test",
+      "--project",
+      "tests/ForgeLine.Presentation.Tests/ForgeLine.Presentation.Tests.csproj",
+      "--configuration",
+      "Release",
+      "--no-build",
+      "--",
+      "--filter-method",
+      "*RebuildingSummaryAllocatesBoundedStorageIndependentOfArmySize"
+    ],
+    "startedAtUtc": "2026-10-30T16:37:19.6752067+00:00",
+    "elapsedMilliseconds": 2555.3241,
+    "exitCode": 0,
+    "processorCountOverride": "",
+    "stdout": {
+      "path": "artifacts\\wave1-diagnostics-01\\summary-normal.stdout.log",
+      "sha256": "dcd7a7ecdbc2fac850118e023a2fc5698653b1a6c6a6b2b0b2435c9edc796e1e"
+    },
+    "stderr": {
+      "path": "artifacts\\wave1-diagnostics-01\\summary-normal.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+]
