@@ -74,13 +74,17 @@ internal sealed class LiveRenderTelemetry : IDisposable
             throw new InvalidDataException("Telemetry context runtime does not match the executing sealed payload.");
         return context;
     }
-    internal LiveTelemetryStart Begin()
+    internal LiveTelemetryStart Begin(GraphicsTimestampInterval signalWait = default)
     {
         VerifyOwner();
         if (_finished) return default;
+        long serviceStart = Stopwatch.GetTimestamp();
+        long counterStart = Stopwatch.GetTimestamp();
         long process = GC.GetTotalAllocatedBytes(precise: true);
+        long counterEnd = Stopwatch.GetTimestamp();
         long thread = GC.GetAllocatedBytesForCurrentThread();
-        return new(Stopwatch.GetTimestamp(), process, thread);
+        return new(Stopwatch.GetTimestamp(), process, thread)
+        { ServiceStartTick = serviceStart, BeginProcessCounter = new(counterStart, counterEnd), SignalWait = signalWait };
     }
     internal void Complete(in LiveTelemetryStart start, string state, long prepareStart = 0, long prepareEnd = 0)
     {
@@ -88,16 +92,26 @@ internal sealed class LiveRenderTelemetry : IDisposable
         if (_finished) { DrainGpu(); return; }
         long end = Stopwatch.GetTimestamp();
         long thread = GC.GetAllocatedBytesForCurrentThread() - start.ThreadBytes;
+        long endCounterStart = Stopwatch.GetTimestamp();
         long process = GC.GetTotalAllocatedBytes(precise: true) - start.ProcessBytes;
+        long endCounterEnd = Stopwatch.GetTimestamp();
+        var observer = new LiveObserverIntervals(start.BeginProcessCounter, new(endCounterStart, endCounterEnd),
+            new(endCounterEnd, endCounterEnd), new(endCounterEnd, endCounterEnd));
         if (!_armed && state == "gameplay") _armed = true;
         if (!_armed || _warmupsRemaining > 0)
         {
             if (!_armed && _beforeCount >= StartupObservationBudget) _overflow = true;
-            if (_beforeCount == _beforeWindow.Length) _overflow = true;
-            else _beforeWindow[_beforeCount++] = new(start.Tick, end, state, process, thread);
+            int prefixIndex = _beforeCount;
+            if (_beforeCount == _beforeWindow.Length) { _overflow = true; prefixIndex = -1; }
+            else _beforeWindow[_beforeCount++] = new(start.Tick, end, state, process, thread)
+                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer };
             if (_armed) _warmupsRemaining--;
-            DrainGpu(); return;
+            long drainStart = Stopwatch.GetTimestamp(); DrainGpu(); long drainEnd = Stopwatch.GetTimestamp();
+            if (prefixIndex >= 0) _beforeWindow[prefixIndex] = _beforeWindow[prefixIndex] with
+            { ServiceEndTick = Stopwatch.GetTimestamp(), Observer = observer with { GpuDrain = new(drainStart, drainEnd) } };
+            return;
         }
+        int frameIndex = _count;
         {
             var cpu = _source.CpuIntervals;
             // Loading/suspended observations retain their real classification; they cannot be
@@ -109,14 +123,21 @@ internal sealed class LiveRenderTelemetry : IDisposable
             GraphicsTimestampInterval wait = InFrame(cpu.FenceWait, start.Tick, end) ? cpu.FenceWait : new(end, end);
             var prepare = prepareStart >= start.Tick && prepareEnd >= prepareStart && prepareEnd <= end
                 ? new GraphicsTimestampInterval(prepareStart, prepareEnd) : new GraphicsTimestampInterval(end, end);
+            long memoryStart = Stopwatch.GetTimestamp();
+            GraphicsResourceMemoryTelemetry memory = _source.ResourceMemory;
+            long memoryEnd = Stopwatch.GetTimestamp();
+            observer = observer with { MemorySnapshot = new(memoryStart, memoryEnd) };
             _frames[_count] = new(_count, start.Tick, end, process, thread, state,
                 new(start.Tick, prepareStart >= start.Tick ? prepareStart : renderStart), prepare,
-                render, present, wait, cpu.Submission, render.StartTick < render.EndTick && cpu.Submitted ? cpu.SubmittedFence : 0, cpu.Generation, cpu.ResourceGeneration, _source.ResourceMemory);
+                render, present, wait, cpu.Submission, render.StartTick < render.EndTick && cpu.Submitted ? cpu.SubmittedFence : 0, cpu.Generation, cpu.ResourceGeneration, memory)
+                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer };
             if (_firstMeasuredFence == 0) _firstMeasuredFence = cpu.SubmittedFence;
             _count++;
             if (_count == _frames.Length) { _finished = true; _source.StopRenderTelemetry(); }
         }
-        DrainGpu();
+        long gpuDrainStart = Stopwatch.GetTimestamp(); DrainGpu(); long gpuDrainEnd = Stopwatch.GetTimestamp();
+        _frames[frameIndex] = _frames[frameIndex] with
+        { ServiceEndTick = Stopwatch.GetTimestamp(), Observer = observer with { GpuDrain = new(gpuDrainStart, gpuDrainEnd) } };
     }
     internal void DrainGpu()
     {
@@ -150,6 +171,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["streamId"] = _streamId;
         document["frequencyHz"] = Stopwatch.Frequency;
         document["overflowed"] = Overflowed;
+        document["serviceIntervalsAvailable"] = true;
         document["window"] = JsonSerializer.SerializeToNode(new { arm = "first-gameplay-iteration", warmups = _warmups,
             samples = _frames.Length, completed = _finished, contiguous = true, idleWaitIncluded = false,
             scope = "complete-active-render-owner-iteration; independent platform and simulation owners excluded" }, JsonOptions);
@@ -159,7 +181,8 @@ internal sealed class LiveRenderTelemetry : IDisposable
         var completed = _gpu.AsSpan(0, _gpuCount).ToArray().ToDictionary(x => (x.Generation, x.ResourceGeneration, x.SubmittedFence));
         document["frames"] = JsonSerializer.SerializeToNode(_frames.AsSpan(0, _count).ToArray().Select(f => new
         {
-            f.Index, f.StartTick, f.EndTick, f.ProcessAllocatedBytes, f.ThreadAllocatedBytes, f.State, f.Submission, f.SubmittedFence, f.Generation, f.ResourceGeneration,
+            f.Index, f.StartTick, f.EndTick, f.ServiceStartTick, f.ServiceEndTick, f.SignalWait, f.Observer,
+            f.ProcessAllocatedBytes, f.ThreadAllocatedBytes, f.State, f.Submission, f.SubmittedFence, f.Generation, f.ResourceGeneration,
             phases = new { host = f.Host, prepare = f.Prepare, renderFrame = f.RenderFrame, present = f.Present, fenceWait = f.FenceWait },
             memory = f.Memory, gpu = completed.TryGetValue((f.Generation, f.ResourceGeneration, f.SubmittedFence), out var timing) ? new
             { queue = timing.Queue, generation = timing.Generation, resourceGeneration = timing.ResourceGeneration,
@@ -182,11 +205,30 @@ internal sealed class LiveRenderTelemetry : IDisposable
         _disposed = true;
     }
 }
-internal readonly record struct LiveTelemetryStart(long Tick, long ProcessBytes, long ThreadBytes);
+internal readonly record struct LiveTelemetryStart(long Tick, long ProcessBytes, long ThreadBytes)
+{
+    internal long ServiceStartTick { get; init; }
+    internal GraphicsTimestampInterval BeginProcessCounter { get; init; }
+    internal GraphicsTimestampInterval SignalWait { get; init; }
+}
+internal readonly record struct LiveObserverIntervals(GraphicsTimestampInterval BeginProcessCounter,
+    GraphicsTimestampInterval EndProcessCounter, GraphicsTimestampInterval MemorySnapshot, GraphicsTimestampInterval GpuDrain);
 internal readonly record struct LiveTelemetryFrame(int Index, long StartTick, long EndTick,
     long ProcessAllocatedBytes, long ThreadAllocatedBytes, string State, GraphicsTimestampInterval Host,
     GraphicsTimestampInterval Prepare, GraphicsTimestampInterval RenderFrame, GraphicsTimestampInterval Present,
     GraphicsTimestampInterval FenceWait, ulong Submission, ulong SubmittedFence, ulong Generation,
-    ulong ResourceGeneration, GraphicsResourceMemoryTelemetry Memory);
+    ulong ResourceGeneration, GraphicsResourceMemoryTelemetry Memory)
+{
+    public long ServiceStartTick { get; init; }
+    public long ServiceEndTick { get; init; }
+    public GraphicsTimestampInterval SignalWait { get; init; }
+    public LiveObserverIntervals Observer { get; init; }
+}
 
-internal readonly record struct LiveTelemetryObservation(long StartTick, long EndTick, string State, long ProcessAllocatedBytes, long ThreadAllocatedBytes);
+internal readonly record struct LiveTelemetryObservation(long StartTick, long EndTick, string State, long ProcessAllocatedBytes, long ThreadAllocatedBytes)
+{
+    public long ServiceStartTick { get; init; }
+    public long ServiceEndTick { get; init; }
+    public GraphicsTimestampInterval SignalWait { get; init; }
+    public LiveObserverIntervals Observer { get; init; }
+}

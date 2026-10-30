@@ -77,6 +77,21 @@ class TelemetryContractsTests(unittest.TestCase):
             if key=="window":bad["window"]["completed"]=False
             with self.assertRaises(q.ValidationError):q.validate_live_owner_telemetry(bad)
 
+    def test_service_interval_exposes_observer_cost_without_renaming_payload_as_complete_cost(self):
+        frame=dict(index=0,startTick=10,endTick=20,serviceStartTick=5,serviceEndTick=30,state="gameplay",processAllocatedBytes=16,threadAllocatedBytes=8,
+                   phases={name:dict(startTick=10,endTick=20) for name in q.PHASES},gpu=None,signalWait=dict(startTick=0,endTick=4),
+                   observer=dict(beginProcessCounter=dict(startTick=5,endTick=9),endProcessCounter=dict(startTick=21,endTick=25),
+                                 memorySnapshot=dict(startTick=25,endTick=27),gpuDrain=dict(startTick=27,endTick=29)))
+        value=dict(schemaVersion=1,kind="live-render-owner-telemetry",scope="live-client",gpuStreamScope="independent-live-client",nativeFixtureBindingAvailable=False,
+                   streamId="synthetic-service",frequencyHz=1000,overflowed=False,includes=list(q.PHASES),frames=[frame],serviceIntervalsAvailable=True)
+        result=q.validate_live_owner_telemetry(value)
+        self.assertEqual(10,result["payloadFrame"]["mean"]);self.assertEqual(25,result["observerInclusiveService"]["mean"])
+        self.assertEqual(4,result["observerComponents"]["beginProcessCounter"]["mean"])
+        bad=copy.deepcopy(value);bad["frames"][0]["serviceEndTick"]=19
+        with self.assertRaises(q.ValidationError):q.validate_live_owner_telemetry(bad)
+        bad=copy.deepcopy(value);bad["frames"][0]["observer"]["beginProcessCounter"]["endTick"]=11
+        with self.assertRaises(q.ValidationError):q.validate_live_owner_telemetry(bad)
+
     def test_initiative_ownership_rejects_overlap_forward_dependencies_and_unauthorized_diff(self):
         path=Path(__file__).parents[3]/"docs/rendering/render-engine-upgrade/Ownership.json"
         value=json.loads(path.read_text())

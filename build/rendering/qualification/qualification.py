@@ -451,7 +451,29 @@ def validate_live_owner_telemetry(value: Any) -> dict:
             value.get("kind") == "live-render-owner-telemetry" and value.get("scope") == "live-client", "Invalid live owner telemetry contract")
     require(value.get("nativeFixtureBindingAvailable") is False, "Ordinary live gameplay must not claim native fixture identity")
     result = validate_frame_samples(value)
-    return dict(**result, nativeFixtureAcceptance="open", scope="active-render-owner; independent platform/simulation work excluded")
+    services, gaps = [], []
+    components = {name: [] for name in ("beginProcessCounter", "endProcessCounter", "memorySnapshot", "gpuDrain", "signalWait")}
+    previous_end = None
+    if value.get("serviceIntervalsAvailable") is True:
+        frequency = integer(value.get("frequencyHz"), "CPU frequency", 1)
+        for frame in value["frames"]:
+            a, b = integer(frame.get("serviceStartTick"), "service start"), integer(frame.get("serviceEndTick"), "service end")
+            require(a <= frame["startTick"] < frame["endTick"] <= b, "Payload lies outside observer-inclusive service interval")
+            require(previous_end is None or previous_end <= a, "Service intervals overlap or regress")
+            if previous_end is not None: gaps.append((a - previous_end) * 1000 / frequency)
+            previous_end = b; services.append((b-a)*1000/frequency)
+            observer = obj(frame.get("observer"), "observer intervals")
+            for name in components:
+                interval = obj(frame.get("signalWait") if name == "signalWait" else observer.get(name), name)
+                start, end = integer(interval.get("startTick"), name+" start"), integer(interval.get("endTick"),name+" end")
+                require(start <= end and (end <= a if name == "signalWait" else a <= start <= end <= b), "Observer/wait interval lies outside its declared scope")
+                if name == "beginProcessCounter": require(end <= frame["startTick"], "Begin observer cost must precede payload")
+                elif name != "signalWait": require(frame["endTick"] <= start, "End observer cost must follow payload")
+                components[name].append((end-start)*1000/frequency)
+    return dict(payloadFrame=result["fullFrame"], observerInclusiveService=distribution(services), interServiceGap=distribution(gaps),
+                observerComponents={name: distribution(values) for name,values in components.items()},
+                gpu=result["gpu"], processAllocations=result["processAllocations"], threadAllocations=result["threadAllocations"],
+                nativeFixtureAcceptance="open", scope="payload and observer-inclusive active-render-owner service are separate; independent platform/simulation work excluded")
 
 
 def validate_frame_samples(value: dict) -> dict:

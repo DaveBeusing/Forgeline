@@ -116,6 +116,23 @@ public sealed class LiveRenderTelemetryTests
         }
         finally { Environment.SetEnvironmentVariable(name, previous); File.Delete(path); }
     }
+    [Fact]
+    public void ObserverServiceIncludesBothPreciseCounterCallsAndThePostPayloadWork()
+    {
+        using var collector = new LiveRenderTelemetry(new Source(), 1);
+        collector.Complete(collector.Begin(), "gameplay");
+        using var report = JsonDocument.Parse(collector.Export().ToJsonString());
+        var frame = report.RootElement.GetProperty("frames")[0];
+        long start = frame.GetProperty("startTick").GetInt64(), end = frame.GetProperty("endTick").GetInt64();
+        long serviceStart = frame.GetProperty("serviceStartTick").GetInt64(), serviceEnd = frame.GetProperty("serviceEndTick").GetInt64();
+        var observer = frame.GetProperty("observer");
+        Assert.True(serviceStart <= observer.GetProperty("beginProcessCounter").GetProperty("startTick").GetInt64());
+        Assert.True(observer.GetProperty("beginProcessCounter").GetProperty("endTick").GetInt64() <= start);
+        Assert.True(end <= observer.GetProperty("endProcessCounter").GetProperty("startTick").GetInt64());
+        Assert.True(observer.GetProperty("endProcessCounter").GetProperty("endTick").GetInt64() <= serviceEnd);
+        Assert.True(observer.GetProperty("gpuDrain").GetProperty("endTick").GetInt64() <= serviceEnd);
+        Assert.True(serviceStart <= start && end <= serviceEnd);
+    }
     private sealed class Source : IGraphicsRenderTelemetry
     {
         public bool TelemetryOverflowed => false;

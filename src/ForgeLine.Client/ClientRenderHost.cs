@@ -527,7 +527,9 @@ internal sealed class ClientRenderHost : IDisposable
             {
                 // Active rendering is paced by the device, not an extra 16 ms
                 // mailbox sleep. Suspended/occluded/empty work still sleeps.
+                long signalWaitStart = liveTelemetry is null ? 0 : Stopwatch.GetTimestamp();
                 _signal.WaitOne(presentedLastIteration ? TimeSpan.Zero : IdleWait);
+                long signalWaitEnd = liveTelemetry is null ? 0 : Stopwatch.GetTimestamp();
                 presentedLastIteration = false;
 
                 if (Volatile.Read(ref _stopping) != 0)
@@ -535,7 +537,7 @@ internal sealed class ClientRenderHost : IDisposable
                     break;
                 }
 
-                LiveTelemetryStart liveStart = liveTelemetry?.Begin() ?? default;
+                LiveTelemetryStart liveStart = liveTelemetry?.Begin(new(signalWaitStart, signalWaitEnd)) ?? default;
                 ClientRenderFrame? frame =
                     TakeLatestFrame();
 

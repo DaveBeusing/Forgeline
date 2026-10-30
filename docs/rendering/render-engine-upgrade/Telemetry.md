@@ -186,3 +186,25 @@ The parser now treats null/empty/whitespace context as absent while retaining st
 source/runtime checks for any supplied file. Environment-backed regression cases
 cover all absent forms plus correct and mismatched supplied contexts. A fresh clean
 source attempt, rather than an overwritten retry, must validate the real producer.
+
+The second actual owner attempt at 9cf3491256e9ef18718a43af5611054465735f45
+started correctly but hit the unchanged one-minute smoke deadline. It retained
+217 of the required 512 measured frames and 217 GPU completions, with no overflow.
+The window is incomplete and is not a successful qualification. Payload median
+was approximately 10.535 ms while the 217-frame span was 46.866 seconds; work
+outside that old payload bracket requires attribution. Original log/output remain
+under artifacts/wave0-live-02 and are never replaced.
+
+A separate ignored synthetic .NET 10.0.13 process-counter probe used eight
+allocation/sleeping workers, eight warmups and 64 observations per predetermined
+precise/approximate/approximate/precise cohort. Precise medians were 0.004 ms,
+p95 0.0043/0.0106 ms; approximate medians/p95 were 0.0001 ms. This does not
+reproduce or explain the live engine's approximately 200-ms pacing gap.
+
+The live observer now retains fixed-storage timing intervals for both precise
+process-counter calls, memory snapshot, GPU drain and native signal wait. Its
+observer-inclusive service interval begins before the first counter and ends
+after the final observation/drain; the existing payload interval is separately
+named. Strict diagnostic reports expose both, component distributions and
+remaining inter-service gaps. Frame-exact counting and all sample/deadline
+requirements remain unchanged until actual operation timings identify the cause.
