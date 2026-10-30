@@ -178,6 +178,17 @@ public sealed class LiveRenderTelemetryTests
         var first = new ReferenceFixtureFrameObservation(0, 0, default, 1920, 1080, 999, 7, 3, default, default, 3, 0, 0, 0);
         Assert.Throws<InvalidDataException>(() => collector.ValidateFixtureCorrespondence([first, first with { Index = 1, Ordinal = 1 }]));
     }
+    [Theory]
+    [InlineData(true, true)] [InlineData(false, true)] [InlineData(true, false)]
+    public void RealGameplayAttestationRequiresMatchingActualSessionAndProgress(bool matching, bool progressing)
+    {
+        using var collector = new LiveRenderTelemetry(new Source(), 2);
+        collector.BindSessionOrigin(LiveSessionOriginTests.Origin());
+        collector.Complete(collector.Begin(), "gameplay", simulation: new(7, 7, 10, 7, 10, true));
+        collector.Complete(collector.Begin(), "gameplay", simulation: new(7, matching ? 7UL : 8UL, 11, 7, progressing ? 11UL : 10UL, true));
+        using var json = JsonDocument.Parse(collector.Export().ToJsonString());
+        Assert.Equal(matching && progressing, json.RootElement.GetProperty("modeAttestationAvailable").GetBoolean());
+    }
     private sealed class SubmittedSource : IGraphicsRenderTelemetry
     {
         internal int Remaining { get; init; } = 1;

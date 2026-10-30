@@ -15,6 +15,8 @@ using ForgeLine.Presentation;
 
 namespace ForgeLine.Client;
 
+internal enum ReferenceCollectorMode { Full, CollectorOn, CollectorOff }
+
 internal sealed record VisualReferenceCaptureRequest
 {
     public required string OutputRoot { get; init; }
@@ -28,6 +30,7 @@ internal sealed record VisualReferenceCaptureRequest
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
     public bool CaptureShadowDiagnostics { get; init; }
+    public ReferenceCollectorMode CollectorMode { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
     public double? MechanicalSeconds { get; init; }
@@ -65,7 +68,7 @@ internal sealed record VisualReferenceCaptureRequest
         if (ui && (Scenes is null || Scenes.Length != 1 || Scenes[0] != VisualReferenceSceneKind.BattlefieldCombat ||
             Zooms is null || Zooms.Length != 1 || Zooms[0] != RtsReferenceZoom.NormalGameplay || CameraPath != ReferenceCameraPath.Fixed))
             throw new ArgumentException("Named UI states require the fixed BattlefieldCombat normal-zoom fixture.");
-        if (!Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
+        if (!Enum.IsDefined(CollectorMode) || !Enum.IsDefined(RunProfile) || !Enum.IsDefined(CameraPath)) throw new ArgumentException("Unsupported performance profile or camera path.");
         if (Commit is null || Commit.Length != 40 || Commit.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("Capture requires a complete source commit.");
         if (MechanicalSeconds is double seconds && (!double.IsFinite(seconds) || seconds is < 0 or > RuntimeAnimationData.MaximumDuration ||
             Scenes is null || Scenes.Any(s => s is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation or VisualReferenceSceneKind.MainBattleTankSingle or VisualReferenceSceneKind.MainBattleTankHundred or VisualReferenceSceneKind.MainBattleTankThousand or VisualReferenceSceneKind.InfantrySkinning or VisualReferenceSceneKind.InfantrySkinningRepeated or VisualReferenceSceneKind.InfantrySkinningEngineer) &&
@@ -110,6 +113,7 @@ internal static class VisualReferenceCapture
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
                 ?? throw new ArgumentException("Empty capture request.");
             request.Validate();
+            if (request.CollectorMode != ReferenceCollectorMode.Full) throw new NotSupportedException("Collector controls are separate actual-host experiments, not native reference modes.");
             string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
             if (!identity.EndsWith(request.Commit, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Requested commit does not match the built client. Rebuild this revision.");
@@ -118,7 +122,7 @@ internal static class VisualReferenceCapture
             Directory.CreateDirectory(request.OutputRoot);
             outputCreated = true;
             string runtimeFingerprint = RuntimeFingerprint(request.RuntimeRoot);
-            var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
+            var catalog = ReferenceRuntimeSeal.Load(request.RuntimeRoot, out object runtimeSeal);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog, mechanicalSeconds: request.MechanicalSeconds)).ToArray();
             using var capturePower = new ReferenceCapturePowerLease();
@@ -168,6 +172,7 @@ internal static class VisualReferenceCapture
                     using var meshes = new SimpleInstanceRenderer(graphics, catalog, lighting: lighting,
                         lodDiameterScale: profile.LodDiameterScale, textureDetail: profile.Textures, vegetationMotion: profile.VegetationMotion,
                         environment: profile.Environment, vegetation: profile.Vegetation);
+                    if (sharedFixture is not null) meshes.EnableContentEvidence();
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles, lighting);
                     using var hud = new GameplayHudRenderer(graphics, catalog);
                     using var frontend = UiReferenceStates.IsFrontend(uiScenario) ? new FrontendOverlayRenderer(graphics) : null;
@@ -384,7 +389,7 @@ internal static class VisualReferenceCapture
                         meshes.ObserveFrameDiagnostics(sampleDiagnostics);
                         performance.DrainRawGpu(graphics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory, actualSubmission: (graphics as IGraphicsRenderTelemetry)?.CpuIntervals, measuredInterval: new GraphicsTimestampInterval(start, cpuEndedAt));
+                            new { content = sharedFixture is not null ? meshes.CaptureContentEvidence() : (RenderContentEvidence?)null, objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory, actualSubmission: (graphics as IGraphicsRenderTelemetry)?.CpuIntervals, measuredInterval: new GraphicsTimestampInterval(start, cpuEndedAt), actualCamera: camera.CaptureState());
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
@@ -526,7 +531,7 @@ internal static class VisualReferenceCapture
                         architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
                         logicalProcessors = Environment.ProcessorCount, cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
                         configuration = typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration },
-                    runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    runtimeFingerprint, runtimeSeal, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
                     adapterIdentity = (graphics as IGraphicsRenderTelemetry)?.DeviceIdentity, adapterBinding = adapterCheckpoint?.Evidence,
                     hostWindowDpi = window.Dpi, executionRequirement = "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
                     clientAssemblySha256 = FileHash(typeof(Program).Assembly.Location),

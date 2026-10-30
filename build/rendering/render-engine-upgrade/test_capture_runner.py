@@ -6,7 +6,7 @@ from baseline_contracts import ContractError
 RAW=b'GPU-aaaa-bbbb,00000000:30:00.0,GPU,596.53,41,180,11.08,0x0000000000000004\n'
 class CaptureRunnerTests(unittest.TestCase):
     def fixture(self,root):
-        root=Path(root);exe=root/'client.exe';exe.write_bytes(b'client');exe.with_suffix('.dll').write_bytes(b'assembly');sensor=root/'sensor.exe';sensor.write_bytes(b'sensor')
+        root=Path(root);payload=root/'bin';payload.mkdir();exe=payload/'client.exe';exe.write_bytes(b'client');exe.with_suffix('.dll').write_bytes(b'assembly');sensor=root/'sensor.exe';sensor.write_bytes(b'sensor')
         runtime=root/'runtime';runtime.mkdir();(runtime/'payload').write_bytes(b'sealed')
         request=root/'request.json';request.write_text(json.dumps(dict(commit='a'*40,runtimeRoot=str(runtime))))
         return exe,sensor,request

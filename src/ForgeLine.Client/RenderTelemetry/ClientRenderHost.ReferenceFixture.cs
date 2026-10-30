@@ -15,7 +15,10 @@ internal sealed partial class ClientRenderHost
     private int _fixtureCaptureRequested, _fixtureCaptureCompleted;
     private object? _fixtureReadbackEvidence;
     private object? _fixtureAdapterBinding;
+    private readonly ReferenceCollectorControl? _fixtureCollectorControl;
+    private void RejectFixtureEarlyExit(string state) { if (_referenceFixture is not null) throw new InvalidDataException("Fixture attempt failed before successful presentation: " + state); }
     private ClientRenderConfiguration? _fixtureComposition;
+    private GraphicsDeviceInfo? _fixtureDevice;
     internal int FixtureAcknowledged => _fixtureSequence?.Acknowledged ?? -1;
     internal bool FixtureReadbackCompleted => Volatile.Read(ref _fixtureCaptureCompleted) != 0;
     internal void CheckFixtureFailure() => ThrowIfFaulted();
@@ -32,7 +35,7 @@ internal sealed partial class ClientRenderHost
         Volatile.Write(ref _fixtureCaptureRequested, 1); _signal.Set();
     }
     private void AcknowledgeFixtureFrame(int ordinal, RtsCameraState camera, int width, int height,
-        PresentationSnapshot snapshot, IGraphicsRenderTelemetry source, SimpleInstanceRenderer meshes, int bufferCount, int hudVertices)
+        PresentationSnapshot snapshot, IGraphicsRenderTelemetry source, SimpleInstanceRenderer meshes, int bufferCount, int hudVertices, ParticleVfxDiagnostics particles)
     {
         long observedFrom = Stopwatch.GetTimestamp();
         var recipe = _referenceFixture!;
@@ -42,10 +45,11 @@ internal sealed partial class ClientRenderHost
         int index = ordinal - recipe.Warmups;
         if (index >= 0 && index < recipe.Samples)
         {
-            var cpu = source.CpuIntervals;
-            if (!cpu.Submitted || cpu.SubmittedFence == 0) throw new InvalidOperationException("Fixture ACK requires an actual submitted frame.");
+            var cpu = source.LastSubmission ?? throw new InvalidDataException("Fixture actual submission missing.");
+            if (cpu.SubmittedFence == 0) throw new InvalidOperationException("Fixture ACK requires an actual submitted frame.");
             _fixtureFrames![index] = new(ordinal, index, camera, width, height, cpu.SubmittedFence, cpu.Generation, cpu.ResourceGeneration,
-                meshes.WorkMetrics, meshes.SubmissionMetrics, bufferCount, hudVertices, observedFrom, Stopwatch.GetTimestamp());
+                meshes.WorkMetrics, meshes.SubmissionMetrics, bufferCount, hudVertices, observedFrom, Stopwatch.GetTimestamp())
+                { Content = meshes.CaptureContentEvidence(), Particles = particles };
         }
         _fixtureSequence!.Acknowledge(ordinal);
     }
@@ -90,12 +94,17 @@ internal sealed partial class ClientRenderHost
         var recipe = _referenceFixture ?? throw new InvalidOperationException("No fixture configured.");
         return new { schemaVersion = 1, kind = "actual-client-render-host-reference-fixture", sourceSha = ClientBuildIdentity.SourceRevision,
             runtimeFingerprint = recipe.RuntimeFingerprint, key = recipe.CaseKey, recipeFingerprint = recipe.Fingerprint, recipeInputs = recipe.IdentityInputs, recipeInputBytesBase64 = recipe.InputBytesBase64,
-            profile = _fixtureComposition?.Profile, lighting = _fixtureComposition?.Lighting, atmosphere = _fixtureComposition?.Atmosphere,
+            device = _fixtureDevice, profile = _fixtureComposition?.Profile, lighting = _fixtureComposition?.Lighting, atmosphere = _fixtureComposition?.Atmosphere,
             snapshotFingerprint = recipe.SnapshotFingerprint, adapterBinding = _fixtureAdapterBinding, frames = _fixtureFrames, readback = _fixtureReadbackEvidence,
+            collectorControl = _fixtureCollectorControl?.Export(), collectorMode = recipe.CollectorMode,
             window = new { recipe.Warmups, recipe.Samples, contiguous = true, acknowledged = FixtureAcknowledged + 1 },
             nativePixelComparison = "Requires separate actual native capture with identical computed recipe and pixels; not granted by CLI context" };
     }
 }
 internal readonly record struct ReferenceFixtureFrameObservation(int Ordinal, int Index, RtsCameraState Camera,
     int Width, int Height, ulong SubmittedFence, ulong Generation, ulong ResourceGeneration, SubmissionWorkMetrics Work,
-    InstanceSubmissionMetrics Submission, int BufferCount, int HudVertices, long ObserverStartTick, long ObserverEndTick);
+    InstanceSubmissionMetrics Submission, int BufferCount, int HudVertices, long ObserverStartTick, long ObserverEndTick)
+{
+    public RenderContentEvidence? Content { get; init; }
+    public ParticleVfxDiagnostics Particles { get; init; }
+}

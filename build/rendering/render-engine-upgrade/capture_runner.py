@@ -17,14 +17,30 @@ def runtime_fingerprint(root):
         if path.is_file():result.update(path.relative_to(root).as_posix().encode('utf-8'));result.update(bytes.fromhex(sha256_bytes(path.read_bytes())))
     return result.hexdigest()
 
-def run_capture(client_executable,request_path,output,sensor_executable,dll_path,*,host=False,require_foreground=True,timeout_seconds=600):
+def payload_inventory(root):
+    root=Path(root).resolve(strict=True);rows=[]
+    import hashlib
+    for path in sorted(root.rglob('*'),key=lambda p:p.relative_to(root).as_posix()):
+        require(not path.is_symlink(),'Executable payload cannot contain symbolic links')
+        if path.is_file():
+            digest=hashlib.sha256()
+            with path.open('rb') as stream:
+                for block in iter(lambda:stream.read(1024*1024),b''):digest.update(block)
+            rows.append(dict(path=path.relative_to(root).as_posix(),bytes=path.stat().st_size,sha256=digest.hexdigest()))
+    require(rows,'Executable payload inventory is empty');return rows
+
+def run_capture(client_executable,request_path,output,sensor_executable,dll_path,*,host=False,gameplay=False,require_foreground=True,timeout_seconds=600):
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=False)
     started=now()
     try:
+        require(not (host and gameplay),'Gameplay is an actual session mode, not an authored host fixture')
         require(type(timeout_seconds) is int and 1<=timeout_seconds<=600,'Capture command timeout must remain within declared ten-minute bound')
         client=resolve_executable(client_executable);sensor=resolve_executable(sensor_executable)
+        require(not output.is_relative_to(Path(client).parent),'Evidence output cannot mutate the executable payload directory')
+        payload_before=payload_inventory(Path(client).parent);write_new(output/'payload-inventory-before.json',payload_before)
         original=Path(request_path).read_bytes();request=parse_json_bytes(original)
         runtime=runtime_fingerprint(request['runtimeRoot']);source=request['commit']
+        if gameplay:require(request.get('warmups')==64 and request.get('samples')==512,'Actual gameplay uses unchanged64/512 declared window')
         import re
         require(type(source) is str and re.fullmatch('[0-9a-f]{40}',source),'Exact capture source is required')
         request.update(outputRoot=str(output/'capture'),adapterBindingDirectory=str(output/'identity'))
@@ -36,7 +52,12 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         write_new(output/'attempt.json',dict(schemaVersion=1,kind='actual-baseline-capture-attempt',status='failed',phase='preflight',startedAtUtc=started,completedAtUtc=now(),failures=[str(error)],qualified=False))
         raise
     stop=threading.Event();ready=threading.Event();lock=threading.Lock();control={};failure=[];cleanup=[];child=None;status='failed';command_started=None;command_completed=None
-    argv=[client,'--reference-host-fixture-request' if host else '--reference-capture-request',str(request_file)]
+    argv=[client,'--smoke-test'] if gameplay else [client,'--reference-host-fixture-request' if host else '--reference-capture-request',str(request_file)]
+    child_env=None
+    if gameplay:
+        child_env=dict(os.environ)
+        child_env.update(FORGELINE_RENDER_TELEMETRY_OUTPUT=str(output/'capture'/'owner.json'),FORGELINE_RENDER_TELEMETRY_CONTEXT='',
+            FORGELINE_RENDER_TELEMETRY_SAMPLES='512',FORGELINE_RENDER_TELEMETRY_WARMUPS='64',FORGELINE_RENDER_TELEMETRY_ADAPTER_BINDING=str(output/'identity'))
     with SensorJournal(output/'sensors') as journal:
         def sample():
             raw=b'';err=b'';begin=now();tick=time.perf_counter();query_exit=None;query_timeout=False
@@ -66,7 +87,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
             require(ready.wait(15) and not failure,'Initial physical sensor observation unavailable')
             with (output/'stdout.log').open('xb') as stdout,(output/'stderr.log').open('xb') as stderr:
                 command_started=now();deadline=time.monotonic()+timeout_seconds
-                child=subprocess.Popen(argv,stdout=stdout,stderr=stderr,shell=False)
+                child=subprocess.Popen(argv,stdout=stdout,stderr=stderr,shell=False,**(dict(env=child_env) if child_env is not None else {}))
                 checkpoint=output/'identity'/'checkpoint.json'
                 while not checkpoint.exists():
                     require(child.poll() is None,'Producer exited before actual adapter checkpoint')
@@ -87,20 +108,28 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                     time.sleep(.01)
                 command_completed=now()
                 exit_code=child.returncode;control.clear();require(exit_code==0,'Actual capture command failed with exit '+str(exit_code))
-                manifest_path=output/'capture'/('fixture-manifest.json' if host else 'manifest.json')
+                manifest_path=output/'capture'/('owner.json' if gameplay else 'fixture-manifest.json' if host else 'manifest.json')
                 require(manifest_path.is_file() and not (manifest_path.parent/'failure.json').exists(),'Producer did not retain a complete successful manifest')
                 manifest=parse_json_bytes(manifest_path.read_bytes())
-                require(manifest.get('status')=='structural-pass' and manifest.get('sourceSha' if host else 'commit')==source and str(manifest.get('runtimeFingerprint','')).lower()==runtime,'Final producer source/runtime/status mismatch')
-                final_identity=manifest.get('fixture',{}).get('readback',{}).get('adapterIdentity') if host else manifest.get('adapterIdentity')
+                if gameplay:
+                    require(manifest.get('window',{}).get('completed') is True and manifest.get('overflowed') is False and manifest.get('failedFixtureAttempt') is None and
+                        manifest.get('producerMode')=='actual-live-gameplay' and manifest.get('modeAttestationAvailable') is True and manifest.get('sourceSha')==source and str(manifest.get('runtimeFingerprint','')).lower()==runtime,
+                        'Actual gameplay session/progress/window/source/runtime proof missing')
+                else:require(manifest.get('status')=='structural-pass' and manifest.get('sourceSha' if host else 'commit')==source and str(manifest.get('runtimeFingerprint','')).lower()==runtime,'Final producer source/runtime/status mismatch')
+                final_identity=manifest.get('fixture',{}).get('readback',{}).get('adapterIdentity') if host and not gameplay else manifest.get('adapterIdentity')
                 require(final_identity==actual.get('adapterIdentity'),'Final producer identity differs from exact live checkpoint')
                 if host:
-                    owner=manifest_path.parent/'owner.json'
-                    require(owner.is_file() and sha256_bytes(owner.read_bytes())==str(manifest.get('ownerSha256','')).lower(),'Final owner stream missing or changed')
-                else:require(type(manifest.get('captures')) is list and manifest['captures'],'Native producer has no actual captures')
+                    if request.get('collectorMode','Full')!='CollectorOff':
+                        owner=manifest_path.parent/'owner.json'
+                        require(owner.is_file() and sha256_bytes(owner.read_bytes())==str(manifest.get('ownerSha256','')).lower(),'Final owner stream missing or changed')
+                    else:require(manifest.get('owner') is None and manifest.get('fixture',{}).get('collectorControl',{}).get('collectorEnabled') is False,'OFF must retain a real separate control probe and no fake owner')
+                elif not gameplay:require(type(manifest.get('captures')) is list and manifest['captures'],'Native producer has no actual captures')
                 stop.set();observer.join(15);require(not observer.is_alive(),'Sensor observer did not stop within its query bound')
                 sample();require(not failure,'Physical observation failed')
                 require(runtime_fingerprint(request['runtimeRoot'])==runtime,'Sealed runtime assets changed during capture')
                 require(sha256_bytes(Path(sensor).read_bytes())==sensor_before and sha256_bytes(Path(client).read_bytes())==client_before and sha256_bytes(Path(client).with_suffix('.dll').read_bytes())==client_assembly_before,'Capture/provider executable or actual client assembly changed')
+                payload_after=payload_inventory(Path(client).parent);write_new(output/'payload-inventory-after.json',payload_after)
+                require(payload_before==payload_after,'Complete executable payload changed during capture')
                 status='structural-pass'
         except Exception as error:
             failure.append(str(error));control.clear()
@@ -121,7 +150,10 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
             if observer.is_alive():failure.append('Observer query did not finish within bound')
             record=dict(schemaVersion=1,kind='actual-baseline-capture-attempt',status=status,sourceSha=source,runtimeFingerprint=runtime,
                         startedAtUtc=started,completedAtUtc=now(),commandStartedAtUtc=command_started,commandCompletedAtUtc=command_completed,argv=argv,processId=child.pid if child else None,exitCode=child.returncode if child else None,
+                        captureMode='actual-live-gameplay' if gameplay else 'reference-host-fixture' if host else 'native-reference',
                         foregroundEnforced=require_foreground,failures=failure,cleanup=cleanup,requestSha256=sha256_bytes(request_file.read_bytes()),originalRequestSha256=sha256_bytes(original),
+                        payloadInventoryBeforeSha256=sha256_bytes((output/'payload-inventory-before.json').read_bytes()),
+                        payloadInventoryAfterSha256=sha256_bytes((output/'payload-inventory-after.json').read_bytes()) if (output/'payload-inventory-after.json').is_file() else None,
                         clientExecutableSha256=client_before,clientAssemblySha256=client_assembly_before,sensorExecutableSha256=sensor_before,providerVersionSha256=sha256_bytes(version_raw),
                         physicalAcceptance='unreviewed evidence; requires accepted source/contract/policies and complete baseline controls',qualified=False)
             write_new(output/'attempt.json',record)

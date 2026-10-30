@@ -11,6 +11,7 @@
       "owns": [
         "src/ForgeLine.Client/Program.cs",
         "src/ForgeLine.Client/ClientRenderHost.cs",
+        "src/ForgeLine.Client/ClientApplication.cs",
         "src/ForgeLine.Client/VisualReferenceCapture.cs",
         "src/ForgeLine.Client/ReferencePerformanceSamples.cs",
         "src/ForgeLine.Client/ReferenceCaptureManifest.cs",
@@ -34,7 +35,10 @@
         "docs/rendering/render-engine-upgrade/evidence/baseline/",
         ".github/workflows/render-qualification.yml",
         "Directory.Packages.props",
-        "docs/DocumentationIndex.md"
+        "docs/DocumentationIndex.md",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.ContentEvidence.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
+        "tests/ForgeLine.Presentation.Tests/ContentEvidence/"
       ]
     },
     {

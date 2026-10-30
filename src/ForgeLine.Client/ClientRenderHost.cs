@@ -146,6 +146,7 @@ internal sealed partial class ClientRenderHost : IDisposable
     private int _gameplayPresented;
     private readonly bool _asynchronousStartup;
     private readonly SimulationSessionId? _expectedSession;
+    private readonly LiveSessionOrigin? _sessionOrigin;
     private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly Func<ClientSimulationTelemetry>? _simulationTelemetry;
     private readonly ClientRenderPublication _publication = new();
@@ -199,11 +200,12 @@ internal sealed partial class ClientRenderHost : IDisposable
         ParticleSettings? particles = null,
         RenderQualitySettings? renderQuality = null,
         TerrainPresentationProfile? terrainProfile = null,
-        ReferenceFixtureRecipe? referenceFixture = null)
+        ReferenceFixtureRecipe? referenceFixture = null, LiveSessionOrigin? sessionOrigin = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
         _expectedSession = expectedSession;
+        _sessionOrigin = sessionOrigin;
         _frontendOwner = transitionHost;
         _simulationTelemetry = simulationTelemetry;
         if (transitionHost is not null && !asynchronousStartup)
@@ -227,6 +229,7 @@ internal sealed partial class ClientRenderHost : IDisposable
         {
             _fixtureSequence = new(referenceFixture.FrameCount);
             _fixtureFrames = new ReferenceFixtureFrameObservation[referenceFixture.Samples];
+            if (referenceFixture.CollectorMode != ReferenceCollectorMode.Full) _fixtureCollectorControl = new(referenceFixture.Warmups, referenceFixture.Samples, referenceFixture.CollectorMode);
         }
         _sceneLighting =
             sceneLighting ??
@@ -438,9 +441,19 @@ internal sealed partial class ClientRenderHost : IDisposable
                 { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = _referenceFixture.Software, AllowSoftwareAdapterFallback = _referenceFixture.Software }) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
             using var liveTelemetry = _referenceFixture is null ? LiveRenderTelemetry.FromEnvironment(graphics, _runtimeAssets)
-                : new LiveRenderTelemetry((IGraphicsRenderTelemetry)graphics, _referenceFixture.Samples,
-                    Path.Combine(_referenceFixture.OutputRoot, "owner.json"), warmups: _referenceFixture.Warmups,
-                    runtimeFingerprint: _referenceFixture.RuntimeFingerprint, actualDevice: graphics.Diagnostics.Device);
+                : ReferenceCollectorControl.CreateOptionalCollector(_referenceFixture.CollectorMode, (IGraphicsRenderTelemetry)graphics, _referenceFixture.Samples,
+                    Path.Combine(_referenceFixture.OutputRoot, "owner.json"), _referenceFixture.Warmups,
+                    _referenceFixture.RuntimeFingerprint, graphics.Diagnostics.Device);
+            liveTelemetry?.BindSessionOrigin(_referenceFixture is null ? _sessionOrigin : null);
+            if (_referenceFixture is null && liveTelemetry is not null && _runtimeAssets is not null)
+            {
+                object seal = ReferenceRuntimeSeal.VerifyLoaded(_runtimeAssets);
+                string runtime = VisualReferenceCapture.RuntimeFingerprint(_runtimeAssets.RuntimeRoot);
+                var binding = ReferenceAdapterCheckpoint.PublishAndWait(
+                    Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_ADAPTER_BINDING"), graphics, runtime,
+                    initialTarget.NativeHandle.ToInt64(), () => Volatile.Read(ref _stopping) == 0);
+                liveTelemetry.BindProducerEvidence(binding?.Evidence, seal);
+            }
             if (_referenceFixture is { } adapterFixture)
                 _fixtureAdapterBinding = ReferenceAdapterCheckpoint.PublishAndWait(adapterFixture.AdapterBindingDirectory, graphics, adapterFixture.RuntimeFingerprint, initialTarget.NativeHandle.ToInt64(), () => Volatile.Read(ref _stopping) == 0)?.Evidence;
             var qualitySettings = _referenceFixture?.Settings ?? ClientGraphicsOverrides.Read(_renderQuality with
@@ -451,7 +464,7 @@ internal sealed partial class ClientRenderHost : IDisposable
             var composition = ClientRenderConfiguration.Resolve(graphics, qualitySettings,
                 initialTarget.Width, initialTarget.Height, _sceneLighting, _referenceFixture?.Atmosphere ?? _sceneAtmosphere.Graphics);
             composition.Apply(graphics);
-            if (_referenceFixture is not null) _fixtureComposition = composition;
+            if (_referenceFixture is not null) { _fixtureComposition = composition; _fixtureDevice = graphics.Diagnostics.Device; }
             RenderQualityProfile qualityProfile = composition.Profile;
             SceneLightingSettings lighting = composition.Lighting;
             GraphicsAtmosphereSettings atmosphere = composition.Atmosphere;
@@ -467,6 +480,7 @@ internal sealed partial class ClientRenderHost : IDisposable
             using var instanceRenderer = new SimpleInstanceRenderer(graphics, _runtimeAssets, lighting,
                 lodDiameterScale: qualityProfile.LodDiameterScale, textureDetail: qualityProfile.Textures, vegetationMotion: qualityProfile.VegetationMotion,
                 environment: qualityProfile.Environment, vegetation: qualityProfile.Vegetation);
+            if (_referenceFixture is not null) instanceRenderer.EnableContentEvidence();
             using var particleRenderer = new ParticleVfxRenderer(graphics, _runtimeAssets, qualityProfile.Particles, lighting);
             long lastParticleFrame = Stopwatch.GetTimestamp();
             var dockFeedback = new UiInteractionFeedback();
@@ -576,12 +590,14 @@ internal sealed partial class ClientRenderHost : IDisposable
                     }
                     if (!_fixtureSequence!.TryRead(out fixtureOrdinal)) continue;
                 }
+                long collectorControlStart = _fixtureCollectorControl is null ? 0 : Stopwatch.GetTimestamp();
                 LiveTelemetryStart liveStart = liveTelemetry?.Begin(new(signalWaitStart, signalWaitEnd)) ?? default;
                 ClientRenderFrame? frame =
                     TakeLatestFrame();
 
                 if (!frame.HasValue)
                 {
+                    RejectFixtureEarlyExit("empty");
                     CompleteLiveTelemetry(liveTelemetry, liveStart, "empty");
                     continue;
                 }
@@ -594,6 +610,7 @@ internal sealed partial class ClientRenderHost : IDisposable
                 {
                     dockFeedback.Cancel(); frontendFeedback.Cancel(); uiAudio.StopPlayback(); worldAudio.StopPlayback();
                     runtimeMetricsSampler.Reset();
+                    RejectFixtureEarlyExit("suspended");
                     CompleteLiveTelemetry(liveTelemetry, liveStart, "suspended");
                     continue;
                 }
@@ -638,6 +655,7 @@ internal sealed partial class ClientRenderHost : IDisposable
                             frontendRenderer.Render(context, loading, current.UiScale);
                     });
                     presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > loadingPresented;
+                    RejectFixtureEarlyExit("loading");
                     CompleteLiveTelemetry(liveTelemetry, liveStart, "loading");
                     continue;
                 }
@@ -773,6 +791,7 @@ internal sealed partial class ClientRenderHost : IDisposable
                     }
                     Interlocked.Increment(ref _completedFrames);
                     Volatile.Write(ref _lastCompletedFrameAt, Stopwatch.GetTimestamp());
+                    RejectFixtureEarlyExit("terrain-preparing");
                     CompleteLiveTelemetry(liveTelemetry, liveStart, "terrain-preparing", terrainStarted, terrainEndedAt);
                     continue;
                 }
@@ -1007,13 +1026,19 @@ internal sealed partial class ClientRenderHost : IDisposable
                         throw;
                     }
                 }
-                CompleteLiveTelemetry(liveTelemetry, liveStart, "gameplay", terrainStarted, livePrepareEndedAt);
+                CompleteLiveTelemetry(liveTelemetry, liveStart, "gameplay", terrainStarted, livePrepareEndedAt,
+                    liveTelemetry is not null && _referenceFixture is null && _expectedSession.HasValue && _simulationTelemetry is not null
+                        ? new LiveSimulationProvenance(_expectedSession.Value.Value, snapshot.SessionId.Value, snapshot.Tick.Value,
+                            telemetry.SessionId.Value, telemetry.CompletedTicks, telemetry.State == RuntimeSimulationState.Running) : null);
                 if (_referenceFixture is not null && graphics.PresentedFrameCount > presentedBefore)
-                    AcknowledgeFixtureFrame(fixtureOrdinal, renderCamera.CaptureState(), width, height, snapshot, (IGraphicsRenderTelemetry)graphics, instanceRenderer, diagnostics.Surface.BufferCount, gameplayHudRenderer.LastRenderedVertexCount);
+                    AcknowledgeFixtureFrame(fixtureOrdinal, renderCamera.CaptureState(), width, height, snapshot, (IGraphicsRenderTelemetry)graphics, instanceRenderer, diagnostics.Surface.BufferCount, gameplayHudRenderer.LastRenderedVertexCount, particleRenderer.Diagnostics);
+                if (_fixtureCollectorControl is not null && fixtureOrdinal < _referenceFixture!.Warmups + _referenceFixture.Samples)
+                    _fixtureCollectorControl.Record(fixtureOrdinal, collectorControlStart, Stopwatch.GetTimestamp(),
+                        ((IGraphicsRenderTelemetry)graphics).LastSubmission!.Value, renderCamera.CaptureState(), width, height);
             }
 
             graphics.WaitForIdle();
-            if (_referenceFixture is not null) liveTelemetry!.ValidateFixtureCorrespondence(_fixtureFrames!);
+            if (_referenceFixture is not null && liveTelemetry is not null) liveTelemetry.ValidateFixtureCorrespondence(_fixtureFrames!);
             GraphicsDiagnostics completedGraphics = graphics.Diagnostics;
             lock (_frameGate)
             {
@@ -1040,9 +1065,9 @@ internal sealed partial class ClientRenderHost : IDisposable
     }
 
     private void CompleteLiveTelemetry(LiveRenderTelemetry? collector, in LiveTelemetryStart start,
-        string state, long prepareStart = 0, long prepareEnd = 0)
+        string state, long prepareStart = 0, long prepareEnd = 0, LiveSimulationProvenance? simulation = null)
     {
-        collector?.Complete(start, state, prepareStart, prepareEnd);
+        collector?.Complete(start, state, prepareStart, prepareEnd, simulation);
         if (collector?.WindowCompleted == true) Volatile.Write(ref _telemetryWindowPending, 0);
     }
 

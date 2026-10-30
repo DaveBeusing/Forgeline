@@ -26,7 +26,7 @@ internal static class ReferenceFixtureHostCapture
             Directory.CreateDirectory(request.OutputRoot); created = true;
             long setupStarted = Stopwatch.GetTimestamp();
             long setupAllocated = GC.GetTotalAllocatedBytes(precise: true);
-            var catalog = RuntimeAssetCatalog.Load(request.RuntimeRoot);
+            var catalog = ReferenceRuntimeSeal.Load(request.RuntimeRoot, out object runtimeSeal);
             string runtimeFingerprint = VisualReferenceCapture.RuntimeFingerprint(request.RuntimeRoot);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixture = VisualReferenceScene.Create(request.Scenes[0], terrain, runtimeAssets: catalog, mechanicalSeconds: request.MechanicalSeconds);
@@ -68,8 +68,9 @@ internal static class ReferenceFixtureHostCapture
             ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "fixture-manifest.json"), JsonSerializer.Serialize(new
             {
                 schemaVersion = 1, kind = "actual-client-render-host-reference-fixture-run", status = "structural-pass",
-                sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, setupMilliseconds, setupProcessAllocatedBytes,
-                owner = "owner.json", ownerSha256 = VisualReferenceCapture.FileHash(Path.Combine(request.OutputRoot, "owner.json")),
+                sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, runtimeSeal, setupMilliseconds, setupProcessAllocatedBytes,
+                owner = request.CollectorMode == ReferenceCollectorMode.CollectorOff ? null : "owner.json",
+                ownerSha256 = request.CollectorMode == ReferenceCollectorMode.CollectorOff ? null : VisualReferenceCapture.FileHash(Path.Combine(request.OutputRoot, "owner.json")),
                 clientAssemblySha256 = VisualReferenceCapture.FileHash(typeof(Program).Assembly.Location),
                 hostWindow = window.ClientSize, hostWindowDpi = window.Dpi, nativeHandle = window.NativeHandle.Value.ToInt64(),
                 fixture = host.FixtureEvidence(), physicalAdmission = "Requires separately verified exact device/provider and foreground conditions"
@@ -90,6 +91,8 @@ internal static class ReferenceFixtureHostCapture
             request.UiScenarios.Length != 1 || request.UiScenarios[0] != UiReferenceScenario.World || request.UiScales.Length != 1 ||
             request.CinematicFrontend || request.Scenes[0] == VisualReferenceSceneKind.MaterialFoundation)
             throw new NotSupportedException("Actual host fixture commands require one authored World case; special UI/material-reference modes are explicitly unsupported.");
+        if (request.CollectorMode != ReferenceCollectorMode.Full && (request.RunProfile != ReferenceRunProfile.Warm || request.Warmups != 64 || request.Samples != 512))
+            throw new NotSupportedException("Collector on/off is a separate fixed64/512 warm experiment.");
         _ = LiveRenderTelemetry.CompletionCapacityFor(request.Samples, request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups);
     }
 }

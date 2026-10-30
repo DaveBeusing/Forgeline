@@ -2,7 +2,7 @@
 
 [Documentation](../../README.md) - [Complete catalog](../../DocumentationIndex.md)
 
-No qualified RenderEngine performance baseline has been established. Wave 1 delivers diagnostic acquisition, frozen-protocol preparation, strict admission refusal and source-labelled owner telemetry analysis. Physical baseline acceptance remains OPEN and wave 2 is NOT READY.
+The [admission contract implementation](Admission.md) adds actual device/session/fixture proof and strict controls without establishing measurements. No qualified RenderEngine performance baseline has been established. Wave 1 delivers diagnostic acquisition, frozen-protocol preparation, strict admission refusal and source-labelled owner telemetry analysis. Physical baseline acceptance remains OPEN and wave 2 is NOT READY.
 
 Blocking admissions are exact renderer-to-sensor physical mapping, reviewed common hardware/allocation/GPU-memory policies, native-fixture live binding, exact-source required CI, frozen binary/runtime inventories, and complete controlled A/A cohorts. Native adapter names and caller-supplied hashes cannot close physical identity. No policy bounds or approval have been manufactured.
 

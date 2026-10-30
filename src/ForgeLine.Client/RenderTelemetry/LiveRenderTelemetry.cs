@@ -31,6 +31,20 @@ internal sealed class LiveRenderTelemetry : IDisposable
     private ulong _firstMeasuredFence;
     private bool _overflow, _disposed;
     private object? _failedFixtureAttempt;
+    private LiveSessionOrigin? _sessionOrigin;
+    private object? _producerAdapterBinding, _producerRuntimeSeal;
+    internal void BindProducerEvidence(object? adapterBinding, object runtimeSeal)
+    {
+        VerifyOwner();
+        if (_armed || _count != 0) throw new InvalidOperationException("Actual producer identity must bind before sampling.");
+        _producerAdapterBinding = adapterBinding; _producerRuntimeSeal = runtimeSeal;
+    }
+    internal void BindSessionOrigin(LiveSessionOrigin? origin)
+    {
+        VerifyOwner();
+        if (_armed || _count != 0) throw new InvalidOperationException("Actual session origin must be bound before capture starts.");
+        _sessionOrigin = origin;
+    }
     internal int Count => _count;
     internal bool WindowCompleted => _finished;
     internal bool Overflowed => _overflow || _source.TelemetryOverflowed;
@@ -90,7 +104,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         return new(Stopwatch.GetTimestamp(), process, thread)
         { ServiceStartTick = serviceStart, BeginProcessCounter = new(counterStart, counterEnd), SignalWait = signalWait };
     }
-    internal void Complete(in LiveTelemetryStart start, string state, long prepareStart = 0, long prepareEnd = 0)
+    internal void Complete(in LiveTelemetryStart start, string state, long prepareStart = 0, long prepareEnd = 0, LiveSimulationProvenance? simulation = null)
     {
         VerifyOwner();
         if (_failedFixtureAttempt is not null) throw new InvalidOperationException("A failed fixture window cannot consume another observation.");
@@ -109,7 +123,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
             int prefixIndex = _beforeCount;
             if (_beforeCount == _beforeWindow.Length) { _overflow = true; prefixIndex = -1; }
             else _beforeWindow[_beforeCount++] = new(start.Tick, end, state, process, thread)
-                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer };
+                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer, Simulation = simulation };
             if (_armed) _warmupsRemaining--;
             long drainStart = Stopwatch.GetTimestamp(); DrainGpu(); long drainEnd = Stopwatch.GetTimestamp();
             if (prefixIndex >= 0) _beforeWindow[prefixIndex] = _beforeWindow[prefixIndex] with
@@ -135,7 +149,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
             _frames[_count] = new(_count, start.Tick, end, process, thread, state,
                 new(start.Tick, prepareStart >= start.Tick ? prepareStart : renderStart), prepare,
                 render, present, wait, cpu.Submission, render.StartTick < render.EndTick && cpu.Submitted ? cpu.SubmittedFence : 0, cpu.Generation, cpu.ResourceGeneration, memory)
-                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer };
+                { ServiceStartTick = start.ServiceStartTick, SignalWait = start.SignalWait, Observer = observer, Simulation = simulation };
             if (_firstMeasuredFence == 0) _firstMeasuredFence = cpu.SubmittedFence;
             _count++;
             if (_count == _frames.Length) { _finished = true; _source.StopRenderTelemetry(); }
@@ -199,10 +213,19 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["schemaVersion"] = 1;
         document["kind"] = "live-render-owner-telemetry";
         document["nativeFixtureBindingAvailable"] = false;
+        document["sessionOrigin"] = JsonSerializer.SerializeToNode(_sessionOrigin, JsonOptions);
+        bool realSession = _sessionOrigin is not null && _finished && _count > 1 && _frames.AsSpan(0, _count).ToArray().All(f => f.Simulation is { Running: true } p &&
+            p.ExpectedSession > 0 && p.ExpectedSession == p.SnapshotSession && p.SnapshotSession == p.CallbackSession) &&
+            _frames[0].Simulation!.Value.CompletedTicks < _frames[_count - 1].Simulation!.Value.CompletedTicks &&
+            _frames[0].Simulation!.Value.SnapshotTick < _frames[_count - 1].Simulation!.Value.SnapshotTick;
+        document["producerMode"] = realSession ? "actual-live-gameplay" : "unattested-live-or-authored-reference-fixture";
+        document["modeAttestationAvailable"] = realSession;
         document["sourceSha"] = ClientBuildIdentity.SourceRevision;
         document["runtimeFingerprint"] = _runtimeFingerprint;
         document["actualDevice"] = JsonSerializer.SerializeToNode(_actualDevice, JsonOptions);
         document["adapterIdentity"] = JsonSerializer.SerializeToNode(_source.DeviceIdentity, JsonOptions);
+        document["adapterBinding"] = JsonSerializer.SerializeToNode(_producerAdapterBinding, JsonOptions);
+        document["runtimeSeal"] = JsonSerializer.SerializeToNode(_producerRuntimeSeal, JsonOptions);
         document["scope"] = "live-client";
         document["gpuStreamScope"] = "independent-live-client";
         document["streamId"] = _streamId;
@@ -223,7 +246,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["frames"] = JsonSerializer.SerializeToNode(_frames.AsSpan(0, _count).ToArray().Select(f => new
         {
             f.Index, f.StartTick, f.EndTick, f.ServiceStartTick, f.ServiceEndTick, f.SignalWait, f.Observer,
-            f.ProcessAllocatedBytes, f.ThreadAllocatedBytes, f.State, f.Submission, f.SubmittedFence, f.Generation, f.ResourceGeneration,
+            f.ProcessAllocatedBytes, f.ThreadAllocatedBytes, f.State, f.Simulation, f.Submission, f.SubmittedFence, f.Generation, f.ResourceGeneration,
             phases = new { host = f.Host, prepare = f.Prepare, renderFrame = f.RenderFrame, present = f.Present, fenceWait = f.FenceWait },
             memory = f.Memory, gpu = completed.TryGetValue((f.Generation, f.ResourceGeneration, f.SubmittedFence), out var timing) ? new
             { queue = timing.Queue, generation = timing.Generation, resourceGeneration = timing.ResourceGeneration,
@@ -264,6 +287,7 @@ internal readonly record struct LiveTelemetryFrame(int Index, long StartTick, lo
     public long ServiceEndTick { get; init; }
     public GraphicsTimestampInterval SignalWait { get; init; }
     public LiveObserverIntervals Observer { get; init; }
+    public LiveSimulationProvenance? Simulation { get; init; }
 }
 
 internal readonly record struct LiveTelemetryObservation(long StartTick, long EndTick, string State, long ProcessAllocatedBytes, long ThreadAllocatedBytes)
@@ -272,4 +296,8 @@ internal readonly record struct LiveTelemetryObservation(long StartTick, long En
     public long ServiceEndTick { get; init; }
     public GraphicsTimestampInterval SignalWait { get; init; }
     public LiveObserverIntervals Observer { get; init; }
+    public LiveSimulationProvenance? Simulation { get; init; }
 }
+
+internal readonly record struct LiveSimulationProvenance(ulong ExpectedSession, ulong SnapshotSession, ulong SnapshotTick,
+    ulong CallbackSession, ulong CompletedTicks, bool Running);
