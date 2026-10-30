@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "archive": "images.zip",
+  "bytes": 51080078,
+  "sha256": "abf51d814f5d958edf49354028dbceb9996d1c758d996f6f49743af8bf78621c",
+  "method": "Concatenate parts in listed order to restore the original native-image ZIP byte-for-byte; verify every part and the combined SHA-256 before extraction.",
+  "parts": [
+    {
+      "path": "images.zip.part-01",
+      "bytes": 7000000,
+      "sha256": "5e3a0d838d10f01ea1a00f809875f28bba46bf080510bc8bff8b936f1c786c2e",
+      "gitSha": "011df438e1c404fd9e6982bde0e505108a212143"
+    },
+    {
+      "path": "images.zip.part-02",
+      "bytes": 7000000,
+      "sha256": "79600b60d74483544621a2bb120097f4a96a59f11e57935e8a4a064c08e4d2e7",
+      "gitSha": "9d3b7212585fdb5ce3860e130a553a93921389e4"
+    },
+    {
+      "path": "images.zip.part-03",
+      "bytes": 7000000,
+      "sha256": "4668c6ac3da7cf87ef4fa329db269b65544c9c321e8805bf2a9a52aa3434e0e0",
+      "gitSha": "d9bb5b1262483f4ccc6356e3628de50a0aeef0d6"
+    },
+    {
+      "path": "images.zip.part-04",
+      "bytes": 7000000,
+      "sha256": "fe97a8b937652f8879c81b4424980cc810605bcc0ad272e261f9fd6dd11e44e4",
+      "gitSha": "cd743df650180c02552d45dec1f533c1ac5b0e50"
+    },
+    {
+      "path": "images.zip.part-05",
+      "bytes": 7000000,
+      "sha256": "a2439fbf8af4d737942dd5d275b92637d93c34b5aea6d711864a2bf5cfbb49bf",
+      "gitSha": "9506f9c45f1042132d67d7e5e639d4af5ba843bb"
+    },
+    {
+      "path": "images.zip.part-06",
+      "bytes": 7000000,
+      "sha256": "e9cb0a21d2d1023bf86b05b52622cfd06c5a70b9cbe753996cd7df7a4cc8245e",
+      "gitSha": "ecb8b42284e0a31d7bcbb8f2f8797caa0aa4b8a0"
+    },
+    {
+      "path": "images.zip.part-07",
+      "bytes": 7000000,
+      "sha256": "7da3e0868421d74d1a618dd73a68f7edab6a9772ec707dbd70ccfbc208136060",
+      "gitSha": "6b21f7fd67733511aa47edf6954f5ee9ea825053"
+    },
+    {
+      "path": "images.zip.part-08",
+      "bytes": 2080078,
+      "sha256": "269fbc49eada6b573d42608bbf79bea73e43a174116545fb3b68bdd3e4bbc201",
+      "gitSha": "eabcbf6ad576f40dfded7691cda028580c3dce42"
+    }
+  ]
+}

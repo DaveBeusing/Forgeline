@@ -1,5 +1,7 @@
 # Presentation Extraction and Debugging
 
+The [serial rendering integration report](rendering/performance-integration/Qualification.md) retains the source-specific correspondence qualification alongside the combined native evidence. For unique unordered current entity IDs, lookup uses the already prepared permutation; duplicate and predecessor semantics remain explicit. Snapshot ownership, player authorization and the producer/consumer publication boundary are unchanged. Native image and counter observations complement the focused correspondence/submission tests; they do not grant human visual acceptance.
+
 ## Purpose
 
 The presentation boundary converts mutable simulation/game state into immutable render-facing data. Rendering consumes only extracted snapshots and never queries or mutates live ECS storage.

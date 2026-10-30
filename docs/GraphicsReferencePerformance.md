@@ -1,5 +1,7 @@
 # Graphics reference scene and performance qualification
 
+The [serial rendering integration qualification](rendering/performance-integration/Qualification.md) compares named master `af8aaac0f9425b077d3a4497271495c1fce00d87` with the integrated candidate using immutable source-labelled clients, one payload, repeated Fixed/Sweep scaling and production scenes, and matched static-memory controls. Raw per-frame evidence, valid completed-fence counts, image comparisons, regression/variance observations and exact reproduction commands remain linked from that report. All four wave-02 capabilities were already present in the named master; historical single-feature results are not combined-source speedup acceptance.
+
 For matched installed UI workloads, full-matrix resource counters and the
 separate whole-frame/skin-cost boundaries, see
 [graphical interface qualification](GraphicalInterfaceQualification.md).

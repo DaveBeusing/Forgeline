@@ -1,5 +1,7 @@
 # Development
 
+The [serial rendering integration qualification](rendering/performance-integration/Qualification.md) records the full canonical gates, source identities, native lifecycle coverage and separately collected timing evidence. Use the existing CI command with `--max-parallel-test-modules 1` for the complete solution; unbounded concurrent native test modules can contend for the same desktop/device and invalidate bounded-wait observations. Test assertions, time limits and the natural terminal-match requirement are unchanged.
+
 The [UI review handbook](UiVisualReview.md) describes bounded native capture and
 resume. [Graphical interface qualification](GraphicalInterfaceQualification.md)
 records executed coverage, package identity and required gates still outstanding.
