@@ -1,5 +1,7 @@
 # Graphics asset bindings
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The source manifest, compiled container and renderer must agree on the identities
 of mesh material slots, texture channels, LODs, skins and animation clips. Integrity
 hashes alone establish byte consistency; they do not establish these typed bindings.

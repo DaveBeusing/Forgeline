@@ -1,5 +1,7 @@
 # Cargo Convoy and Escort Operations
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Scope and ownership
 
 Cargo convoys are optional fixed-tick regional movement coordination. They do not replace `CargoTransportOrder`, `CargoTransportRouteState`, inventories, throughput reservations, Cargo Truck fuel, vehicle docking or the physical FIFO queue. A convoy is its own generation-aware ECS entity; the group carries owner, route anchors, network version, leader, status and tick identity. Trucks retain their individual cargo order and every resource transfer remains owned by the existing loading/unloading lifecycle.
@@ -35,7 +37,6 @@ A group status is informational and must not become a material-transfer trigger.
 - Validation: focused Game and Presentation tests before full Release build, Microsoft.Testing.Platform solution test suite and required `build-test`, Movement quality, scalability, save/replay and natural terminal-match gates
 
 The system's goal is deliberate, physically believable pacing; it does not promise that two independent cargo trucks share a single hierarchical-navigation computation. Performance measurements must distinguish convoy coordination overhead from existing per-truck pathfinding and may not count route reuse that did not occur.
-
 
 ## Reproducible 10/50/100 performance qualification
 

@@ -1,5 +1,7 @@
 # Blender rigid motion authoring
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The authoring adapter produces static component geometry plus the existing typed
 `mechanicalParts` metadata. It reuses the pinned Blender launcher, source importer,
 strict rest-pose exporter, compiler and rigid presentation renderer. It adds no

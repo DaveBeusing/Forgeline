@@ -1,5 +1,7 @@
 # Asset Pipeline
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 [Graphics asset bindings](GraphicsAssetBindings.md) describes typed runtime
 dependency checks, payload material/texture validation, compiler 1.12.1 slot-order
 preservation and the extended residency binding inventory.
@@ -12,6 +14,54 @@ World vegetation source geometry can be reproduced with
 `python build/Author-WorldVegetation.py`. It retains the existing source paths,
 stable IDs, material atlas regions and High/Reduced chains. Compile its glTF
 outputs through the normal compiler; see [environment composition](EnvironmentDressing.md).
+
+<details>
+<summary>On this page</summary>
+
+- [Optional Blender authoring](#optional-blender-authoring)
+- [Purpose](#purpose)
+- [Build modes and deployment integrity](#build-modes-and-deployment-integrity)
+- [Canonical Directories](#canonical-directories)
+- [Stable Asset IDs](#stable-asset-ids)
+- [Asset Metadata](#asset-metadata)
+- [Source Scale and Coordinates](#source-scale-and-coordinates)
+- [Static Mesh Import](#static-mesh-import)
+  - [Production mesh vertex contract](#production-mesh-vertex-contract)
+  - [Material slots and migration](#material-slots-and-migration)
+- [Texture Import](#texture-import)
+  - [Offline mip generation](#offline-mip-generation)
+  - [Runtime format and compression](#runtime-format-and-compression)
+  - [Runtime texture representation](#runtime-texture-representation)
+- [Material Definitions](#material-definitions)
+- [Dependency Graph](#dependency-graph)
+- [Incremental Compilation](#incremental-compilation)
+- [Runtime Output](#runtime-output)
+- [Runtime Lookup](#runtime-lookup)
+- [Directorate building and infrastructure source sets](#directorate-building-and-infrastructure-source-sets)
+- [Combat, destruction, and logistics VFX source set](#combat-destruction-and-logistics-vfx-source-set)
+- [RTS UI semantic asset set](#rts-ui-semantic-asset-set)
+- [Compiler Usage](#compiler-usage)
+- [Validation](#validation)
+- [Directorate shared production material library](#directorate-shared-production-material-library)
+- [Current Boundary](#current-boundary)
+- [Committed Vertical Slice world assets](#committed-vertical-slice-world-assets)
+- [Committed Directorate Vertical Slice unit assets](#committed-directorate-vertical-slice-unit-assets)
+- [Runtime Qualification](#runtime-qualification)
+- [Concept surface and effect completion](#concept-surface-and-effect-completion)
+- [Rigid mechanical mesh authoring](#rigid-mechanical-mesh-authoring)
+  - [Battlefield effect materials](#battlefield-effect-materials)
+- [Modular environment authoring](#modular-environment-authoring)
+- [Operational building authoring](#operational-building-authoring)
+- [Industrial building authoring](#industrial-building-authoring)
+- [Logistics building authoring](#logistics-building-authoring)
+- [Infantry and battlefield source owner](#infantry-and-battlefield-source-owner)
+- [Combat and support vehicle source ownership](#combat-and-support-vehicle-source-ownership)
+- [UI font resources](#ui-font-resources)
+- [Display-referred title images](#display-referred-title-images)
+- [Blender surface and LOD preparation](#blender-surface-and-lod-preparation)
+- [Blender rigid motion metadata](#blender-rigid-motion-metadata)
+
+</details>
 
 ## Optional Blender authoring
 
@@ -34,7 +84,6 @@ The optional [infantry skinning path](InfantrySkinAssets.md) extends the shared 
 [Compiled UI atlases and skin rendering](UiAtlasRendering.md) add compiler 1.10.0
 and the bounded UiSkin binary payload. Authored atlas regions reference ordinary
 compiled page textures and share existing manifest/container integrity.
-
 
 The text-free Directorate UI skin sources and editable vector masters use this
 same compiler boundary. See [skin artwork](UiSkinArtwork.md),
@@ -590,7 +639,6 @@ PNG/TGA authoring inputs compile through the standard deterministic texture pipe
 
 See [World Asset Presentation](WorldAssetPresentation.md) for how stable world asset IDs map to Central Divide presentation data.
 
-
 ## Committed Directorate Vertical Slice unit assets
 
 The first production-oriented gameplay-unit set lives below `assets/source/units/directorate/`. Six unit families provide stable LOD0/LOD1/LOD2 meshes, separate collision assets, runtime materials, strategic-symbol materials, and required gameplay-facing sockets. The existing Combat Engineer reuses the Rifle Squad visual family rather than creating a duplicate asset lineage.
@@ -598,7 +646,6 @@ The first production-oriented gameplay-unit set lives below `assets/source/units
 The production units retain their established typed mechanical articulation and VFX sockets. Optional independent rigid clips are available through the [bounded clip contract](RigidClipAssets.md); production unit definitions do not opt into clips automatically.
 
 See [Directorate Unit Assets](DirectorateUnitAssets.md) for the complete unit presentation contract.
-
 
 ## Runtime Qualification
 
@@ -656,7 +703,6 @@ Two ferrous exports replace source paths under existing IDs. At environment-kit
 integration the catalog contained 373 assets (190 meshes, 56 textures, 127 materials). Compile with the existing
 build/validate integrity modes; generated runtime files remain compiler-owned.
 See [source conventions and reproduction](ModularEnvironmentKit.md).
-
 
 ## Operational building authoring
 

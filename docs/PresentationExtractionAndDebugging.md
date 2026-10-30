@@ -1,6 +1,32 @@
 # Presentation Extraction and Debugging
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The [serial rendering integration report](rendering/performance-integration/Qualification.md) retains the source-specific correspondence qualification alongside the combined native evidence. For unique unordered current entity IDs, lookup uses the already prepared permutation; duplicate and predecessor semantics remain explicit. Snapshot ownership, player authorization and the producer/consumer publication boundary are unchanged. Native image and counter observations complement the focused correspondence/submission tests; they do not grant human visual acceptance.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Extraction Timing](#extraction-timing)
+- [Snapshot Ownership](#snapshot-ownership)
+- [Buffered Handoff](#buffered-handoff)
+- [Session and Command Boundaries](#session-and-command-boundaries)
+- [Interpolation](#interpolation)
+- [Current Test Entity Path](#current-test-entity-path)
+- [Generic Instance Renderer](#generic-instance-renderer)
+- [Debug Draw](#debug-draw)
+- [Simulation-Owned Debug Extraction](#simulation-owned-debug-extraction)
+- [Player-facing strategic overlay extraction](#player-facing-strategic-overlay-extraction)
+- [Gameplay HUD composition boundary](#gameplay-hud-composition-boundary)
+- [Development Overlay](#development-overlay)
+- [Performance Instrumentation](#performance-instrumentation)
+- [Rendering Baselines](#rendering-baselines)
+- [Architecture Guards](#architecture-guards)
+- [Faction Intelligence Extraction](#faction-intelligence-extraction)
+- [Independent consumers](#independent-consumers)
+
+</details>
 
 ## Purpose
 
@@ -196,7 +222,7 @@ The Windows render host has one explicit production HUD path: `GameplayHudRender
 
 The layout defines stable safe-area regions rather than allowing each feature to derive unrelated viewport-relative coordinates. Current named regions are the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary view. Layout scale starts from the existing 96-DPI baseline and combines it with the configured UI scale.
 
-The production HUD path and development diagnostics are separate owners. Turning Shift + F1 development metrics off does not disable the gameplay HUD, and enabling engineering diagnostics does not make those diagnostics player-facing state. `ResourcePowerHudSurface` owns the top resource/power bar and authoritative alert/command-feedback stack. `SelectionInspectorHudSurface` owns the selected-entity inspector and consumes only the immutable `PlayerSelectionSummary`; multi-selection does not display first-entity operational state as if it were aggregated. `PlayerActionDockHudSurface` owns the production action region and consumes the immutable `PlayerActionSnapshot` plus copied action/targeting view state; it never reads live ECS or treats UI activation as authoritative success. These player-facing facts no longer route through the development-text renderer. Match result, pause, help, and onboarding presentation is also composed by the production RTS information surface, and the former `GameplayHudLegacyTextSurface` compatibility path has been removed.
+The production HUD and development diagnostics have separate owners. Turning development metrics off does not disable gameplay HUD state. The live composition includes the resource/power strip, notifications, minimap, guidance, group overview, Operations and the existing action rings. Selection details use the shared read-only status/tooltip path; rectangular dock, mode-bar and selection-inspector regions are retired. Controllers consume immutable player/action/selection snapshots and submit through validated requests rather than reading live ECS or treating UI activation as success. See [current HUD composition and input parity](HudSurfaceConsolidation.md) and [Graphical battlefield HUD](GraphicalBattlefieldHud.md). Match results, pause, help and onboarding retain their production-owned paths; engineering overlays remain diagnostic.
 
 ## Development Overlay
 
@@ -265,7 +291,6 @@ These checks preserve the invariant that a complete simulation remains runnable 
 
 Ground-movement debug capture is opt-in and copies immutable diagnostic values at simulation tick boundaries. Presentation never retains live ECS movement references. See [Ground Movement and Local Steering](GroundMovementAndSteering.md).
 
-
 ## Faction Intelligence Extraction
 
 When a presentation composition provides a `FactionIntelligenceStore` and viewing faction, `PresentationExtractor` applies the authoritative battlefield-intelligence result before publishing render instances. Enemy entities carrying `IntelligenceSignature` are included only while currently identified for that faction. Detected-only radar contacts remain separate contact read models.
@@ -273,7 +298,6 @@ When a presentation composition provides a `FactionIntelligenceStore` and viewin
 A bounded `FactionIntelligenceSnapshot` can carry explicit Unexplored, Explored, and Visible cells plus Detected/Identified last-known contacts. F2 debug visualization can render those cells, sensor ranges, contact markers, and sensor timing without mutating simulation visibility.
 
 See `BattlefieldIntelligence.md` for the authoritative sensing and targeting semantics.
-
 
 ## Independent consumers
 

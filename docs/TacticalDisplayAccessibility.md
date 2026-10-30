@@ -1,5 +1,7 @@
 # Tactical display readability
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Settings → General retains the existing UI scale (75–200%), reduced UI motion,
 tooltip delay and tooltip text-size controls. Additional rows scroll in the same
 keyboard and pointer viewport:

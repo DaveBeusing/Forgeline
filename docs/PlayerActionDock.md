@@ -1,9 +1,31 @@
 # Player Action Dock
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The rectangular dock described here is historical. Current player controls use
 the existing action rings and shared status tooltip, with no rectangular fallback
 or mode bar. See [current surface ownership and parity](HudSurfaceConsolidation.md).
 
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Modes and shortcuts](#modes-and-shortcuts)
+- [Availability and authoritative validation](#availability-and-authoritative-validation)
+- [Build](#build)
+- [Processing](#processing)
+- [Unit production](#unit-production)
+- [Logistics](#logistics)
+- [Supply](#supply)
+- [Combat and artillery](#combat-and-artillery)
+- [Technology](#technology)
+- [Lifetime and terminal behavior](#lifetime-and-terminal-behavior)
+- [Validation](#validation)
+- [Configurable keyboard controls](#configurable-keyboard-controls)
+- [Adaptive command dock](#adaptive-command-dock)
+- [Logistics setup](#logistics-setup)
+
+</details>
 
 ## Purpose
 
@@ -108,7 +130,6 @@ Combat mode uses only the owned tactical selection and intelligence-bounded targ
 
 Attack remains identified-target gated. Attack Move and Retreat enter their existing targeting flows. Stop and Hold submit immediate commands. Fire Mission requires artillery with ammunition and uses the existing detected/identified-contact or coordinate targeting path. Cancel Fire Mission is enabled only when the copied artillery state contains an active mission. Recovery uses the existing retreat/recovery request.
 
-
 ## Technology
 
 Technology mode is a presentation over authoritative simulation state. It groups the current Directorate technology catalog by domain and exposes phase, prerequisites, real material costs, required facility, required power fraction, current progress, completed state, and the authoritative reason why a technology cannot currently start or continue.
@@ -142,7 +163,6 @@ The keys described above are defaults. Settings can rebind mode, next-item, prim
 All seven modes now use two-column status cards and a two-row footer. Build shows costs/deposit requirements; Process inputs/outputs/queue state; Units costs/technology/queue progress; Logistics stock thresholds/transport context; Supply automatic policy and explicit supply requests; Combat eligibility/target intent; Technology facility/prerequisites/costs/research progress. Captured active work alone has progress. Primary controls name the existing operation. Pending copied commands and matching local contextual requests disable dispatch controls; navigation remains available. Authoritative validation still decides acceptance.
 
 See [native dock qualification](CommandDockQualification.md) for package/source identities, scale coverage, reference images, performance limits and outstanding acceptance.
-
 
 ## Logistics setup
 

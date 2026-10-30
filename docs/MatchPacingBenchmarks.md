@@ -1,5 +1,7 @@
 # Match pacing and decision benchmarks
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The existing headless telemetry runner emits an additional PacingBenchmarks schema-1 block and a sibling .pacing.md analysis when --telemetry-output is used. Gameplay telemetry remains schema 2 with additive optional decision observations. Existing client telemetry does not enable them. No opponent policy, costs, resources, sensing, combat or transport rule changes.
 
 ## Run and compare

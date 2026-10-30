@@ -1,6 +1,23 @@
 # Predictive logistics traffic
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
 GroundMovement is the sole owner of transform and order commits. The simulation captures current physical bodies, authored obstacles, service reservations and bounded per-vehicle neighborhoods before planning. Missing, truncated, stale or exhausted captures hold controlled vehicles. Precise docks and queues retain their original admission and release owners.
+
+<details>
+<summary>On this page</summary>
+
+- [Bounds and persisted authority](#bounds-and-persisted-authority)
+- [Prediction, ownership and actual movement](#prediction-ownership-and-actual-movement)
+- [Recovery without replacing orders](#recovery-without-replacing-orders)
+- [Bounded local detours](#bounded-local-detours)
+- [Projected endpoint continuity](#projected-endpoint-continuity)
+- [Numerical envelope continuity](#numerical-envelope-continuity)
+- [Construction and active production budgets](#construction-and-active-production-budgets)
+- [Captured clearance and three-vehicle departures](#captured-clearance-and-three-vehicle-departures)
+- [Qualification status](#qualification-status)
+
+</details>
 
 ## Bounds and persisted authority
 

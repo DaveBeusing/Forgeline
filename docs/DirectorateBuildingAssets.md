@@ -1,5 +1,7 @@
 # Directorate Building and Infrastructure Assets
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The Command Core, four operational families and five industrial and three logistics families use
 editable component kits, distinct LODs and dedicated construction/damage/wreck
 geometry. All retain their public identities, gameplay footprints and shared
@@ -9,6 +11,33 @@ geometry. All retain their public identities, gameplay footprints and shared
 [Logistics building production](LogisticsBuildingProduction.md) and
 [Production surfaces](ProductionSurfaceMasters.md) for source ownership,
 dimensions, qualification evidence and open acceptance.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Included building families](#included-building-families)
+- [Source layout](#source-layout)
+- [Shared modular building kit](#shared-modular-building-kit)
+- [Construction presentation](#construction-presentation)
+- [Operational state presentation](#operational-state-presentation)
+- [Destruction boundary](#destruction-boundary)
+- [LOD and collision](#lod-and-collision)
+- [Strategic symbols](#strategic-symbols)
+- [Road kit](#road-kit)
+- [North Bridge and South Ford](#north-bridge-and-south-ford)
+- [Production material treatment](#production-material-treatment)
+- [Renderer and performance](#renderer-and-performance)
+- [Validation](#validation)
+- [Current boundary](#current-boundary)
+- [VFX integration](#vfx-integration)
+- [Concept surface completion](#concept-surface-completion)
+- [Command Core production geometry](#command-core-production-geometry)
+- [Operational building production geometry](#operational-building-production-geometry)
+- [Industrial production geometry](#industrial-production-geometry)
+- [Logistics production geometry](#logistics-production-geometry)
+
+</details>
 
 ## Purpose
 
@@ -251,7 +280,6 @@ Automated coverage verifies:
 ## Current boundary
 
 This baseline integrates the required Vertical Slice functions without expanding gameplay mechanics and now carries production Base Color/Normal/ORM material treatment through the existing runtime path. Roads are not player-constructible, rail content remains outside the current slice, and no new economic or power mechanic is introduced. Human art acceptance, sustained performance, emissive animation, audio, repair visuals and editor-specific road placement remain separate work over these stable contracts.
-
 
 ## VFX integration
 

@@ -1,5 +1,36 @@
 # Battlefield Intelligence
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Canonical Intelligence States](#canonical-intelligence-states)
+- [Ownership](#ownership)
+- [Faction Intelligence Store](#faction-intelligence-store)
+- [Intelligence Grid](#intelligence-grid)
+- [Visual Sensors](#visual-sensors)
+- [Controlled Update Frequency](#controlled-update-frequency)
+- [Radar Sensors](#radar-sensors)
+  - [Powered radar operation](#powered-radar-operation)
+- [Detection and Identification](#detection-and-identification)
+- [Contact Loss and Last-Known State](#contact-loss-and-last-known-state)
+- [Targeting Integration](#targeting-integration)
+- [Sensors-Phase Ordering](#sensors-phase-ordering)
+- [Presentation Extraction](#presentation-extraction)
+- [Debug Visualization](#debug-visualization)
+- [Diagnostics](#diagnostics)
+- [Correctness Coverage](#correctness-coverage)
+- [Performance Coverage](#performance-coverage)
+- [Extension Boundary](#extension-boundary)
+- [Artillery Contact Consumption](#artillery-contact-consumption)
+- [Tactical Behavior Consumption](#tactical-behavior-consumption)
+- [Atmospheric visual haze](#atmospheric-visual-haze)
+- [Explicit cover and ground visual occlusion](#explicit-cover-and-ground-visual-occlusion)
+
+</details>
+
 ## Purpose
 
 FORGELINE battlefield intelligence is authoritative simulation state owned per faction. It determines what terrain has been explored, what terrain is currently visible, which enemy contacts are currently detected or identified, and whether a combat target may use exact enemy entity state.
@@ -331,11 +362,9 @@ Later intelligence work may add:
 
 Those systems should extend the existing faction store, contact model, sensor scheduling, and target-availability boundary rather than bypass them.
 
-
 ## Artillery Contact Consumption
 
 Indirect fire is the first tactical consumer of opaque intelligence contacts. A contact-key mission copies the stored last-known position and last-seen tick into a coordinate fire mission. The artillery state does not retain or reacquire the hidden enemy entity. Direct coordinate missions require current visual visibility. Detected radar contacts may therefore support area fire against their known coordinates without granting direct entity targeting. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).
-
 
 ## Tactical Behavior Consumption
 

@@ -1,5 +1,7 @@
 # Seeded skirmish selection
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Player flow
 
 New Game starts with Authored Map. Its existing scenario order, Practice entries, seed adjustment, default selection and Enter-to-start behavior remain available. The map-source choice follows the authored seed row, preserving the original detail row coordinates and focus. Tab reaches that choice; Left/Right, Enter or a pointer click switches to Generated Map.

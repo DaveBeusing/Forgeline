@@ -1,5 +1,18 @@
 # Client render pass composition
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Implementation and ownership](#implementation-and-ownership)
+- [Creation, frame and disposal trace](#creation-frame-and-disposal-trace)
+- [Capability and quality gates](#capability-and-quality-gates)
+- [Lifecycle and recovery boundaries](#lifecycle-and-recovery-boundaries)
+- [Verification — NOT EXECUTED](#verification--not-executed)
+
+</details>
+
 ## Implementation and ownership
 
 The baseline already renders directional shadows, terrain, instances, optional

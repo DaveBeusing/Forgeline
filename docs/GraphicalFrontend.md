@@ -1,5 +1,7 @@
 # Graphical frontend
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Scope and ownership
 
 Based on master `fd1a4c0d5869136a43ff5ae7306c9254a60881cf` (0.1.375),

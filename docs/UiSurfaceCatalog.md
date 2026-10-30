@@ -1,7 +1,25 @@
 # Player interface surface catalog
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The [integrated qualification](GraphicalInterfaceQualification.md) records all
-58 current states, native coverage, compact-layout repairs and pending acceptance.
+58 recorded states, native coverage, compact-layout repairs and pending acceptance.
+
+> [!NOTE]
+> This is the source-bound owner catalog for the audit revision recorded below. Its rectangular dock/inspector rows describe that earlier layout. [Graphical battlefield HUD](GraphicalBattlefieldHud.md) and [HUD surface consolidation](HudSurfaceConsolidation.md) define current live surfaces and retired hit regions.
+
+<details>
+<summary>On this page</summary>
+
+- [Audit contract](#audit-contract)
+- [Frontend](#frontend)
+- [Battlefield HUD](#battlefield-hud)
+- [World, diagnostics and independent paths](#world-diagnostics-and-independent-paths)
+- [Evidence and maintenance](#evidence-and-maintenance)
+- [Graphical economic surface coverage](#graphical-economic-surface-coverage)
+- [Graphical tactical consumer coverage](#graphical-tactical-consumer-coverage)
+
+</details>
 
 ## Audit contract
 

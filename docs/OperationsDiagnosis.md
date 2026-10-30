@@ -1,5 +1,24 @@
 # Operations diagnosis and bounded chain observation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and authority](#scope-and-authority)
+- [Stable conveyor facts](#stable-conveyor-facts)
+- [Links and production inputs](#links-and-production-inputs)
+- [Quantities are independent observations](#quantities-are-independent-observations)
+- [Bounded traversal and retained data](#bounded-traversal-and-retained-data)
+- [Existing player workflow](#existing-player-workflow)
+- [Cost and rendering boundary](#cost-and-rendering-boundary)
+- [Measured input delivery, wait and backlog windows](#measured-input-delivery-wait-and-backlog-windows)
+- [Shared-cause warning groups](#shared-cause-warning-groups)
+- [Validation and remaining acceptance](#validation-and-remaining-acceptance)
+  - [Throughput and grouping delivery status](#throughput-and-grouping-delivery-status)
+
+</details>
+
 ## Scope and authority
 
 The diagnosis explains one owned, singly selected facility, conveyor or Cargo Truck at one completed simulation tick. It is a copied observation, not a second economic authority or a permanent UI graph of the base. Opening Operations, tracing a link and focusing an entity issue no simulation command, order, repair, stock transfer or notification.

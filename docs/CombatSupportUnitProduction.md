@@ -1,10 +1,29 @@
 # Directorate combat and support unit production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Scout Vehicle, Self-Propelled Artillery, Cargo Truck and Supply Truck use
 editable component kits, real glTF geometry, three distinct LODs and dedicated
 damaged/critical/wreck meshes. Stable primary/LOD/material/collision/symbol IDs,
 authoritative scales, movement, hitboxes, navigation, cargo and supply rules remain.
 Human art, live interaction and sustained native performance acceptance are pending.
+
+<details>
+<summary>On this page</summary>
+
+- [Integration and source ownership](#integration-and-source-ownership)
+- [Dimensions and role geometry](#dimensions-and-role-geometry)
+- [Sockets, states and rigid motion](#sockets-states-and-rigid-motion)
+- [Reference and qualification method](#reference-and-qualification-method)
+- [Synchronization with infantry and battlefield production](#synchronization-with-infantry-and-battlefield-production)
+- [Final validation](#final-validation)
+  - [Matched High/1080p timings](#matched-high1080p-timings)
+  - [Repeated-unit resource limits](#repeated-unit-resource-limits)
+  - [Original native review images](#original-native-review-images)
+- [Reproduction and remaining acceptance](#reproduction-and-remaining-acceptance)
+- [Native logistics truck masters](#native-logistics-truck-masters)
+
+</details>
 
 ## Integration and source ownership
 

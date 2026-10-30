@@ -1,5 +1,20 @@
 # Logistics navigation resilience and CPU qualification
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and provenance](#scope-and-provenance)
+- [Corrected movement intent and arrival](#corrected-movement-intent-and-arrival)
+- [Behavior-preserving CPU changes](#behavior-preserving-cpu-changes)
+- [Executed qualification](#executed-qualification)
+- [Paired performance observations](#paired-performance-observations)
+- [Reproduction and integration boundary](#reproduction-and-integration-boundary)
+- [Remaining movement work, not implemented here](#remaining-movement-work-not-implemented-here)
+
+</details>
+
 ## Scope and provenance
 
 Review started from master `42ac542f3c7d8b2d793d8dffd6930f772ad95186`
@@ -70,8 +85,9 @@ were relaxed to produce the measurements.
 ## Executed qualification
 
 [Paired qualification run 40134443631](https://github.com/DaveBeusing/Forgeline/actions/runs/40134443631)
-used Ubuntu 24.04 X64, .NET SDK 10.0.402 and runtime 10.0.13. The repository's
-10.0.401 SDK selection permits latest-patch roll-forward.
+used Ubuntu 24.04 X64, .NET SDK 10.0.402 and runtime 10.0.13. That qualification source selected SDK 10.0.401 with latest-patch roll-forward.
+Current checkouts instead use the exact SDK and roll-forward policy in
+[global.json](../global.json).
 
 The checkout was `fb294efddc753c5cf375eaec020b7d4afea8fb35`. It included the new
 tests and probe but the original production sources. Baseline binaries were

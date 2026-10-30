@@ -1,5 +1,28 @@
 # Power Networks
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Power units](#power-units)
+- [Logical network membership](#logical-network-membership)
+- [Generators](#generators)
+- [Consumers](#consumers)
+- [Operational states](#operational-states)
+- [Allocation order](#allocation-order)
+- [Shortage behavior](#shortage-behavior)
+- [Network diagnostics](#network-diagnostics)
+- [Data-driven power profiles](#data-driven-power-profiles)
+- [Extraction integration](#extraction-integration)
+- [Production and construction integration](#production-and-construction-integration)
+- [Deterministic-friendly behavior](#deterministic-friendly-behavior)
+- [Scale validation](#scale-validation)
+- [Deferred physical-grid systems](#deferred-physical-grid-systems)
+
+</details>
+
 ## Purpose
 
 FORGELINE power is authoritative continuous infrastructure capacity. It is not an inventory resource and it is not accumulated as stored energy in the initial implementation.

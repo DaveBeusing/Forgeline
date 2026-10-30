@@ -1,5 +1,25 @@
 # Operations Rules and Recovery
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and ownership](#scope-and-ownership)
+- [Command and rule lifecycle](#command-and-rule-lifecycle)
+- [Read models and diagnostics](#read-models-and-diagnostics)
+- [Save, restore and replay](#save-restore-and-replay)
+- [Qualification](#qualification)
+- [Player controls](#player-controls)
+- [Feedback and manual precedence](#feedback-and-manual-precedence)
+- [Executable UI recovery coverage](#executable-ui-recovery-coverage)
+- [Session-local stock and production templates](#session-local-stock-and-production-templates)
+  - [Deliberate application](#deliberate-application)
+  - [Input, stale state and results](#input-stale-state-and-results)
+  - [Delivery and manual acceptance](#delivery-and-manual-acceptance)
+
+</details>
+
 ## Scope and ownership
 
 V1 operations rules are opt-in, player-owned commands for an explicitly identified processing facility. They do not replace production, distribution, cargo fleets, vehicle queues, power allocation, or movement. Each rule has an owner, a stable numeric ID, and one generation-aware facility ID. Operations rules remain separate per-facility rules. The session-local policy-template controls below offer explicit multi-facility stock/production application through ordinary commands, without inferring global ownership or resource transfer.

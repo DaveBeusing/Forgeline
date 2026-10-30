@@ -1,5 +1,26 @@
 # Logistics Network and Routing
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Network Model](#network-model)
+- [Transport Edges](#transport-edges)
+- [Route Cost Policy](#route-cost-policy)
+- [Reachability and Route Search](#reachability-and-route-search)
+- [Availability and Infrastructure Disruption](#availability-and-infrastructure-disruption)
+- [Versioning, Invalidation, and Caching](#versioning-invalidation-and-caching)
+- [Economic Building Registration](#economic-building-registration)
+- [Diagnostics](#diagnostics)
+- [Performance](#performance)
+- [Validation Coverage](#validation-coverage)
+- [Current Boundary](#current-boundary)
+- [Planned conveyor integration boundary](#planned-conveyor-integration-boundary)
+
+</details>
+
 ## Purpose
 
 FORGELINE logistics routing is an authoritative graph model for strategic cargo connectivity between economic locations. It is deliberately separate from low-level unit navigation: the logistics graph decides which economic nodes and transport links form a valid transport route, while physical transport execution may later use the navigation subsystem to move vehicles between the route's node positions.

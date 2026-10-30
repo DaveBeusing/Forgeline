@@ -1,5 +1,7 @@
 # PR Versioning
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 FORGELINE increments the tracked PATCH exactly once per pull request.
 This repository policy supersedes the automatic preview/RC allocation and
 publication mapping introduced with Unified Versioning Standard 1.0.

@@ -1,5 +1,31 @@
 # Industrial Production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Stable Resources and Recipes](#stable-resources-and-recipes)
+- [Processing Facilities](#processing-facilities)
+- [Automatic raw-material processing in matches](#automatic-raw-material-processing-in-matches)
+- [Visible finished-material stock](#visible-finished-material-stock)
+- [Fixed-Tick Lifecycle](#fixed-tick-lifecycle)
+- [Queue and Priority Semantics](#queue-and-priority-semantics)
+- [Desired-Stock Automation](#desired-stock-automation)
+- [Pause and Cancellation](#pause-and-cancellation)
+- [Blocking and Status Semantics](#blocking-and-status-semantics)
+- [Diagnostics and Read Models](#diagnostics-and-read-models)
+- [Determinism and Resource Conservation](#determinism-and-resource-conservation)
+- [Headless Validation](#headless-validation)
+- [Performance Validation](#performance-validation)
+- [Human Player Controls](#human-player-controls)
+- [Planned local conveyor integration](#planned-local-conveyor-integration)
+- [Production and logistics diagnosis](#production-and-logistics-diagnosis)
+- [Optional operations rules](#optional-operations-rules)
+
+</details>
+
 ## Purpose
 
 FORGELINE industrial production converts extracted raw resources into strategic intermediate resources through authoritative fixed-tick simulation.
@@ -211,7 +237,6 @@ Regression coverage includes normal production, missing input, missing power, bl
 `ProductionBenchmarks` exercises 100, 1,000, and 5,000 simultaneously active processing facilities using the real fixed-tick production and power systems.
 
 Benchmark timing remains observational and is not a hard CI threshold.
-
 
 ## Human Player Controls
 

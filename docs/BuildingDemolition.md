@@ -1,5 +1,7 @@
 # Building demolition
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Players may select their own completed buildings or construction sites and press
 **Delete** (rebindable under gameplay controls). The action is available with the
 selected building's radial ring open, but is ignored while a modal dialog, key

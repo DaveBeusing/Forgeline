@@ -1,5 +1,7 @@
 # Graphical Production and Operations Interface
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Integrate production artwork into the live build/production cards, queues, logistics/operations views, current technology presentation and actionable alerts. Preserve physical economy and command semantics. Complete implementation, tests, evidence and PR handling through the existing GitHub connection without changing working environment.
@@ -49,7 +51,7 @@ Extend existing operations, action-panel, production, actionable-alert and Clien
 
 ## Build and CI requirements
 
-Use current pinned SDK/Microsoft.Testing.Platform. Restore/build Release, validate references, compile runtime assets, run targeted tests and then `dotnet test --solution ForgeLine.sln --configuration Release --no-build` plus complete required CI. Capture current named `QueueBlocked`, `Technology`, `ResourcePressure`, `LowPower`, `SupplyCritical` and dock-result states through existing reference tooling. A bounded headless production/logistics scenario must retain authoritative outcomes. Do not remove the natural terminal-match gate or suppress existing GPU lifecycle failures.
+Use current pinned SDK/Microsoft.Testing.Platform. Restore/build Release, validate references, compile runtime assets, run targeted tests and then `dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1` plus complete required CI. Capture current named `QueueBlocked`, `Technology`, `ResourcePressure`, `LowPower`, `SupplyCritical` and dock-result states through existing reference tooling. A bounded headless production/logistics scenario must retain authoritative outcomes. Do not remove the natural terminal-match gate or suppress existing GPU lifecycle failures.
 
 ## Branch and pull request strategy
 

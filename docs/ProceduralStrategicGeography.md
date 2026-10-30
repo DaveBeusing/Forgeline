@@ -1,5 +1,7 @@
 # Procedural strategic geography
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 `ProceduralStrategicLayoutGenerator.Generate` is an offline, headless Game API.
 It consumes a completed `TerrainWorld` and the World generation recipe; footprint
 admission uses `ITerrainQuery`. It returns a complete qualified layout or ordered

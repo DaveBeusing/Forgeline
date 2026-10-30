@@ -1,5 +1,7 @@
 # Command Core Blender production source
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Measured results and current promotion gates are recorded in
 [CommandCoreBlenderQualification.md](CommandCoreBlenderQualification.md).
 

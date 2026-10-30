@@ -1,5 +1,32 @@
 # RTS Camera and Input
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Coordinate Convention](#coordinate-convention)
+- [Default Controls](#default-controls)
+- [Raw Input](#raw-input)
+- [Input State and Action Mapping](#input-state-and-action-mapping)
+- [Minimap camera and command input](#minimap-camera-and-command-input)
+- [HUD input precedence](#hud-input-precedence)
+- [Camera State](#camera-state)
+- [Edge Scrolling](#edge-scrolling)
+- [Projection and Picking APIs](#projection-and-picking-apis)
+- [Diagnostics](#diagnostics)
+- [Terrain Validation Scene](#terrain-validation-scene)
+- [Navigation Regression Coverage](#navigation-regression-coverage)
+- [Adaptive frontend geometry](#adaptive-frontend-geometry)
+- [Gameplay usability](#gameplay-usability)
+- [Native tactical pointer and map footprint](#native-tactical-pointer-and-map-footprint)
+- [Nonmodal gameplay menus](#nonmodal-gameplay-menus)
+- [Minimap hover expansion (current implementation)](#minimap-hover-expansion-current-implementation)
+- [Contextual Q/E rotation and radial paging](#contextual-qe-rotation-and-radial-paging)
+
+</details>
+
 ## Purpose
 
 The RTS camera/input foundation separates native device events, semantic action mapping, presentation camera behavior, and simulation command generation.
@@ -73,7 +100,6 @@ These thresholds require visual qualification before production acceptance.
 Control groups retain Ctrl+digit assignment, digit recall and Ctrl+Shift+digit clearing. Two separate unmodified presses of the same assigned digit within 350 ms recall and then focus the current visible owned surviving members' mean position. The interval is constructor-configurable for tests. Holds, modifiers, another slot, empty groups, session replacement, help/pause and display/focus transitions break the sequence. Short key presses completed between frames are retained once; operating-system repeats are ignored.
 
 Each successful saved-group recall opens exactly one [shared action ring](GroupActionMenus.md), even if the same members were already selected. Current selection, saved slots and simulation-owned movement groups stay separate. Lost generations/authority are pruned independently of camera visibility; a partly visible group keeps full command membership and uses a marked visible anchor. Outside right-click closes the ring and submits the existing whole-selection move once.
-
 
 Focus cancels held world/minimap gestures and shows a brief nonblocking camera message. Viewport, DPI and UI-scale changes suppress held input until release and cancel placement, targeting and double-click/double-tap state. Native interactive monitor transitions remain manual qualification.
 
@@ -253,19 +279,9 @@ The integrated controller journey covers keyboard/drag pan, zoom bounds, unit/bu
 
 ## Adaptive frontend geometry
 
-Frontend menus, setup/load/settings, loading, controls and pause use the same immutable
-`FrontendGeometry` value for drawing and hit testing. The platform owner resolves physical
-client-pixel bounds using actual window DPI and current UI scale, then publishes that value
-with the surface. The render thread never reads mutable window state. A stale surface after
-resize waits for matching geometry; zero-size/minimized surfaces suspend rendering.
+Frontend drawing, hit testing, DPI and live-resize behavior share the client-owned geometry contract. See [Windows Client](WindowsClient.md) for the full lifecycle and layout rules.
 
-Up/Down and the mouse wheel scroll long controls/credits pages, and navigate the existing
-settings/save lists. Focus remains visible as row capacity changes. Enter, Escape, Back and
-existing actions retain their meanings. Stationary mouse position does not override keyboard
-navigation. Disabled/absent commands and static setup labels never activate adjustments.
-Resize, DPI/scale changes, focus loss and modal ownership changes suppress held input until
-release, clear hover/pressed state and preserve model focus. Closing help/pause still consumes
-the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
+For frontend scrolling, focus retention and Enter/Escape/Back behavior, see [Windows Client](WindowsClient.md).
 
 See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).
 
@@ -279,7 +295,6 @@ Gameplay overrides using them are dropped during settings load; affected camera
 slots receive available ordinary default keys without resetting other settings.
 F10/F11 remain player overlay/minimap keys. Windows modifier decoding and
 press/release suppression retain their normal ownership.
-
 
 Enabled action cards activate on the first click. Clicking a building card
 starts its placement preview; the next world click places it through the
@@ -327,12 +342,7 @@ priority. Focus loss, display/layout, selection identity and session transitions
 clear transient ownership and cancel retained gestures. Dock keyboard focus applies
 only over its controls, leaving free-world camera input available.
 
-Later context/ring menus register `ITransientHudMenu` with this coordinator (four
-bounded registration slots). `ContainsControl` reports actual visible input regions,
-including disabled controls, excluding centers, gaps and decorative connectors.
-`Dismiss` must clear the complete nested stack, hover, press, tooltips and focus
-idempotently. Closed or visually fading menus return `IsOpen == false`; their
-activation path still requires a fresh gesture. Registration lasts for one match.
+Transient menus use the bounded coordinator and actual visible input regions. See [input ownership and qualification](GameplayInputAccessibilityAndQualification.md) for registration, dismissal and event-ownership rules.
 
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.

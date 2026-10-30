@@ -1,5 +1,7 @@
 # Battlefield effect catalog
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Ownership and source audit
 
 The completed-tick extractor is the sole event consumer. Renderers consume its

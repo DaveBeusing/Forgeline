@@ -1,5 +1,29 @@
 # Formation Movement and Group Orders
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Presentation controls](#presentation-controls)
+- [Command Boundary](#command-boundary)
+- [Formation Templates](#formation-templates)
+- [Stable Slot Assignment](#stable-slot-assignment)
+- [Shared Navigation](#shared-navigation)
+- [Locomotion Ownership](#locomotion-ownership)
+- [Speed Harmonization](#speed-harmonization)
+- [Choke-Point Handling](#choke-point-handling)
+- [Arrival and Member Removal](#arrival-and-member-removal)
+- [Diagnostics](#diagnostics)
+- [Debug Visualization](#debug-visualization)
+- [Validation](#validation)
+- [Player combat groups](#player-combat-groups)
+- [Current Boundaries](#current-boundaries)
+- [Current-selection group card](#current-selection-group-card)
+
+</details>
+
 ## Purpose
 
 Formation movement turns a multi-unit move command into one simulation-owned movement group with shared strategic navigation and formation-relative local locomotion targets.

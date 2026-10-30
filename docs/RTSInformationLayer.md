@@ -1,5 +1,36 @@
 # RTS Information Layer
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Stable UI asset convention](#stable-ui-asset-convention)
+- [Resource icons](#resource-icons)
+- [Unit and building roles](#unit-and-building-roles)
+- [Commands and cursors](#commands-and-cursors)
+- [Player action dock](#player-action-dock)
+- [Combat group overview](#combat-group-overview)
+- [Selection and world markers](#selection-and-world-markers)
+- [Selection inspector](#selection-inspector)
+- [Health and supply information](#health-and-supply-information)
+- [Production status and notifications](#production-status-and-notifications)
+- [Minimap model](#minimap-model)
+- [Minimap interaction](#minimap-interaction)
+- [Fog of war](#fog-of-war)
+- [Strategic overlays](#strategic-overlays)
+- [Development diagnostic overlays](#development-diagnostic-overlays)
+- [Production HUD visual language and readability](#production-hud-visual-language-and-readability)
+- [Runtime integration](#runtime-integration)
+- [Validation](#validation)
+- [Current boundaries](#current-boundaries)
+- [Technology progression view](#technology-progression-view)
+- [Strategic logistics capacity](#strategic-logistics-capacity)
+- [Battlefield status detail](#battlefield-status-detail)
+
+</details>
+
 ## Purpose
 
 FORGELINE's initial RTS information layer communicates selection, commands, resource and role identity, supply/readiness, battlefield intelligence, minimap state, and strategic overlays without owning gameplay state.
@@ -106,6 +137,11 @@ The cursor set includes:
 
 ## Player action dock
 
+Current commands use the existing single/group action rings, including available global shortcut actions. The seven domain names remain meaningful without restoring a rectangular dock or global mode bar. [HUD consolidation](HudSurfaceConsolidation.md) owns live surface parity; the former dock mapping is retained below as historical context.
+
+<details>
+<summary>Historical rectangular surface and copied-state contract</summary>
+
 The production command surface uses the existing semantic icon catalog but exposes only actions backed by current gameplay/read-model contracts. The seven mode buttons are Build, Process, Units, Logistics, Supply, Combat, and Technology. Semantic Patrol or Repair icons remain available to future UI work, but the dock does not manufacture unsupported gameplay behavior from those assets.
 
 Cards and footer controls render enabled/disabled state from the same model used by pointer/keyboard dispatch. When the immutable action snapshot already knows that a build lacks materials, a recipe or unit lacks inputs, an Attack lacks an identified target, artillery has no ammunition, or there is no active fire mission to cancel, the control is visibly disabled with an explicit reason instead of silently failing.
@@ -113,6 +149,8 @@ Cards and footer controls render enabled/disabled state from the same model used
 Build, processing, unit-production, logistics, supply, and combat views use only existing copied read-model values: costs and captured availability; queue/progress/block state; rally presence; stock thresholds/priority/distribution/bottlenecks; cargo lifecycle/wait/failure; supply thresholds/provider/priority; tactical eligibility/order/target counts; and artillery ammunition/range/mission state. Resolved acceptance/rejection remains command feedback, not renderer-owned state.
 
 Pointer hit regions come from the shared DPI-aware ActionDock layout. Cards select context, footer buttons perform the corresponding action/edit operation, and the entire open dock captures pointer input before the world interaction layer.
+
+</details>
 
 ## Combat group overview
 
@@ -148,11 +186,18 @@ Picking, hover, selection markers, and renderer culling share the same presentat
 
 ## Selection inspector
 
+Current selection/status details use the shared read-only tooltip and covered group summaries. [Graphical battlefield HUD](GraphicalBattlefieldHud.md) describes current rendering and ownership. The earlier dedicated inspector mapping below is historical.
+
+<details>
+<summary>Historical rectangular surface and copied-state contract</summary>
+
 The production selection inspector is a dedicated gameplay HUD surface, separate from world-space selection markers and from engineering diagnostics. Its header uses the stable semantic role icon for a common unit/building identity when available, plus the copied display name and authorized selection count.
 
 For exactly one selected owned entity, the inspector may render Health, supply/Fuel/Ammunition, readiness, power, and current work/progress/block reason from the copied player read model. For multiple entities it renders only count and semantically safe common/generic identity; it does not infer group Health, readiness, supply, or work from the first selected entity.
 
 Selection disappearance requires no presentation history cleanup. If filtering removes the entity because it is destroyed, stale, hidden from the authorized selection path, foreign-owned, or the session/selection is cleared, the following snapshot contains an empty or changed selection summary and the inspector redraws from that state.
+
+</details>
 
 ## Health and supply information
 
@@ -340,16 +385,13 @@ Blocked causes are carried semantically rather than inferred from color. Current
 
 The initial capability hook is exercised by Combat Engineer production, which requires the Field Engineering capability unlocked by Industrial Standardization. Unit-production validation checks the authoritative capability state independently of the HUD.
 
-
-
 Selection marquee and short-lived order markers follow the frame-owned interaction contract in [Selection and Command Interaction](SelectionAndCommandInteraction.md). Player world lines use bounded reusable screen-expanded geometry with soft alpha edges; the marquee uses clipped fill plus contrast outlines. These visuals do not certify authoritative command acceptance.
 
 The information renderer rebuilds minimap symbols, selection/group membership and fog cells in render-owner scratch collections. Each update clears prior contents while retaining capacity, including across session replacement. Borrowed frame lists are consumed immediately by that renderer and never published. The public `RtsMinimapModelBuilder.Build` still returns an owned immutable copy for external callers; both paths use the same mapping rules. See [Interaction qualification](InteractionQualification.md) for state/display coverage and the warm allocation guard.
 
-
 ## Strategic logistics capacity
 
-The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
+See [Strategic logistics capacity](StrategicLogisticsCapacity.md) for LOG filtering, authorized Operations focus and the distinct meanings of output, buffers and scheduled load.
 
 ## Battlefield status detail
 

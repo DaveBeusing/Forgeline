@@ -1,5 +1,7 @@
 # Guided strategy practice
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Choose an optional **Practice** scenario in New Game. Central Divide remains the first selection and starts normal skirmish immediately. Practice uses the registered compiled Central Divide terrain and current assets, with two human participants and no strategic opponent automation.
 
 | Scenario key | Completed-tick outcomes |

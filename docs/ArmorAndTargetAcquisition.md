@@ -1,5 +1,36 @@
 # Armor and Target Acquisition
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Ownership](#ownership)
+- [Armor Profiles](#armor-profiles)
+- [Facing Classification](#facing-classification)
+- [Weapon Effectiveness](#weapon-effectiveness)
+- [Armor Damage Resolution](#armor-damage-resolution)
+- [Target Acquisition Phase](#target-acquisition-phase)
+- [Target Validity](#target-validity)
+- [Deterministic Target Priority](#deterministic-target-priority)
+- [Automatic Targeting](#automatic-targeting)
+- [Fire Policies](#fire-policies)
+  - [Hold Fire](#hold-fire)
+  - [Return Fire](#return-fire)
+  - [Fire At Will](#fire-at-will)
+- [Intelligence Availability Hook](#intelligence-availability-hook)
+- [Terrain-Aware Line of Fire](#terrain-aware-line-of-fire)
+- [Projectile Target Validity](#projectile-target-validity)
+- [Diagnostics](#diagnostics)
+- [Debug Visualization](#debug-visualization)
+- [Correctness Coverage](#correctness-coverage)
+- [Performance Coverage](#performance-coverage)
+- [Extension Boundary](#extension-boundary)
+- [Authored infantry cover](#authored-infantry-cover)
+
+</details>
+
 ## Purpose
 
 FORGELINE directional armor and target acquisition extend the authoritative combat execution layer without creating a parallel combat authority.
@@ -277,7 +308,6 @@ Later systems may add:
 - veterancy.
 
 Those systems must extend these armor, targeting, weapon, Health, and lifecycle contracts rather than replace them with parallel combat state.
-
 
 See [Battlefield Intelligence](BattlefieldIntelligence.md) for the faction visibility store, sensor semantics, Detected/Identified lifecycle, last-known contacts, presentation filtering, and the concrete intelligence target-availability policy.
 

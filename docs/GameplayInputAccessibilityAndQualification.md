@@ -1,8 +1,24 @@
 # Gameplay Input and Visual Qualification
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Own single selections use [world anchored action rings](WorldAnchoredActionMenus.md). Click/release selects an object and opens categories. Existing category keys reopen its ring. The rectangular mode bar and inspector are removed. Click an item to act; use Parameters and Next item for pre-activation editing, queue cancellation and existing setting shortcuts. The inner hole, empty sectors and gaps remain world input. Outside click and Escape dismiss centrally; targeting uses the next world click once. Group tools use the same ring, and copied selection/group status appears in its read-only tooltip.
 
 Gameplay shortcuts share `GameplayBindingRegistry` in the input boundary. The registry captures immutable keys, captions and cached English fallback prompts; the platform now recognizes every Latin letter. Camera mapping stays in the existing `RtsCameraBindings` contract and is consulted for conflicts. Selection, navigation and commands still use the existing presentation controllers and authoritative request gateway.
+
+<details>
+<summary>On this page</summary>
+
+- [Editing and migration](#editing-and-migration)
+- [Prompts and feedback](#prompts-and-feedback)
+- [Automated fixtures and profiling](#automated-fixtures-and-profiling)
+- [Native and manual acceptance](#native-and-manual-acceptance)
+- [Nonmodal gameplay menus](#nonmodal-gameplay-menus)
+- [Logistics setup](#logistics-setup)
+- [Contextual keyboard ownership](#contextual-keyboard-ownership)
+- [Direct tactical shortcuts and command acknowledgement](#direct-tactical-shortcuts-and-command-acknowledgement)
+
+</details>
 
 ## Editing and migration
 
@@ -71,11 +87,9 @@ activation path still requires a fresh gesture. Registration lasts for one match
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.
 
-
 ## Logistics setup
 
 The existing LOGISTICS navigation, activation and decrease/increase bindings also operate INPUTS cards and USE INPUTS. Preview prepares additional-step thresholds; APPLY POLICY submits each resource separately. No new fixed key is introduced. Ring, mouse and remapped keyboard paths retain the shared selection/session guards. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
-
 
 Current removed-surface layout, interaction and native evidence is recorded in
 [HUD surface consolidation](HudSurfaceConsolidation.md#integrated-qualification-19-october-2026).

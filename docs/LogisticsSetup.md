@@ -1,6 +1,27 @@
 # Logistics setup and operation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Constructing a building spends Command Core construction stock. It does not fill the new building's local production inventory. Cargo Trucks replenish building inputs through regional distribution; Supply Trucks carry Fuel/Ammunition for field recipients and use a separate drive tank. A Supply Truck is not an available regional Cargo Truck.
+
+<details>
+<summary>On this page</summary>
+
+- [World loading and holding visualization](#world-loading-and-holding-visualization)
+- [Optional selected-facility recovery rules](#optional-selected-facility-recovery-rules)
+- [First production chain](#first-production-chain)
+- [Command Core automatic refill](#command-core-automatic-refill)
+- [Manual quantity editing for other facilities](#manual-quantity-editing-for-other-facilities)
+- [Policy meanings](#policy-meanings)
+- [Read the actual material path](#read-the-actual-material-path)
+- [Verification](#verification)
+- [Fifty-unit policy editing and current transport orders](#fifty-unit-policy-editing-and-current-transport-orders)
+- [Cargo fleet capacity diagnosis](#cargo-fleet-capacity-diagnosis)
+- [Reading local demand and transport progress](#reading-local-demand-and-transport-progress)
+- [Optional operations rules](#optional-operations-rules)
+- [Reusing settings with policy templates](#reusing-settings-with-policy-templates)
+
+</details>
 
 ## World loading and holding visualization
 

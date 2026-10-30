@@ -1,5 +1,7 @@
 # Tactical Map, Cursors and World Indicators
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Integrate the Directorate tactical artwork into the live minimap, strategic legends, cursors, selection/target/order indicators and world-space operational displays while preserving actual map geometry and faction-limited intelligence. Complete implementation, tests, evidence and PR handling through the existing GitHub connection without changing working environment.

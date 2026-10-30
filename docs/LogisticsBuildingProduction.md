@@ -1,5 +1,7 @@
 # Directorate logistics building production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The current [saved Blender workflow](LogisticsBlenderProduction.md) preserves
 this integrated artwork in three editable native masters and adopts their
 lossless GLB exports through the same LOD/state IDs. The component recipes and
@@ -12,6 +14,29 @@ actual glTF meshes, three dedicated LODs and family construction/status/wreck
 geometry. Their public identities, inventory capacities, logistics topology,
 vehicle movement, collision/navigation footprints and shared PBR masters are retained.
 Human art, live interaction and sustained native performance acceptance remain pending.
+
+<details>
+<summary>On this page</summary>
+
+- [Reviewed integration state and scope](#reviewed-integration-state-and-scope)
+- [Editable sources and modular reuse](#editable-sources-and-modular-reuse)
+- [Dimensions, silhouette and terrain interface](#dimensions-silhouette-and-terrain-interface)
+- [LOD, material and collision contracts](#lod-material-and-collision-contracts)
+- [States and sockets](#states-and-sockets)
+- [Reference scenes and real traffic](#reference-scenes-and-real-traffic)
+- [Qualification and reproduction](#qualification-and-reproduction)
+- [Original native comparisons](#original-native-comparisons)
+  - [StorageDepot, 120 m](#storagedepot-120-m)
+  - [SupplyDepot, 120 m](#supplydepot-120-m)
+  - [LogisticsHub, 120 m](#logisticshub-120-m)
+  - [Logistics Hub, 1000 m](#logistics-hub-1000-m)
+  - [Real loading snapshot, 420 m](#real-loading-snapshot-420-m)
+  - [Real transit snapshot, 420 m](#real-transit-snapshot-420-m)
+  - [Real unloading snapshot, 420 m](#real-unloading-snapshot-420-m)
+  - [Real sustained snapshot, 420 m](#real-sustained-snapshot-420-m)
+- [Package verification](#package-verification)
+
+</details>
 
 ## Reviewed integration state and scope
 

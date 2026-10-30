@@ -1,9 +1,22 @@
 # Seeded terrain landforms
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 `ProceduralTerrainFactory` creates a separate headless `TerrainWorld` from a
 `ProceduralTerrainRecipe`. It does not participate in scenario loading or change
 the version 1 authored Central Divide and Split Basin recipes, map artifacts,
 savegames or replays. Callers consume the existing `ITerrainQuery` interface.
+
+<details>
+<summary>On this page</summary>
+
+- [Inputs and evaluation](#inputs-and-evaluation)
+- [Parameter and allocation limits](#parameter-and-allocation-limits)
+- [Diagnostics and command](#diagnostics-and-command)
+- [Qualification](#qualification)
+- [Current integration and required CI](#current-integration-and-required-ci)
+
+</details>
 
 ## Inputs and evaluation
 

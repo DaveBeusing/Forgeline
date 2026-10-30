@@ -1,5 +1,7 @@
 # Asset Startup Diagnostics
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Asset compilation is an explicit authoring/build step. The client consumes compiled runtime assets and never starts the compiler. A missing or invalid manifest produces a visible startup failure. Compile assets using the command below before launching a source checkout; packaged clients require no source files or compiler.
 
 ## Live compiler records

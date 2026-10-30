@@ -1,5 +1,22 @@
 # HUD surface consolidation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Integration baseline](#integration-baseline)
+- [Functional parity contract](#functional-parity-contract)
+- [Early checkpoint (historical)](#early-checkpoint-historical)
+- [Implemented composition and checks](#implemented-composition-and-checks)
+- [Integrated qualification, 19 October 2026](#integrated-qualification-19-october-2026)
+  - [Native method and coverage](#native-method-and-coverage)
+  - [Inspection and corrections](#inspection-and-corrections)
+  - [Reproduction and remaining acceptance](#reproduction-and-remaining-acceptance)
+  - [CI viewport regression](#ci-viewport-regression)
+
+</details>
+
 ## Integration baseline
 
 Initial source baseline: `master` `d4c7b62077c98500d6309cdd6c6dbf5e6bd6490c` (0.1.406).
@@ -75,7 +92,6 @@ The first PR CI build exposed a retained benchmark call to the deleted inspector
 pointer adapter (`CombatGroupCardController.Update`, CS1061). The benchmark now
 records the actual retained ring status and measures summary rebuild separately.
 No budget or assertion was weakened. Failed local/CI evidence remains historical.
-
 
 ## Integrated qualification, 19 October 2026
 
@@ -200,7 +216,6 @@ bright/dark terrain and sustained target-refresh load. Physical DPI 96/192 monit
 moves, human motion/readability/accessibility approval and that live playthrough
 have not been performed. The PR remains draft for these explicit acceptance gates;
 no merge/release approval is implied by the automated/native results.
-
 
 ### CI viewport regression
 

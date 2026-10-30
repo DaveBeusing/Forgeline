@@ -1,5 +1,33 @@
 # Combat Execution
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Ownership](#ownership)
+- [Weapon Definitions](#weapon-definitions)
+- [Weapon State and Fire Eligibility](#weapon-state-and-fire-eligibility)
+- [Ammunition](#ammunition)
+- [Hitscan](#hitscan)
+- [Physical Projectiles](#physical-projectiles)
+- [Damage Resolution](#damage-resolution)
+- [Destruction and Lifecycle](#destruction-and-lifecycle)
+  - [Completed Buildings and Economic Ownership](#completed-buildings-and-economic-ownership)
+- [Industrial Regression Evidence](#industrial-regression-evidence)
+- [Combat Events](#combat-events)
+- [Diagnostics and Debug Visualization](#diagnostics-and-debug-visualization)
+- [Fixed-Tick Ordering](#fixed-tick-ordering)
+- [Deterministic-Friendly Behavior](#deterministic-friendly-behavior)
+- [Correctness Coverage](#correctness-coverage)
+- [Performance Coverage](#performance-coverage)
+- [Extension Boundary](#extension-boundary)
+- [Indirect Fire Extension](#indirect-fire-extension)
+- [Tactical Combat Orders](#tactical-combat-orders)
+
+</details>
+
 ## Purpose
 
 FORGELINE combat execution is simulation-authoritative. Weapon cadence, Ammunition consumption, projectile travel, hit resolution, Health, damage, and destruction are decided entirely by fixed-tick simulation state.
@@ -334,14 +362,11 @@ Later combat work may add realistic ballistic penetration, aiming, accuracy, gui
 
 Those systems should extend the existing weapon, projectile, Health, damage, event, and lifecycle foundations rather than create parallel combat authorities.
 
-
 See [Armor and Target Acquisition](ArmorAndTargetAcquisition.md) for the authoritative directional-armor, penetration, target-class, automatic-acquisition, priority, fire-policy, intelligence-availability, and line-of-fire contracts.
-
 
 ## Indirect Fire Extension
 
 Artillery uses a separate `ArtilleryWeaponCatalog` and coordinate-based mission lifecycle while reusing `CombatRuntime`, `AmmunitionState`, `CombatDamageResolutionSystem`, Health, armor, combat events, and entity lifecycle. Indirect area damage enters the same pending-damage path as direct fire, and downward impacts resolve against Top armor. See [Artillery and Indirect Fire](ArtilleryAndIndirectFire.md).
-
 
 ## Tactical Combat Orders
 

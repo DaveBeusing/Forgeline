@@ -1,9 +1,23 @@
 # Developer session controls
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 `ClientSimulationHost` is the sole simulation owner. Its real
 `IDeveloperSessionController` is exposed as `host.DeveloperSessions` in Developer
 builds. Public builds exclude `DeveloperTools/Implementation`; they expose an
 unavailable Foundation provider and cannot activate the executor.
+
+<details>
+<summary>On this page</summary>
+
+- [Composition and authorization](#composition-and-authorization)
+- [Pause ownership and menu handoff](#pause-ownership-and-menu-handoff)
+- [Steps and lifecycle recording](#steps-and-lifecycle-recording)
+- [Host pacing and copied status](#host-pacing-and-copied-status)
+- [Validation scope](#validation-scope)
+  - [Scoped acceptance evidence](#scoped-acceptance-evidence)
+
+</details>
 
 ## Composition and authorization
 

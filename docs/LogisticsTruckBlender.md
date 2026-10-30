@@ -1,9 +1,22 @@
 # Cargo and Supply truck Blender masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The existing Cargo and Supply trucks already contain distinct payload geometry,
 three LODs, damage/critical/wreck geometry, shared PBR surfaces and eight articulated
 wheels. The production gap is a persistent native Blender master for each family.
 Preserve that artwork and expose its existing component hierarchy for editing.
+
+<details>
+<summary>On this page</summary>
+
+- [Sources and runtime ownership](#sources-and-runtime-ownership)
+- [Supported edits and export](#supported-edits-and-export)
+- [Native qualification boundaries](#native-qualification-boundaries)
+- [Audit and integration gate](#audit-and-integration-gate)
+- [Observed production qualification](#observed-production-qualification)
+
+</details>
 
 ## Sources and runtime ownership
 

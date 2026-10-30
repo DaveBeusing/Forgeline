@@ -1,5 +1,7 @@
 # Runtime visual asset compatibility
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The native client and generated runtime assets must be updated together. Runtime container integrity proves that a catalog is internally consistent; it does not prove that the catalog contains IDs selected by a newer renderer.
 
 ## Conveyor and command-core incident

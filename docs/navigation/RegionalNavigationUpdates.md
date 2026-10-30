@@ -1,5 +1,30 @@
 # Regional navigation preparation
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Status and source boundary](#status-and-source-boundary)
+- [Source ownership and baseline requirements](#source-ownership-and-baseline-requirements)
+- [Change aggregation and source validation](#change-aggregation-and-source-validation)
+- [Immutable raster and connectivity preparation](#immutable-raster-and-connectivity-preparation)
+- [Work budgets and complete rebuild behavior](#work-budgets-and-complete-rebuild-behavior)
+- [Publication ordering and pending safety](#publication-ordering-and-pending-safety)
+- [Route dependency proofs](#route-dependency-proofs)
+- [Snapshot lifetime and world boundaries](#snapshot-lifetime-and-world-boundaries)
+- [State capture and restore](#state-capture-and-restore)
+- [Configuration and diagnostics](#configuration-and-diagnostics)
+- [Internal API directory](#internal-api-directory)
+  - [Coordinator and state](#coordinator-and-state)
+  - [Journal, pending checks and route proofs](#journal-pending-checks-and-route-proofs)
+  - [Layout, raster and connectivity](#layout-raster-and-connectivity)
+  - [Preparation, canonical input mapping and Game source helpers](#preparation-canonical-input-mapping-and-game-source-helpers)
+- [Required central contract and integration changes](#required-central-contract-and-integration-changes)
+- [Validation and later acceptance](#validation-and-later-acceptance)
+
+</details>
+
 ## Status and source boundary
 
 The independent internal preparation layer is implemented under `src/ForgeLine.Navigation/Regional/`, with read-only source helpers under `src/ForgeLine.Game/Navigation/WorldUpdates/`. It prepares immutable regional raster pages, capability-specific connectivity, pending hard blockers, route dependency proofs and an explicit publication boundary. Internal adapters consume the integrated canonical revision-1 input contracts. **There is no public world-update output adapter, runtime registration or delivered gameplay integration.** Existing navigation, movement, construction, demolition, destruction, conveyors, infrastructure and composition callers remain unchanged.

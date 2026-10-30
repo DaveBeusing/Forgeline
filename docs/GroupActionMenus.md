@@ -1,5 +1,7 @@
 # Group action menus
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Shared hover and group inspector details
 
 Hovered group and object sectors use the same darkened 0.30-alpha backing and a high-contrast arc constrained to the selected sector's outer edge. The read-only inspector remains visible while the group ring is used, preferring free space on the right and falling back to valid safe-area placement without taking input. Group composition, known-count averages, damage/supply and formation are still copied from the same current authorized group snapshot. Missing group/selection evidence is never inferred from render entities, and aggregate facts do not expose individual hostile metrics.

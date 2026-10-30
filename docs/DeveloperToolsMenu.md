@@ -1,5 +1,21 @@
 # Developer tools menu
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Entry and scope](#entry-and-scope)
+- [Display and requests](#display-and-requests)
+- [Targets and diagnostics](#targets-and-diagnostics)
+- [Host and adapter handoff](#host-and-adapter-handoff)
+- [Input lifetime and remaining qualification](#input-lifetime-and-remaining-qualification)
+- [Current integration and acceptance](#current-integration-and-acceptance)
+- [Historical menu-package acceptance evidence](#historical-menu-package-acceptance-evidence)
+- [Visualization checkboxes and retired shortcuts](#visualization-checkboxes-and-retired-shortcuts)
+
+</details>
+
 ## Entry and scope
 
 The live provider integration is included in master through PR #379

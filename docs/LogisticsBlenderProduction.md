@@ -1,5 +1,7 @@
 # Editable logistics Blender sources
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Storage Depot, Supply Depot and Logistics Hub already have distinct authored
 warehouses, container stacks, fuel vessels, ammunition storage, service fittings,
 gantries, construction stages and damage meshes. Preserve that integrated art

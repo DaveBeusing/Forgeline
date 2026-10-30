@@ -1,5 +1,7 @@
 # Graphical production and operations interface
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Smelters, Refineries and Electronics Plants now process local raw materials automatically while powered and able to store output. Their action rings and contextual commands omit PROCESS, and its shortcut does not open a redundant production panel. Inspect their state and configure actual material deliveries through LOGISTICS and Operations. Other production facilities retain their existing order controls. See [industrial production](IndustrialProduction.md#automatic-raw-material-processing-in-matches).
 
 The current context and alert presentation uses separate bounded rows: a left placement-status hint (current/stale/pending/invalid/materials) and the right notification stack. Both use independent 0.30-opacity backgrounds, centered single-line content and 180 ms presentation-time easing; existing notification actions continue to access Operations and complete authorized details. The previous tall placement guidance panel is not a background hit target. Onboarding controls, authoritative alert severity, lifecycle, facility actions and request boundaries remain unchanged. Qualification evidence for previous layouts remains historical; current-source DPI and physical-monitor visual review is required.
@@ -16,7 +18,19 @@ inspector, action dock and minimap; normal/larger UI scales retain a 14-pixel te
 floor. Six-row paging and existing actions remain authoritative. See the
 [qualification and original comparisons](GraphicalInterfaceQualification.md).
 
-The command dock now renders its existing domain cards from prepared production atlases. Operations rows/details and actionable alerts use the same skin. The implementation consumes copied read models; simulation rules, input geometry and command validation remain authoritative.
+The compiled production skin supports the current domain controls, Operations rows/details and actionable alerts. Earlier rectangular command-dock card descriptions remain historical; [Graphical battlefield HUD](GraphicalBattlefieldHud.md) defines the current ring-based composition. The implementation consumes copied read models; simulation rules, input geometry and command validation remain authoritative.
+
+<details>
+<summary>On this page</summary>
+
+- [Surface coverage](#surface-coverage)
+- [Artwork and render order](#artwork-and-render-order)
+- [Work state and authority](#work-state-and-authority)
+- [Bounded resources and qualification](#bounded-resources-and-qualification)
+- [Notification details](#notification-details)
+- [Contextual Operations panel transition](#contextual-operations-panel-transition)
+
+</details>
 
 ## Surface coverage
 

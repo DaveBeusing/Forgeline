@@ -1,5 +1,18 @@
 # Fuel refinery and ammunition plant Blender masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and audit](#scope-and-audit)
+- [Reproduction](#reproduction)
+- [Qualification and promotion](#qualification-and-promotion)
+- [Observed execution checkpoint](#observed-execution-checkpoint)
+- [Synchronized installed-player evidence](#synchronized-installed-player-evidence)
+
+</details>
+
 ## Scope and audit
 
 The checked integration anchor is remote `master`
@@ -33,7 +46,7 @@ does not grant production promotion.
 
 ## Reproduction
 
-Use the pinned Blender 5.2.2 x64, .NET SDK 10.0.401 and PowerShell 7.4+:
+Use the pinned Blender 5.2.2 x64, the exact .NET SDK selected by [global.json](../global.json) and PowerShell 7.4+:
 
 ```powershell
 pwsh tools/blender/Invoke-Blender.ps1 -Action Check -OutputRoot artifacts/industrial-plants/toolchain

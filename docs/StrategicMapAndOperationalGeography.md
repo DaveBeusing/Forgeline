@@ -1,8 +1,36 @@
 # Strategic Map and Operational Geography
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The offline [procedural strategic layout stage](ProceduralStrategicGeography.md)
 uses the same definition, navigation and qualification boundaries. It does not
 change the authored maps or their runtime registration.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Map Scale](#map-scale)
+- [Strategic Geography](#strategic-geography)
+- [Spawn and Base Areas](#spawn-and-base-areas)
+- [Explicit Buildable Geography](#explicit-buildable-geography)
+- [Resources and Expansion Pressure](#resources-and-expansion-pressure)
+- [Roads and Logistics](#roads-and-logistics)
+- [Strategic Crossings](#strategic-crossings)
+- [Elevation](#elevation)
+- [Hierarchical Navigation Qualification](#hierarchical-navigation-qualification)
+- [Operational Geography Qualification](#operational-geography-qualification)
+- [Compiled Map Artifact and Registration](#compiled-map-artifact-and-registration)
+- [Authoritative Terrain Recipe](#authoritative-terrain-recipe)
+- [Map Compiler](#map-compiler)
+- [Setup, CLI and Packaging](#setup-cli-and-packaging)
+- [CI](#ci)
+- [Benchmarks](#benchmarks)
+- [Architecture Boundaries](#architecture-boundaries)
+- [Revision-2 tactical areas](#revision-2-tactical-areas)
+- [Offline balance audit](#offline-balance-audit)
+
+</details>
 
 ## Purpose
 

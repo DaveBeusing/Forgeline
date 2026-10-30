@@ -1,5 +1,7 @@
 # Selection and Command Interaction
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Owned single objects and groups use the existing world anchored action rings.
 The rectangular inspector, mode bar and command dock have been removed. Shared
 published geometry drives rendering and sector hits. Item release submits once;
@@ -12,6 +14,42 @@ path. Partial capabilities show eligible/selected counts; type filters, attentio
 formation and focus preserve saved groups. Outside dismissal reaches the world
 once. Session, generation, ownership and membership changes invalidate presses.
 See [current parity and qualification](HudSurfaceConsolidation.md).
+
+<a id="hover-tooltips"></a>
+
+<details>
+<summary>On this page</summary>
+
+- [Hover tooltips and contextual information](#hover-tooltips-and-contextual-information)
+  - [Local preference persistence](#local-preference-persistence)
+  - [Port and placement information](#port-and-placement-information)
+- [Purpose](#purpose)
+- [Ownership Boundaries](#ownership-boundaries)
+- [Selectable Metadata and Identity Mapping](#selectable-metadata-and-identity-mapping)
+- [Visibility and Filtering](#visibility-and-filtering)
+- [Input Conventions](#input-conventions)
+- [Screen and Box Picking](#screen-and-box-picking)
+- [Movement Command Flow](#movement-command-flow)
+- [Stale Entity Handling](#stale-entity-handling)
+- [Production stock and Command Core refill](#production-stock-and-command-core-refill)
+- [Read-only selection status](#read-only-selection-status)
+- [Feedback and Diagnostics](#feedback-and-diagnostics)
+- [Validation](#validation)
+- [Player action rings](#player-action-rings)
+- [Tactical Targeting](#tactical-targeting)
+- [Selection and command feedback rendering](#selection-and-command-feedback-rendering)
+- [Multi-selection group controls](#multi-selection-group-controls)
+- [Operations overview](#operations-overview)
+- [Actionable alerts](#actionable-alerts)
+- [Gameplay shortcuts and interaction feedback](#gameplay-shortcuts-and-interaction-feedback)
+- [HUD content density and alert capture](#hud-content-density-and-alert-capture)
+- [Adaptive ring navigation](#adaptive-ring-navigation)
+- [Graphical world feedback](#graphical-world-feedback)
+- [Shared green drag-selection treatment](#shared-green-drag-selection-treatment)
+- [Persistent selected-unit orders](#persistent-selected-unit-orders)
+- [Queued viewport orders and patrol](#queued-viewport-orders-and-patrol)
+
+</details>
 
 ## Hover tooltips and contextual information
 

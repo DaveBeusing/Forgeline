@@ -1,5 +1,31 @@
 # Hierarchical Navigation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Ownership and Dependencies](#ownership-and-dependencies)
+- [Movement Classes](#movement-classes)
+- [Traversability Grid](#traversability-grid)
+- [Sectors and Portals](#sectors-and-portals)
+- [High-Level Search](#high-level-search)
+- [Local Refinement](#local-refinement)
+- [Request and Result Lifecycle](#request-and-result-lifecycle)
+- [Cancellation and Stale Results](#cancellation-and-stale-results)
+- [Versioning and Invalidation](#versioning-and-invalidation)
+- [Failure Behavior](#failure-behavior)
+- [Diagnostics](#diagnostics)
+- [Central Divide operational qualification](#central-divide-operational-qualification)
+- [Validation](#validation)
+- [Benchmarks](#benchmarks)
+- [Current Limitations](#current-limitations)
+- [Bounded refinement recovery](#bounded-refinement-recovery)
+- [Executed refinement measurements](#executed-refinement-measurements)
+
+</details>
+
 ## Purpose
 
 ForgeLine uses hierarchical navigation so long-distance RTS movement scales with regional structure instead of running one full-resolution global A* search for every unit.

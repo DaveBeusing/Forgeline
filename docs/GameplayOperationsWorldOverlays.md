@@ -1,5 +1,7 @@
 # Gameplay and Operations world overlays
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Operations world annotations are composed by `OperationsWorldOverlaySurface`
 through the existing `GameplayHudRenderer`. They use its native-resolution HUD
 pass, the existing primitive pipeline and shared font atlas. No Client hook,

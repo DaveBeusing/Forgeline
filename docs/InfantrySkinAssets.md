@@ -1,5 +1,7 @@
 # Infantry skeletal assets
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The two existing Directorate infantry roles use editable four-figure Blender masters in `assets/source/units/directorate/authoring/infantry`. Their LOD0 mesh IDs now reference separate `skin.directorate.*` assets and nine `animation.directorate.*` assets per role. LOD1/2, materials, collision, sockets, footprints, selection and gameplay identities retain their existing contracts. Each squad remains one simulation entity.
 
 The [infantry surface refinement](InfantrySurfaceRefinement.md) corrects the saved

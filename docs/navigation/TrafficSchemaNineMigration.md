@@ -1,5 +1,7 @@
 # Authoritative traffic schema 9
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
 Schema 8 did not describe traffic history, the original route-search start rotation or the now-retained source request on active routes. Schema 9 explicitly adds these authoritative facts and the sorted navigation.traffic domain. Runtime units also spawn at their authored suspension height, preventing an inconsistent terrain-height transition on their first precise movement. These are declared simulation-state changes, not a map-content migration.
 
 The save/replay envelope version, map revision, map bytes and scenario descriptor identity remain unchanged. Old authoritative schema 8 must not be accepted as schema 9. Recovery continues through the existing command-history reconstruction and state-hash verification.

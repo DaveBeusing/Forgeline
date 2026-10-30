@@ -1,5 +1,7 @@
 # Graphical UI and HUD Implementation
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Delivery status
 
 This directory contains eight independently scoped implementation requests for the Directorate graphical interface migration. They are plans to execute, not completed game features.

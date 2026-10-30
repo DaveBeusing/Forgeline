@@ -1,10 +1,23 @@
 # Conveyor materials and textures
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Implementation base: master `32234ea6` (0.1.448), including the model kit from
 PR #297. Final integration includes master `a3d2893e` (0.1.449, Operations guidance). This package prepares 0.1.450. Automated tests, runtime/camera smokes,
 resolution comparisons and manual art acceptance were deliberately not run at
 the user's request. The scoped asset build is recorded separately in
 [ConveyorMaterialBuild.json](ConveyorMaterialBuild.json).
+
+<details>
+<summary>On this page</summary>
+
+- [Material specification](#material-specification)
+- [Atlas, masks and physical response](#atlas-masks-and-physical-response)
+- [Simulation observation to presentation](#simulation-observation-to-presentation)
+- [Reproduction](#reproduction)
+- [Manual acceptance, pending](#manual-acceptance-pending)
+
+</details>
 
 ## Material specification
 

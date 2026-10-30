@@ -1,5 +1,25 @@
 # Base Conveyor Logistics
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Status and ownership](#status-and-ownership)
+- [Operating boundary](#operating-boundary)
+- [Conveyable material policy](#conveyable-material-policy)
+- [V1 component kit](#v1-component-kit)
+  - [Structural and ground rules](#structural-and-ground-rules)
+- [Graph, ports and transfer invariants](#graph-ports-and-transfer-invariants)
+  - [Provisional deterministic capacity contract](#provisional-deterministic-capacity-contract)
+  - [Operating states and diagnostics](#operating-states-and-diagnostics)
+- [Power and strategic impact](#power-and-strategic-impact)
+- [Hybrid integration and compatibility](#hybrid-integration-and-compatibility)
+- [Qualification requirements for implementation](#qualification-requirements-for-implementation)
+- [Ownership boundaries](#ownership-boundaries)
+
+</details>
+
 ## Status and ownership
 
 The [construction implementation](ConveyorConstructionPlacementAndUX.md) and
@@ -237,4 +257,3 @@ Navigation and docking retain vehicle motion authority. Assets and copied read m
 describe completed state without creating material or a second simulation. Building
 destruction cleanup remains with its existing lifecycle owner, including invalidating
 ports and inventories; a conveyor cannot silently adopt a reused building index.
-

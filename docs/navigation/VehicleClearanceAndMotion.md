@@ -1,5 +1,25 @@
 # Vehicle clearance and continuous motion
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Implementation boundary](#implementation-boundary)
+- [Concrete entry points and configuration](#concrete-entry-points-and-configuration)
+- [Authoritative dimensions and coordinate conventions](#authoritative-dimensions-and-coordinate-conventions)
+- [Physical clearance service](#physical-clearance-service)
+  - [Whole-body sweep](#whole-body-sweep)
+  - [Terrain over the footprint and center trajectory](#terrain-over-the-footprint-and-center-trajectory)
+  - [Work, completeness and result semantics](#work-completeness-and-result-semantics)
+- [Continuous ordinary-route planning](#continuous-ordinary-route-planning)
+  - [Precise owners and progression](#precise-owners-and-progression)
+- [Stable capture and simultaneous proposal arbitration](#stable-capture-and-simultaneous-proposal-arbitration)
+- [Diagnostics, persistence and cache identity](#diagnostics-persistence-and-cache-identity)
+- [Validation boundary](#validation-boundary)
+
+</details>
+
 ## Implementation boundary
 
 This implementation consumes navigation integration contract revision 1. It adds

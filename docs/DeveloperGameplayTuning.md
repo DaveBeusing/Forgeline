@@ -1,5 +1,19 @@
 # Developer gameplay tuning
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and source](#scope-and-source)
+- [Editor schema](#editor-schema)
+- [State and execution handoff](#state-and-execution-handoff)
+- [Physical conveyor hook](#physical-conveyor-hook)
+- [Restart builder](#restart-builder)
+- [Qualification boundary](#qualification-boundary)
+
+</details>
+
 ## Scope and source
 
 Starts from master 9dd75d9a4133f576e3fe1a2838584e3fa98654a1 with the integrated

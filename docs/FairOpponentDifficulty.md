@@ -1,9 +1,22 @@
 # Fair opponent difficulty profiles
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Difficulty is a validated policy for the existing Directorate opponent.
 Easy, Standard and Hard use the same starting stock, unit/building prices,
 production times, weapon/sensor statistics, physical supply and game commands.
 There is no resource multiplier, fog override or hidden-target permission.
+
+<details>
+<summary>On this page</summary>
+
+- [Selection and compatibility](#selection-and-compatibility)
+- [Policy differences](#policy-differences)
+- [Information and counterplay](#information-and-counterplay)
+- [Qualification-only diagnostics](#qualification-only-diagnostics)
+- [Qualification commands](#qualification-commands)
+
+</details>
 
 ## Selection and compatibility
 
@@ -81,6 +94,7 @@ including censored matches, rather than inferring wins from faster decisions.
 ## Information and counterplay
 
 The preserved knowledge boundary is:
+
 - owned economy, force, construction and physical supply are directly assessed;
 - public authored map sites/starts can guide reconnaissance and AttackMove;
 - detected contacts provide permitted last-known coordinates only;

@@ -1,5 +1,7 @@
 # Deterministic environment scatter
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 `EnvironmentScatterGenerator` produces immutable, palette-indexed decoration per
 chunk. `BattlefieldScatterClearance` adapts existing gameplay geometry and the
 strategic reservation raster into a frozen exclusion snapshot. Generation owns
@@ -7,6 +9,20 @@ no ECS entities, renderer, fog state, navigation obstacles or save payloads.
 Existing authored maps, `WorldObjects`, static dressing extraction and scenario
 loading are unchanged. Rendering, visibility admission and persistence of these
 new sets require separate integration.
+
+<details>
+<summary>On this page</summary>
+
+- [Composition](#composition)
+- [Version 1 placement](#version-1-placement)
+- [Profiles and assets](#profiles-and-assets)
+- [Gameplay clearance](#gameplay-clearance)
+- [Bounds and budgets](#bounds-and-budgets)
+- [Canonical output and fingerprints](#canonical-output-and-fingerprints)
+- [Diagnostics and reference plots](#diagnostics-and-reference-plots)
+- [Executed qualification](#executed-qualification)
+
+</details>
 
 ## Composition
 

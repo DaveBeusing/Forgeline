@@ -1,5 +1,7 @@
 # Procedural atlas production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The CPU Cycles recipe producer extends the existing pinned Blender launcher. It
 creates immutable source generations beneath `artifacts/`, with the existing
 compiler as the sole source-to-runtime boundary. No game shader, material record,

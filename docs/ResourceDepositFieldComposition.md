@@ -1,5 +1,18 @@
 # Deterministic resource field composition
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Implemented boundary](#implemented-boundary)
+- [Identity, topology and budgets](#identity-topology-and-budgets)
+- [Terrain and extraction adaptation](#terrain-and-extraction-adaptation)
+- [Assets, culling and picking](#assets-culling-and-picking)
+- [Prepared checks — NOT EXECUTED](#prepared-checks--not-executed)
+
+</details>
+
 ## Implemented boundary
 
 Resource deposits now carry an optional immutable `ResourceDepositField` on their

@@ -1,11 +1,24 @@
 # Windows application branding
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The canonical FORGELINE application mark is
 `assets/source/branding/forgeline/application/forgeline.ico`. It was integrated by
 PR #133; the directory repair in PR #137 preserved its original image payloads.
 The current valid file contains 16, 32 and 48 px PNG frames. This change reuses
 that existing product mark unchanged. The studio cinematic and HUD/faction marks
 are separate assets and are not sources for this application icon.
+
+<details>
+<summary>On this page</summary>
+
+- [Executable and native window contract](#executable-and-native-window-contract)
+- [Build and packaged qualification](#build-and-packaged-qualification)
+- [Artwork updates](#artwork-updates)
+- [Manual Windows acceptance and cache diagnosis](#manual-windows-acceptance-and-cache-diagnosis)
+- [Recorded qualification](#recorded-qualification)
+
+</details>
 
 ## Executable and native window contract
 
@@ -94,6 +107,7 @@ unpin/re-pin that shortcut and reopen Explorer. Do not delete user caches,
 shortcuts or restart Explorer automatically. Cache staleness does not prove that
 the new binary lacks its resource. Final high-DPI art and manual pin/unpin/shell
 acceptance remain distinct from the verified native assignment.
+
 ## Recorded qualification
 
 Validated on 2026-10-12 from master `36a45381f3237dac94223f338c69c3390833fb71`.

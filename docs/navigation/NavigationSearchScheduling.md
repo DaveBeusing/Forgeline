@@ -1,5 +1,20 @@
 # Connected fleet search scheduling and bounded storage
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Product path](#product-path)
+- [Admission, fairness and full ownership](#admission-fairness-and-full-ownership)
+- [One work ledger and coordinator cache phases](#one-work-ledger-and-coordinator-cache-phases)
+- [Bounded ownership](#bounded-ownership)
+- [Authoritative state, derived payloads and recovery](#authoritative-state-derived-payloads-and-recovery)
+- [Copied diagnostics](#copied-diagnostics)
+- [Validation and manual handoff](#validation-and-manual-handoff)
+
+</details>
+
 ## Product path
 
 MatchRuntime connects the prepared NavigationSearchScheduler to VehicleFleetKernel

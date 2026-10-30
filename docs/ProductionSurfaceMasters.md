@@ -1,5 +1,7 @@
 # Production surface masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Current saved terrain material sources, deterministic Cycles export and the
 already-integrated BC7 terrain policy are described in
 [Terrain Blender sources](TerrainPbrBlender.md). Historical RGBA allocation
@@ -180,7 +182,6 @@ masters and one material per LOD. Minerals use cell 11, timber 10, foliage 13,
 concrete 6, steel 1 and warnings 5. No texture/material or alpha-card family is
 added. New normals/UVs compile to tangents through the existing pipeline.
 
-
 The four [operational building families](OperationalBuildingProduction.md)
 also reuse these masters, atlas-cell insets, sRGB Base Color and linear
 Normal/ORM channels. Source geometry adds external windows, manufactured
@@ -215,4 +216,4 @@ The integrated qualification contains 492 assets (309 meshes, 56 textures and
 127 materials). Dedicated unit and logistics traffic captures report zero mesh
 fallbacks and texture-binding failures; human surface/art acceptance remains open.
 
-The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
+See [Asset Pipeline](AssetPipeline.md) and the [procedural CPU atlas producer](ProceduralPbrProduction.md) for isolated source generations, production-promotion rules and the unchanged runtime budgets.

@@ -1,8 +1,23 @@
 # Vehicle Docking
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Building cargo pickup, cargo delivery and Supply Truck loading share one
 simulation-owned loading lane. Logical logistics transit nodes retain their
 existing movement semantics.
+
+<details>
+<summary>On this page</summary>
+
+- [Loading-lane world overlay](#loading-lane-world-overlay)
+- [Geometry and ownership](#geometry-and-ownership)
+- [Movement and service](#movement-and-service)
+- [Supply commands and propulsion](#supply-commands-and-propulsion)
+- [Persistence and presentation](#persistence-and-presentation)
+- [Reference scenes](#reference-scenes)
+- [Cargo propulsion Fuel visits](#cargo-propulsion-fuel-visits)
+
+</details>
 
 ## Loading-lane world overlay
 

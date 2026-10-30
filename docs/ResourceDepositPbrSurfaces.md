@@ -1,5 +1,7 @@
 # Resource deposit PBR surfaces
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Initial integration base: `b726ff9c00b7dc74cf285219fa58440acf663e16`, version
 0.1.454, including the modular resource cluster sources. The four existing
 `material.world.resource.<family>` IDs, factors and one-slot mesh bindings remain
@@ -15,6 +17,17 @@ additional surface IDs are an additive authoring inventory; selecting them needs
 a separately approved presentation contract, including batching/budget review.
 The visual-language roughness ranges and inclusion coverage are art-review targets,
 not measurements or acceptance claims for these unqualified maps.
+
+<details>
+<summary>On this page</summary>
+
+- [Surface design and editable sources](#surface-design-and-editable-sources)
+- [Shared UV, slot and shader contract](#shared-uv-slot-and-shader-contract)
+- [Channels, mip policy and budget boundary](#channels-mip-policy-and-budget-boundary)
+- [Provenance and execution status](#provenance-and-execution-status)
+- [Manual acceptance commands — NOT EXECUTED](#manual-acceptance-commands--not-executed)
+
+</details>
 
 ## Surface design and editable sources
 

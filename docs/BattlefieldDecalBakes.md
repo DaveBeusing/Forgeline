@@ -1,11 +1,34 @@
 # Battlefield decal bakes
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The branch is synchronized with master `34c69dd97db417d1982fd7bf75cb1baa197082f6`
 (merged terrain #284, staged vegetation #281 and world-prop #283), version
 0.1.438. The current decal candidate is **0.1.439**, exactly one PATCH higher.
 Earlier qualification sections retain their actual source identities and versions.
 The final integration results are recorded below; the path-corrected native masters
 retain their separately verified `f7d63b7d` input hashes.
+
+<details>
+<summary>On this page</summary>
+
+- [Integration audit](#integration-audit)
+- [Demonstrated source gap and repair](#demonstrated-source-gap-and-repair)
+- [Authoring and diagnostic checks](#authoring-and-diagnostic-checks)
+- [Original 0.1.437 qualification (retained)](#original-01437-qualification-retained)
+  - [Source, compiler and contracts](#source-compiler-and-contracts)
+  - [Native images, counters and timing](#native-images-counters-and-timing)
+  - [Reproducible installed player](#reproducible-installed-player)
+  - [Evidence and integration decision](#evidence-and-integration-decision)
+- [Integration on master a2a88f06: 0.1.438](#integration-on-master-a2a88f06-01438)
+  - [Fresh native and installed controls](#fresh-native-and-installed-controls)
+- [Packed image path correction](#packed-image-path-correction)
+  - [Re-executed saved-master gate](#re-executed-saved-master-gate)
+- [Final integration on master 34c69dd9: 0.1.439](#final-integration-on-master-34c69dd9-01439)
+  - [Latest-base checks and catalogs](#latest-base-checks-and-catalogs)
+  - [Current-source images, timing and installation](#current-source-images-timing-and-installation)
+
+</details>
 
 ## Integration audit
 
@@ -259,7 +282,6 @@ local failed timing gates additionally prevent performance promotion. No merge,
 release, tag or golden approval is made. The intended result is a reproducible,
 reviewable source/runtime candidate, not a claim of completed production acceptance.
 
-
 ## Integration on master a2a88f06: 0.1.438
 
 The measured runtime source is `c7cbb542c77f56ce5de0988e043ad65495b12b37`,
@@ -373,7 +395,6 @@ source and installed package remain `c7cbb542`.
 The corrected five authoring test classes pass locally: five passed, zero failed/
 skipped, 7m41.096s, using an actual fresh full production compile.
 
-
 ## Packed image path correction
 
 The final portability audit found that Blender's visible image path was relative
@@ -391,7 +412,6 @@ installed package retain source `c7cbb542`; their production C# and compiler-rea
 inputs remain unchanged. The native saved-master gate is executed separately
 against the committed path-corrected sources, with its own source identity and
 new 39-file input index. Original authoring evidence remains historical.
-
 
 ### Re-executed saved-master gate
 
@@ -421,7 +441,6 @@ indexes **337 original files**. The local archive
 every entry was read back and hash-verified. The actual native metadata is
 committed as reproducible gzip with portable path tokens. Final PR-head CI is
 verified independently; physical performance and human visual gates remain open.
-
 
 ## Final integration on master 34c69dd9: 0.1.439
 

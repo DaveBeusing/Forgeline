@@ -1,5 +1,7 @@
 # Bounded surface and LOD production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The production entrypoint extends the pinned Blender launcher and validated source
 importer. It prepares reviewable source clones under `artifacts/`; the player and
 normal asset build have no Blender dependency. It does not apply results to

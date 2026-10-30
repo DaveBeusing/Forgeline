@@ -1,5 +1,7 @@
 # Production texture and instance budgets
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The canonical compiled gameplay texture limit remains **56 MiB**, the native
 scene texture peak limit **64 MiB**, and the canonical instance limit **11 base
 batches plus bounded additional LOD splits**. This change reduces real texture

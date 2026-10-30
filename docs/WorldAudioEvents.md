@@ -1,5 +1,7 @@
 # Authorized world audio events
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 This is the event-layer contract introduced before playback. The current mixer,
 packaging, listener and device lifecycle are documented in
 [spatial world audio](SpatialWorldAudio.md). Historical references below to the

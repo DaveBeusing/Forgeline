@@ -1,5 +1,7 @@
 # Scalable object rendering and depth reconstruction
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Ownership and current paths
 
 Presentation consumes copied viewer-authorized instances; simulation/headless remain independent. RenderWorld prepares a render-owner index once per accepted immutable snapshot. It caches previous full entity-generation matches, then reuses those indices during indexed interpolation instead of repeating a binary lookup for every render and shadow pass. Lookup by explicit entity identity retains the existing public behavior. New sessions clear previous matches; stale ticks cannot replace current state. No cached source outlives the two existing snapshots.
@@ -52,6 +54,4 @@ Scaled Medium composition observations are 0.769 ms for repeated units versus 0.
 
 ## Chunk decoration rendering
 
-The opt-in [chunk decoration render connection](ChunkDecorationRendering.md) consumes
-copied public scatter snapshots through the existing Windows instancing, LOD, wind and
-shadow paths. Separate bounded render residency preserves gameplay and authored inputs.
+[Chunk decoration rendering](ChunkDecorationRendering.md) connects copied scatter snapshots to the existing instancing, LOD, wind and bounded shadow paths. [World environment rendering](WorldEnvironmentRendering.md) owns the shared integration context.

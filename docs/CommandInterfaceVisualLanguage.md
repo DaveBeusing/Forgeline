@@ -1,5 +1,25 @@
 # FORGELINE Command Interface Visual Language
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Ring hover and contextual object detail hierarchy](#ring-hover-and-contextual-object-detail-hierarchy)
+- [Scope and Current Audit](#scope-and-current-audit)
+  - [Verified design weaknesses](#verified-design-weaknesses)
+  - [Existing strengths to retain](#existing-strengths-to-retain)
+- [Visual Direction](#visual-direction)
+- [Frontend Composition](#frontend-composition)
+- [Performance and Validation](#performance-and-validation)
+- [Remaining Production-Quality Work](#remaining-production-quality-work)
+- [Battlefield HUD hierarchy](#battlefield-hud-hierarchy)
+- [Adaptive command dock](#adaptive-command-dock)
+- [Compiled skin foundation](#compiled-skin-foundation)
+- [Battlefield selection markers and drag marquee](#battlefield-selection-markers-and-drag-marquee)
+
+</details>
+
 ## Ring hover and contextual object detail hierarchy
 
 Radial hover is indicated by an isolated darker wedge and thin bright outer arc, not by fading its text/icon or changing gameplay hit geometry. The adjoining read-only object panel uses a lightly translucent backing, an emphasized object name, a full empty row after the name and structured fact labels. Its right-hand placement is prioritized inside the existing safe-area and obstacle layout. It does not add a second inventory, simulation, or command system; valid current single-object and group read models are the only data sources. DPI, narrow layouts, screenshot contrast and actual D3D12 review require current-source acceptance separate from historical UI evidence.
@@ -115,6 +135,8 @@ No reviewed command fixture or accepted pixel golden is regenerated. New capture
 review evidence, not automatic golden approval. See [HUD qualification](BattlefieldHudQualification.md).
 
 ## Adaptive command dock
+
+The dock layout below is historical. Current command placement and status detail use the existing rings and shared tooltip; see [HUD surface consolidation](HudSurfaceConsolidation.md).
 
 Dock hierarchy: mode tabs, selected context, card title, availability/work status, captured quantities and progress, six rebound-key controls. Explicit operation labels replace ACT. LAST accepted/rejected feedback never promises production/delivery/research completion. Compact dock content fits its existing region without changing other HUD panels.
 

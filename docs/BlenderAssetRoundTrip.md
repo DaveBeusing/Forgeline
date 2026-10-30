@@ -1,5 +1,7 @@
 # Blender source round trips
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The pinned [Blender launcher](../tools/blender/README.md) now imports and exports
 existing source definitions through editable Blender geometry while checking the
 current compiler contract. Every run requires a fresh, explicit output subdirectory

@@ -1,5 +1,7 @@
 # Spatial world audio
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The Windows player mixes the authorized [world event layer](WorldAudioEvents.md)
 into 48 kHz stereo PCM16 on a dedicated audio owner. It ships 56 world WAVs and
 `audio/playback.json` alongside the existing four interface cues. The separate

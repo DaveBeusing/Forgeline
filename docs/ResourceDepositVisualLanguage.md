@@ -1,5 +1,27 @@
 # Resource deposit visual language
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Status and ownership](#status-and-ownership)
+- [Family grammar](#family-grammar)
+  - [Morphologies and occurrence](#morphologies-and-occurrence)
+  - [Fragment and field composition](#fragment-and-field-composition)
+- [Independent variation layers](#independent-variation-layers)
+  - [State and depletion](#state-and-depletion)
+- [Interchange contract](#interchange-contract)
+  - [Persistent identity and binding](#persistent-identity-and-binding)
+  - [Copied presentation selection record](#copied-presentation-selection-record)
+  - [Deterministic seed derivation](#deterministic-seed-derivation)
+  - [Bounds, LOD and controlled fallback](#bounds-lod-and-controlled-fallback)
+- [Manual acceptance matrix — NOT EXECUTED](#manual-acceptance-matrix--not-executed)
+  - [Negative cases and prepared assertions](#negative-cases-and-prepared-assertions)
+  - [Evidence and integration gates](#evidence-and-integration-gates)
+
+</details>
+
 ## Status and ownership
 
 Normative art and interchange specification, schema `resource-visual/1`.

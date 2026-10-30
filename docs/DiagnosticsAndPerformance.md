@@ -1,8 +1,42 @@
 # Diagnostics and Performance
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 For Windows launch, frontend and session readiness timing, see [Startup Timing and Readiness](StartupDiagnostics.md). Use `--startup-diagnostics-output <report.json>` on the client to collect opt-in monotonic phase events.
 
 ForgeLine Engine treats correctness diagnostics and performance measurement as part of the engine foundation rather than late-stage tooling.
+
+<details>
+<summary>On this page</summary>
+
+- [Diagnostic Model](#diagnostic-model)
+- [Simulation Diagnostics](#simulation-diagnostics)
+- [Combat Runtime Metrics](#combat-runtime-metrics)
+- [Battlefield Intelligence Metrics](#battlefield-intelligence-metrics)
+- [Job Metrics](#job-metrics)
+- [Headless Diagnostic Reports](#headless-diagnostic-reports)
+  - [Gameplay Telemetry Is a Separate Evidence Stream](#gameplay-telemetry-is-a-separate-evidence-stream)
+  - [Save and Replay Recovery Validation](#save-and-replay-recovery-validation)
+  - [Bounded Skirmish Progression Reports](#bounded-skirmish-progression-reports)
+  - [Investigating a Nonterminal Match](#investigating-a-nonterminal-match)
+- [Headless Test Harness](#headless-test-harness)
+- [Render-owner telemetry](#render-owner-telemetry)
+- [Benchmarks](#benchmarks)
+  - [Frame hot-path measurements](#frame-hot-path-measurements)
+- [Stress Scenarios](#stress-scenarios)
+- [Interpreting Results](#interpreting-results)
+- [CI](#ci)
+- [Current Engineering Targets](#current-engineering-targets)
+- [Spatial Index Diagnostics](#spatial-index-diagnostics)
+- [Presentation Diagnostics](#presentation-diagnostics)
+- [Navigation Diagnostics](#navigation-diagnostics)
+- [Formation Movement Diagnostics](#formation-movement-diagnostics)
+- [Artillery Diagnostics](#artillery-diagnostics)
+- [Tactical Combat and Readiness Metrics](#tactical-combat-and-readiness-metrics)
+- [Skirmish Strategic Assessment Allocation Measurement](#skirmish-strategic-assessment-allocation-measurement)
+- [Visual Asset Qualification](#visual-asset-qualification)
+
+</details>
 
 ## Diagnostic Model
 
@@ -217,8 +251,12 @@ This keeps deterministic integration scenarios concise and ensures tests do not 
 Use the test runner selected by `global.json`. The canonical full-suite command for the current Microsoft.Testing.Platform configuration is:
 
 ```powershell
-dotnet test --solution ForgeLine.sln --configuration Release
+dotnet test --solution ForgeLine.sln --configuration Release --max-parallel-test-modules 1
 ```
+
+## Render-owner telemetry
+
+The opt-in [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) records active render-owner payload and observer-inclusive service costs separately, with original completed GPU timestamps and disjoint logical resource populations. It excludes independent platform/simulation thread work and is not a sum of all application CPU time. The current foundation exposes a hardware-observation ingestion contract, not a temperature/clock sensor provider or a completed physical-memory/thermal acceptance gate.
 
 ## Benchmarks
 
@@ -420,7 +458,6 @@ The F2 tactical read model exposes current combat order/status, legitimate targe
 
 The simulation benchmark host includes 100/1,000-unit tactical acquisition and deterministic group target-coordination workloads.
 
-
 ## Skirmish Strategic Assessment Allocation Measurement
 
 Strategic-opponent allocation work is measured separately from aggregate full-match allocation. The historical cumulative allocation reported by a headless run describes the complete instrumented process and must not be attributed to one system without narrower evidence.
@@ -438,7 +475,6 @@ dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simula
 The workload matrix covers one versus two strategic controllers, diagnostics disabled versus enabled, and an early versus later vertical-slice state. `EightNonDecisionTicks` measures the lightweight cadence path between strategic decisions. `DecisionCadenceWindow` advances exactly one configured reaction window and therefore includes one strategic decision evaluation per active controller, including the layered debug projection when diagnostics are enabled. BenchmarkDotNet `MemoryDiagnoser` reports managed allocation for the benchmark process, while the opponent work counters show which strategic assessments were actually performed. Worker-thread allocation is not represented by `GC.GetAllocatedBytesForCurrentThread`-style accounting; use BenchmarkDotNet/process diagnostics when whole-process attribution is required.
 
 For before/after comparisons, retain the BenchmarkDotNet environment header, runtime version, OS, architecture, processor count, scenario age, controller count, diagnostics state, and seed. Compare normalized allocation distributions for identical parameters. Do not treat a reduced managed-allocation result as proof that every maximum-tick outlier, retained-heap issue, or GC pause has been resolved.
-
 
 ## Visual Asset Qualification
 

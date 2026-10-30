@@ -1,5 +1,7 @@
 # Chunk decoration rendering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Ownership and composition
 
 ChunkDecorationSnapshot copies EnvironmentScatterChunk instances and species into

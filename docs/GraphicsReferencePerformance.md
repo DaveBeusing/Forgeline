@@ -1,5 +1,7 @@
 # Graphics reference scene and performance qualification
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The [serial rendering integration qualification](rendering/performance-integration/Qualification.md) compares named master `af8aaac0f9425b077d3a4497271495c1fce00d87` with the integrated candidate using immutable source-labelled clients, one payload, repeated Fixed/Sweep scaling and production scenes, and matched static-memory controls. Raw per-frame evidence, valid completed-fence counts, image comparisons, regression/variance observations and exact reproduction commands remain linked from that report. All four wave-02 capabilities were already present in the named master; historical single-feature results are not combined-source speedup acceptance.
 
 For matched installed UI workloads, full-matrix resource counters and the
@@ -7,6 +9,19 @@ separate whole-frame/skin-cost boundaries, see
 [graphical interface qualification](GraphicalInterfaceQualification.md).
 
 The existing native Central Divide reference runner now supports paired performance runs without adding a gameplay preset or changing normal startup. The representative preset reuses IndustrialBase and BattlefieldCombat: the approved thirteen-building roster, vehicles/infantry, canonical terrain and vegetation, lighting, atmosphere, selection/HUD, visible combat effects and filtered hidden enemies. Vehicles1000 reuses CombatSupportRepeated's 1,000 extracted production vehicles. Camera culling can reduce the visible root population; mechanical parts can expand submitted object-instance counts above the 1,000 root vehicles.
+
+The newer [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) adds optional raw GPU observations to explicit native captures while retaining schema 2 and its derived series. Older source-bound manifests remain historical derived evidence. The ordinary live-owner stream is independently labelled and cannot be promoted into an IndustrialBase or other native fixture using caller-supplied labels.
+
+<details>
+<summary>On this page</summary>
+
+- [Setup and invocation](#setup-and-invocation)
+- [Measurement contract](#measurement-contract)
+- [Comparing evidence](#comparing-evidence)
+- [Packaged runtime and CI](#packaged-runtime-and-ci)
+- [Recorded baseline](#recorded-baseline)
+
+</details>
 
 ## Setup and invocation
 

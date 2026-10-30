@@ -1,5 +1,24 @@
 # Technology Progression
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Technology definitions](#technology-definitions)
+- [Authoritative research state](#authoritative-research-state)
+- [Gameplay effects and compatibility](#gameplay-effects-and-compatibility)
+- [Capability gates](#capability-gates)
+- [Opponent investment](#opponent-investment)
+- [Presentation and HUD](#presentation-and-hud)
+- [Persistence and determinism](#persistence-and-determinism)
+- [Current scope boundary](#current-scope-boundary)
+- [Progression correction and manual acceptance](#progression-correction-and-manual-acceptance)
+- [Logistics Coordination: splitter controls](#logistics-coordination-splitter-controls)
+
+</details>
+
 ## Purpose
 
 FORGELINE technology progression is an industrial simulation subsystem rather than a universal-currency linear research tree. Research competes with production for real resources and remains constrained by infrastructure and power.

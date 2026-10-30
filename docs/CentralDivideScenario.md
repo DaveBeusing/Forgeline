@@ -1,5 +1,28 @@
 # Directorate Vertical Slice
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Canonical battlefield](#canonical-battlefield)
+- [Production presentation](#production-presentation)
+- [Progression](#progression)
+- [Structures](#structures)
+- [Units](#units)
+- [Combat, Movement, and Intelligence](#combat-movement-and-intelligence)
+- [Production and Logistics Flow](#production-and-logistics-flow)
+  - [Unit-production rally points](#unit-production-rally-points)
+- [Validation](#validation)
+- [Presentation Status](#presentation-status)
+- [Current Boundaries](#current-boundaries)
+- [Human Construction and Production Access](#human-construction-and-production-access)
+- [Paid local base conveyors](#paid-local-base-conveyors)
+- [Pacing evidence boundaries](#pacing-evidence-boundaries)
+
+</details>
+
 ## Purpose
 
 The Directorate is the first complete playable FORGELINE faction content set. It exercises the existing construction, economy, industrial production, power, logistics, navigation, battlefield supply, intelligence, direct-combat, armor, and indirect-fire systems without faction-specific simulation shortcuts.
@@ -162,7 +185,6 @@ The slice intentionally excludes:
 
 Repair behavior should only be added when a reusable generic repair foundation exists.
 
-
 ## Human Construction and Production Access
 
 The Windows client exposes the current Directorate content through one shared action surface rather than one hotkey per catalog entry.
@@ -178,7 +200,6 @@ Availability and costs are copied from the same building, recipe, unit, and inve
 ## Paid local base conveyors
 
 [Base Conveyor Logistics](BaseConveyorLogistics.md) and its [building port matrix](BaseConveyorPortMatrix.md) describe the implemented optional local conveyor layer. Players build paid physical modules and explicitly attach eligible building ports; existing scenarios receive no automatic network. Finite buffers move actual inventory through original production recipes, while regional Cargo Trucks and battlefield Supply Trucks retain their physical loading and movement lifecycles. The [flow qualification](ConveyorSimulationAndVehicleInterop.md) covers a Standard-stock Gameplay start with paid buildings and bands, an actual Ore truck delivery, two Smelter cycles and Steel reaching storage. Headless conservation, recovery and navigation evidence does not replace the unchanged natural terminal-match gate or native visual acceptance.
-
 
 ## Pacing evidence boundaries
 

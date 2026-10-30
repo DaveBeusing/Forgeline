@@ -1,5 +1,7 @@
 # Asynchronous match session loading
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Construction and ownership
 
 After New Game, Continue or Load Game, the Windows client starts one dedicated session-loading thread. It performs configuration validation, CPU scenario assembly, save reading and deterministic reconstruction. Independent startup products remain reused; session retries do not reload the runtime asset catalog.
@@ -61,7 +63,6 @@ All three captures remain Running; saved/restored authoritative hashes and RNG m
 The retained recovery/loading and startup documents define no numeric restore-time product gate; therefore this is not reported as a passed or failed latency target. The observed roughly 41-second reconstruction for a 20-minute match is a concrete cost requiring product follow-up. Direct checkpoint reconstruction or a separate bounded-history/compression design would be a later architectural task. This change preserves complete deterministic reconstruction and does not claim a speedup.
 
 Earlier loading-test counts above describe their historical implementation checkpoint, not current complete acceptance. Current source-specific results and final-head mandatory CI are recorded in the PR. Physical D3D12, live Pause/Help/Minimize overlap, input/graphics lifetime and human visual review remain separate evidence classes.
-
 
 ## Generated skirmish preparation
 

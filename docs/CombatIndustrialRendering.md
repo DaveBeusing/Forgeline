@@ -1,5 +1,7 @@
 # Combat and industrial rendering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Runtime contract
 
 Completed combat events and copied gameplay state feed presentation only. Existing muzzle, impact, explosion, smoke, dust, supply/refuel/rearm and wreck mappings remain in place. Steam and welding add two typed presets without changing compiled formats or adding assets: 38 concrete effect kinds reuse 36 effect meshes and ten VFX material families in the 492-asset runtime catalog.

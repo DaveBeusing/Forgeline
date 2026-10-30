@@ -1,5 +1,7 @@
 # Infantry atlas orientation refinement
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 **Current PR: 0.1.434 on tank-integrated master `3c732aa5`.** See the final
 post-tank section and [current evidence index](qualification/infantry-surfaces/post-tank/index.json).
 Earlier 0.1.432/433 observations below retain their actual source identities.
@@ -8,6 +10,23 @@ Performance qualification fails and human/global renderer acceptance stays open.
 This review candidate corrects a demonstrated UV-origin defect in the existing
 Rifle Squad and Combat Engineer masters. It does not replace the established art,
 re-rig the figures or claim complete high-fidelity art/animation acceptance.
+
+<details>
+<summary>On this page</summary>
+
+- [Audited integration source](#audited-integration-source)
+- [Demonstrated quality gap and change](#demonstrated-quality-gap-and-change)
+- [Reproduction and qualification](#reproduction-and-qualification)
+- [Executed authoring and functional checkpoint](#executed-authoring-and-functional-checkpoint)
+- [Native checkpoint and capture admission repair](#native-checkpoint-and-capture-admission-repair)
+- [Completed native matrix and master reconciliation](#completed-native-matrix-and-master-reconciliation)
+- [Final integrated implementation and functional results](#final-integrated-implementation-and-functional-results)
+- [Final native observations and failed performance qualification](#final-native-observations-and-failed-performance-qualification)
+- [Reproducible package and fresh installation](#reproducible-package-and-fresh-installation)
+- [Review evidence and remaining acceptance](#review-evidence-and-remaining-acceptance)
+- [Post-tank master reconciliation: current 0.1.434](#post-tank-master-reconciliation-current-01434)
+
+</details>
 
 ## Audited integration source
 

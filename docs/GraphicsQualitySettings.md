@@ -1,5 +1,7 @@
 # Graphics quality and display settings
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The client defaults to Medium. Settings offers Low, Medium, High and Ultra, with independent overrides for implemented features. Selecting a preset clears its overrides while retaining manual exposure, color grading, display, camera and input preferences. `PROFILE` means inherit the selected preset. Simulation and headless execution do not consume these settings.
 
 | Preset | Shadow size | Particles / fill areas | Atmosphere | Surface detail / vegetation motion | Object LOD diameter | Texture detail | Spatial AA |
@@ -10,6 +12,17 @@ The client defaults to Medium. Settings offers Low, Medium, High and Ultra, with
 | Ultra | 4096 | 4096 / 2 | Height | Enabled | 1.25 | Full | High, 30% |
 
 All presets default to 100% world resolution. Ultra retains more object detail; it shares the bounded High shadow/particle/AA resources. It does not enable additional effects. Vegetation motion controls wind animation, not vegetation visibility or gameplay coverage.
+
+<details>
+<summary>On this page</summary>
+
+- [Independent controls and persistence](#independent-controls-and-persistence)
+- [Applying and reverting](#applying-and-reverting)
+- [Capabilities and effective policy](#capabilities-and-effective-policy)
+- [Reproduction and measured evidence](#reproduction-and-measured-evidence)
+- [World environment integration](#world-environment-integration)
+
+</details>
 
 ## Independent controls and persistence
 
@@ -92,6 +105,5 @@ Release builds, architecture/version checks, policy, migration, native scaling/d
 ## World environment integration
 
 Additive schema 3 fields environment, vegetation and terrainResidency preserve neutral defaults and survive preset changes. Invalid values use existing graphics quarantine. Weather controls are development/configuration inputs with the normal next-session lifecycle; no new UI rows are introduced. See [World environment rendering](WorldEnvironmentRendering.md) for bounds and fallback.
-
 
 Depth-guided spatial reconstruction uses existing scene/depth, retains native overlays and adds no history target. ExecuteIndirect and temporal reconstruction remain evaluated deferrals. See [scalable rendering](ScalableRendering.md) for evidence and limitations.

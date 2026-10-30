@@ -1,5 +1,7 @@
 # Directorate tank Blender production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The bounded [armor finish refinement](TankSurfaceRefinement.md) records the current
 static armor UV migration, isolated tank review loads and separate acceptance gates.
 

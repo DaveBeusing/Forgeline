@@ -1,5 +1,26 @@
 # FORGELINE Project Context and Repository Governance
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Status](#status)
+- [Verified Project Identity](#verified-project-identity)
+- [Project Domain Role](#project-domain-role)
+- [Product and Engineering Boundaries](#product-and-engineering-boundaries)
+- [Source Precedence](#source-precedence)
+- [Semantic Versioning Policy](#semantic-versioning-policy)
+- [Git and Integration Policy](#git-and-integration-policy)
+- [Required Validation](#required-validation)
+- [Intended `master` Protection](#intended-master-protection)
+  - [Enforcement Status](#enforcement-status)
+- [Development and Validation Source](#development-and-validation-source)
+- [Decisions Pending Product Owner Approval](#decisions-pending-product-owner-approval)
+- [Approval](#approval)
+
+</details>
+
 ## Status
 
 This document is the repository-local project context for FORGELINE. It consolidates verified repository facts, binding engineering and governance rules, the intended repository-protection policy, and decisions that still require explicit Product Owner approval.
@@ -17,7 +38,7 @@ Project-specific approval metadata is intentionally not fabricated. Until this d
 - **Runtime baseline:** .NET 10 LTS
 - **Configured SDK:** .NET SDK 10.0.402 selected by `global.json`
 - **Package management:** centrally managed through `Directory.Packages.props`
-- **Versioning:** SemVer `MAJOR.MINOR.PATCH`, centrally defined in `Directory.Build.props`; baseline `0.1.0`
+- **Versioning:** SemVer `MAJOR.MINOR.PATCH`, centrally defined in `Directory.Build.props`; read that file for the current version
 - **Interactive host baseline:** Windows x64
 - **Interactive graphics backend:** Direct3D 12
 
@@ -84,6 +105,7 @@ Individual commits and validation reruns do not consume PATCH. Automatic
 tag allocation and release publication are disabled. Historical tags and
 versions remain intact. [PR Versioning](ReleaseVersioning.md) defines the current
 repository policy and supersedes the previous release-only mapping.
+
 ## Git and Integration Policy
 
 The project development model requires:
@@ -111,18 +133,7 @@ The check context emitted by the workflow is:
 - **Provider:** GitHub Actions
 - **GitHub App ID:** `15368`
 
-The required check represents the complete CI job, not only compilation or the unit-test subset. Its current validation path includes:
-
-1. PR version, build identity and version contract validation;
-2. restore;
-3. project-reference validation;
-4. Release build;
-5. Windows graphics client smoke validation;
-6. headless diagnostics smoke validation;
-7. lightweight entity stress validation;
-8. the Microsoft.Testing.Platform solution test run;
-9. the natural vertical-slice terminal validation using seed 2026, an 80,000-tick limit, and `--require-terminal`;
-10. diagnostic artifact upload on success or failure.
+The required check represents the **complete CI job**, including version/build identity, restore, architecture, Release build, compiled maps, runtime assets, focused contracts, native/headless smoke, the full solution suite, reproducible packaging and the natural terminal-match gate. [Development](Development.md#canonical-validation-path) owns the canonical command sequence; `.github/workflows/ci.yml` owns the actual executed ordering and feature-specific selections. Full-solution test modules use the existing CI limit of one at a time. Diagnostic artifacts retain failures as well as successes.
 
 The terminal-match gate must not be removed, weakened, replaced with a forced result, or given free resources merely to obtain a green check. Repeated five-match soak validation remains separate from the ordinary pull-request timing gate unless repository policy is deliberately changed.
 
@@ -213,4 +224,3 @@ No value should be inferred for these items from repository history, tags, filen
 - **Approved Date:** Not set
 
 Git history records document revisions but does not by itself constitute Product Owner approval.
-

@@ -1,5 +1,7 @@
 # Rooted vegetation Blender sources
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Status: isolated authoring and runtime-review candidate; production promotion and
 human visual approval remain separate gates.
 
@@ -9,6 +11,17 @@ completed successfully. There were no related unfinished remote branches or open
 PRs. Existing volumetric vegetation, broadleaf and the render foundation were
 already integrated. PRs 171, 181, 190, 192, 227–229 and 268 were inspected for
 implementation and qualification scope; historical results are source-specific.
+
+<details>
+<summary>On this page</summary>
+
+- [Existing art and demonstrated gap](#existing-art-and-demonstrated-gap)
+- [Native source contract](#native-source-contract)
+- [Reproduction and acceptance](#reproduction-and-acceptance)
+- [Functional checkpoint](#functional-checkpoint)
+- [Installed native checkpoint](#installed-native-checkpoint)
+
+</details>
 
 ## Existing art and demonstrated gap
 

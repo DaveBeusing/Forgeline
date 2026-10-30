@@ -1,5 +1,7 @@
 # Resource deposit cluster geometry
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Implementation base: master `d4e100e7` (0.1.452). These sources replace the four
 canonical resource shapes with modular geological clusters. Existing resource,
 High/Reduced mesh, material and symbol IDs are retained. No renderer, field-spawn,
@@ -9,6 +11,17 @@ Final integration base: `8e2935abaa8486b2b72125ac7354ac729381de3f` (0.1.453,
 conveyor flow integration). The branch contains that master unchanged and prepares
 exactly one net PATCH increment to 0.1.454. No build or test was started after this
 integration either.
+
+<details>
+<summary>On this page</summary>
+
+- [Frozen geometry naming and morphology](#frozen-geometry-naming-and-morphology)
+- [Editable sources and export](#editable-sources-and-export)
+- [Frame, surfaces, states and LOD cost](#frame-surfaces-states-and-lod-cost)
+- [Historical sources and prepared contracts](#historical-sources-and-prepared-contracts)
+- [Manual acceptance commands — NOT EXECUTED](#manual-acceptance-commands--not-executed)
+
+</details>
 
 ## Frozen geometry naming and morphology
 

@@ -1,5 +1,21 @@
 # Directorate semantic UI artwork
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Implementation and source ownership](#implementation-and-source-ownership)
+- [Semantic coverage and consumers](#semantic-coverage-and-consumers)
+- [Native roster portraits](#native-roster-portraits)
+- [Raster, state and cursor contract](#raster-state-and-cursor-contract)
+- [Provenance, evidence and remaining scope](#provenance-evidence-and-remaining-scope)
+- [Battlefield consumer integration](#battlefield-consumer-integration)
+- [Production and operations consumers](#production-and-operations-consumers)
+- [Tactical consumers](#tactical-consumers)
+
+</details>
+
 ## Implementation and source ownership
 
 Based on master `859d6f6bf04d5f32b759a50b93337e57c4169f8d` (0.1.373),
