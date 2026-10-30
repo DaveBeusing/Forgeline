@@ -1196,7 +1196,7 @@ internal sealed class ClientApplication
                     throw new InvalidOperationException("Smoke qualification did not observe running presentation/tick progress within one minute.");
                 if (!smokeCompletionRequested &&
                     _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeCompletionDelay &&
-                    smokeRates.LastRunningRates is not null)
+                    smokeRates.LastRunningRates is not null && renderHost.TelemetryWindowCompleted)
                 {
                     if (!simulationHost.TryRunSmokeCompletion(eastBase.CommandCore))
                         throw new InvalidOperationException("Simulation control boundary is full while scheduling smoke completion.");

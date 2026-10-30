@@ -16,10 +16,12 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
     private ulong _lastFence = minimumFence;
     private readonly ulong _minimumFence = minimumFence;
     private ulong _frequency;
+    private readonly List<GraphicsRawGpuTiming> _rawGpu = new(capacity + 8);
+    private bool _rawOverflow;
     private long _observations, _excluded, _duplicate, _missing, _zero, _missingFrequency;
     private ulong _unobservedFenceValues;
 
-    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null)
+    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null)
     {
         if (!double.IsFinite(milliseconds) || milliseconds <= 0 || allocatedBytes < 0)
             throw new ArgumentOutOfRangeException(nameof(milliseconds));
@@ -30,7 +32,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             frame?.CompositeCpuMilliseconds, diagnostics.DirectionalShadows?.CpuMilliseconds,
             diagnostics.Resources, diagnostics.Health, diagnostics.Memory, submission)
         { CpuSubmission = frame?.CpuSubmission, CompletedGpuFence = frame?.GpuSubmissionFence,
-            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds });
+            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory });
         AddGpu(diagnostics);
     }
 
@@ -60,9 +62,23 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             { TimestampFrequencyHz = _frequency, ObservedAtCpuSubmission = frame.CpuSubmission });
     }
 
+    internal void DrainRawGpu(IGraphicsDevice graphics)
+    {
+        if (graphics is not IGraphicsRenderTelemetry telemetry) return;
+        while (telemetry.TryReadGpuCompletion(out var timing))
+        {
+            if (timing.SubmittedFence <= _minimumFence) continue;
+            if (_rawGpu.Count == _capacity + 8) { _rawOverflow = true; continue; }
+            _rawGpu.Add(timing);
+        }
+        _rawOverflow |= telemetry.TelemetryOverflowed;
+    }
+
     internal object Report(GraphicsDiagnostics diagnostics) => new
     {
         collectorSchemaVersion = 2, cpuFrames = _cpu, gpuFrames = _gpu,
+        rawGpuTiming = new { overflowed = _rawOverflow, completions = _rawGpu.OrderBy(x => x.Generation).ThenBy(x => x.SubmittedFence),
+            scope = "native-reference-direct-queue", worldIntervalIncludesShadow = true },
         controls = new { staticBufferUploadFallback = Environment.GetEnvironmentVariable("FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK") == "1" },
         allocations = VisualReferenceCapture.Distribution(_cpu.Select(x => (double)x.AllocatedBytes).ToArray()),
         cpuPasses = new
@@ -135,6 +151,7 @@ internal sealed record ReferenceCpuSample(int Index, double Milliseconds, long A
     double? WorldMilliseconds, double? OverlayMilliseconds, double? CompositeMilliseconds, double? ShadowMilliseconds,
     GraphicsResourceDiagnostics Resources, GraphicsHealthDiagnostics Health, GraphicsMemoryDiagnostics? Memory, object? Submission)
 {
+    public GraphicsResourceMemoryTelemetry? ResourceMemory { get; init; }
     public ulong? CpuSubmission { get; init; }
     public ulong? CompletedGpuFence { get; init; }
     public double? PresentMilliseconds { get; init; }

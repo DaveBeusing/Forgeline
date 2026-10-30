@@ -80,7 +80,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           New-Item artifacts -ItemType Directory -Force | Out-Null
           $paths | Where-Object { $_ -ne 'Directory.Build.props' } | Set-Content artifacts/qualification-ownership.txt -Encoding utf8NoBOM
-          python build/rendering/parallelization/ValidateOwnership.py --package RenderPerformanceAndVisualQualification --diff-file artifacts/qualification-ownership.txt
+          python build/rendering/qualification/ci_scope.py --base $env:QUALIFICATION_BASE_SHA --head $env:QUALIFICATION_HEAD_SHA --diff-file artifacts/qualification-ownership.txt --report artifacts/qualification-scope.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ($paths -contains 'Directory.Build.props') {
             $before = (& git show "$($env:QUALIFICATION_BASE_SHA):Directory.Build.props") -join "`n"

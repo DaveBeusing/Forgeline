@@ -16,6 +16,9 @@ param(
     [string]$Workstream = 'RenderPerformanceAndVisualQualification',
     [ValidatePattern('^[0-9a-f]{40}$')][string]$OwnershipBaseSource,
     [string]$HardwareQualificationEvidence, [string]$GateEvidenceRoot,
+    [string]$InitiativeOwnershipPath,
+    [string]$HardwareObservationPath, [string]$HardwarePolicyPath,
+    [ValidatePattern('^[0-9a-f]{64}$')][string]$ExpectedHardwareIdentitySha256,
     [switch]$Software, [switch]$PlanOnly
 )
 Set-StrictMode -Version Latest
@@ -52,6 +55,7 @@ $cohort = [ordered]@{
     integratedFoundationSha = $ownership.integratedFoundationSha; integratedRepairSha = $ownership.integratedRepairSha
     plan = $plan; planEvidence = @{ path = 'plan.json'; sha256 = Get-QualificationHash $planPath }
     hardware = @{ qualified = $false; qualificationEvidence = $null }
+    sourcePins = @{}
     runs = $runs; commands = $commands; preflight = $preflight; supplemental = @(); validationEvidence = @()
     inventory = $evidence; comparisons = $comparisons
     collectorStatus = @{ status = 'failed'; reason = 'Collector did not complete.' }
@@ -113,6 +117,22 @@ try {
     $ownershipCommand = Invoke-JournalledCommand -Executable $pythonPath -Arguments @(
         (Join-Path $repository 'build/rendering/parallelization/ValidateOwnership.py'), '--manifest', $ownershipPath)
     Assert-QualificationCommand $ownershipCommand
+    if ($InitiativeOwnershipPath) {
+        if (-not $OwnershipBaseSource) { throw 'Initiative ownership requires an explicit OwnershipBaseSource.' }
+        $InitiativeOwnershipPath = (Resolve-Path -LiteralPath $InitiativeOwnershipPath).Path
+        $trustedOwnership = Get-CommandOutput (Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $repository, 'show', "${AnalysisMasterSource}:docs/rendering/render-engine-upgrade/Ownership.json"))
+        $declaredOwnership = [IO.File]::ReadAllText($InitiativeOwnershipPath)
+        if ($trustedOwnership.TrimEnd() -cne $declaredOwnership.TrimEnd()) { throw 'Initiative ownership differs from its committed analysis-source contract.' }
+        $initiative = $declaredOwnership | ConvertFrom-Json
+        Assert-QualificationCommand (Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $repository, 'merge-base', '--is-ancestor', $initiative.baselineSha, $OwnershipBaseSource))
+        Assert-QualificationCommand (Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $repository, 'merge-base', '--is-ancestor', $AnalysisMasterSource, 'origin/master'))
+        Assert-QualificationCommand (Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $repository, 'merge-base', '--is-ancestor', $OwnershipBaseSource, $AnalysisMasterSource))
+        Assert-QualificationCommand (Invoke-JournalledCommand -Executable $pythonPath -Arguments @(
+            (Join-Path $PSScriptRoot 'telemetry_contracts.py'), 'ownership', '--manifest', $InitiativeOwnershipPath))
+        $ownershipCopy = Join-Path $output 'initiative-ownership.json'
+        [IO.File]::Copy($InitiativeOwnershipPath, $ownershipCopy, $false)
+        $evidence.Add(@{path='initiative-ownership.json';sha256=Get-QualificationHash $ownershipCopy})
+    }
     if ($GateEvidenceRoot) {
         $gateIndexPath = (Resolve-Path -LiteralPath (Join-Path $GateEvidenceRoot 'index.json')).Path
         Assert-QualificationCommand (Invoke-JournalledCommand -Executable $pythonPath -Arguments @(
@@ -154,6 +174,14 @@ try {
             $pinned = (Get-Content -LiteralPath (Join-Path $root 'global.json') -Raw | ConvertFrom-Json).sdk.version
             if ($sdk -cne $pinned) { throw "Use the repository-pinned SDK $pinned for this cohort; observed $sdk." }
             $identity = Assert-QualificationPackage -Root $packageRoot -Source $source
+            $pinCommand = Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $root, 'show', "${source}:global.json")
+            Assert-QualificationCommand $pinCommand
+            $provenanceCopy = Join-Path $output "$role-provenance.json"
+            [IO.File]::Copy((Join-Path $packageRoot 'build-provenance.json'), $provenanceCopy, $false)
+            $pinJournal = $commands[$commands.Count - 1]
+            $cohort.sourcePins[$role] = @{ sourceSha = $source; globalJsonCommand = $pinJournal
+                provenance = @{ path = "$role-provenance.json"; sha256 = Get-QualificationHash $provenanceCopy } }
+            $evidence.Add($cohort.sourcePins[$role].provenance)
             if ($identity.provenance.sdk -cne $sdk) { throw 'The package was produced with a different SDK.' }
             $inputs[$role] = @{ root = $root; packageRoot = $packageRoot; source = $source; identity = $identity; sdk = $sdk }
             Write-QualificationJson -Path (Join-Path $output "$role-inputs.json") -Value @{ sourceSha = $source; sdk = $sdk
@@ -169,9 +197,17 @@ try {
             $diffPath = Join-Path $output 'owned-paths.txt'
             $stream = [IO.File]::Open($diffPath, [IO.FileMode]::CreateNew)
             try { $stream.Write([Text.Encoding]::UTF8.GetBytes(($paths -join "`n") + "`n")) } finally { $stream.Dispose() }
+            if ($InitiativeOwnershipPath) {
+                Assert-QualificationCommand (Invoke-JournalledCommand -Executable $pythonPath -Arguments @(
+                    (Join-Path $PSScriptRoot 'telemetry_contracts.py'), 'ownership', '--manifest', $InitiativeOwnershipPath,
+                    '--package', $Workstream, '--diff-file', $diffPath))
+                $historicalDiff = Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $inputs.candidate.root, 'diff', '--exit-code', $OwnershipBaseSource, $CandidateSource, '--', 'docs/rendering/parallelization/ParallelRenderOwnership.json')
+                Assert-QualificationCommand $historicalDiff
+            } else {
             Assert-QualificationCommand (Invoke-JournalledCommand -Executable $pythonPath -Arguments @(
                 (Join-Path $repository 'build/rendering/parallelization/ValidateOwnership.py'), '--manifest', $ownershipPath,
                 '--package', $Workstream, '--diff-file', $diffPath))
+            }
             $beforeVersion = Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $inputs.candidate.root, 'show', "${OwnershipBaseSource}:Directory.Build.props")
             $afterVersion = Invoke-JournalledCommand -Executable 'git' -Arguments @('-C', $inputs.candidate.root, 'show', "${CandidateSource}:Directory.Build.props")
             Assert-QualificationCommand $beforeVersion; Assert-QualificationCommand $afterVersion
@@ -255,7 +291,7 @@ try {
                     Assert-InputUnchanged $inputState
                     $relative = 'pair-{0:D2}/{1}/{2}-{3}' -f $pair, $role, $variant.runProfile, $variant.cameraPath
                     $root = Join-Path $output $relative
-                    $conditions = Get-QualificationConditions
+                    $conditions = Get-QualificationConditions -HardwareObservationPath $HardwareObservationPath -HardwarePolicyPath $HardwarePolicyPath -ExpectedHardwareIdentitySha256 $ExpectedHardwareIdentitySha256
                     $parameters = @{ Capture = $true; OutputRoot = $root; Scenes = $plan.scenes; Profiles = $plan.profiles
                         Zooms = $plan.zooms; Displays = $plan.displays; RasterDpi = $plan.rasterDpi; UiScenarios = @('World'); UiScales = @(1)
                         Warmups = $Warmups; Samples = $(if ($variant.runProfile -eq 'Warm') { $WarmSamples } else { $ColdSamples })
@@ -267,7 +303,7 @@ try {
                     if (Test-Path -LiteralPath $manifestPath) {
                         $runs.Add(@{ pair = $pair; position = $position; role = $role; runProfile = $variant.runProfile; cameraPath = $variant.cameraPath
                             manifest = "$relative/manifest.json"; manifestSha256 = Get-QualificationHash $manifestPath; command = $command
-                            sdk = $inputState.sdk; conditions = $conditions; conditionsAfter = Get-QualificationConditions })
+                            sdk = $inputState.sdk; conditions = $conditions; conditionsAfter = Get-QualificationConditions -HardwareObservationPath $HardwareObservationPath -HardwarePolicyPath $HardwarePolicyPath -ExpectedHardwareIdentitySha256 $ExpectedHardwareIdentitySha256 -RequiredSinceUtc $conditions.observedAtUtc })
                     }
                     Assert-QualificationCommand $command
                     Assert-InputUnchanged $inputState

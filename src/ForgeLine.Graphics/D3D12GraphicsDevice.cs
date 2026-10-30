@@ -639,7 +639,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 {
                     ownedResource.Dispose();
                 }
-            });
+            }, residentByteCount);
 
             UploadTexture(
                 resource,
@@ -727,7 +727,12 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ThrowIfRecording();
         try
         {
+            long started = !_telemetryActive ? 0 : System.Diagnostics.Stopwatch.GetTimestamp();
+            _cpuIntervals = new(_submittedFrameCount, new(started, started), new(started, started), new(started, started), false);
             RenderFrameCore(clearColor, recordCommands);
+            if (_telemetryActive) _cpuIntervals = _cpuIntervals with { RenderFrame = new(started, System.Diagnostics.Stopwatch.GetTimestamp()),
+                Submission = _submittedFrameCount, Submitted = _cpuIntervals.Submitted, SubmittedFence = _lastSubmittedFrameFence,
+                Generation = _telemetryGeneration, ResourceGeneration = checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1) };
         }
         catch (Exception exception)
         {
@@ -766,6 +771,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         long waitStarted = System.Diagnostics.Stopwatch.GetTimestamp();
         WaitForFrame(_frameIndex);
         _frameWaitMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(waitStarted).TotalMilliseconds;
+        if (_telemetryActive) _cpuIntervals = _cpuIntervals with { FenceWait = new(waitStarted, System.Diagnostics.Stopwatch.GetTimestamp()) };
         _resources.Collect(GetCompletedFence());
         ReadCompletedGpuTiming(
             _frameIndex);
@@ -887,6 +893,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             _configuration.EnableVSync ? 1u : 0u,
             PresentFlags.None);
         _presentMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(presentStarted).TotalMilliseconds;
+        if (_telemetryActive) _cpuIntervals = _cpuIntervals with { Present = new(presentStarted, System.Diagnostics.Stopwatch.GetTimestamp()), Submitted = true };
 
         if (presentResult.Failure)
         {
@@ -1279,6 +1286,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
         ulong worldEnd = _timestampReadback.GetData<ulong>(offset + 2 * sizeof(ulong));
         ulong overlayStart = _timestampReadback.GetData<ulong>(offset + 3 * sizeof(ulong));
+        RecordRawGpuTiming(frameIndex, start, end, worldEnd, overlayStart);
         ReadCompletedShadowTiming(frameIndex);
         ReadCompletedParticleTiming(frameIndex);
 
@@ -1766,7 +1774,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
     }
 
-    internal GraphicsResourceRetirement.Resource RegisterResource(Action release) => _resources.Register(release);
+    internal GraphicsResourceRetirement.Resource RegisterResource(Action release, long logicalBytes = 0) => _resources.Register(release, logicalBytes);
 
     internal void UseResource(GraphicsResourceRetirement.Resource resource)
     {
