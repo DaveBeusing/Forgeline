@@ -10,7 +10,7 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='command',required=True)
     p=sub.add_parser('plan');p.add_argument('--execution-source',required=True);p.add_argument('--planning-source',required=True);p.add_argument('--output',required=True)
     p=sub.add_parser('analyze-owner');p.add_argument('--input',required=True);p.add_argument('--output',required=True);p.add_argument('--historical',action='store_true')
-    p=sub.add_parser('diagnose');p.add_argument('--output',required=True);p.add_argument('--nvidia-smi',required=True);p.add_argument('--manifest');p.add_argument('--global-json');p.add_argument('--uuid');p.add_argument('--samples',type=int,default=3);p.add_argument('--interval',type=float,default=1)
+    p=sub.add_parser('diagnose');p.add_argument('--output',required=True);p.add_argument('--nvidia-smi',required=True);p.add_argument('--manifest');p.add_argument('--global-json');p.add_argument('--uuid');p.add_argument('--pid',type=int);p.add_argument('--hwnd',type=lambda v:int(v,0));p.add_argument('--samples',type=int,default=3);p.add_argument('--interval',type=float,default=1)
     p=sub.add_parser('admit');p.add_argument('--output',required=True)
     args=parser.parse_args(argv)
     try:
@@ -26,7 +26,7 @@ def main(argv=None):
             if args.manifest:
                 if not args.global_json:raise ContractError('Actual source global.json is required with a native manifest')
                 native=native_identity(read_json(args.manifest),read_json(args.global_json)['sdk']['version'])
-            acquire(args.output,args.nvidia_smi,native,args.uuid,args.samples,args.interval)
+            acquire(args.output,args.nvidia_smi,native,args.uuid,args.samples,args.interval,args.pid,args.hwnd)
         else:
             value=dict(kind='baseline-admission',status='blocked',physicalAcceptance='open',wave2Ready=False,
                        reasons=['renderer-to-provider physical identity unavailable','previously reviewed hardware/allocation/GPU-memory policies unavailable',

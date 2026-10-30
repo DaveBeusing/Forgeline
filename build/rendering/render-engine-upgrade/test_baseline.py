@@ -83,6 +83,28 @@ class Contracts(unittest.TestCase):
             out=Path(root)/"run";result=p.acquire(out,"fake",samples=1)
             self.assertEqual(result["status"],"diagnostic-complete");self.assertEqual((out/"sensor-00000.stdout").read_bytes(),ROW)
             self.assertEqual(json.loads((out/"latest-unbound.json").read_text())["kind"],"unbound-physical-gpu-observations")
+    def test_no_pid_means_unavailable_foreground(self):
+        self.assertEqual(p.window_facts()["status"],"unavailable")
+    def test_window_facts_require_actual_control(self):
+        good=dict(pid=7,hwnd=100,candidates=[100],owner_pid=7,foreground=100,foreground_pid=7,visible=True,iconic=False)
+        self.assertEqual(p.classify_window_facts(**good)["status"],"controlled")
+        for key,value in (("owner_pid",8),("foreground_pid",8),("foreground",200),("visible",False),("iconic",True)):
+            with self.subTest(key=key):self.assertEqual(p.classify_window_facts(**dict(good,**{key:value}))["status"],"failed")
+        for candidates in ([],[100,101]):
+            self.assertEqual(p.classify_window_facts(**dict(good,hwnd=None,candidates=candidates))["status"],"failed")
+    def test_foreground_loss_retained_as_failed_attempt(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as root,patch("provider.subprocess.run",return_value=subprocess.CompletedProcess(["fake"],0,ROW,b"")),patch("provider.power_status",return_value={"powerSource":"ac"}),patch("provider.window_facts",return_value={"status":"failed","foregroundHwnd":200}):
+            out=Path(root)/"run"
+            with self.assertRaises(c.ContractError):p.acquire(out,"fake",samples=1,client_pid=7)
+            result=json.loads((out/"latest-unbound.json").read_text());self.assertEqual(result["samples"][0]["window"]["foregroundHwnd"],200)
+            self.assertEqual(json.loads((out/"attempt.json").read_text())["status"],"failed")
+    def test_sensor_window_gap_retains_failed_sample(self):
+        times=["2026-10-30T00:00:00Z","2026-10-30T00:00:00Z","2026-10-30T00:00:06Z","2026-10-30T00:00:07Z"]
+        with tempfile.TemporaryDirectory() as root,patch("provider.run_record",return_value=(ROW,{"startedAtUtc":times[0]})),patch("provider.power_status",return_value={"powerSource":"ac"}),patch("provider.window_facts",return_value={"status":"controlled"}),patch("provider.now",side_effect=times),patch("provider.time.sleep"):
+            out=Path(root)/"run"
+            with self.assertRaisesRegex(c.ContractError,"gap exceeds"):p.acquire(out,"fake",samples=2)
+            self.assertEqual(len(json.loads((out/"latest-unbound.json").read_text())["samples"]),2)
     def test_unsupported_cpu_input_is_explicit(self):
         with self.assertRaises((ValueError,KeyError)):c.analyze_owner({'kind':'cpu-benchmark'})
 if __name__=='__main__':unittest.main()

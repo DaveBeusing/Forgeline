@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "C:\\Windows\\System32\\nvidia-smi.exe",
+    "--query-gpu=uuid,pci.bus_id,name,driver_version,temperature.gpu,clocks.current.graphics,power.draw,clocks_event_reasons.active",
+    "--format=csv,noheader,nounits"
+  ],
+  "startedAtUtc": "2026-10-30T15:54:47.719637+00:00",
+  "completedAtUtc": "2026-10-30T15:54:48.015665+00:00",
+  "durationSeconds": 0.2960339999990538,
+  "exitCode": 0,
+  "failure": null,
+  "outputs": {
+    "stdout": {
+      "path": "sensor-00000.stdout",
+      "sha256": "65836d89075503e2bad829fee71f4f9e1de4faa34c9f2d24e23b8e6318a9c3a4"
+    },
+    "stderr": {
+      "path": "sensor-00000.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

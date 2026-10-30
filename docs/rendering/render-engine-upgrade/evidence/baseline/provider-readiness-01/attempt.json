@@ -1,0 +1,11 @@
+{
+  "kind": "unbound-provider-acquisition",
+  "startedAtUtc": "2026-10-30T15:54:47.719316+00:00",
+  "completedAtUtc": "2026-10-30T15:54:50.758006+00:00",
+  "status": "diagnostic-complete",
+  "failure": null,
+  "samplesRetained": 3,
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "qualifiedPublication": "blocked: renderer physical identity attestation unavailable"
+}

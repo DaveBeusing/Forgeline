@@ -63,7 +63,47 @@ def power_status():
 def decode_power(raw):
     status=raw['ACLineStatus'];return dict(raw=raw,powerSource={0:'battery',1:'ac',255:'unknown'}.get(status,'unknown'))
 
-def acquire(output,executable,native=None,expected_uuid=None,samples=3,interval=1.0):
+def classify_window_facts(pid,hwnd,candidates,owner_pid,foreground,foreground_pid,visible,iconic):
+    reasons=[]
+    if hwnd is None:
+        if len(candidates)!=1:reasons.append("missing-or-ambiguous-client-window")
+        else:hwnd=candidates[0]
+    if owner_pid!=pid:reasons.append("window-owner-pid-mismatch")
+    if not visible:reasons.append("window-hidden")
+    if iconic:reasons.append("window-minimized")
+    if foreground!=hwnd or foreground_pid!=pid:reasons.append("client-not-foreground")
+    return dict(status="failed" if reasons else "controlled",observedAtUtc=now(),requestedPid=pid,hwnd=hwnd,
+                candidates=candidates,ownerPid=owner_pid,foregroundHwnd=foreground,foregroundOwnerPid=foreground_pid,
+                visible=visible,iconic=iconic,reasons=reasons,semantics="WS_VISIBLE is not physical unobscured coverage")
+
+def window_facts(pid=None,hwnd=None):
+    if pid is None:return dict(status="unavailable",observedAtUtc=now(),reason="No client PID supplied; foreground continuity unobserved")
+    require(type(pid) is int and pid>0,"Client PID must be a positive integer")
+    require(hwnd is None or type(hwnd) is int and hwnd>0,"Client HWND must be a positive integer")
+    require(os.name=="nt","Actual client window facts require Windows")
+    from ctypes import wintypes
+    user=ctypes.WinDLL("user32",use_last_error=True)
+    user.GetForegroundWindow.restype=wintypes.HWND
+    user.GetWindowThreadProcessId.argtypes=[wintypes.HWND,ctypes.POINTER(wintypes.DWORD)]
+    for name in ("IsWindowVisible","IsIconic"):
+        getattr(user,name).argtypes=[wintypes.HWND];getattr(user,name).restype=wintypes.BOOL
+    def owner(handle):
+        value=wintypes.DWORD();user.GetWindowThreadProcessId(handle,ctypes.byref(value));return value.value
+    candidates=[]
+    callback_type=ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)
+    @callback_type
+    def visit(handle,_):
+        if owner(handle)==pid:candidates.append(int(handle))
+        return True
+    user.EnumWindows.argtypes=[callback_type,wintypes.LPARAM];user.EnumWindows.restype=wintypes.BOOL
+    require(user.EnumWindows(visit,0)!=0,"EnumWindows failed")
+    selected=hwnd if hwnd is not None else candidates[0] if len(candidates)==1 else None
+    foreground=user.GetForegroundWindow();foreground=int(foreground) if foreground else None
+    return classify_window_facts(pid,selected,candidates,owner(selected) if selected else None,foreground,
+                                 owner(foreground) if foreground else None,bool(selected and user.IsWindowVisible(selected)),
+                                 bool(selected and user.IsIconic(selected)))
+
+def acquire(output,executable,native=None,expected_uuid=None,samples=3,interval=1.0,client_pid=None,client_hwnd=None):
     require(type(samples) is int and 1<=samples<=43201,'Sample count outside bounded diagnostic range')
     require(0.1<=interval<=5,'Diagnostic interval must be 0.1..5 seconds')
     output=Path(output);output.mkdir(parents=True,exist_ok=False)
@@ -71,13 +111,14 @@ def acquire(output,executable,native=None,expected_uuid=None,samples=3,interval=
     try:
         for i in range(samples):
             raw,command=run_record([str(executable),'--query-gpu='+FIELDS,'--format=csv,noheader,nounits'],output,f'sensor-{i:05d}')
-            inventory=parse_inventory(raw);power=power_status();at=now()
+            inventory=parse_inventory(raw);power=power_status();window=window_facts(client_pid,client_hwnd);at=now()
             mapping=candidate_mapping(native,inventory,expected_uuid)
-            if series.samples:
-                require((utc(at)-utc(series.samples[-1]['observedAtUtc'])).total_seconds()<=5,'Sensor acquisition gap exceeds five seconds')
-            series.add(dict(observedAtUtc=at,acquisitionStartedAtUtc=command['startedAtUtc'],devices=inventory,power=power,
+            gap_valid=not series.samples or (utc(at)-utc(series.samples[-1]['observedAtUtc'])).total_seconds()<=5
+            series.add(dict(observedAtUtc=at,acquisitionStartedAtUtc=command['startedAtUtc'],devices=inventory,power=power,window=window,
                             rawSha256=sha256_bytes(raw),commandRecord=f'sensor-{i:05d}.command.json'))
             atomic_diagnostic_snapshot(output/'latest-unbound.json',series.snapshot(inventory,mapping))
+            require(gap_valid,'Sensor/window acquisition gap exceeds five seconds; facts retained')
+            require(window['status']!='failed','Client foreground control failed; actual facts retained')
             if i+1<samples:time.sleep(interval)
         status='diagnostic-complete'
     except Exception as error:failure=str(error)
