@@ -1,0 +1,13 @@
+{
+  "kind": "baseline-admission",
+  "status": "blocked",
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "reasons": [
+    "renderer-to-provider physical identity unavailable",
+    "previously reviewed hardware/allocation/GPU-memory policies unavailable",
+    "exact-source required CI admission unverified",
+    "native-fixture live binding unavailable",
+    "qualified A/A cohorts unavailable"
+  ]
+}

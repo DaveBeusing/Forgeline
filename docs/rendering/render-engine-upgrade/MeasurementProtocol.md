@@ -1,4 +1,4 @@
-# Measurement protocol — diagnostic preparation
+# Measurement protocol - diagnostic preparation
 
 Status: physical baseline admission OPEN; wave 2 NOT READY. This protocol does not authorize a performance claim or render optimization.
 
@@ -19,3 +19,6 @@ CPU `--frame-hotpaths` and `--scalability` outputs are currently unsupported by 
 Preserve every attempt and all rejected cohorts. No winning-rerun selection, sample/deadline reductions, synchronization changes or policy relaxation are authorized. Pass optional `--pid <actual-client-pid> [--hwnd <actual-hwnd>]` to retain read-only Win32 foreground HWND/owner PID, selected-window owner PID, visibility, minimized state and observation timestamps per sensor sample. Without an explicit HWND exactly one PID-owned top-level window is required. Wrong ownership, missing/ambiguous windows, hidden/minimized state, foreground loss or acquisition gaps fail diagnostic control and retain actual facts. No PID means foreground continuity unavailable. No window activation is performed. Point samples cannot establish visibility between observations. Foreground facts require actual observations; WS_VISIBLE does not prove unobscured or continuous foreground presentation.
 
 Provider semantics: [NVIDIA query documentation](https://docs.nvidia.com/deploy/nvidia-smi/), [documented NVML event-bit subset](https://docs.nvidia.com/deploy/archive/R550/nvml-api/group__nvmlClocksEventReasons.html), and [Windows SYSTEM_POWER_STATUS](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-system_power_status). Any active known reason is conservatively retained; GPU idle is not treated as a stable-hardware pass. Unknown future bits are unavailable.
+
+
+Recorded execution is summarized in [Baseline.md](Baseline.md): canonical commands are functional validation with explicit compiled/publisher source splits; CPU reports are unqualified single invocations and preserve their original schema/bytes. `analyze-owner` intentionally rejects CPU report schemas. Gzip files preserve their original SHA256 and can be decompressed for independent analysis without relabelling the source. The before/after executable/runtime input inventory is identical, but this alone does not satisfy physical, fixture, policy or repeated-control admissions. Snapshot rewriting/fsync grows with the accumulated series; a three-sample readiness check does not establish long-run observation cost. Both wave 2 lanes retain no-change dispositions until qualifying evidence is accepted.

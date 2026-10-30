@@ -1,0 +1,413 @@
+{
+  "kind": "functional-canonical-validation",
+  "physicalPerformanceAcceptance": "not-applicable",
+  "source": {
+    "baselineSha": "6b38707e29753bee64a014b7e23ef8bd150e970a",
+    "branchSource": "remote",
+    "branchRef": "origin/master",
+    "script": "D:\\Code\\Forgeline\\artifacts\\render-plan-staging\\Run-Wave0Canonical.ps1",
+    "scriptSha256": "07239b74216041db56a66425ddd72136ad0a949a6a8fd6a800d7f2ade40dbcea",
+    "note": "Full canonical validation at version-only preparation commit. Subsequent tooling/document edits are validated separately; do not relabel this source.",
+    "compiledSourceSha": "b8c3b79bbaa53ffb8e9961fc2cc9d9815de2b32d",
+    "toolingHeadDuringSuite": "2651bbeb6908b1ba6093b3a5dabac35f32f3bcbf",
+    "stageSourceNote": "Full-suite binaries identify b8c3b79b; subsequent commits change only Python/docs/evidence. Publisher and terminal binaries retain their own actual product-version/source metadata and are recorded separately.",
+    "publisherSourceSha": "2651bbeb6908b1ba6093b3a5dabac35f32f3bcbf",
+    "publisherSourceTreeClean": true,
+    "terminalProductVersion": "0.1.537-dev+b8c3b79bbaa53ffb8e9961fc2cc9d9815de2b32d"
+  },
+  "commands": [
+    {
+      "name": "version",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Validate-SemVer.ps1",
+        "-BaseRef",
+        "origin/master",
+        "-HeadRef",
+        "HEAD"
+      ],
+      "startedAtUtc": "2026-10-30T15:40:51.0018888+00:00",
+      "completedAtUtc": "2026-10-30T15:40:55.3320089+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\version.log",
+      "logSha256": "d377b85a269be25a60c4aa37ddfe00d988469fb68f1da55e0b03de5a02a47ed7"
+    },
+    {
+      "name": "version-contracts",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Test-Versioning.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:40:55.3719129+00:00",
+      "completedAtUtc": "2026-10-30T15:40:58.7145681+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\version-contracts.log",
+      "logSha256": "c13d4356e2eaeb1a11dea208a155cdddde155cccc2114e0284af35c02e86672a"
+    },
+    {
+      "name": "version-allocation",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Test-VersionAllocation.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:40:58.7188286+00:00",
+      "completedAtUtc": "2026-10-30T15:41:16.5404754+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\version-allocation.log",
+      "logSha256": "61dcdbcc862d8f46aa13b827919359c9aa39ad3459bafd4cb3795beed69e314b"
+    },
+    {
+      "name": "qualification-python",
+      "executable": "python",
+      "arguments": [
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "build/rendering/qualification",
+        "-p",
+        "test_*.py",
+        "-q"
+      ],
+      "startedAtUtc": "2026-10-30T15:41:16.5433312+00:00",
+      "completedAtUtc": "2026-10-30T15:42:01.8112995+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\qualification-python.log",
+      "logSha256": "ac2edcb8fc6acfb47990d38b9220a4807c3b6eee527cf6673a45ae30bea83d92"
+    },
+    {
+      "name": "qualification-powershell",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/rendering/qualification/Test-RenderQualification.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:42:01.8163693+00:00",
+      "completedAtUtc": "2026-10-30T15:42:14.1890418+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\qualification-powershell.log",
+      "logSha256": "f5ef1367822126590c34fef0e4f0223897478dc999de7d8cb2fee5685d447e54"
+    },
+    {
+      "name": "restore",
+      "executable": "dotnet",
+      "arguments": [
+        "restore",
+        "ForgeLine.sln"
+      ],
+      "startedAtUtc": "2026-10-30T15:42:14.1919116+00:00",
+      "completedAtUtc": "2026-10-30T15:42:35.2606477+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\restore.log",
+      "logSha256": "531213a04086875234e92536d824396e868822311d1b82b37ffb3c6fb5f53953"
+    },
+    {
+      "name": "references",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Validate-ProjectReferences.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:42:35.2674189+00:00",
+      "completedAtUtc": "2026-10-30T15:42:42.1369058+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\references.log",
+      "logSha256": "2ec3e22361cad8c494a55359c1288284f7050063c1fda25c3d453c52a684715d"
+    },
+    {
+      "name": "build",
+      "executable": "dotnet",
+      "arguments": [
+        "build",
+        "ForgeLine.sln",
+        "--configuration",
+        "Release",
+        "--no-restore"
+      ],
+      "startedAtUtc": "2026-10-30T15:42:42.1410117+00:00",
+      "completedAtUtc": "2026-10-30T15:44:49.0154841+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\build.log",
+      "logSha256": "7f372539bdc02cd29dfc3497159622402bf658ccc18b927e7c40342b9835688a"
+    },
+    {
+      "name": "map-central",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--output",
+        "artifacts\\wave1-canonical-01\\central-divide.flmap.json",
+        "--qualification-output",
+        "artifacts\\wave1-canonical-01\\central-map-qualification.json"
+      ],
+      "startedAtUtc": "2026-10-30T15:44:49.0301315+00:00",
+      "completedAtUtc": "2026-10-30T15:44:58.3146080+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\map-central.log",
+      "logSha256": "4ca4f1164efa98cae2ad0cca7619b1b97fde10d782ced662027358cb4aa0220c"
+    },
+    {
+      "name": "map-split",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--scenario",
+        "split-basin",
+        "--output",
+        "artifacts\\wave1-canonical-01\\split-basin.flmap.json",
+        "--qualification-output",
+        "artifacts\\wave1-canonical-01\\split-map-qualification.json"
+      ],
+      "startedAtUtc": "2026-10-30T15:44:58.3197508+00:00",
+      "completedAtUtc": "2026-10-30T15:45:04.9110411+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\map-split.log",
+      "logSha256": "3833e3fcb8e84942e46fc2d9eee4d02c1276715d247d3ba8f1f9d5607a576aac"
+    },
+    {
+      "name": "scenario-contracts",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Test-CompiledScenarioLoading.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:45:04.9172751+00:00",
+      "completedAtUtc": "2026-10-30T15:46:14.5259820+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\scenario-contracts.log",
+      "logSha256": "2d49e4d90376d0348073d2986e32bcfab5f05fa124f14e0fa2ddd433ea4cc1e4"
+    },
+    {
+      "name": "runtime-assets",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Build-RuntimeAssets.ps1",
+        "-Mode",
+        "build",
+        "-ForceRebuild",
+        "-NoBuild"
+      ],
+      "startedAtUtc": "2026-10-30T15:46:14.5312283+00:00",
+      "completedAtUtc": "2026-10-30T15:56:13.6822022+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\runtime-assets.log",
+      "logSha256": "1c1d552241ef694e112940a7893d6dbe9815a7352c2313133ad0bc1b3885f23d"
+    },
+    {
+      "name": "asset-contracts",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Test-RuntimeAssetPipeline.ps1"
+      ],
+      "startedAtUtc": "2026-10-30T15:56:13.6852380+00:00",
+      "completedAtUtc": "2026-10-30T15:56:21.0570594+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\asset-contracts.log",
+      "logSha256": "0e6ca6646d089cb0d444a79a54dd5453ab066ed41208490d3dd14235474e1074"
+    },
+    {
+      "name": "client-smoke",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "src/ForgeLine.Client/ForgeLine.Client.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--smoke-test",
+        "--render-stress",
+        "1000"
+      ],
+      "startedAtUtc": "2026-10-30T15:56:21.0601292+00:00",
+      "completedAtUtc": "2026-10-30T15:56:38.6731234+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\client-smoke.log",
+      "logSha256": "f913e252889a1be0b349a8d953043baa55506e8d7fa50d5971e8d5f6511c1439"
+    },
+    {
+      "name": "headless-smoke",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--ticks",
+        "64",
+        "--seed",
+        "12345",
+        "--tick-rate",
+        "20",
+        "--entities",
+        "1000",
+        "--diagnostics-output",
+        "artifacts\\wave1-canonical-01\\headless-smoke.json"
+      ],
+      "startedAtUtc": "2026-10-30T15:56:38.6762847+00:00",
+      "completedAtUtc": "2026-10-30T15:56:40.7042602+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\headless-smoke.log",
+      "logSha256": "146e17e81453d0938c153969c2d0275a9405c2292b6d90be85d4ab915cae53d7"
+    },
+    {
+      "name": "headless-stress",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--ticks",
+        "16",
+        "--seed",
+        "67890",
+        "--tick-rate",
+        "20",
+        "--entities",
+        "10000",
+        "--diagnostics-output",
+        "artifacts\\wave1-canonical-01\\headless-stress.json"
+      ],
+      "startedAtUtc": "2026-10-30T15:56:40.7068861+00:00",
+      "completedAtUtc": "2026-10-30T15:56:42.7951510+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\headless-stress.log",
+      "logSha256": "e3aa1bb14a447da48adf5d24fe038b308d0cb5a79b2f1b9a0ed46de6165a7452"
+    },
+    {
+      "name": "solution-tests",
+      "executable": "dotnet",
+      "arguments": [
+        "test",
+        "--solution",
+        "ForgeLine.sln",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--max-parallel-test-modules",
+        "1"
+      ],
+      "startedAtUtc": "2026-10-30T15:56:42.7980611+00:00",
+      "completedAtUtc": "2026-10-30T16:24:25.1733330+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\solution-tests.log",
+      "logSha256": "b05fb48462787dfed2d4ce0dfc4243dd15b605d11cc7ede4e24b88185d554c3f"
+    },
+    {
+      "name": "publish",
+      "executable": "pwsh",
+      "arguments": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Publish-PreAlpha.ps1",
+        "-Configuration",
+        "Release",
+        "-VerifyReproducible",
+        "-RuntimeAssetRoot",
+        "assets/runtime"
+      ],
+      "startedAtUtc": "2026-10-30T16:24:25.1768795+00:00",
+      "completedAtUtc": "2026-10-30T16:28:08.1553808+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\publish.log",
+      "logSha256": "4c760811631784629f1cbdeebfea5a18437b977568f8bb512bfda0b1f5f5b0c3"
+    },
+    {
+      "name": "terminal-match",
+      "executable": "dotnet",
+      "arguments": [
+        "run",
+        "--project",
+        "src/ForgeLine.Headless/ForgeLine.Headless.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "--",
+        "--scenario",
+        "central-divide",
+        "--profile",
+        "validation",
+        "--ticks",
+        "80000",
+        "--seed",
+        "2026",
+        "--require-terminal",
+        "--diagnostics-output",
+        "artifacts\\wave1-canonical-01\\terminal-match.json"
+      ],
+      "startedAtUtc": "2026-10-30T16:28:08.1589959+00:00",
+      "completedAtUtc": "2026-10-30T16:34:06.7751476+00:00",
+      "exitCode": 0,
+      "log": "artifacts\\wave1-canonical-01\\terminal-match.log",
+      "logSha256": "9e193a6c0a9da680e82e9f5b8aeb13e5e9b2482a618a05a0bae638c2bb62b0e0"
+    }
+  ],
+  "solutionTests": {
+    "total": 4907,
+    "passed": 4826,
+    "skipped": 81,
+    "failed": 0,
+    "elapsed": "27m40.288s"
+  },
+  "terminal": {
+    "seed": 2026,
+    "tickCeiling": 80000,
+    "terminalTick": 59098,
+    "winner": 1,
+    "result": "Victory",
+    "reason": "CommandCoreDestroyed",
+    "elapsedMilliseconds": 354032.5
+  },
+  "rawLogs": "Retained locally under artifacts/wave1-canonical-01; log hashes above"
+}

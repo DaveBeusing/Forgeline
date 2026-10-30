@@ -1,0 +1,19 @@
+{
+  "kind": "unbound-provider-acquisition",
+  "startedAtUtc": "2026-10-30T16:39:40.903367+00:00",
+  "completedAtUtc": "2026-10-30T16:39:43.588042+00:00",
+  "status": "diagnostic-complete",
+  "failure": null,
+  "samplesRetained": 3,
+  "providerVersion": {
+    "rawText": "NVIDIA-SMI version  : 596.53\r\nNVML version        : 596.53\r\nDRIVER version      : 596.53\r\nCUDA Version        : 13.2",
+    "rawSha256": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c",
+    "commandRecord": "provider-version.command.json"
+  },
+  "executableSha256Before": "0b15f195778e22ac3a365c40ab6bb1c0ada9521da338d18332cf341b4a6d8ae1",
+  "executableSha256After": "0b15f195778e22ac3a365c40ab6bb1c0ada9521da338d18332cf341b4a6d8ae1",
+  "querySchema": "uuid,pci.bus_id,name,driver_version,temperature.gpu,clocks.current.graphics,power.draw,clocks_event_reasons.active",
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "qualifiedPublication": "blocked: renderer physical identity attestation unavailable"
+}

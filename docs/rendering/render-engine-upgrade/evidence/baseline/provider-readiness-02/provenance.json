@@ -1,0 +1,26 @@
+{
+  "kind": "diagnostic-readiness-provenance",
+  "toolkitSource": "01af224f301eefabb4018bbf02410d5622541d5c",
+  "executionBaseline": "6b38707e29753bee64a014b7e23ef8bd150e970a",
+  "concurrentActivity": "Canonical/CPU diagnostic lanes completed before acquisition; no native workload launched",
+  "foreground": "unavailable: no client PID supplied",
+  "physicalAcceptance": "open",
+  "wave2Ready": false,
+  "stableHardwareClaim": false,
+  "files": {
+    "attempt.json": "1eb82b7a42d1725067e16dde0ca5870042548cc704e2dad3cee33de3ba5cd1c3",
+    "latest-unbound.json": "d4c9f7b774d3ed07139643cd755047fe9d4a8903b923fe3c924ec15a8c3521dd",
+    "provider-version.command.json": "0a0094d11dd5e75e645393a2fb0348631fd5392f81aeb897f6f48860683a3e9b",
+    "provider-version.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "provider-version.stdout": "6b4ebe0dc47cb8ef8e78c36b9f4ebaae0ffe6e98e9fe006d761ba522ae67f33c",
+    "sensor-00000.command.json": "a5e525b1e1de287657b516554a11bb187bdfbcbe8b4a7c79984863197d671353",
+    "sensor-00000.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00000.stdout": "fb94c2330f6c13da50fa9dceecec4fdbf816d1aaf9d956af99acdf2159d76ff7",
+    "sensor-00001.command.json": "47c16d711b6eb55a11023712e058444565687a1130be10b6dd0bdcf46420b0f0",
+    "sensor-00001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00001.stdout": "04625389348f276fb00ace7caeead5b0b439ee9e7ebe4418e8ba96473bafe0f1",
+    "sensor-00002.command.json": "16ee9470d1017acfb7d3ca626fde0d94b2c6bcdbdd85184ee561d1f87af4574b",
+    "sensor-00002.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sensor-00002.stdout": "04625389348f276fb00ace7caeead5b0b439ee9e7ebe4418e8ba96473bafe0f1"
+  }
+}

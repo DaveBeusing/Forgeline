@@ -1,0 +1,13 @@
+{
+  "kind": "diagnostic-cpu-null-graphics",
+  "gitHead": "01af224f301eefabb4018bbf02410d5622541d5c",
+  "benchmarkProductVersion": "0.1.537-dev+b8c3b79bbaa53ffb8e9961fc2cc9d9815de2b32d",
+  "benchmarkSha256": "1bee10dd2c5cf788a66ca576ff2cd4b2fdcdb580a053ee211aca7c2a66f72642",
+  "capturedAtUtc": "2026-10-30T16:35:25.3632541+00:00",
+  "scalabilitySamples": 512,
+  "scalabilityWarmups": 128,
+  "scalabilityMaximumRoots": 10000,
+  "original100000SampleRecipe": "not-run; exceeds65536samplelimit; not an entity count",
+  "physicalAcceptance": "open",
+  "wave2Ready": false
+}

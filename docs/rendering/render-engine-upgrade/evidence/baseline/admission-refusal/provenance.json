@@ -1,0 +1,19 @@
+{
+  "kind": "expected-admission-refusal",
+  "toolingCodeSource": "01af224f301eefabb4018bbf02410d5622541d5c",
+  "argv": [
+    "python",
+    "build/rendering/render-engine-upgrade/baseline.py",
+    "admit",
+    "--output",
+    "artifacts/wave1-admission-01.json"
+  ],
+  "expectedExitCode": 2,
+  "actualExitCode": 2,
+  "scope": "Expected fail-closed CLI behavior; not a failed canonical stage or accepted qualification",
+  "files": {
+    "wave1-admission-01.json": "038f02bcf97f6d75be47c8cc51eb709e9d8f9aacfade4c83f26035d466a0406d",
+    "wave1-admission-01.stderr.log": "7d88d498ed99d5d5fd65078742209f1835a87943421dc2b0efe85520022c45bf",
+    "wave1-admission-01.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
