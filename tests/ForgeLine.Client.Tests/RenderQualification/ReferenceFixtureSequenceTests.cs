@@ -6,6 +6,7 @@ using System.Text.Json;
 using ForgeLine.Assets;
 using ForgeLine.Game;
 using ForgeLine.Core;
+using ForgeLine.Graphics;
 
 namespace ForgeLine.Client.Tests;
 
@@ -85,6 +86,17 @@ public sealed class ReferenceFixtureSequenceTests
         Assert.Equal(inputs.Length, inputs.Select(value => Convert.ToHexString(SHA256.HashData(ReferenceFixtureRecipe.SerializeIdentityInputs(value)))).Distinct().Count());
         Assert.Throws<NotSupportedException>(() => ReferenceFixtureRecipe.WorldUiIdentity(default(PlayerActionPanelView) with
             { Ring = new(default, default, 0, 0, true, true) }, RtsInformationLayerView.Empty));
+    }
+    [Fact]
+    public void UnpresentedOrStaleAttemptsCannotAdvanceTheFixtureSequence()
+    {
+        var before = new GraphicsFrameSubmission(3, 20, 1, 1);
+        var after = new GraphicsFrameSubmission(4, 25, 1, 1);
+        ReferenceFixturePresentation.RequireSuccessful(3, 4, before, after); // Shared-queue fence gaps are valid.
+        Assert.Throws<InvalidDataException>(() => ReferenceFixturePresentation.RequireSuccessful(3, 3, before, after));
+        Assert.Throws<InvalidDataException>(() => ReferenceFixturePresentation.RequireSuccessful(3, 4, before, after with { SubmittedFence = 20 }));
+        Assert.Throws<InvalidDataException>(() => ReferenceFixturePresentation.RequireSuccessful(3, 4, before, after with { Submission = 3 }));
+        Assert.Throws<InvalidDataException>(() => ReferenceFixturePresentation.RequireSuccessful(3, 4, before, after with { Generation = 2 }));
     }
     private static VisualReferenceCaptureRequest Request() => new()
     {

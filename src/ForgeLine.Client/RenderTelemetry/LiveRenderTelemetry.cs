@@ -30,6 +30,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
     private bool _armed, _finished;
     private ulong _firstMeasuredFence;
     private bool _overflow, _disposed;
+    private object? _failedFixtureAttempt;
     internal int Count => _count;
     internal bool WindowCompleted => _finished;
     internal bool Overflowed => _overflow || _source.TelemetryOverflowed;
@@ -79,6 +80,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
     internal LiveTelemetryStart Begin(GraphicsTimestampInterval signalWait = default)
     {
         VerifyOwner();
+        if (_failedFixtureAttempt is not null) throw new InvalidOperationException("A failed fixture window cannot resume.");
         if (_finished) return default;
         long serviceStart = Stopwatch.GetTimestamp();
         long counterStart = Stopwatch.GetTimestamp();
@@ -91,6 +93,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
     internal void Complete(in LiveTelemetryStart start, string state, long prepareStart = 0, long prepareEnd = 0)
     {
         VerifyOwner();
+        if (_failedFixtureAttempt is not null) throw new InvalidOperationException("A failed fixture window cannot consume another observation.");
         if (_finished) { DrainGpu(); return; }
         long end = Stopwatch.GetTimestamp();
         long thread = GC.GetAllocatedBytesForCurrentThread() - start.ThreadBytes;
@@ -141,6 +144,37 @@ internal sealed class LiveRenderTelemetry : IDisposable
         _frames[frameIndex] = _frames[frameIndex] with
         { ServiceEndTick = Stopwatch.GetTimestamp(), Observer = observer with { GpuDrain = new(gpuDrainStart, gpuDrainEnd) } };
     }
+    internal void RecordFixtureFailure(in LiveTelemetryStart start, string state)
+    {
+        VerifyOwner();
+        if (_failedFixtureAttempt is not null) throw new InvalidOperationException("The first failed fixture attempt cannot be replaced.");
+        long end = Stopwatch.GetTimestamp();
+        long? thread = _finished ? null : GC.GetAllocatedBytesForCurrentThread() - start.ThreadBytes;
+        long? process = _finished ? null : GC.GetTotalAllocatedBytes(precise: true) - start.ProcessBytes;
+        _failedFixtureAttempt = new { state, nextSampleIndex = _count, warmupsRemaining = _warmupsRemaining,
+            startTick = start.Tick, endTick = end, processAllocatedBytes = process, threadAllocatedBytes = thread,
+            cpu = _source.CpuIntervals, scope = _finished ? "post-window" : "failed attempt; does not advance warmups or sample index" };
+        _source.StopRenderTelemetry();
+    }
+    internal void ValidateFixtureCorrespondence(ReadOnlySpan<ReferenceFixtureFrameObservation> acknowledgements)
+    {
+        VerifyOwner(); DrainGpu();
+        if (!_finished || _failedFixtureAttempt is not null || Overflowed || _count != _frames.Length || acknowledgements.Length != _count || _gpuCount != _count)
+            throw new InvalidDataException("Fixture owner/ACK/GPU window is failed or incomplete.");
+        var completed = new HashSet<(ulong, ulong, ulong)>();
+        foreach (var sample in _gpu.AsSpan(0, _gpuCount))
+            if (!completed.Add((sample.Generation, sample.ResourceGeneration, sample.SubmittedFence)) || sample.CompletedFence < sample.SubmittedFence)
+                throw new InvalidDataException("Fixture GPU completion is duplicated or uncompleted.");
+        for (int i = 0; i < _count; i++)
+        {
+            var frame = _frames[i]; var ack = acknowledgements[i];
+            if (frame.Index != i || ack.Index != i || ack.Ordinal != _warmups + i || frame.State != "gameplay" ||
+                ack.SubmittedFence != frame.SubmittedFence || ack.Generation != frame.Generation || ack.ResourceGeneration != frame.ResourceGeneration ||
+                !completed.Remove((frame.Generation, frame.ResourceGeneration, frame.SubmittedFence)))
+                throw new InvalidDataException("Actual owner CPU, successful camera ACK and completed GPU tuple/index differ.");
+        }
+        if (completed.Count != 0) throw new InvalidDataException("Completed GPU tuples remain unreferenced by the fixture owner window.");
+    }
     internal void DrainGpu()
     {
         VerifyOwner();
@@ -177,6 +211,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["ownerThread"] = JsonSerializer.SerializeToNode(new { managedThreadId = _owner, nativeThreadId = _nativeOwner,
             processId = Environment.ProcessId, timestampClock = "Stopwatch/QPC", highResolution = Stopwatch.IsHighResolution }, JsonOptions);
         document["overflowed"] = Overflowed;
+        document["failedFixtureAttempt"] = JsonSerializer.SerializeToNode(_failedFixtureAttempt, JsonOptions);
         document["serviceIntervalsAvailable"] = true;
         document["window"] = JsonSerializer.SerializeToNode(new { arm = "first-gameplay-iteration", warmups = _warmups,
             samples = _frames.Length, completed = _finished, contiguous = true, idleWaitIncluded = false,

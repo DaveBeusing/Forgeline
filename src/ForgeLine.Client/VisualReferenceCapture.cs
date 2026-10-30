@@ -27,6 +27,7 @@ internal sealed record VisualReferenceCaptureRequest
     public int Samples { get; init; } = 128;
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
+    public bool CaptureShadowDiagnostics { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
     public double? MechanicalSeconds { get; init; }
@@ -101,6 +102,7 @@ internal static class VisualReferenceCapture
         var failedCaptures = new List<string>();
         var uiPixelHashes = new Dictionary<string, string>(StringComparer.Ordinal);
         object? captureState = null;
+        object? timedWindowState = null;
         long startupStart = Stopwatch.GetTimestamp();
         long startupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
         try
@@ -151,6 +153,7 @@ internal static class VisualReferenceCapture
                 foreach (float uiScale in request.UiScales)
                 {
                     graphics.WaitForIdle();
+                    timedWindowState = null;
                     long setupStart = Stopwatch.GetTimestamp();
                     long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
                     var beforeSetup = graphics.Diagnostics;
@@ -319,15 +322,37 @@ internal static class VisualReferenceCapture
                     void RecordFrame()
                     {
                         if (!meshes.AssetsPrepared) PrepareTerrain();
+                        ulong beforePresent = graphics.PresentedFrameCount;
+                        var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                         graphics.RenderFrame(GraphicsColor.ForgeLineClear, record);
                         meshes.Submit(); meshes.Retire();
+                        ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                     }
                     byte[] CaptureFrame()
                     {
                         if (!meshes.AssetsPrepared) PrepareTerrain();
-                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record);
+                        ulong beforePresent = graphics.PresentedFrameCount;
+                        var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
+                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
                         meshes.Submit(); meshes.Retire();
+                        ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                         return pixels;
+                    }
+                    object CaptureInputRecord(int repetition, byte[] pixels)
+                    {
+                        ReadOnlyMemory<byte> depth = graphics.CaptureShadowDepth;
+                        string? file = null;
+                        if (request.CaptureShadowDiagnostics && !depth.IsEmpty)
+                        {
+                            file = $"{key}-readback-{repetition:D2}.depth";
+                            using var stream = new FileStream(Path.Combine(request.OutputRoot, file), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+                            stream.Write(depth.Span);
+                        }
+                        return new { repetition, frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
+                            actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
+                            pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)),
+                            shadowFingerprint = depth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(depth.Span)),
+                            shadowFile = file, shadowLayout = (graphics as IGraphicsRenderTelemetry)?.CaptureShadowLayout };
                     }
                     PrepareTerrain();
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
@@ -352,13 +377,14 @@ internal static class VisualReferenceCapture
                         camera.ApplyState(sharedFixture?.SampleCameras[i] ?? ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
                         long start = Stopwatch.GetTimestamp(); PrepareTerrain(); RecordFrame();
-                        cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+                        long cpuEndedAt = Stopwatch.GetTimestamp();
+                        cpu[i] = Stopwatch.GetElapsedTime(start, cpuEndedAt).TotalMilliseconds;
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
                         meshes.ObserveFrameDiagnostics(sampleDiagnostics);
                         performance.DrainRawGpu(graphics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory, actualSubmission: (graphics as IGraphicsRenderTelemetry)?.CpuIntervals);
+                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory, actualSubmission: (graphics as IGraphicsRenderTelemetry)?.CpuIntervals, measuredInterval: new GraphicsTimestampInterval(start, cpuEndedAt));
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
@@ -372,6 +398,10 @@ internal static class VisualReferenceCapture
                     performance.DrainRawGpu(graphics);
                     if (measured.Frame is { } finalFrame && finalFrame.GpuSubmissionFence > lastFence && measured.GpuFrameMilliseconds is { } finalGpu)
                         gpu.Add(finalGpu);
+                    timedWindowState = new { sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, key,
+                        recipeFingerprint = sharedFixture?.Fingerprint, recipeInputs = sharedFixture?.IdentityInputs,
+                        recipeInputBytesBase64 = sharedFixture?.InputBytesBase64, camera = initialCamera, profile, lighting,
+                        performance = performance.Report(measured) };
                     camera.ApplyState(initialCamera);
                     PrepareTerrain();
                     // Restore fixed pose and settle history only after the timed window.
@@ -393,14 +423,12 @@ internal static class VisualReferenceCapture
                     bool repeatPixelsEqual = true;
                     var repeatFailures = new List<object>();
                     ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
-                    captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
-                        shadowFingerprint = shadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(shadowDepth.Span)) });
+                    captureInputs.Add(CaptureInputRecord(0, rgba));
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
                         captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
                         byte[] repeated = CaptureFrame();
-                        captureInputs.Add(new { frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
-                            shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)) });
+                        captureInputs.Add(CaptureInputRecord(repetition, repeated));
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
                             if (repeatPixelsEqual)
@@ -513,7 +541,7 @@ internal static class VisualReferenceCapture
             Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
-                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs }, JsonOptions));
+                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs, timedWindow = timedWindowState }, JsonOptions));
             return 1;
         }
     }

@@ -15,6 +15,10 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsRenderTelemetry
     private ulong _telemetryLastFence = ulong.MaxValue;
     public bool TelemetryOverflowed { get { VerifyOwner(); return _completedTelemetry?.Overflowed ?? false; } }
     public GraphicsCpuFrameIntervals CpuIntervals { get { VerifyOwner(); return _cpuIntervals; } }
+    public GraphicsFrameSubmission? LastSubmission
+    {
+        get { ThrowIfDisposed(); return new(_submittedFrameCount, _lastSubmittedFrameFence, _telemetryGeneration, checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1)); }
+    }
     public GraphicsDeviceTelemetryIdentity? DeviceIdentity
     {
         get

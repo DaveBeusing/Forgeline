@@ -178,3 +178,13 @@ internal sealed class ReferenceFixtureSequence(int count)
     }
     internal int Acknowledged { get { lock (_gate) return _acknowledged; } }
 }
+
+internal static class ReferenceFixturePresentation
+{
+    internal static void RequireSuccessful(ulong beforeCount, ulong afterCount, GraphicsFrameSubmission? before, GraphicsFrameSubmission? after)
+    {
+        if (afterCount != checked(beforeCount + 1) || after is not { SubmittedFence: > 0, Generation: > 0, ResourceGeneration: > 0 } actual ||
+            before is not { } previous || actual.Generation != previous.Generation || actual.SubmittedFence <= previous.SubmittedFence || actual.Submission != checked(previous.Submission + 1))
+            throw new InvalidDataException("Every fixture attempt must submit and present one new actual frame; skipped/stale attempts cannot be retried or consumed.");
+    }
+}

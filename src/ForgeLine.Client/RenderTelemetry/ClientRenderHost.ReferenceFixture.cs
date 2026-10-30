@@ -57,8 +57,11 @@ internal sealed partial class ClientRenderHost
         for (int repeat = 0; repeat < recipe.RepeatCaptures; repeat++)
         {
             prepare();
+            ulong beforePresent = graphics.PresentedFrameCount;
+            var beforeSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission;
             byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands);
             meshes.Submit(); meshes.Retire();
+            ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, ((IGraphicsRenderTelemetry)graphics).LastSubmission);
             string hash = Convert.ToHexString(SHA256.HashData(pixels));
             records.Add(new { repeat, pixelSha256 = hash, inputFingerprint = graphics.CaptureInputFingerprint });
             if (original is null)

@@ -10,7 +10,13 @@ public interface IGraphicsRenderTelemetry
     GraphicsCpuFrameIntervals CpuIntervals { get; }
     GraphicsResourceMemoryTelemetry ResourceMemory { get; }
     GraphicsDeviceTelemetryIdentity? DeviceIdentity => null;
+    GraphicsTextureReadbackLayout? CaptureShadowLayout => null;
+    GraphicsFrameSubmission? LastSubmission => null;
 }
+
+public readonly record struct GraphicsFrameSubmission(ulong Submission, ulong SubmittedFence, ulong Generation, ulong ResourceGeneration);
+
+public readonly record struct GraphicsTextureReadbackLayout(int Width, int Height, int RowPitch, ulong Offset, string Format);
 
 // Additive physical-device identity; intentionally outside the historical GraphicsDeviceInfo digest.
 public readonly record struct GraphicsDeviceTelemetryIdentity(string AdapterLuidHex, uint NodeCount,

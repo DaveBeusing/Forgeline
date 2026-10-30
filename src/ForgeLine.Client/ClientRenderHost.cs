@@ -886,6 +886,7 @@ internal sealed partial class ClientRenderHost : IDisposable
                                 current.UiScale);
                         }
                     };
+                var fixtureBeforeSubmission = _referenceFixture is null ? null : (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                 graphics.RenderFrame(GraphicsColor.ForgeLineClear, recordFrame);
                 if (_referenceFixture is not null)
                 {
@@ -997,12 +998,22 @@ internal sealed partial class ClientRenderHost : IDisposable
                     nextDiagnosticAt =
                         renderFinishedAt;
                 }
+                if (_referenceFixture is not null)
+                {
+                    try { ReferenceFixturePresentation.RequireSuccessful(presentedBefore, graphics.PresentedFrameCount, fixtureBeforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission); }
+                    catch (InvalidDataException)
+                    {
+                        liveTelemetry?.RecordFixtureFailure(liveStart, "fixture-not-presented");
+                        throw;
+                    }
+                }
                 CompleteLiveTelemetry(liveTelemetry, liveStart, "gameplay", terrainStarted, livePrepareEndedAt);
                 if (_referenceFixture is not null && graphics.PresentedFrameCount > presentedBefore)
                     AcknowledgeFixtureFrame(fixtureOrdinal, renderCamera.CaptureState(), width, height, snapshot, (IGraphicsRenderTelemetry)graphics, instanceRenderer, diagnostics.Surface.BufferCount, gameplayHudRenderer.LastRenderedVertexCount);
             }
 
             graphics.WaitForIdle();
+            if (_referenceFixture is not null) liveTelemetry!.ValidateFixtureCorrespondence(_fixtureFrames!);
             GraphicsDiagnostics completedGraphics = graphics.Diagnostics;
             lock (_frameGate)
             {

@@ -58,13 +58,17 @@ public sealed class ReferencePerformanceSamplesTests
     {
         var samples = new ReferencePerformanceSamples(2, 0);
         var actual = new GraphicsCpuFrameIntervals(1, new(10, 20), new(18, 20), new(10, 12), true, 999, 7, 3);
-        samples.AddCpu(0, 1, 0, Diagnostics(0, null), actualSubmission: actual);
+        samples.AddCpu(0, 1, 0, Diagnostics(0, null), actualSubmission: actual, measuredInterval: new GraphicsTimestampInterval(8, 22));
         using var result = JsonDocument.Parse(JsonSerializer.Serialize(samples.Report(Diagnostics(0, null)), VisualReferenceCapture.JsonOptions));
         var row = result.RootElement.GetProperty("cpuFrames")[0].GetProperty("actualSubmission");
         Assert.Equal(1UL, row.GetProperty("submission").GetUInt64());
         Assert.Equal(999UL, row.GetProperty("submittedFence").GetUInt64());
         Assert.Equal(7UL, row.GetProperty("generation").GetUInt64());
         Assert.Equal(3UL, row.GetProperty("resourceGeneration").GetUInt64());
+        Assert.Equal(8, result.RootElement.GetProperty("cpuFrames")[0].GetProperty("measuredInterval").GetProperty("startTick").GetInt64());
+        Assert.True(result.RootElement.GetProperty("cpuTimestampFrequencyHz").GetInt64() > 0);
+        Assert.True(result.RootElement.GetProperty("ownerThread").GetProperty("nativeThreadId").GetUInt32() > 0);
+        Assert.True(result.RootElement.GetProperty("clockAnchor").GetProperty("beforeTick").GetInt64() <= result.RootElement.GetProperty("clockAnchor").GetProperty("afterTick").GetInt64());
     }
 
     private static GraphicsDiagnostics Diagnostics(ulong fence, double? milliseconds) => new(new("contract", 0, false, "test", false), new(1,1,3,0,false,"Immediate",false,false,0,0))

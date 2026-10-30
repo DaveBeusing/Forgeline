@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Diagnostics;
 using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 
@@ -10,6 +11,9 @@ internal enum ReferenceCameraPath { Fixed, Sweep, Traverse }
 // Only the explicit reference runner constructs this collector. It never submits simulation commands.
 internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFence)
 {
+    private readonly object _clockAnchor = RenderOwnerThreadIdentity.ClockAnchor();
+    private readonly uint _nativeOwner = RenderOwnerThreadIdentity.GetCurrentThreadId();
+    private readonly int _managedOwner = Environment.CurrentManagedThreadId;
     private readonly List<ReferenceCpuSample> _cpu = new(ValidateCapacity(capacity));
     private readonly List<ReferenceGpuSample> _gpu = new(capacity);
     private readonly int _capacity = capacity;
@@ -21,7 +25,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
     private long _observations, _excluded, _duplicate, _missing, _zero, _missingFrequency;
     private ulong _unobservedFenceValues;
 
-    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null, GraphicsCpuFrameIntervals? actualSubmission = null)
+    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null, GraphicsCpuFrameIntervals? actualSubmission = null, GraphicsTimestampInterval? measuredInterval = null)
     {
         if (!double.IsFinite(milliseconds) || milliseconds <= 0 || allocatedBytes < 0)
             throw new ArgumentOutOfRangeException(nameof(milliseconds));
@@ -32,7 +36,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             frame?.CompositeCpuMilliseconds, diagnostics.DirectionalShadows?.CpuMilliseconds,
             diagnostics.Resources, diagnostics.Health, diagnostics.Memory, submission)
         { CpuSubmission = frame?.CpuSubmission, CompletedGpuFence = frame?.GpuSubmissionFence,
-            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory, ActualSubmission = actualSubmission });
+            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory, ActualSubmission = actualSubmission, MeasuredInterval = measuredInterval });
         AddGpu(diagnostics);
     }
 
@@ -77,6 +81,8 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
     internal object Report(GraphicsDiagnostics diagnostics) => new
     {
         collectorSchemaVersion = 2, cpuFrames = _cpu, gpuFrames = _gpu,
+        cpuTimestampFrequencyHz = Stopwatch.Frequency, clockAnchor = _clockAnchor,
+        ownerThread = new { processId = Environment.ProcessId, nativeThreadId = _nativeOwner, managedThreadId = _managedOwner },
         rawGpuTiming = new { overflowed = _rawOverflow, completions = _rawGpu.OrderBy(x => x.Generation).ThenBy(x => x.SubmittedFence),
             scope = "native-reference-direct-queue", worldIntervalIncludesShadow = true },
         controls = new { staticBufferUploadFallback = Environment.GetEnvironmentVariable("FORGELINE_STATIC_BUFFER_UPLOAD_FALLBACK") == "1" },
@@ -153,6 +159,7 @@ internal sealed record ReferenceCpuSample(int Index, double Milliseconds, long A
 {
     public GraphicsResourceMemoryTelemetry? ResourceMemory { get; init; }
     public GraphicsCpuFrameIntervals? ActualSubmission { get; init; }
+    public GraphicsTimestampInterval? MeasuredInterval { get; init; }
     public ulong? CpuSubmission { get; init; }
     public ulong? CompletedGpuFence { get; init; }
     public double? PresentMilliseconds { get; init; }
