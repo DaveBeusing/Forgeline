@@ -6,6 +6,7 @@ using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.World;
 using ForgeLine.Game;
+using ForgeLine.Input;
 
 namespace ForgeLine.Client;
 
@@ -84,11 +85,42 @@ internal sealed class ReferenceFixtureRecipe
             recipeVersion = 1, fixture.Kind, SnapshotFingerprint, VisualSeconds, request.MechanicalSeconds,
             alpha = 1, particleAgeSeconds = .2, particleDelta = 0, paused = true, Settings, Atmosphere,
             request.SurfaceMarks, Display, RasterDpi, UiScale, CameraSettings, CameraPath, Samples,
-            panel = Panel, Information, selected, lines = Indicators.Lines.ToArray(), labels = Indicators.Labels.ToArray(), RuntimeFingerprint
+            ui = WorldUiIdentity(Panel, Information), selected, lines = Indicators.Lines.ToArray(), labels = Indicators.Labels.ToArray(), RuntimeFingerprint
         };
-        byte[] inputBytes = JsonSerializer.SerializeToUtf8Bytes(IdentityInputs, VisualReferenceCapture.JsonOptions);
+        byte[] inputBytes = SerializeIdentityInputs(IdentityInputs);
         InputBytesBase64 = Convert.ToBase64String(inputBytes);
         Fingerprint = Convert.ToHexString(SHA256.HashData(inputBytes));
+    }
+    internal static byte[] SerializeIdentityInputs(object inputs) => JsonSerializer.SerializeToUtf8Bytes(inputs, VisualReferenceCapture.JsonOptions);
+    internal static object WorldUiIdentity(in PlayerActionPanelView panel, in RtsInformationLayerView information)
+    {
+        // World fixtures have no interactive ring. Do not silently drop its span-backed state.
+        if (panel.IsOpen || panel.Ring.UsesRing || panel.Ring.Open || panel.Ring.Group is not null)
+            throw new NotSupportedException("Interactive panel/ring states need their separate authored UI contract.");
+        var bindings = panel.Bindings ?? GameplayBindingRegistry.Default;
+        var ring = panel.Ring;
+        return new
+        {
+            scenario = UiReferenceScenario.World,
+            panel = new
+            {
+                panel.Mode, panel.SelectedIndex, panel.Priority, panel.ProductionMode, panel.DesiredStockQuantity,
+                panel.LogisticsPriority, panel.StockThresholdField, panel.StockMinimum, panel.StockTarget, panel.StockMaximum,
+                panel.AutomaticResupplyEnabled, panel.AutomaticFuelThreshold, panel.AutomaticAmmunitionThreshold,
+                panel.PointerCaptured, panel.OriginX, panel.OriginY, panel.SupplyPriority, panel.HoveredIndex,
+                panel.PointerPressed, panel.ContextualPending, panel.ContextualActivationTick, panel.ContextualSessionId,
+                panel.SelectionPending, panel.ContextualHoveredIndex, panel.ContextualPressed, panel.Motion,
+                panel.LogisticsSteps, panel.StockPreview, panel.StockConflict,
+                bindings = GameplayBindingRegistry.Definitions.Select(definition => new
+                { definition.Action, key = bindings.Key(definition.Action), prompt = bindings.Prompt(definition.Action) }).ToArray(),
+                ring = new { ring.Entity, ring.Session, ring.SelectionRevision, ring.Revision, ring.SingleOwned,
+                    ring.Open, ring.Resolved, ring.Opacity, ring.HoveredSlot, ring.Pressed, ring.GroupFactsCurrent,
+                    ring.VisibleMembers, ring.Global, ring.GlobalAnchor,
+                    geometry = new { ring.Geometry.Anchor, ring.Geometry.Center, ring.Geometry.InnerRadius, ring.Geometry.OuterRadius, ring.Geometry.Count },
+                    group = (object?)null }
+            },
+            information
+        };
     }
     internal static string BuildCaseKey(VisualReferenceSceneKind kind, VisualReferenceCaptureRequest request,
         RtsReferenceDisplay display, RenderQuality quality, RtsReferenceZoom zoom, float uiScale)
