@@ -177,3 +177,12 @@ reserve warmup-prefix headroom, and restore default diagnostic object layout.
 Those changes are not relabelled as the prior full canonical run; revised-source
 focused checks, actual live export, independent review and final exact-source CI
 are recorded separately. No second PATCH is allocated against the same base.
+
+The first actual corrected-source owner attempt at ec4f961f2855bebf93774355407eb9c1931d0780
+failed before window startup because a cleared optional context environment variable
+arrived as an empty string and was opened as a filename. The failed command/log is
+retained under artifacts/wave0-live-01; it produced no owner output and is not a pass.
+The parser now treats null/empty/whitespace context as absent while retaining strict
+source/runtime checks for any supplied file. Environment-backed regression cases
+cover all absent forms plus correct and mismatched supplied contexts. A fresh clean
+source attempt, rather than an overwritten retry, must validate the real producer.

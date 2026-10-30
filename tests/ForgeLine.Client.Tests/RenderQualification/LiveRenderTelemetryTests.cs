@@ -84,6 +84,38 @@ public sealed class LiveRenderTelemetryTests
         Assert.Equal(4097, report.RootElement.GetProperty("beforeWindow").GetArrayLength());
         Assert.Equal(1, report.RootElement.GetProperty("frames").GetArrayLength());
     }
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void AbsentOrClearedOptionalContextDoesNotOpenAFile(string? value)
+    {
+        const string name = "FORGELINE_RENDER_TELEMETRY_CONTEXT";
+        string? previous = Environment.GetEnvironmentVariable(name);
+        try
+        {
+            Environment.SetEnvironmentVariable(name, value);
+            Assert.Null(LiveRenderTelemetry.ReadOptionalContextFromEnvironment(new string('a', 40), null));
+        }
+        finally { Environment.SetEnvironmentVariable(name, previous); }
+    }
+    [Fact]
+    public void ProvidedContextStillRequiresItsExactExecutingSourceAndRuntime()
+    {
+        const string name = "FORGELINE_RENDER_TELEMETRY_CONTEXT";
+        string? previous = Environment.GetEnvironmentVariable(name);
+        string path = Path.GetTempFileName();
+        string source = new('a', 40), runtime = new('b', 64);
+        try
+        {
+            File.WriteAllText(path, JsonSerializer.Serialize(new { sourceSha = source, runtimeFingerprint = runtime }));
+            Environment.SetEnvironmentVariable(name, path);
+            Assert.NotNull(LiveRenderTelemetry.ReadOptionalContextFromEnvironment(source, runtime));
+            Assert.Throws<InvalidDataException>(() => LiveRenderTelemetry.ReadOptionalContextFromEnvironment(new string('c', 40), runtime));
+            Assert.Throws<InvalidDataException>(() => LiveRenderTelemetry.ReadOptionalContextFromEnvironment(source, new string('c', 64)));
+        }
+        finally { Environment.SetEnvironmentVariable(name, previous); File.Delete(path); }
+    }
     private sealed class Source : IGraphicsRenderTelemetry
     {
         public bool TelemetryOverflowed => false;

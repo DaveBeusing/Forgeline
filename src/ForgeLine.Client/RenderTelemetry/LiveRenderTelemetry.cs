@@ -56,17 +56,23 @@ internal sealed class LiveRenderTelemetry : IDisposable
         if (graphics is not IGraphicsRenderTelemetry source)
             throw new NotSupportedException("The device cannot produce requested live telemetry.");
         if (File.Exists(output)) throw new IOException("Telemetry evidence must use a new output file.");
-        string? contextPath = Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_CONTEXT");
-        JsonObject? context = contextPath is null ? null : JsonNode.Parse(File.ReadAllText(contextPath))?.AsObject()
-            ?? throw new InvalidDataException("Invalid telemetry identity context.");
-        if (context is not null && context["sourceSha"]?.GetValue<string>() != ClientBuildIdentity.SourceRevision)
-            throw new InvalidDataException("Telemetry context source does not match the executing assembly.");
         string? runtimeFingerprint = runtimeAssets is null ? null : VisualReferenceCapture.RuntimeFingerprint(runtimeAssets.RuntimeRoot);
-        if (context is not null && !string.Equals(context["runtimeFingerprint"]?.GetValue<string>(), runtimeFingerprint, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException("Telemetry context runtime does not match the executing sealed payload.");
+        JsonObject? context = ReadOptionalContextFromEnvironment(ClientBuildIdentity.SourceRevision, runtimeFingerprint);
         int capacity = int.TryParse(Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_SAMPLES"), out int parsed) ? parsed : 512;
         int warmups = int.TryParse(Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_WARMUPS"), out int discarded) ? discarded : 64;
         return new(source, capacity, output, context, warmups, runtimeFingerprint, graphics.Diagnostics.Device);
+    }
+    internal static JsonObject? ReadOptionalContextFromEnvironment(string expectedSource, string? runtimeFingerprint)
+    {
+        string? path = Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_CONTEXT");
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        JsonObject context = JsonNode.Parse(File.ReadAllText(path)) as JsonObject
+            ?? throw new InvalidDataException("Invalid telemetry identity context.");
+        if (context["sourceSha"]?.GetValue<string>() != expectedSource)
+            throw new InvalidDataException("Telemetry context source does not match the executing assembly.");
+        if (!string.Equals(context["runtimeFingerprint"]?.GetValue<string>(), runtimeFingerprint, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("Telemetry context runtime does not match the executing sealed payload.");
+        return context;
     }
     internal LiveTelemetryStart Begin()
     {
