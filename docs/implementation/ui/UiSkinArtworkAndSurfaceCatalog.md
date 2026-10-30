@@ -1,5 +1,7 @@
 # UI Skin Artwork and Surface Catalog
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Implement a complete, reusable Directorate skin-art foundation for every existing player-facing UI and HUD surface that still relies on prototype geometric styling. Deliver clean production artwork, not another reference montage. Execute the remaining scope end to end through the existing GitHub connection without requiring a change of working environment.

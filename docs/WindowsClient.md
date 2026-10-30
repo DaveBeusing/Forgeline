@@ -1,5 +1,37 @@
 # Windows Client
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Platform Boundary](#platform-boundary)
+- [Startup Flow](#startup-flow)
+- [Message Loop](#message-loop)
+- [Window Events](#window-events)
+- [DPI Behavior](#dpi-behavior)
+- [Window Modes](#window-modes)
+- [Window Mode Qualification](#window-mode-qualification)
+- [Native Graphics Target](#native-graphics-target)
+- [Shutdown Lifecycle](#shutdown-lifecycle)
+- [Pre-Alpha Frontend](#pre-alpha-frontend)
+- [Launch](#launch)
+- [Match HUD](#match-hud)
+- [Bounded Smoke Validation](#bounded-smoke-validation)
+- [Clean Playable Match Composition](#clean-playable-match-composition)
+- [Execution owners](#execution-owners)
+  - [Selected combat-group ring](#selected-combat-group-ring)
+- [Optional operations surface](#optional-operations-surface)
+- [Alert and strategic-layer controls](#alert-and-strategic-layer-controls)
+- [Adaptive frontend geometry](#adaptive-frontend-geometry)
+- [Static cinematic menu presentation](#static-cinematic-menu-presentation)
+- [Nonmodal gameplay menus](#nonmodal-gameplay-menus)
+- [Minimap display lifecycle](#minimap-display-lifecycle)
+- [Context-specific gameplay shortcuts](#context-specific-gameplay-shortcuts)
+
+</details>
+
 ## Purpose
 
 `ForgeLine.Client` is the interactive Windows x64 host. It owns the native application lifecycle, Direct3D 12 graphics foundation, RTS input/camera stack, presentation extraction, rendering, and real-time frame pacing without introducing Win32 or D3D12 details into world, simulation, or game rules.
@@ -244,9 +276,7 @@ CI executes this validation only on Windows runners.
 
 For manual validation, also resize the window, minimize and restore it, move it between displays with different DPI scaling where available, change focus, close it using the system close button, and repeat several debug launches while watching process and USER/GDI handle counts.
 
-
 See [Presentation Extraction and Debugging](PresentationExtractionAndDebugging.md) for the simulation-to-render ownership boundary, interpolation, debug controls, metrics, and render stress workflow.
-
 
 ## Clean Playable Match Composition
 
@@ -255,7 +285,6 @@ A normal client launch contains the configured Central Divide skirmish only. The
 Combat, sensing, artillery, Fuel/Ammunition, resupply, readiness, opponent behavior, and Command Core victory are exercised by the actual Directorate/skirmish systems. F2 continues to expose their diagnostics without adding presentation-owned gameplay state.
 
 Synthetic generic entities remain available exclusively through `--render-stress <count>` for bounded rendering validation. CI uses that option for graphics stress independently of the headless full-match correctness gate.
-
 
 ## Execution owners
 
@@ -321,33 +350,13 @@ creates a fresh frontend owner. See [policy and qualification](CinematicFrontend
 
 ## Nonmodal gameplay menus
 
-`TransientHudMenuController` coordinates the existing action rings and Operations before
-controller actions and world input. A world-origin press dismisses every transient
-menu, then the original retained input reaches the existing selection, move,
-placement or targeting owner exactly once. No synthetic event is injected.
-Selection and target intent are not menu state. Right click during placement or
-targeting cancels that intent and is reserved from movement on the same frame.
+[Input ownership and qualification](GameplayInputAccessibilityAndQualification.md) defines ring/Operations coordination before world input and reuse of the original press sequence.
 
-Only published, present ring sectors (including disabled sectors) own menu input.
-Centers, gaps, tethers, absent sectors and the former rectangular panel areas do not.
-The visible Operations information panel deliberately owns its entire background
-so its readable content cannot conceal a world command. Status, minimap, alerts,
-onboarding retain their independent input owners; selection status is read-only.
+Only actual published controls own menu input; centers and gaps retain their documented routing. See [input ownership](GameplayInputAccessibilityAndQualification.md) for the exact surface rules.
 
-Menu-origin gestures retain ownership through release outside the panel. A brief
-press/release outside cancels before UI activation. A ring action validates its original item and menu identity on release. Closing is logical and
-immediate: animation opacity never adds capture. Escape closes the whole transient
-stack before target cancellation or Pause; true modal/settings/display states keep
-priority. Focus loss, display/layout, selection identity and session transitions
-clear transient ownership and cancel retained gestures. Ring keyboard focus applies
-only over its controls, leaving free-world camera input available.
+Menu gestures and release identity follow the [shared input ownership contract](GameplayInputAccessibilityAndQualification.md), including cancellation outside the original action.
 
-Later context/ring menus register `ITransientHudMenu` with this coordinator (four
-bounded registration slots). `ContainsControl` reports actual visible input regions,
-including disabled controls, excluding centers, gaps and decorative connectors.
-`Dismiss` must clear the complete nested stack, hover, press, tooltips and focus
-idempotently. Closed or visually fading menus return `IsOpen == false`; their
-activation path still requires a fresh gesture. Registration lasts for one match.
+Transient menus use the bounded coordinator and actual visible input regions. See [input ownership and qualification](GameplayInputAccessibilityAndQualification.md) for registration, dismissal and event-ownership rules.
 
 [Executed interaction qualification](NonModalHudQualification.md) records the
 source identity, sequence tests and remaining native/human acceptance.

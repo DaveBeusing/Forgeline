@@ -1,5 +1,30 @@
 # World Asset Presentation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Terrain material family](#terrain-material-family)
+- [Decals](#decals)
+- [Reusable props and vegetation](#reusable-props-and-vegetation)
+- [Production surface materials](#production-surface-materials)
+- [LOD](#lod)
+- [Resource deposit families](#resource-deposit-families)
+  - [Resource visual variation contract](#resource-visual-variation-contract)
+  - [Presentation states](#presentation-states)
+- [Hover, inspection, and strategic symbols](#hover-inspection-and-strategic-symbols)
+- [Central Divide map/editor authoring example](#central-divide-mapeditor-authoring-example)
+- [Validation](#validation)
+- [Concept texture completion](#concept-texture-completion)
+- [Modular environment sources](#modular-environment-sources)
+- [Battlefield destruction variants](#battlefield-destruction-variants)
+- [World environment integration](#world-environment-integration)
+- [Biome terrain materials](#biome-terrain-materials)
+
+</details>
+
 ## Purpose
 
 Resource variant bindings, complete-pair fallbacks, instancing diagnostics and the
@@ -234,15 +259,10 @@ effects or resource changes are added. See
 
 Authored public wear uses ITerrainSurfaceMarkSource and immutable WithSurfaceMarks profiles. Existing detailed decal quads remain the fine-track path. Stable vegetation density and distance admission preserve simulation and intelligence ownership. See [World environment rendering](WorldEnvironmentRendering.md).
 
-
 Live impact marks and short owned-vehicle tracks reuse the authored decal quad/material IDs through DecalPool. Receiver marks use copied full entity identity and normalized local anchors; invalid or hidden receivers retire their marks. Missing decal meshes/materials skip the mark. See [shared decal decision](adr/BoundedPresentationDecals.md).
-
 
 RuntimeMaterialDiagnostics now reports unique LoadedMeshCount and logical ResidentMeshBytes. LOD buffers remain loaded on first admitted use and cached for the compiled-catalog session; this is not asynchronous eviction or a physical-residency guarantee. Conservative copied-snapshot groups can skip offscreen instance/asset work before normal individual admission. See [scalable rendering](ScalableRendering.md).
 
-
 ## Biome terrain materials
 
-The opt-in [biome terrain material profile](BiomeTerrainMaterials.md) blends the existing
-four-layer palette from environment fields and infrastructure masks. Authored renderer
-defaults remain compatible; generated scenes explicitly select the new profile ID.
+See [Biome terrain materials](BiomeTerrainMaterials.md) for the opt-in environment-field profile and [World and terrain](WorldAndTerrain.md) for its shared renderer integration.

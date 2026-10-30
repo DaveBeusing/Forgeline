@@ -1,5 +1,22 @@
 # Artillery Blender preservation and inspection
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Current-source audit](#current-source-audit)
+- [Authoring boundary](#authoring-boundary)
+- [Reproduction](#reproduction)
+- [Observed native checkpoint](#observed-native-checkpoint)
+- [Clean review-source and complete-suite evidence](#clean-review-source-and-complete-suite-evidence)
+- [Native D3D12 observations](#native-d3d12-observations)
+- [Reproducible installed player](#reproducible-installed-player)
+- [Integration decision](#integration-decision)
+- [Merge reconciliation](#merge-reconciliation)
+
+</details>
+
 ## Current-source audit
 
 Integration/default branch `master` was fetched at
@@ -59,7 +76,7 @@ are deliberately rejected as strict export inputs.
 
 ## Reproduction
 
-Use pinned Blender 5.2.2 x64, .NET SDK 10.0.401 and PowerShell 7.4+:
+Use pinned Blender 5.2.2 x64, the exact .NET SDK selected by [global.json](../global.json) and PowerShell 7.4+:
 
 ```powershell
 dotnet restore ForgeLine.sln

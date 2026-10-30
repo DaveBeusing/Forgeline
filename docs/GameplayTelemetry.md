@@ -1,5 +1,30 @@
 # Gameplay Telemetry and Match Analysis
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Architecture Boundary](#architecture-boundary)
+- [Reproducibility](#reproducibility)
+- [Stable Metric Contract](#stable-metric-contract)
+  - [Economy and Production](#economy-and-production)
+  - [Power](#power)
+  - [Logistics and Supply](#logistics-and-supply)
+  - [Units, Combat, Expansion, and Match Result](#units-combat-expansion-and-match-result)
+- [Progression Milestones](#progression-milestones)
+- [Debug Summaries](#debug-summaries)
+- [Headless Batch Execution](#headless-batch-execution)
+- [Aggregation](#aggregation)
+- [Revision Comparison](#revision-comparison)
+- [Validation](#validation)
+- [Normal-profile pacing outcomes](#normal-profile-pacing-outcomes)
+- [Bounded player after-action report](#bounded-player-after-action-report)
+- [Decision benchmark extension](#decision-benchmark-extension)
+
+</details>
+
 ## Purpose
 
 FORGELINE gameplay telemetry provides reproducible evidence for pacing, economy, logistics, combat, progression, and match-result analysis.
@@ -212,7 +237,7 @@ parameters and terminal gate. Neither profile's success substitutes for the othe
 
 ## Bounded player after-action report
 
-The terminal client and explicit headless --debrief-output path share a player-scoped first/latest summary independent of offline all-player telemetry. The result remains authoritative; unavailable historical causes, battle/contact/territory evidence and safe map coordinates are stated explicitly. See [debrief controls, schema, privacy and qualification](AfterActionStrategicDebrief.md).
+The [match-flow guide](MatchFlowAndPlayerExperience.md) and [strategic debrief](AfterActionStrategicDebrief.md) describe the player-scoped first/latest summary, authority and unavailable-history behavior.
 
 ## Decision benchmark extension
 

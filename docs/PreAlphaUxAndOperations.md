@@ -1,5 +1,27 @@
 # Pre-Alpha UX and Operations
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Match Setup](#match-setup)
+- [Frontend and Session Transitions](#frontend-and-session-transitions)
+- [Pause and Help](#pause-and-help)
+- [Minimal Onboarding](#minimal-onboarding)
+- [Settings](#settings)
+- [UI Scale and DPI](#ui-scale-and-dpi)
+- [Failure Diagnostics](#failure-diagnostics)
+- [Packaging](#packaging)
+- [Qualification](#qualification)
+- [Operations onboarding and acceptance](#operations-onboarding-and-acceptance)
+- [Alert and map onboarding](#alert-and-map-onboarding)
+- [Adaptive frontend geometry](#adaptive-frontend-geometry)
+- [Battlefield information hierarchy](#battlefield-information-hierarchy)
+
+</details>
+
 ## Purpose
 
 RTS shortcuts: Home focuses the current owned home building; double-tapping an assigned unmodified digit within 350 ms focuses its currently visible surviving group members. Double-left-click within 350 ms and the scaled movement threshold expands only owned visible units with the same stable type. Shift+click requests building continuation after authoritative acceptance; F9 rotates, and Escape cancels. Help lists these bindings. Brief focus/repeat/pending messages are nonblocking and never report a click as authoritative success.
@@ -200,10 +222,9 @@ Automated CI covers:
 
 Manual qualification is defined in [Pre-Alpha Verification Checklist](PreAlphaVerificationChecklist.md) and includes DPI/UI scaling, keyboard flow, setup/help/pause behavior, settings recovery, clean package launch, and one complete packaged match.
 
-
 ## Operations onboarding and acceptance
 
-OPERATIONS above the selection inspector opens the optional overview. Resource/power, alert and single-facility inspector clicks provide contextual entry without a new shortcut. Use Filter, Next Page, a facility row, Focus Facility/Focus Next or Open Existing Controls. Reported shortages explain observed facts; they do not invent economic causes. Net flow remains explicitly unavailable. Manual active-policy/route-focus journeys, terrain contrast, extreme-scale readability and monitor DPI/focus transitions remain acceptance items. See [operations limits](ProductionAndLogisticsOperations.md).
+The optional Operations overview opens through the resource/power strip, an authorized alert OPS/MORE action or the selected-facility context, without a new shortcut. Use Filter, Next Page, a facility row, Focus Facility/Focus Next or Open Existing Controls. Reported shortages explain observed facts; they do not invent economic causes. Net flow remains explicitly unavailable. Manual active-policy/route-focus journeys, terrain contrast, extreme-scale readability and monitor DPI/focus transitions remain acceptance items. See [operations limits](ProductionAndLogisticsOperations.md).
 
 ## Alert and map onboarding
 
@@ -211,19 +232,9 @@ FOCUS inspects a representative affected owned target. OPS or MORE opens existin
 
 ## Adaptive frontend geometry
 
-Frontend menus, setup/load/settings, loading, controls and pause use the same immutable
-`FrontendGeometry` value for drawing and hit testing. The platform owner resolves physical
-client-pixel bounds using actual window DPI and current UI scale, then publishes that value
-with the surface. The render thread never reads mutable window state. A stale surface after
-resize waits for matching geometry; zero-size/minimized surfaces suspend rendering.
+Frontend drawing, hit testing, DPI and live-resize behavior share the client-owned geometry contract. See [Windows Client](WindowsClient.md) for the full lifecycle and layout rules.
 
-Up/Down and the mouse wheel scroll long controls/credits pages, and navigate the existing
-settings/save lists. Focus remains visible as row capacity changes. Enter, Escape, Back and
-existing actions retain their meanings. Stationary mouse position does not override keyboard
-navigation. Disabled/absent commands and static setup labels never activate adjustments.
-Resize, DPI/scale changes, focus loss and modal ownership changes suppress held input until
-release, clear hover/pressed state and preserve model focus. Closing help/pause still consumes
-the gesture before gameplay resumes. `GameplayHudLayout` retains separate ownership.
+For frontend scrolling, focus retention and Enter/Escape/Back behavior, see [Windows Client](WindowsClient.md).
 
 See [named regions and migration](FrontendLayout.md) and [qualification](FrontendLayoutQualification.md).
 

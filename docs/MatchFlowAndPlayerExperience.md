@@ -1,5 +1,41 @@
 # Match Flow and Player Experience
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Completed-tick hover inspection](#completed-tick-hover-inspection)
+- [Purpose](#purpose)
+- [Early-game guidance and completed-action evidence](#early-game-guidance-and-completed-action-evidence)
+- [Match configuration and initialization](#match-configuration-and-initialization)
+- [Authoritative lifecycle](#authoritative-lifecycle)
+- [End-of-match behavior](#end-of-match-behavior)
+- [Command Core objective](#command-core-objective)
+- [Player HUD read model](#player-hud-read-model)
+- [Gameplay HUD composition](#gameplay-hud-composition)
+- [Player action dock presentation](#player-action-dock-presentation)
+- [Selection inspector presentation](#selection-inspector-presentation)
+- [Selection and production presentation](#selection-and-production-presentation)
+- [Contextual command feedback](#contextual-command-feedback)
+- [Alerts](#alerts)
+- [Power-network ownership](#power-network-ownership)
+- [Intelligence and minimap boundary](#intelligence-and-minimap-boundary)
+- [Development statistics](#development-statistics)
+- [Validation](#validation)
+- [Current UX limitations](#current-ux-limitations)
+- [Player Action Surface](#player-action-surface)
+- [Player Logistics and Supply Surface](#player-logistics-and-supply-surface)
+- [Player Tactical Combat Surface](#player-tactical-combat-surface)
+- [Independent client lifecycle](#independent-client-lifecycle)
+  - [Group operational information](#group-operational-information)
+- [Production and logistics overview](#production-and-logistics-overview)
+- [Alert condition lifecycle](#alert-condition-lifecycle)
+- [Gameplay prompt discovery](#gameplay-prompt-discovery)
+- [Bounded player after-action report](#bounded-player-after-action-report)
+
+</details>
+
 ## Completed-tick hover inspection
 
 `PresentationInteractionState.SetHover` publishes the render owner's full-generation entity identity and observing session. `PresentationExtractor` captures at most one `PlayerHoverSummary` per completed tick, ignoring mismatched-session requests and destroyed/stale entities. The summary travels inside the same immutable `PresentationSnapshot` as instances, intelligence and player actions; UI does not poll ECS. Owned summaries reuse the ownership-filtered `PlayerExperienceSnapshotFactory.CaptureSelection` copier without changing actual selection.
@@ -13,6 +49,8 @@ Authorization precedes publication: deposit facts require current visible terrai
 The vertical-slice match flow turns the existing FORGELINE simulation systems into one complete skirmish lifecycle. Match authority remains inside simulation state; the client only submits commands and renders player-specific read models.
 
 The current playable configuration uses the Central Divide prototype battlefield, Player 1 as the local Directorate side, Player 2 as the computer-controlled opposing side, and a seeded simulation.
+
+<a id="early-game-guidance-observations"></a>
 
 ## Early-game guidance and completed-action evidence
 
@@ -117,7 +155,7 @@ The HUD never creates or advances gameplay state. Every published player-experie
 
 `GameplayHudRenderer` is the production-facing root compositor for the in-match HUD. `ClientRenderHost` submits player-facing HUD state through this compositor independently from `DevelopmentOverlayRenderer`, which remains the owner of development metrics and engineering diagnostic labels.
 
-`GameplayHudLayout` resolves the shared DPI-aware safe area and named regions for the top status bar, selection inspector, action dock, alert stack, minimap, and optional secondary views. `GameplayHudVisualStyle` centralizes production panel geometry, spacing, icon scale, text hierarchy, state rails/outlines, alert severity colors, and progress-bar thickness so the major surfaces share one visual vocabulary without moving gameplay authority into presentation.
+`GameplayHudLayout` resolves the shared DPI-aware safe area for the current resource/power strip, notifications, minimap, guidance, group overview, Operations and action-ring composition. Retired rectangular dock/inspector regions reserve no layout or input area; [HUD surface consolidation](HudSurfaceConsolidation.md) owns the current parity contract. `GameplayHudVisualStyle` centralizes production panel geometry, spacing, icon scale, text hierarchy, state rails/outlines, alert severity colors, and progress-bar thickness so the major surfaces share one visual vocabulary without moving gameplay authority into presentation.
 
 HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces should consume immutable presentation snapshots/read models, render within the named region that owns their presentation responsibility, and submit player-authored changes through the established request/command boundary. They must not acquire live ECS or simulation ownership.
 
@@ -126,6 +164,11 @@ HUD surfaces implement the narrow `IGameplayHudSurface` contract. New surfaces s
 Match results and compact onboarding render through the production RTS information surface. Pause and F1/F12 controls use the shared frontend renderer; controls are modal and pause authoritative gameplay through the existing simulation-owner boundary. `GameplayHudLegacyTextSurface` has been removed. `DevelopmentOverlayRenderer` is reserved for Shift + F1 / F2 engineering diagnostics and is not a normal player-facing HUD owner.
 
 ## Player action dock presentation
+
+The current action surface is the existing single/group ring, using the shared action controller and copied availability/result data. Global B/P/U/L/Y/K/H modes enter that ring where the selected context permits them. See [current HUD ownership](HudSurfaceConsolidation.md) and [action menus](WorldAnchoredActionMenus.md). The earlier rectangular rendering description is retained below as historical context.
+
+<details>
+<summary>Historical rectangular surface and copied-state contract</summary>
 
 Primary commands sit beside the selection inspector in adaptive shared geometry.
 Combat capabilities expose a small direct-action set; copied building/facility capabilities
@@ -144,7 +187,14 @@ The dock never treats a click as command success. It submits the same `PlayerAct
 
 Keyboard and pointer interaction share the same action model and HUD hit regions. Session replacement clears dock state; terminal match snapshots suppress the dock and reject new action input.
 
+</details>
+
 ## Selection inspector presentation
+
+Current selection details are shown through the shared read-only status/tooltip path, including the covered group aggregates and exact command results. See [Graphical battlefield HUD](GraphicalBattlefieldHud.md) and [input ownership](GameplayInputAccessibilityAndQualification.md) for live composition, availability and dismissal. The earlier dedicated inspector description is historical.
+
+<details>
+<summary>Historical rectangular surface and copied-state contract</summary>
 
 The production gameplay HUD owns selected-entity inspection through `SelectionInspectorHudSurface`. The inspector consumes only the completed-tick `PlayerSelectionSummary` embedded in the current `PlayerExperienceSnapshot`; it does not query live ECS, inventory, production, power, supply, or readiness state while rendering.
 
@@ -153,6 +203,8 @@ Single selection may expose the copied primary entity's display name, semantic u
 Multi-selection deliberately does not reuse the first selected entity's operational state as an aggregate. The summary exposes total authorized count plus an exact common unit/building identity only when every authorized selected entity shares that identity. Otherwise the inspector uses a generic Units, Buildings, Construction Sites, or Mixed Selection label. Health, supply, Fuel, Ammunition, readiness, power, inventory, and work fields are suppressed for multi-selection until a real aggregate contract exists.
 
 The inspector is presentation-only and stateless across snapshots. Selection clear, entity destruction, stale-generation filtering, session replacement, construction completion, and production-state changes are reflected by the next immutable snapshot rather than retained in HUD-owned history.
+
+</details>
 
 ## Selection and production presentation
 
@@ -258,14 +310,13 @@ Current limitations include:
 
 The in-match HUD itself now has a qualified production visual hierarchy. Common 1280×720, 1920×1080, 2560×1440, and representative 3440×1440 layouts are covered at the 96-DPI baseline and higher-DPI values. Selected, hovered, pressed, disabled, warning, critical, fog, supply, technology, and terminal states retain explicit text/icon/shape or pattern meaning instead of relying on tint alone.
 
-
 ## Player Action Surface
 
-The interactive match uses a reusable action palette for player-authored construction and production while keeping simulation ownership unchanged.
+The interactive match uses the existing action rings for player-authored construction and production while keeping simulation ownership unchanged.
 
-The palette is session-scoped and consumes immutable completed-tick `PlayerActionSnapshot` data. Construction entries come from the current building catalog and Command Core inventory. Processing and unit-production entries exist only for a single selected owned compatible facility and use that facility's local input inventory. Its screen origin and pointer bounds come from the shared DPI-aware action-dock region rather than controller-owned viewport constants.
+The palette is session-scoped and consumes immutable completed-tick `PlayerActionSnapshot` data. Construction entries come from the current building catalog and Command Core inventory. Processing and unit-production entries exist only for a single selected owned compatible facility and use that facility's local input inventory. Its screen geometry and input ownership come from the shared bounded ring layouts; the retired dock rectangle is not an input target.
 
-`B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Pointer clicks inside the panel are captured through the shared `HudInteractionContext` before world selection, movement, or placement. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
+`B`, `P`, and `U` select construction, processing, and unit-production modes. While a mode owns keyboard focus, RTS camera keys are suppressed. Published ring sectors use the shared input coordinator before world selection, movement or placement; gaps and the center retain their documented world-input behavior. Mixed selections, foreign ownership, destroyed/stale facilities, terminal matches, and a fresh session remove incompatible transient actions instead of retaining stale authority.
 
 Command submission is not success feedback. `PlayerActionSnapshot.PendingCommandCount` identifies unresolved player submissions; completed results are published separately as accepted/rejected `PlayerCommandFeedback`. Production progress and block reasons remain authoritative copied state from the selected facility.
 
@@ -289,7 +340,6 @@ The bounded player-commanded acceptance path uses the shared gameplay compositio
 
 This bounded evidence validates the cross-feature Build-Supply-Conquer path, command authority, physical supply, intelligence gating, damage, and natural terminal resolution. It does not claim to be a long free-form human playthrough, exhaustive battlefield-balance proof, or a substitute for the canonical 80,000-tick terminal CI gate. It is also distinct from the Windows graphics smoke, which intentionally destroys a Command Core only to validate native-host/render/session lifecycle behavior rather than natural combat progression.
 
-
 ## Independent client lifecycle
 
 The Windows client no longer advances authoritative gameplay from the render/event loop.
@@ -303,7 +353,6 @@ Restart stops and joins the render/simulation owners before the shared runtime a
 ### Group operational information
 
 Multi-selection presents owned live unit composition and covered averages instead of one member's details. The displayed contributor counts and N/A distinguish missing components from low readiness or supply. Group/type filtering and member focus affect only presentation selection or camera state. Exact accepted/rejected counts from the latest resolved command retain PARTIAL feedback; selecting a subgroup does not reinterpret that historical result.
-
 
 ## Production and logistics overview
 

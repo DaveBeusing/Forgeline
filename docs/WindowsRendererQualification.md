@@ -1,5 +1,7 @@
 # Manual Windows renderer qualification
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Status: **execution and product acceptance pending**. This runbook wires existing
 build, content, reference and package commands; it records no new native, WARP,
 headless or manual success. Historical evidence applies only to its recorded SHA.
@@ -8,11 +10,22 @@ fixtures. See [renderer inventory](RendererFeatureInventory.md),
 [overlay acceptance](GameplayOperationsWorldOverlays.md) and the existing
 [paired performance collector](rendering/qualification/Qualification.md).
 
+<details>
+<summary>On this page</summary>
+
+- [Machine and source prerequisites](#machine-and-source-prerequisites)
+- [Staged commands and evidence](#staged-commands-and-evidence)
+- [Capture matrix and visible acceptance](#capture-matrix-and-visible-acceptance)
+- [Package install and live desktop checks](#package-install-and-live-desktop-checks)
+- [Failure, recovery and sign-off](#failure-recovery-and-sign-off)
+
+</details>
+
 ## Machine and source prerequisites
 
 Use a Windows x64 desktop with an interactive physical D3D12 adapter, its current
 vendor driver and enough display capability for the requested cells. Install Git,
-PowerShell 7.4 or later and the exact SDK in `global.json` (currently 10.0.401,
+PowerShell 7.4 or later and the exact SDK in `global.json` (currently 10.0.402,
 C# 14, Microsoft.Testing.Platform). `dotnet --version` must match from the checkout.
 The SDK restores native/shader dependencies; do not substitute a standalone HLSL
 compiler or change shader/golden tolerances. Internet access to configured NuGet

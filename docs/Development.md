@@ -1,262 +1,273 @@
 # Development
 
-The [serial rendering integration qualification](rendering/performance-integration/Qualification.md) records the full canonical gates, source identities, native lifecycle coverage and separately collected timing evidence. Use the existing CI command with `--max-parallel-test-modules 1` for the complete solution; unbounded concurrent native test modules can contend for the same desktop/device and invalidate bounded-wait observations. Test assertions, time limits and the natural terminal-match requirement are unchanged.
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
 
-The [UI review handbook](UiVisualReview.md) describes bounded native capture and
-resume. [Graphical interface qualification](GraphicalInterfaceQualification.md)
-records executed coverage, package identity and required gates still outstanding.
+This is the canonical build and validation entry point. Run commands from the repository root using the exact SDK and Microsoft.Testing.Platform selected by [global.json](../global.json).
 
-## Source of Truth
+<a id="source-of-truth"></a>
 
-The current GitHub repository is the technical source of truth for implemented code, configuration, tests, and current build behavior.
+<details>
+<summary>On this page</summary>
 
-The integration branch is `master`. Feature, fix, and technical work should begin from the current `master`, reuse relevant existing work where appropriate, use short-lived branches, and integrate through pull requests.
+- [Start here](#start-here)
+- [SDK and build configuration](#sdk-and-build-configuration)
+- [Semantic versioning](#semantic-versioning)
+- [Canonical validation path](#canonical-validation-path)
+- [Pull requests and required check](#pull-requests-and-required-check)
+- [Test projects](#test-projects)
+- [Windows client host](#windows-client-host)
+  - [Developer builds](#developer-builds)
+- [Headless runtime and recovery](#headless-runtime-and-recovery)
+- [Feature-specific validation](#feature-specific-validation)
+- [Diagnostics and benchmarks](#diagnostics-and-benchmarks)
+  - [Opt-in render-owner telemetry](#opt-in-render-owner-telemetry)
+- [Documentation maintenance](#documentation-maintenance)
 
-Project-specific governance, source precedence, protection requirements, and unresolved Product Owner decisions are recorded in [Project Context and Repository Governance](ProjectContext.md). Placeholder or template approval metadata is not treated as project approval evidence.
+</details>
 
-## SDK
+## Start here
 
-The repository is pinned through `global.json`:
+| Task | Source of truth |
+| :--- | :--- |
+| Build and validate a PR | [Canonical validation](#canonical-validation-path) and [CI workflow](../.github/workflows/ci.yml) |
+| Prepare the version | [PR Versioning](ReleaseVersioning.md) and [Directory.Build.props](../Directory.Build.props) |
+| Understand dependencies | [Architecture](Architecture.md) and `build/Validate-ProjectReferences.ps1` |
+| Understand governance and approvals | [Project Context](ProjectContext.md) |
+| Compile or repair runtime content | [Asset Pipeline](AssetPipeline.md) and [Runtime recovery](RuntimeVisualAssetCompatibility.md) |
+| Find a feature or historical result | [Documentation hub](README.md) and [complete catalog](DocumentationIndex.md) |
 
-```text
-.NET SDK 10.0.402
-C# 14
-```
+Current `master` is the technical source of truth for implemented code, configuration and build behavior. Start technical work from its current revision, reuse relevant existing work deliberately, and integrate through short-lived PRs. Placeholder approval metadata does not establish product approval.
 
-Common compiler, analyzer, nullability, deterministic-build, and formatting settings are centralized in the repository root.
+<a id="sdk"></a>
 
-NuGet versions are managed centrally through `Directory.Packages.props`.
+## SDK and build configuration
 
-## Semantic Versioning
-
-Each PR increments PATCH exactly once relative to current master.
-Run `pwsh ./build/Increment-PrVersion.ps1 -BaseRef origin/master` and commit
-Directory.Build.props with the PR. Repeating preparation against the same base
-does not increment again. CI validates the PR as a whole; commits and reruns
-do not consume versions. Concurrent PRs must rebase and refresh their version.
-See [PR Versioning](ReleaseVersioning.md) for metadata and artifact identity.
-CI does not create tags or publish releases.
-
-Windows icon resources and package assertions are documented in [Windows application branding](WindowsApplicationBranding.md).
-
-## Canonical Validation Path
-
-From the repository root:
+| Setting | Repository value / owner |
+| :--- | :--- |
+| **SDK** | .NET SDK **10.0.402**, exact selection with roll-forward disabled in `global.json`. |
+| **Language** | C# 14. |
+| **Test runner** | Microsoft.Testing.Platform, selected in `global.json`. |
+| **Compiler and analysis** | Central settings in `Directory.Build.props`; nullable analysis, deterministic builds and warnings as errors. |
+| **NuGet packages** | Central versions in `Directory.Packages.props`. |
+| **Interactive host** | Windows x64 / Direct3D 12. Simulation and headless code keep their platform separation. |
 
 ```powershell
-pwsh ./build/Validate-SemVer.ps1 -BaseRef <base-commit> -HeadRef HEAD
+dotnet --version
+dotnet restore ForgeLine.sln
+dotnet build ForgeLine.sln --configuration Release --no-restore
+```
+
+Blender is required for Blender authoring/export tasks, not an ordinary build from existing source assets. Use the family-specific toolchain instructions when reauthoring.
+
+## Semantic versioning
+
+Each PR commits **one PATCH increment relative to current master**, including documentation-only PRs. Repeating preparation against the same base is idempotent; extra commits and CI attempts do not consume versions.
+
+```powershell
+pwsh ./build/Increment-PrVersion.ps1 -BaseRef origin/master
+pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master
+```
+
+Rebase concurrent PRs onto current master and refresh their version before integration. [PR Versioning](ReleaseVersioning.md) owns the policy, artifact metadata and validation contracts. CI performs no automatic tag allocation or release publication. The generic [Unified Versioning Standard](UnifiedVersioningStandard.md) remains a historical proposal rather than the current repository increment policy.
+
+## Canonical validation path
+
+> [!IMPORTANT]
+> This is the complete local reproduction sequence for a PR. The required remote `build-test` result belongs to the exact source under review. A successful build, selected tests, smoke run or earlier green revision does not substitute for that complete CI job.
+
+```powershell
+# 1. Version, restore, project graph and Release build
+pwsh ./build/Validate-SemVer.ps1 -BaseRef origin/master -HeadRef HEAD
 dotnet restore ForgeLine.sln
 pwsh ./build/Validate-ProjectReferences.ps1
 dotnet build ForgeLine.sln --configuration Release --no-restore
+
+# 2. Compiled maps and a complete runtime asset build
 dotnet run --project tools/ForgeLine.MapCompiler/ForgeLine.MapCompiler.csproj --configuration Release --no-build -- --output artifacts/maps/central-divide.flmap.json --qualification-output artifacts/map-qualification.json
 pwsh ./build/Test-CompiledScenarioLoading.ps1
 pwsh ./build/Build-RuntimeAssets.ps1 -Mode build -ForceRebuild -NoBuild
 pwsh ./build/Test-RuntimeAssetPipeline.ps1
 
+# 3. Native and headless smoke/stress
 dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test --render-stress 1000
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 64 --seed 12345 --tick-rate 20 --entities 1000 --diagnostics-output artifacts/headless-smoke.json
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 16 --seed 67890 --tick-rate 20 --entities 10000 --diagnostics-output artifacts/headless-stress-10000.json
+
+# 4. Complete solution, reproducible local package and natural terminal match
 dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
 pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible -RuntimeAssetRoot assets/runtime
 dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --scenario central-divide --profile validation --ticks 80000 --seed 2026 --require-terminal --diagnostics-output artifacts/match.json
 ```
 
-The GitHub Actions CI workflow executes this sequence on pull requests targeting `master` and on pushes to `master`. Windows client smoke validation is guarded to Windows runners, while headless diagnostic JSON files are uploaded as the `engine-diagnostics` workflow artifact.
+Run solution test modules **one at a time**, as CI does. Native desktop consumers and bounded simulation/client waits share machine resources. This preserves the full suite, assertions and deadlines; it does not filter tests or weaken the natural terminal-match requirement.
 
+The CI workflow runs for PRs targeting `master` and pushes to `master`. Native client smoke is Windows-specific. Diagnostic JSON is uploaded as the `engine-diagnostics` artifact. The workflow includes additional focused feature gates before the complete suite; consult the workflow for their exact current selections.
 
-The solution test command uses the existing CI limit of one test module at a time. Native desktop consumers and bounded client/simulation waits share machine resources; independently parallel modules can exhaust those waits. This schedules the complete suite without changing test filters, assertions, time limits or the natural terminal-match gate.
+The terminal gate uses seed **2026**, an **80,000-tick ceiling** and **`--require-terminal`**. Preserve the natural result and configured stock. A forced winner, free resources or shortened replacement workload cannot satisfy it.
 
-## Pull Requests and Required Check
+<a id="commit-discipline"></a>
 
-After the Release build, `pwsh ./build/Run-MatchSoak.ps1 -NoBuild` runs the canonical preset soak without rebuilding. Omit `-NoBuild` to retain the normal build-and-run behavior. The legacy `Run-VerticalSliceSoak.ps1` forwards to the new script and preserves its historical default report paths. The canonical CLI is `--scenario central-divide`; `--scenario vertical-slice` remains an alias.
+## Pull requests and required check
 
-`master` is the integration branch. Integration is intended to occur through pull requests from short-lived technical branches.
+| Requirement | Meaning |
+| :--- | :--- |
+| **Required check** | GitHub Actions `build-test`, covering the complete job. |
+| **Branch** | Short-lived feature/fix/technical work based on current `master`. |
+| **Version** | Exactly one PATCH increment per PR. |
+| **Commits** | Small, logically complete English commits; preserve technical history. |
+| **Integration** | Ordinary merge and rebase remain permitted; the existing no-squash policy remains in force. |
+| **Protection** | Required checks, up-to-date enforcement and effective repository settings need actual GitHub readback. |
 
-The CI workflow emits the required check context `build-test` from GitHub Actions. That check represents the complete job, including the natural vertical-slice terminal validation; a successful build or unit-test subset is not equivalent to the full required check.
+See [Project Context](ProjectContext.md#intended-master-protection) for intended protection and dated enforcement records. Documentation does not itself enforce repository settings or grant product approval.
 
-The early technology gate checks paid artillery/radar effects, research and fleet priorities, normal-stock opponent progression, serialized Save/Replay and matching Technology focus. It preserves all complete-suite, asset, native, package and terminal gates.
+Early feature gates provide independent diagnostics. Their success does not remove map/runtime, full-solution, native/WARP, package, recovery or terminal-match requirements. Packaging also validates registered maps in the exported client folders.
 
-The early Operations rule-controls gate runs the existing rule and command-boundary tests, real selected-facility UI/production/save-replay cases and client submission/native-state contracts. It preserves all later complete-solution, asset, Windows/WARP, package and terminal-match gates. See [Operations rules](OperationsAutomation.md) for scope and player controls.
+## Test projects
 
-The early logistics contract step also runs `PlayerActionDockHudTests` so
-construction, manual quantities, controller behavior and displayed availability
-are qualified together. After the existing runtime-asset compilation, the
-production catalog and render-usage step runs the source/manifest membership,
-building/unit/world/UI/VFX authoring and material/proxy regression tests. These
-focused checks provide independent diagnostics before later interaction gates;
-they do not replace the complete solution test, WARP, package, recovery or
-natural terminal-match checks.
+The solution has **14 test projects**. Keep functional tests near their owning systems, including controlled failure, cancellation, ownership and recovery behavior.
 
-Repository settings must require that check before merge once `master` protection is applied. Integration preserves small validated technical commits. Ordinary merge and rebase integration remain permitted; the existing no-squash policy remains in force. Documentation does not itself enforce branch protection, so the effective GitHub settings must be verified by readback. See [Project Context and Repository Governance](ProjectContext.md).
+| Group | Projects / focus |
+| :--- | :--- |
+| **Engine primitives** | Core, Ecs, Jobs, Input: identity, data/storage, scheduling, dependency/fence behavior and input contracts. |
+| **World and execution** | World, Simulation, Navigation, Logistics: generation/terrain, fixed-tick phases, movement/pathing and transport capacity. |
+| **Game composition** | Game: shared `MatchRuntime`, economy, combat, intelligence, supply, persistence and scenario progression. |
+| **Content** | Assets: source/catalog/compiler/runtime integrity and authoring contracts. |
+| **Interactive presentation** | Platform.Windows, Graphics, Presentation, Client: native lifecycle, rendering, copied read models, UI/host behavior and session recovery. |
 
-The compiled scenario loading and recovery CI gate verifies complete terrain parity, loaded map state, identity rejection, owned new/load/restart and disabled setup entries. Test-CompiledScenarioLoading exercises the actual CLI and missing-content failure. Publish-PreAlpha additionally qualifies the map and runs Validate-ScenarioPackage from each exported client folder. These checks preserve all existing full-solution, renderer, asset, package and natural terminal gates. See [compiled scenario contracts](StrategicMapAndOperationalGeography.md).
+Simulation/Game headless tests must not acquire interactive graphics or Windows dependencies. Use `MatchRuntime` for canonical composition and `SkirmishScenarioHarness` for test-facing scenario access. Focused deterministic tests remain part of the normal suite; repeated full-match cohorts remain opt-in.
 
-## Test Projects
+## Windows client host
 
-The repository contains focused test projects for Core, ECS, Jobs, World, Simulation, Navigation, Logistics, Game, Platform.Windows, Graphics, Input, and Presentation.
-
-Functional tests belong with the systems they validate and should cover controlled failure behavior as well as successful behavior. Directorate content validation and bounded vertical-slice scenarios run in `ForgeLine.Game.Tests` and remain fully headless. Central Divide definition validation, compiled-map roundtrip, explicit build-zone policy, complete strategic/resource reachability, disruption/rerouting/restoration, finite-resource loading, and Command Core objective tests also run in `ForgeLine.Game.Tests` without a presentation dependency. Skirmish-opponent validation reuses `MatchRuntime` for shortage recovery, intelligence-constrained direct targeting, same-seed strategic progression, integrated Build–Supply–Conquer coverage, and fresh-session cleanup. CI additionally executes one bounded terminal match through the real headless host. Repeated multi-match soak remains an on-demand workflow rather than a per-PR timing gate.
-
-Job tests verify range coverage, dependency ordering, fences, exception propagation, one-worker execution, cancellation-aware shutdown, bounded stress execution, and instrumentation. Simulation tests verify fixed tick counts, explicit phase order, command scheduling and stable ordering, deterministic seeded behavior, job-boundary integration, fast headless-style execution, allocation behavior, diagnostics, reusable test scenarios, and bounded entity stress. Simulation tests must remain runnable without starting the interactive client. Navigation tests cover movement-class traversability, obstacle blocking, sector decomposition, portals, high-level routing, choke points, bounded local refinement, cache reuse, explicit route failure, and large-map hierarchy scaling. Logistics tests cover connected and disconnected graphs, disabled infrastructure, alternate routes, deterministic equal-cost ties, node removal, versioned cache invalidation, transport-mode filtering, and minimum-capacity filtering. Game tests additionally cover job-scheduled navigation handoff, stale-result rejection, fixed-tick ground locomotion, arrival, acceleration and turn limits, terrain/slope handling, spatial chunk crossing, local separation, static obstacle steering, stuck detection, one shared strategic route for 10/50/100-unit selections, stable formation slots, unit removal, replacement orders, choke-point fallback, concurrent groups, a 1,000-unit movement stress scenario, economic-building logistics registration, physical cargo transport, load/unload conservation, route invalidation/rerouting, destination-capacity recovery, vehicle-loss semantics, bounded multi-transport stress, throughput-window enforcement, congestion-aware alternate routing, persistent node/edge disruption and restoration, saturation backlog/recovery, route-churn reservation cleanup, hitscan cadence and reload timing, authoritative Ammunition depletion, range rejection, physical projectile travel/collision, exactly-once impact, stale source/target handling, zero-health lifecycle destruction, repeatable headless combat outcomes, Front/Side/Rear/Top armor classification, penetration mitigation, target-class filtering, deterministic target priority, reacquisition, fire-policy behavior, and target-availability/line-of-fire hooks, persistent exploration, visual-visibility loss, radar-only contacts, Detected/Identified transitions, faction isolation, hidden-target exclusion, last-known moving contacts, faction-safe presentation filtering, hidden artillery-coordinate rejection, radar-contact fire missions, indirect min/max range, projectile travel, exactly-once area damage, Ammunition exhaustion, Battlefield-Supply-driven mission recovery, Attack/pursuit-leash behavior, AttackMove engagement/resume, Hold/Stop semantics, group target spreading, real automatic resupply, Retreat, derived unit/group readiness, entity-loss strength degradation, and intelligence-constrained tactical test-opponent behavior.
-
-## Diagnostics
-
-Engine diagnostics are opt-in and must remain independent of rendering, UI, audio, and platform-specific code.
-
-The headless host can emit structured JSON diagnostics:
+The normal client composes the skirmish through `MatchRuntime` with the `gameplay` profile. Player 1 is human-controlled and Player 2 computer-controlled. The client owns its shared `JobScheduler`; scenario/session disposal does not dispose that host-owned scheduler. Restart creates a fresh scenario and does not retain ECS, route, inventory, controller or order state.
 
 ```powershell
-dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release -- --ticks 1000 --seed 1 --entities 1000 --diagnostics-output artifacts/headless.json
+# Preferred development launcher: build, compile/qualify content, then launch
+pwsh ./build/Start-DevelopmentClient.ps1
+
+# Launch existing prepared outputs
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build
+
+# Bounded native smoke
+dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release --no-build -- --smoke-test
 ```
 
-See [Diagnostics and Performance](DiagnosticsAndPerformance.md) for available metrics, invariants, report fields, stress scenarios, and regression-investigation guidance.
+The client never starts asset compilation. For explicit content preparation, use `Build-RuntimeAssets.ps1 -Mode development`; publish/build modes and invalid override handling are documented in [Asset Pipeline](AssetPipeline.md#build-modes-and-deployment-integrity). Native bootstrap checkpoints are described in [Startup diagnostics](StartupDiagnostics.md).
 
-## Benchmark Projects
+Synthetic `--render-stress` instances are opt-in presentation load added after authoritative gameplay/navigation construction. They do not change gameplay navigation topology. Debug/world overlays expose copied diagnostics; they do not own simulation truth.
 
-The repository contains BenchmarkDotNet hosts for ECS, Navigation, Simulation, and Rendering. Benchmark code should be introduced together with meaningful measured workloads. The navigation benchmark host covers both synthetic long-distance hierarchy scaling and complete Central Divide cross-map, expansion, and bridge-loss alternate-route searches; the simulation benchmark host covers fixed-tick, scheduler, spatial-query, 1,000-unit ground-movement workloads, a 10/50/100-unit comparison between independent strategic path searches and one shared formation route, cold logistics routing/reachability on 1,000-node and 10,000-node road graphs, 100/500-vehicle physical cargo transport batches, and 100/1,000-request capacity-aware routing plus repeated topology-change workloads, 100/1,000-weapon authoritative direct-fire ticks, 100/1,000-projectile movement ticks, and 100/1,000-candidate dense-field target acquisition and 100/1,000-unit mixed visual/radar sensor workloads and 10/100 simultaneous artillery fire missions and 100/1,000-unit tactical acquisition/coordination workloads; the rendering benchmark host covers terrain mesh generation, visible-chunk submission preparation, 1,000 near-field instances, and 5,000 total instances with far-field culling. Performance-sensitive architectural changes require measurement rather than assumption.
+Use [Windows Client](WindowsClient.md), [Camera and Input](CameraAndInput.md) and [Graphics Quality Settings](GraphicsQualitySettings.md) for lifecycle, DPI, controls, next-session graphics changes and display rollback. [Manual renderer qualification](WindowsRendererQualification.md) covers physical/WARP capture and external package installation. Its default Plan stage executes no captures and grants no hardware acceptance.
 
-Examples:
+### Developer builds
+
+The default Public build excludes developer implementations. Internal Developer builds use isolated `bin/Developer` and `obj/Developer` roots; apply the property consistently to restore and dependent builds:
 
 ```powershell
-dotnet run --project benchmarks/ForgeLine.Ecs.Benchmarks/ForgeLine.Ecs.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Simulation.Benchmarks/ForgeLine.Simulation.Benchmarks.csproj --configuration Release
-dotnet run --project benchmarks/ForgeLine.Rendering.Benchmarks/ForgeLine.Rendering.Benchmarks.csproj --configuration Release
+dotnet restore ForgeLine.sln -p:ForgeLineEnableDeveloperTools=true
+dotnet build ForgeLine.sln --configuration Release --no-restore -p:ForgeLineEnableDeveloperTools=true
 ```
 
-Correctness tests remain separate from benchmark timing. Benchmark timing thresholds are not CI gates unless explicitly introduced later.
+The public publisher forces developer tools off and verifies assembly variant metadata. See [Developer tools architecture](DeveloperToolsArchitecture.md), [menu](DeveloperToolsMenu.md), [session controls](DeveloperSessionControls.md), [simulation actions](DeveloperSimulationActions.md) and [presets](DeveloperPresets.md).
 
-## Windows Client Host
+<a id="headless-runtime"></a>
 
-For source-pinned manual build, native/WARP capture matrices, live overlay checks
-and an external Windows package install, follow [Windows renderer qualification](WindowsRendererQualification.md).
-Its default Plan stage executes no tests or captures and grants no hardware acceptance.
+## Headless runtime and recovery
 
-The frontend exposes four graphics presets and supported independent feature overrides. Schema 3 persists them per user and migrates earlier settings. Graphics apply at the next session boundary; display changes require a successfully presented 15-second trial before saving. Fixture requests resolve the same policy, including optional reduced world resolution and supplied texture mips. See [graphics settings and benchmark reproduction](GraphicsQualitySettings.md) for resource costs, effective fallback diagnostics and native qualification commands.
-
-Compile runtime assets explicitly with `pwsh ./build/Build-RuntimeAssets.ps1 -Mode development` before launching a source checkout. Publishing without `-RuntimeAssetRoot` builds its own runtime cache; the CI path validates and packages its already built/tested root. See [Asset Pipeline](AssetPipeline.md#build-modes-and-deployment-integrity) for force-rebuild, validation and migration. The interactive client never starts source compilation. A native bootstrap window appears before settings and graphics initialization; changed startup events are checkpointed under the local user diagnostics directory. See [Startup timing](StartupDiagnostics.md) and [Early Native Bootstrap](adr/EarlyNativeBootstrap.md).
-
-The interactive client owns the native Windows host, Direct3D 12 graphics backend, RTS input/camera stack, immutable presentation extraction, frame pacing, and development visualization. Canonical gameplay construction is delegated to `MatchRuntime` using the `Gameplay` profile. Player 1 is explicitly human-controlled and Player 2 computer-controlled; the local slot therefore does not receive a strategic opponent controller.
-
-The client supplies a host-owned `JobScheduler` to the shared runtime. Scenario disposal does not dispose that scheduler; the client host owns its single disposal. Match restart creates a fresh shared scenario so ECS state, inventories, navigation state, routes, controllers, and orders do not leak between sessions.
-
-Normal launches contain only the skirmish world. Synthetic instance load is opt-in through `--render-stress` and is added after authoritative gameplay/navigation construction, so rendering stress entities do not alter the gameplay navigation topology. F2 includes the battlefield's starts, resources, strategic sites, logistics corridor, crossings, infrastructure state, Command Core objectives, and skirmish strategic state alongside the existing system diagnostics.
-
-Launch it with:
+Headless execution uses logical simulation time without wall-clock pacing. Use `--help` for the actual supported CLI:
 
 ```powershell
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --help
 ```
 
-For bounded validation that exits automatically:
+| Mode / option | Contract |
+| :--- | :--- |
+| **`--scenario`** | `lightweight`, `central-divide`, `split-basin` or a registered composition key. `vertical-slice` remains a Central Divide alias. |
+| **`--profile`** | `gameplay` retains player-facing tuning; `validation` uses accelerated stock/opponent and validation-specific navigation/distribution settings. |
+| **`--generated-map`** | Explicit verified generated package; requires the host asset identity. It conflicts with authored scenario/preset selection. |
+| **`--ticks`, `--seed`, `--entities`, `--tick-rate`** | Bounded run configuration; a generated map recipe seed remains separate from the simulation seed. |
+| **`--matches`, `--require-terminal`** | Repeated fresh sessions and explicit terminal-result validation. |
+| **Save / replay / diagnostics** | See [Save, Load, Replay and Recovery](SaveLoadReplayAndRecovery.md) and [Diagnostics](DiagnosticsAndPerformance.md) for complete arguments and identity rules. |
 
-```powershell
-dotnet run --project src/ForgeLine.Client/ForgeLine.Client.csproj --configuration Release -- --smoke-test
-```
+| Profile | Navigation cells / sectors | Distribution retry / attempts / aging |
+| :--- | :--- | :--- |
+| **gameplay** | 16 m cells / 8-cell sectors | 20 ticks / 4 attempts / 200 ticks |
+| **validation** | 32 m cells / 4-cell sectors | 10 ticks / 8 attempts / 100 ticks |
 
-The client is Windows x64 specific. Native Win32 calls remain confined to `ForgeLine.Platform.Windows`; headless and simulation projects must not reference the client or Windows platform project.
-
-See [Windows Client](WindowsClient.md) for lifecycle and DPI details, [RTS Camera and Input](CameraAndInput.md) for camera controls and coordinate conventions, [World and Terrain](WorldAndTerrain.md) for terrain queries, mesh generation, culling, diagnostics, and benchmark coverage, [Ground Movement and Local Steering](GroundMovementAndSteering.md) for authoritative locomotion semantics, [Hierarchical Navigation](HierarchicalNavigation.md) for long-range ground routing, and [Formation Movement and Group Orders](FormationMovementAndGroupOrders.md) for multi-unit shared routing and formation behavior.
-
-## Headless Runtime
-
-The development host supports lightweight engine stress and complete vertical-slice execution:
-
-```text
---scenario <lightweight|vertical-slice>
---profile <gameplay|validation>
---ticks <count>
---seed <value>
---tick-rate <hz>
---entities <count>
---matches <count>
---require-terminal
---diagnostics-output <path>
---help
-```
-
-The logical tick rate describes simulation time. Headless execution does not sleep to match real time and may run substantially faster than the configured logical rate. The vertical-slice runtime remains fixed at the canonical 20 Hz simulation rate and uses the same `MatchRuntime` construction path as the Windows client.
-
-`gameplay` preserves product-facing starting stock, opponent behavior, 16 m navigation cells with 8-cell sectors, and the normal distribution retry/attempt/fairness policy (20 ticks / 4 attempts / 200 aging ticks). `validation` deliberately retains accelerated starting stock and opponent behavior, 32 m navigation cells with 4-cell sectors, and its faster distribution policy (10 / 8 / 100) for deterministic CI/soak coverage. Validation tuning must not be treated as product balance.
-
-Headless participant assignments are explicit runtime settings rather than hidden host behavior. Tests may choose human or computer slots independently of the profile when validating composition parity. Headless match creation forwards cancellation and disposes each scenario after the fresh-session run; the shared runtime introduces no wall-clock pacing.
-
-Run repeated fresh sessions with:
+Tests can assign human/computer participants explicitly regardless of profile. Match creation forwards cancellation; each fresh scenario is disposed after its run. Validation tuning is not a product-balance claim.
 
 ```powershell
 pwsh ./build/Run-MatchSoak.ps1 -Profile validation -Matches 5 -TicksPerMatch 80000 -Seed 2026
 ```
 
-The `Match Soak` GitHub Actions workflow exposes the same runner through manual dispatch and uploads the JSON report.
+After a Release build, add `-NoBuild` to the soak runner to avoid rebuilding. `Run-VerticalSliceSoak.ps1` remains a compatibility forwarder with its historical report defaults. The manual `Match Soak` workflow uploads the same runner’s report; repeated five-match soak is separate from the ordinary PR timing gate.
 
-## Commit Discipline
+<a id="skirmish-opponent-validation"></a>
 
-Prefer several small, logically complete commits over broad aggregate commits.
+<a id="world-environment-integration"></a>
 
-Prepare one PATCH increment per PR against current master. Keep unrelated
-changes separate, preserve history and validate the PR version.
-The existing no-squash integration convention remains in force.
-## Documentation
+<a id="building-demolition"></a>
 
-Documentation changes with implementation. When project responsibilities, dependency boundaries, build commands, validation requirements, supported technical baselines, diagnostic conventions, or performance workflows change, update the relevant documents in the same work.
+<a id="tactical-supply-and-convoy-reliability"></a>
 
+<a id="operations-chain-validation"></a>
 
-## Skirmish Opponent Validation
+<a id="alternate-battlefield"></a>
 
-The skirmish opponent is a game-composition layer, not an alternate simulation authority. New behavior must preserve the command boundary, faction-scoped intelligence, real resource costs, physical Fuel/Ammunition, and normal logistics/movement/combat execution. Difficulty/configuration changes may adjust decision cadence and thresholds but must not alter simulation advantages.
+<a id="developer-tools-foundation"></a>
 
-Use `MatchRuntime` as the canonical reusable game composition and `SkirmishScenarioHarness` as its test-facing wrapper. Keep focused deterministic scenarios in the normal test suite; CI also executes one accelerated terminal validation match, while repeated multi-match soak remains on demand. See [Skirmish Opponent](SkirmishOpponent.md) for behavior, allowed knowledge, configuration, diagnostics, and current limitations.
+<a id="fair-opponent-qualification"></a>
 
-## World environment integration
+<a id="strategic-logistics-capacity"></a>
 
-World appearance overrides and multi-chunk Traverse qualification are described in [World environment rendering](WorldEnvironmentRendering.md). Capture clean committed binaries sequentially; timed traversal includes terrain admissions.
+<a id="command-replay-qualification"></a>
 
+<a id="strategic-map-audit"></a>
 
-Combat/industrial validation adds bounded extraction, industrial production parity, decal lifecycle/visibility, allocation churn, fallback saturation and production perspective-depth regressions to existing mechanical and particle tests. EffectsBarrage and IndustrialEffects are additional native reference scenes. Reproduction and portable measurements: [combat and industrial rendering](CombatIndustrialRendering.md).
+## Feature-specific validation
 
+Keep feature details and reproduction with their owning guides rather than duplicating the full CI sequence.
 
-Scalable rendering adds RenderSnapshotIndexTests, reference/optimized upload parity and native DepthReconstructionTests to CI. Frame hot-path reports now measure snapshot-index rebuild separately. Full reproduction, capability probes and CPU/GPU qualification limits: [scalable rendering](ScalableRendering.md).
+| Area | Guides and dedicated checks |
+| :--- | :--- |
+| **Authored maps and audits** | [Central Divide](CentralDivideBattlefield.md), [Split Basin](SplitBasinBattlefield.md), [strategic geography](StrategicMapAndOperationalGeography.md), [strategic audit](StrategicMapBalanceAudit.md); `Test-CompiledScenarioLoading.ps1` and `Test-StrategicMapAudit.ps1`. |
+| **Generated maps** | [Deterministic contracts](DeterministicWorldGeneration.md), [generated packages](GeneratedBattlefieldMaps.md), [seeded selection](SeededSkirmishSelection.md), [procedural qualification](ProceduralMapQualification.md). |
+| **Terrain and decoration** | [Biome fields](BiomeAndEcologyFields.md), [terrain materials](BiomeTerrainMaterials.md), [chunk decoration](ChunkDecorationRendering.md), [world environment](WorldEnvironmentRendering.md). |
+| **Navigation, supply and convoy** | [Hierarchical navigation](HierarchicalNavigation.md), [navigation resilience](LogisticsNavigationResilience.md), [supply](BattlefieldSupply.md), [convoys](CargoConvoyOperations.md); qualify reachability separately from timing. |
+| **Opponent policies** | [Skirmish Opponent](SkirmishOpponent.md), [Fair opponent difficulty](FairOpponentDifficulty.md); optional normal-stock cohorts distinguish terminal results from censored runs. |
+| **Operations and strategic logistics** | [Rules](OperationsAutomation.md), [diagnosis](OperationsDiagnosis.md), [capacity](StrategicLogisticsCapacity.md); copied visibility, real paid recovery and bounded observations remain required. |
+| **Commands and recovery** | [Replay](DeterministicCommandReplay.md), [save/load/recovery](SaveLoadReplayAndRecovery.md), [building demolition](BuildingDemolition.md); retain cancellation, identity and authority contracts. |
+| **UI and native interaction** | [UI review](UiVisualReview.md), [HUD consolidation](HudSurfaceConsolidation.md), [input qualification](GameplayInputAccessibilityAndQualification.md), [interface qualification](GraphicalInterfaceQualification.md). |
+| **Rendering and effects** | [Graphics](Graphics.md), [scalable rendering](ScalableRendering.md), [combat/industry rendering](CombatIndustrialRendering.md), [reference performance](GraphicsReferencePerformance.md), [serial integration evidence](rendering/performance-integration/Qualification.md). |
 
-## Building demolition
+The navigation refinement workload is reproduced with:
 
-[Building demolition](BuildingDemolition.md) describes Delete input ownership, historical material refunds, authoritative validation and replay compatibility.
+```powershell
+dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release -- --filter *HierarchicalPathfindingBenchmarks* --job Short --inProcess --artifacts artifacts/navigation-fallback --exporters BriefJSON
+```
 
-## Tactical supply and convoy reliability
+The old counterexample can return an incorrect `NoLocalRoute` and therefore perform less work. Use the source-pinned navigation measurements; incomplete work is not a valid speedup baseline.
 
-The early Tactical supply, convoy and bounded navigation contracts step runs TacticalCombatSystemTests, CargoTransportSystemTests, MoveEntitiesCommandTests, HierarchicalNavigationSystemTests, MatchPersistenceTests and the full Navigation test module after the Release build. It preserves the independent conveyor gate and every later full-solution, Windows/WARP, asset/map/package/recovery and natural-terminal check.
+<a id="diagnostics"></a>
 
-The paired refinement workload is reproduced with `dotnet run --project benchmarks/ForgeLine.Navigation.Benchmarks/ForgeLine.Navigation.Benchmarks.csproj --configuration Release -- --filter *HierarchicalPathfindingBenchmarks* --job Short --inProcess --artifacts artifacts/navigation-fallback --exporters BriefJSON`. Qualify reachability separately from timing: the old counterexample returns an incorrect NoLocalRoute and therefore performs less work. See HierarchicalNavigation.md and NavigationRefinementMeasurements.json for recorded sources, allocation, raw measurements and limits.
+<a id="benchmark-projects"></a>
 
-## Operations chain validation
+## Diagnostics and benchmarks
 
-The early Operations chain diagnosis and safe focus CI step checks transient conveyor causes, real paid production-chain recovery, typed bounded links, source-stock semantics, privacy, held navigation, dense copied rendering and extraction/composition bounds. It preserves the tactical, recovery, conveyor, asset/map, full-solution, native, package and natural terminal gates. See [Operations diagnosis](OperationsDiagnosis.md) and its source-pinned measurement report. Native human readability and reference-hardware performance remain separate acceptance classes.
+Engine diagnostics are opt-in and independent of rendering, UI, audio and platform-specific code.
 
-## Alternate battlefield
+```powershell
+dotnet run --project src/ForgeLine.Headless/ForgeLine.Headless.csproj --configuration Release --no-build -- --ticks 1000 --seed 1 --entities 1000 --diagnostics-output artifacts/headless.json
+```
 
-Central Divide remains the default; Split Basin is selected in New Game or via `--scenario split-basin` in client/headless. Both use the same compiled registry, save/replay and deployed package contracts. See [Split Basin](SplitBasinBattlefield.md) for actual-data geography, normal-stock opening, route measurements and reproducible checks. The early Split Basin gate adds focused geography/runtime tests and map compilation without removing any existing gates.
+The repository has five benchmark hosts: **Ecs, Navigation, Simulation, Logistics and Rendering**. Choose measured workloads in the owning host; use the corresponding `benchmarks/ForgeLine.<Area>.Benchmarks/ForgeLine.<Area>.Benchmarks.csproj` project. [Diagnostics and Performance](DiagnosticsAndPerformance.md) explains metrics, bounds, report fields and investigation.
 
-## Developer tools foundation
+Correctness tests run separately from timing. Finish builds, asset compilation and other GPU tests before native timing. Record the exact source, payload, settings, hardware, warmups, sample counts and limitations. Do not add overlapping pass durations or infer a speedup from API choice/draw reduction. Timing thresholds require explicit gates; a merged implementation or green structural capture does not grant performance or human art acceptance.
 
-The default public build excludes developer implementations. Internal Release builds
-opt in with -p:ForgeLineEnableDeveloperTools=true and use isolated bin/Developer
-and obj/Developer roots. Use the same property for restore and dependent builds.
-The public publisher forces false and verifies assembly variant metadata.
-See [Developer tools architecture](DeveloperToolsArchitecture.md) for capability,
-request/result, parameter, preset and provider contracts and ownership handoffs.
-No menu or mutating tool is implied by these contracts.
+<a id="documentation"></a>
 
-## Fair opponent qualification
+### Opt-in render-owner telemetry
 
-The early CI fair-opponent step runs named-policy, legal-intelligence, raid-counterplay and blocked-factory recovery cases. Opt-in normal-stock seeded cohorts retain fixed tick bounds and explicitly distinguish completed matches from censored results. See [Fair opponent difficulty](FairOpponentDifficulty.md) for selection and commands; the canonical terminal gate and shared pacing runner are unchanged.
+The [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) adds `FORGELINE_RENDER_TELEMETRY_OUTPUT` with predeclared warmup/sample counts (defaults 64/512), bounded startup/in-flight headroom, raw completed GPU joins and logical resource-byte accounting. Follow that runbook for the exact enable/restore commands and strict validation. The stream covers the active render-owner iteration, excluding deliberate idle-mailbox wait and independent platform/simulation owners. It is not an approved matched native fixture or a complete physical-allocation budget pass. Preserve source/payload identity, startup states, incomplete windows, overflows and failed attempts.
 
-## Strategic logistics capacity
+## Documentation maintenance
 
-The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
-
-## Command replay qualification
-
-The early CI command-replay step preserves the existing journal, integrity and save-cancellation checks and adds cooperative replay cancellation plus optional intermediate diagnostic comparisons. See [Deterministic command replay](DeterministicCommandReplay.md) for CLI stop behavior, schema/visibility limits and API reproduction, and [executed qualification](CommandReplayQualification.md) for measured results.
-
-## Strategic map audit
-
-After the Release build, run `./build/Test-StrategicMapAudit.ps1` for every registered compiled map, repeatable JSON/Markdown, explicit warning exceptions and controlled failure cases. The same check and focused regression suite run early in CI. See [criteria and reproduction](StrategicMapBalanceAudit.md).
+Update the relevant guide whenever implementation, dependency boundaries, commands, baselines, diagnostics or qualification workflows change. Use the [documentation conventions](DocumentationGuide.md), keep [the catalog](DocumentationIndex.md) complete, and preserve source-pinned results and raw evidence. Current instructions belong in current guides; historical results keep their original SDK, source SHA, status and measurement scope.

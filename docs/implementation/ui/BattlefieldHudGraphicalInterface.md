@@ -1,5 +1,7 @@
 # Graphical Battlefield HUD
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Integrate the Directorate production skin into the live resource/power strip, selection inspector, command-dock shell, combat-group presentation and shared gameplay tooltips. Retain authoritative values and existing RTS interaction. Complete implementation, tests, evidence and PR handling through the existing GitHub connection without changing working environment.
@@ -49,7 +51,7 @@ Preserve and extend current `GameplayHudRuntimeTests`, `ResourcePowerAlertHudTes
 
 ## Build and CI requirements
 
-Use current pinned SDK and Microsoft.Testing.Platform. Restore/build Release, validate project references, compile runtime assets and run targeted HUD/interaction tests, then `dotnet test --solution ForgeLine.sln --configuration Release --no-build` and required CI. Use existing capture tooling for `ResourcePressure`, `LowPower`, `SupplyCritical`, `MixedSelection`, `DockFocus`, `DockHover`, `DockPressed`, `DockPending`, `DockAccepted` and `DockRejected` where present. Retain source/runtime/capture identities. Existing fence/shutdown failures remain disclosed and cannot be suppressed to pass this scope.
+Use current pinned SDK and Microsoft.Testing.Platform. Restore/build Release, validate project references, compile runtime assets and run targeted HUD/interaction tests, then `dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1` and required CI. Use existing capture tooling for `ResourcePressure`, `LowPower`, `SupplyCritical`, `MixedSelection`, `DockFocus`, `DockHover`, `DockPressed`, `DockPending`, `DockAccepted` and `DockRejected` where present. Retain source/runtime/capture identities. Existing fence/shutdown failures remain disclosed and cannot be suppressed to pass this scope.
 
 ## Branch and pull request strategy
 

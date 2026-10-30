@@ -1,5 +1,7 @@
 # UI Visual and Runtime Qualification
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Qualify the completed graphical frontend/HUD migration across visual coverage, interaction, accessibility, native rendering, resource lifetime, performance and distributable player assets. Close regressions in the migrated area and produce attributable evidence rather than declaring quality from a concept board. Execute through the existing GitHub connection without changing working environment.
@@ -58,7 +60,7 @@ dotnet restore ForgeLine.sln
 dotnet build ForgeLine.sln --configuration Release --no-restore
 pwsh ./build/Validate-ProjectReferences.ps1
 pwsh ./build/Build-RuntimeAssets.ps1 -Mode development -NoBuild
-dotnet test --solution ForgeLine.sln --configuration Release --no-build
+dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
 pwsh ./build/Publish-PreAlpha.ps1 -Configuration Release -VerifyReproducible
 ```
 

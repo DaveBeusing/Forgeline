@@ -1,5 +1,7 @@
 # UI Atlas Pipeline and Skin Renderer
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Implement the shared compiled-asset path and graphical skin renderer that lets all existing frontend and HUD surfaces use production artwork without flattening their live content. Complete contracts, compiler support, rendering, lifecycle, tests and a small integration fixture through the existing GitHub connection without changing working environment.
@@ -50,7 +52,7 @@ Add round-trip/integrity, deterministic packing, malformed metadata, boundary UV
 
 ## Build and CI requirements
 
-Use current `global.json` and Microsoft.Testing.Platform. Run restore, Release build, project-reference validation and `Build-RuntimeAssets.ps1 -Mode development -NoBuild`. Use targeted tests under `tests/ForgeLine.Graphics.Tests`, `tests/ForgeLine.Presentation.Tests` and existing asset/compiler test projects first; discover exact test names in current source. Then run `dotnet test --solution ForgeLine.sln --configuration Release --no-build` and required CI. Record native tests not run separately. The observed baseline fence-timeout is not permission to disable lifecycle gates or claim this feature fully qualified.
+Use current `global.json` and Microsoft.Testing.Platform. Run restore, Release build, project-reference validation and `Build-RuntimeAssets.ps1 -Mode development -NoBuild`. Use targeted tests under `tests/ForgeLine.Graphics.Tests`, `tests/ForgeLine.Presentation.Tests` and existing asset/compiler test projects first; discover exact test names in current source. Then run `dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1` and required CI. Record native tests not run separately. The observed baseline fence-timeout is not permission to disable lifecycle gates or claim this feature fully qualified.
 
 ## Branch and pull request strategy
 

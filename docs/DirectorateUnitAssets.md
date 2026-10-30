@@ -1,5 +1,28 @@
 # Directorate Unit Assets
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Included families](#included-families)
+- [Source layout](#source-layout)
+- [LOD contract](#lod-contract)
+- [Collision and gameplay footprint](#collision-and-gameplay-footprint)
+- [Gameplay-facing sockets](#gameplay-facing-sockets)
+- [Animation boundary](#animation-boundary)
+- [Materials and damage states](#materials-and-damage-states)
+- [Strategic symbols and selection](#strategic-symbols-and-selection)
+- [Renderer integration](#renderer-integration)
+- [Validation](#validation)
+- [Current boundary](#current-boundary)
+- [VFX integration](#vfx-integration)
+- [Dedicated infantry and wreck production](#dedicated-infantry-and-wreck-production)
+- [Dedicated combat and support vehicle production](#dedicated-combat-and-support-vehicle-production)
+
+</details>
+
 ## Purpose
 
 The Directorate Vertical Slice unit set is the first gameplay-unit presentation family compiled through the production ForgeLine asset pipeline. It preserves the existing authoritative unit definitions and gameplay IDs while replacing generic renderer placeholders with stable runtime mesh, material, LOD, collision, socket, damage-state, and strategic-symbol bindings.
@@ -179,7 +202,6 @@ Automated coverage verifies:
 
 This is the first production-textured Directorate unit visual baseline, not final high-detail hero art. Shared Base Color/Normal/ORM textures are now active through the production GPU material path. Higher-resolution unique maps where genuinely justified, skeletal animation, track/wheel animation, articulated gun elevation/recoil, portraits, audio, and higher-fidelity destruction can extend the stable contracts without changing gameplay IDs or creating a parallel runtime asset path.
 
-
 ## VFX integration
 
 Directorate weapon and damage visuals use the shared presentation VFX contracts documented in [Combat, Destruction, and Logistics VFX](CombatAndLogisticsVfx.md).
@@ -213,4 +235,4 @@ length under nonuniform unit scale. Owned active artillery missions supply only
 bounded visual aim; gameplay missions and trajectories remain authoritative.
 See [source, native comparisons and remaining acceptance](CombatSupportUnitProduction.md).
 
-The optional [procedural CPU atlas producer](ProceduralPbrProduction.md) preserves the existing atlas and runtime budgets in isolated, verifiable source generations. Production promotion and art approval remain explicit; see its qualification report.
+See [Asset Pipeline](AssetPipeline.md) and the [procedural CPU atlas producer](ProceduralPbrProduction.md) for isolated source generations, production-promotion rules and the unchanged runtime budgets.

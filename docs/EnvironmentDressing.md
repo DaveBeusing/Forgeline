@@ -1,5 +1,20 @@
 # Central Divide environment composition
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Reference and priorities](#reference-and-priorities)
+- [Composition and ownership](#composition-and-ownership)
+- [Vegetation and distance](#vegetation-and-distance)
+- [Qualification](#qualification)
+- [Bounded modular kit](#bounded-modular-kit)
+- [Procedural decoration sets](#procedural-decoration-sets)
+- [Chunk decoration rendering](#chunk-decoration-rendering)
+
+</details>
+
 ## Reference and priorities
 
 The starting revision is `9a2b92bc41f06b8319a8d7cada2b5559a5fa388f`.
@@ -157,9 +172,6 @@ headless generator over biome fields and frozen gameplay clearances. Its compact
 chunk sets, reference plots and fingerprints do not change authored dressing,
 scenario artifacts, ECS allocation, rendering or persistence.
 
-
 ## Chunk decoration rendering
 
-The opt-in [chunk decoration render connection](ChunkDecorationRendering.md) consumes
-copied public scatter snapshots through the existing Windows instancing, LOD, wind and
-shadow paths. Separate bounded render residency preserves gameplay and authored inputs.
+[Chunk decoration rendering](ChunkDecorationRendering.md) connects copied scatter snapshots to the existing instancing, LOD, wind and bounded shadow paths. [World environment rendering](WorldEnvironmentRendering.md) owns the shared integration context.

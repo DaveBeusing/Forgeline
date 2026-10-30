@@ -1,5 +1,7 @@
 # Base Conveyor Port Matrix
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 **Status: implemented finite-flow port subset with headless qualification; native acceptance pending.**
 [Conveyor simulation and vehicle interop](ConveyorSimulationAndVehicleInterop.md)
 lists exact activated sockets, dimensions, resource filters and real inventory bindings.
@@ -36,7 +38,7 @@ standard belt end frames, tier increments and explicit input/output adapters.
 This matrix retains ownership of future *building-specific* physical sockets;
 none are generated automatically by the standalone kit.
 
-### Port metadata
+## Port metadata
 
 Each future authored port must declare: building stable ID and role, port stable
 ID, relative world socket, cardinal-facing direction, elevation tier, permitted
@@ -53,7 +55,7 @@ eligibility agree. The current resource definitions and production recipes
 remain authoritative for which materials a given building truly consumes
 or produces; this table does not invent new recipes.
 
-### Compatibility and future expansion
+## Compatibility and future expansion
 
 Fuel and Volatiles remain nonconveyable pending a separate pipeline decision.
 Other future fluid, gas, unit, construction-unit and oversize resource classes
@@ -66,11 +68,10 @@ inventory**; production reserves complete recipes as before. Existing regional
 logistics policies remain valid, and the dispatcher must not issue duplicate
 reservations for the same demand.
 
-### Required content qualification
+## Required content qualification
 
 Before any port is enabled, test its socket geometry, facing, rise, footprint,
 ownership, intake/output class, capacity, recipe eligibility, blocked/disabled
 status, and lifecycle when the building is damaged, destroyed or removed.
 A missing port definition means no conveyor connection, never a guessed
 automatic transfer.
-

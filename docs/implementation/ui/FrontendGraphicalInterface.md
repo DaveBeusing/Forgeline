@@ -1,5 +1,7 @@
 # Graphical Frontend Interface
 
+[Documentation](../../README.md) · [Complete catalog](../../DocumentationIndex.md)
+
 ## Goal
 
 Replace prototype-style frontend panel/control decoration with the Directorate production skin while preserving every existing screen, setting and interaction. Implement and validate the real application integration end to end through the existing GitHub connection without changing working environment.
@@ -49,7 +51,7 @@ Preserve and extend current `FrontendOverlayRendererTests`, `FrontendLayoutHarde
 
 ## Build and CI requirements
 
-Use the SDK/Microsoft.Testing.Platform selected by current `global.json`. Restore/build Release, validate project references, compile runtime assets, run targeted tests and `dotnet test --solution ForgeLine.sln --configuration Release --no-build`. Use current MTP syntax rather than stale legacy VSTest examples. Capture named frontend states through `build/Invoke-RtsReferenceQualification.ps1` as documented in `docs/UiVisualReview.md`, first at 1080p, then compact/1440p/ultrawide/4K and DPI variants. Inspect current-head CI and distinguish inherited fence/shutdown failures from new regressions; do not weaken the gate.
+Use the SDK/Microsoft.Testing.Platform selected by current `global.json`. Restore/build Release, validate project references, compile runtime assets, run targeted tests and `dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1`. Use current MTP syntax rather than stale legacy VSTest examples. Capture named frontend states through `build/Invoke-RtsReferenceQualification.ps1` as documented in `docs/UiVisualReview.md`, first at 1080p, then compact/1440p/ultrawide/4K and DPI variants. Inspect current-head CI and distinguish inherited fence/shutdown failures from new regressions; do not weaken the gate.
 
 ## Branch and pull request strategy
 

@@ -1,5 +1,7 @@
 # Operational building Blender masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The four existing operational building kits lacked persistent native Blender masters.
 This change retains their current geometry in four editable masters, four separate
 packed PBR inspection projects and forty deterministic GLBs under
@@ -12,6 +14,19 @@ source-less player through an isolated sealed runtime catalog. Canonical product
 sources are not promoted. Render-product acceptance, source ownership release,
 strict image acceptance and human review remain open; this is not full production
 Definition of Done.
+
+<details>
+<summary>On this page</summary>
+
+- [Audit, base and ownership](#audit-base-and-ownership)
+- [Retained families and contracts](#retained-families-and-contracts)
+- [Reopen, export and reproduce](#reopen-export-and-reproduce)
+- [Actual local validation](#actual-local-validation)
+- [Native D3D12 evidence](#native-d3d12-evidence)
+- [Reproducible source-less installed candidate](#reproducible-source-less-installed-candidate)
+- [Retained failures and open decision](#retained-failures-and-open-decision)
+
+</details>
 
 ## Audit, base and ownership
 
@@ -69,7 +84,7 @@ art input is introduced.
 
 ## Reopen, export and reproduce
 
-Use pinned Blender 5.2.2 x64, build d13f752e3b9c, SDK 10.0.401 and PowerShell 7.4+.
+Use pinned Blender 5.2.2 x64, build d13f752e3b9c, the exact .NET SDK selected by [global.json](../global.json) and PowerShell 7.4+.
 Executable SHA-256: f141a3c5754500e6f84361099a4cd53f0bb7662b6a0d2cfaaa8fbb63e92234a0.
 The family adapter delegates to the existing importer/exporter and master organizer;
 shared production modules are not forked. The family-specific negative fixture

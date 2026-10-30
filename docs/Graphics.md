@@ -1,10 +1,49 @@
 # Graphics
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The [serial rendering integration report](rendering/performance-integration/Qualification.md) distinguishes the already merged instancing, static geometry, correspondence and native-collector baseline from the current qualification. Immutable particle quad indices now use the existing initialized static-buffer arena (six 16-bit indices, 12 bytes); frame-indexed particle instance streams remain Upload memory. The native tests cover first use, bounded residency, early disposal, initialization failure and surface suspend/restore without changing the graphics interfaces or frame phases.
 
 The explicit [graphics reference performance lane](GraphicsReferencePerformance.md) records renderer-cold/warm camera runs, allocations, resource observations and fence-qualified pass distributions. Graphics diagnostics expose the direct-queue timestamp frequency; the client collector owns benchmark evidence without changing simulation authority or normal frame recording.
 
 Terrain surface refinement retains the existing four-layer/thirteen-texture pipeline, thirteen-sample ceiling, 64-DWORD direct root signature and 18-DWORD buffered shadow receiver. Pixel-footprint-filtered color/normal detail and Rock-only slope-adaptive coordinates share existing textures and passes. Construction-time settings validate before native allocation; no new GPU target or descriptor class is introduced. Vegetation uses copied, viewer-authorized instance transforms with the same phase in World and SunShadowDepth. Authoring ranges, culling/LOD policy and qualified viewpoints are described in [World Asset Presentation](WorldAssetPresentation.md); the architectural choice is recorded in [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md).
+
+The optional [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) is an owner-thread observation interface alongside the existing graphics contract. New explicit native records retain raw begin/end ticks, queue fences and device/resource generations; default `GraphicsDiagnostics` layouts remain unchanged. Logical live/retiring bytes, staging, descriptors and pending uploads are distinct from DXGI usage and physical allocation, which remains unavailable.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [External Bindings](#external-bindings)
+- [Ownership Boundary](#ownership-boundary)
+- [Adapter Selection](#adapter-selection)
+- [Debug Layer](#debug-layer)
+- [Swap Chain](#swap-chain)
+- [Frame Lifecycle](#frame-lifecycle)
+- [Resize and Minimize](#resize-and-minimize)
+- [Command Submission Boundary](#command-submission-boundary)
+- [Production static-mesh material path](#production-static-mesh-material-path)
+- [Production terrain material path](#production-terrain-material-path)
+- [Resource Foundation](#resource-foundation)
+- [Shader Compilation](#shader-compilation)
+- [Scene Lighting, Exposure, and Output Transfer](#scene-lighting-exposure-and-output-transfer)
+- [Diagnostics](#diagnostics)
+- [Validation](#validation)
+- [Deferred Rendering Work](#deferred-rendering-work)
+- [Render-thread ownership](#render-thread-ownership)
+- [Player interaction overlays](#player-interaction-overlays)
+- [Explicit passes and optional linear scene output](#explicit-passes-and-optional-linear-scene-output)
+- [Directional shadows and contact occlusion](#directional-shadows-and-contact-occlusion)
+- [Atmospheric fog and scene depth](#atmospheric-fog-and-scene-depth)
+- [Depth-aware GPU particles](#depth-aware-gpu-particles)
+- [Final image and quality profiles](#final-image-and-quality-profiles)
+- [Mechanical rigid parts](#mechanical-rigid-parts)
+  - [Battlefield effect refinement](#battlefield-effect-refinement)
+- [World environment integration](#world-environment-integration)
+- [Combat and industrial effect integration](#combat-and-industrial-effect-integration)
+- [Scalable object submission and reconstruction](#scalable-object-submission-and-reconstruction)
+
+</details>
 
 ## Purpose
 
@@ -283,7 +322,6 @@ This foundation deliberately does not implement:
 - editor rendering
 - Vulkan
 
-
 ## Render-thread ownership
 
 See [GPU Resource Retirement and Fault Shutdown](adr/GpuResourceRetirementAndFaultShutdown.md) for resource retirement, upload-write safety, bounded health counters and fatal device-loss policy.
@@ -299,7 +337,6 @@ The renderer consumes immutable presentation snapshots and copied camera/debug/U
 A slow render frame can delay later GPU submissions, but it cannot execute or block authoritative simulation ticks. A slow simulation tick leaves the renderer free to reuse the newest completed snapshot.
 
 See [Client Execution Ownership](adr/ClientExecutionOwnership.md).
-
 
 ## Player interaction overlays
 
@@ -426,7 +463,6 @@ Before the changes, equivalent 25/90/240 m direct GPU means were 1.02/1.10/1.49 
 
 Production-client windowed/borderless qualification passed with Height fog, Medium shadows and 1000 extra instances, zero material/texture binding failures and 186 SRVs (179 asset, three scene, three shadow, one depth). Observed completed-frame GPU total/composition timings were 14.69/0.22 ms at 1600×900 and 51.53/8.61 ms at 5120×2160. These short-run samples are functional evidence, not controlled before/after comparisons or sustained FPS guarantees. High resolution materially increases output cost; Disabled retains the direct fallback.
 
-
 ## Depth-aware GPU particles
 
 Graphics exposes an explicit bounded particle submission within World, after opaque terrain/instances and before scene composition/Overlay. `GpuParticleRenderer` owns fixed frame-indexed upload streams and an indexed quad. Its vertex shader evaluates seeded analytic motion and lifetime; no compute/UAV or indirect API is introduced. `ConfigureParticleDepth` recreates the existing depth surface as typeless at an idle boundary and adds/shares its SRV. No extra render target or texture is allocated.
@@ -474,11 +510,9 @@ UAV simulation or scheduler. See [effect contracts and qualification](Battlefiel
 
 World rendering combines bounded terrain residency, vegetation admission and optional session atmosphere inputs. See [World environment rendering](WorldEnvironmentRendering.md) for preparation/upload contracts, shader bounds and diagnostic interpretation.
 
-
 ## Combat and industrial effect integration
 
 Particle admission overflow is suppressed; mesh fallback has an independent tier cap. Production perspective soft depth uses -Projection.M33. Shared ground/receiver marks reuse textured instancing, fade through ordered coverage and never cast shadows or receive selection identity. See [combat and industrial rendering](CombatIndustrialRendering.md) for contracts, diagnostics and qualification limits.
-
 
 ## Scalable object submission and reconstruction
 

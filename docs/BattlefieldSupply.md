@@ -1,11 +1,40 @@
 # Battlefield Supply
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Building loading joins the same [physical queue](VehicleQueues.md) as cargo
 service. Supply Trucks keep their supply inventories and battlefield role. Queue
 membership does not turn them into regional Cargo Trucks, and battlefield
 recipient resupply does not require a building bay. A fuel-starved participant
 requires physical rescue or a new valid order; it cannot disappear from an
 occupied conflict area to admit a successor.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Resources and Production](#resources-and-production)
+- [Unit Supply State](#unit-supply-state)
+- [Fuel Consumption](#fuel-consumption)
+- [Ammunition Consumption](#ammunition-consumption)
+- [Supply Status](#supply-status)
+- [Supply Depot](#supply-depot)
+- [Supply Truck](#supply-truck)
+- [Automatic Resupply](#automatic-resupply)
+- [Resupply Command](#resupply-command)
+- [Rescue Feasibility and Order Ownership](#rescue-feasibility-and-order-ownership)
+- [Conservation and Failure Semantics](#conservation-and-failure-semantics)
+- [Diagnostics](#diagnostics)
+- [Validation](#validation)
+- [Future Extension](#future-extension)
+- [Artillery Resupply](#artillery-resupply)
+- [Tactical Automatic Resupply](#tactical-automatic-resupply)
+- [Human Player Supply Controls](#human-player-supply-controls)
+- [Logistics setup](#logistics-setup)
+- [Cargo Truck operational Fuel versus battlefield supply](#cargo-truck-operational-fuel-versus-battlefield-supply)
+- [Implemented base-local conveyor handoff](#implemented-base-local-conveyor-handoff)
+
+</details>
 
 ## Purpose
 
@@ -217,12 +246,11 @@ The configured battlefield supply priority is authoritative simulation state and
 
 Actual Fuel and Ammunition move only in `BattlefieldSupplySystem` at legitimate transfer range. Automatic and explicit requests use the same `BattlefieldResupplyPlanner`; the player surface does not create a second rescue or transfer implementation.
 
-
 ## Logistics setup
 
 Supply views distinguish a selected Supply Truck's field cargo, its separate drive-tank inventory, and any assigned provider stock. Supply Trucks are excluded from regional Cargo fleet counts. Confirmed loading/queue state comes from the shared simulation service; no additional supply dispatcher or distance-derived queue is introduced. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
 
-The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.
+The [opening logistics guide](OnboardingInteraction.md) and its [completed-action evidence](OnboardingQualification.md) explain these controls and distinguish real completion from reading a card or accepting a policy.
 
 ## Cargo Truck operational Fuel versus battlefield supply
 
@@ -231,4 +259,3 @@ Cargo propulsion Fuel is stored in a dedicated `UnitFuelState` inventory, indepe
 ## Implemented base-local conveyor handoff
 
 The [conveyor implementation](ConveyorSimulationAndVehicleInterop.md) transfers actual local Ammunition into a Supply Depot through explicitly attached, owned inventory ports. The original Ammunition Plant recipe consumes Steel and Electronics; conveyor buffers and the depot share no proxy stock. Fuel remains physical vehicle cargo and is rejected by the conveyor resource filter. Supply Truck bay loading, provider selection and battlefield recipient transfer remain authoritative. The integration chain tracks manufactured ammunition through the depot, actual truck loading and movement to a Rifle Squad, with separate loaded/delivered quantities and a per-resource ledger. Conveyor flow never directly services a mobile unit. Native loading, driving and visual acceptance remain separate from these headless contracts.
-

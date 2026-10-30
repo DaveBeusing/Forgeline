@@ -1,5 +1,7 @@
 # Production and Logistics Operations
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The Operations overview is an on-demand nonmodal diagnostic panel, not a permanent HUD strip. Click the resource/power strip to open All Facilities, use an alert's OPS or MORE entry for the relevant diagnosis, or use the authorized selected-facility context to inspect production, logistics, supply or power. The panel closes through its own CLOSE control or the existing transient-menu dismissal behavior. The world, minimap and existing contextual commands remain available; no new keyboard binding is added.
 
 ## Selected processing rules
@@ -48,14 +50,13 @@ The HUD information layout fits the Operations panel inside the existing safe-ar
 
 ## Graphical operations integration
 
-The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and the selected inspector. The panel has a 0.30-opacity blended backing instead of the previous opaque underlay; the right alert stack remains in its independent owner. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.
-
+The [production/operations interface](GraphicalProductionAndOperations.md) now uses shared compiled panels, category icons, state controls and selected-facility details. The panel has a 0.30-opacity blended backing instead of the previous opaque underlay; the right alert stack remains in its independent owner. Filters, paging, copied diagnostics, privacy and focus/open-controls semantics remain unchanged. [Qualification](GraphicalProductionAndOperationsQualification.md) records source-bound tests, native cases, packaging and pending acceptance.
 
 ## Logistics setup
 
 NO INPUT and reported transport failures open existing Logistics controls. Regular loading-bay waits retain their confirmed queue position and are distinct from production queues, graph throughput and true blocked access. Focus changes no orders. Source/destination names and quantities are restricted to owned copied facts. See [Logistics setup and operation](LogisticsSetup.md) for the complete first refill sequence.
 
-The [opening logistics guide](OnboardingInteraction.md) explains these same controls and uses [completed-action evidence](OnboardingQualification.md). Reading a card, starting stock, an accepted policy or a provider assignment never substitutes for an actual delivery or field transfer.
+The [opening logistics guide](OnboardingInteraction.md) and its [completed-action evidence](OnboardingQualification.md) explain these controls and distinguish real completion from reading a card or accepting a policy.
 
 ## Contextual entry and panel lifecycle
 
@@ -69,7 +70,7 @@ The separate [Operations Diagnosis](OperationsDiagnosis.md) provides an immutabl
 
 ## Strategic logistics capacity
 
-The optional LOG layer separates conveyors, regional Cargo roads and field service orders. Repeat LOG to filter; click an authorized marker for the existing Operations diagnosis and controls. Current output, buffers and scheduled load retain distinct meanings; missing rates, queues and downtime remain N/A. See [controls, visibility and bounded sampling](StrategicLogisticsCapacity.md) and [qualification](StrategicLogisticsQualification.md).
+See [Strategic logistics capacity](StrategicLogisticsCapacity.md) for LOG filtering, authorized Operations focus and the distinct meanings of output, buffers and scheduled load.
 
 ## Global unit queues
 

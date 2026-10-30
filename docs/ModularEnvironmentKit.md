@@ -1,5 +1,7 @@
 # Central Divide modular environment kit
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Starting master: `fad0f7a69842c5a4b96eda1524e1841255288e69`.
 Runtime-integrity integration: `fb08045edceeeefc0db1c89183d738c462453cec`.
 PR version: 0.1.349, one PATCH above the refreshed master.
@@ -38,6 +40,18 @@ Qualification will record source determinism, compiled bounds/material/LOD
 references, map reproducibility, headless authority parity, native reference
 views and repeated-instance cost. Static pixels are review evidence, not final
 art, continuous LOD-motion, live route or sustained performance acceptance.
+
+<details>
+<summary>On this page</summary>
+
+- [Editable sources and catalog](#editable-sources-and-catalog)
+- [Map integration and review scenes](#map-integration-and-review-scenes)
+- [Reproduction](#reproduction)
+- [Visual observations and acceptance limits](#visual-observations-and-acceptance-limits)
+- [Qualification results](#qualification-results)
+- [Representative native images](#representative-native-images)
+
+</details>
 
 ## Editable sources and catalog
 
@@ -98,7 +112,7 @@ dotnet build ForgeLine.sln -c Release --no-restore --disable-build-servers -m:1
 ./build/Build-RuntimeAssets.ps1 -Mode build -ForceRebuild -NoBuild -QualificationOutput artifacts/kit-integrated-assets.json
 ./build/Build-RuntimeAssets.ps1 -Mode validate -NoBuild -QualificationOutput artifacts/kit-integrated-assets-validated.json
 dotnet run --project tools/ForgeLine.MapCompiler -c Release --no-build -- --output artifacts/maps/kit-central-divide.flmap.json --qualification-output artifacts/kit-map.json
-dotnet test --solution ForgeLine.sln --configuration Release --no-build
+dotnet test --solution ForgeLine.sln --configuration Release --no-build --max-parallel-test-modules 1
 ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Scenes @('EnvironmentKitYard','EnvironmentKitBridge') -Profiles @('Low','Medium','High') -Zooms @('CloseTactical','NormalGameplay','Strategic') -Displays @('1920x1080','2560x1440','3840x2160','3440x1440') -Warmups 8 -Samples 32 -RepeatCaptures 2 -ContinueAfterMismatch -OutputRoot artifacts/kit-native
 ./build/Invoke-RtsReferenceQualification.ps1 -Capture -Scenes @('EnvironmentKitRepeated') -Profiles @('Medium') -Zooms @('CloseTactical','NormalGameplay','Strategic') -Displays @('1920x1080','2560x1440') -Warmups 8 -Samples 32 -RepeatCaptures 2 -ContinueAfterMismatch -OutputRoot artifacts/kit-repeat-native
 ```
@@ -169,6 +183,7 @@ backbuffer sizes. Six additional Medium repeated-kit rows cover Full-HD/QHD and
 all three zooms. Every repeated image matches; every requested surface is exact.
 There are zero fallback meshes, material/texture binding failures and submission
 faults. Resident texture payload remains 52,707,564 bytes and peak SRV usage is
+
 186. Total local-video-memory usage peaks at 732,606,464 bytes in these captures;
 this includes render targets/shadows and is distinct from texture payload.
 

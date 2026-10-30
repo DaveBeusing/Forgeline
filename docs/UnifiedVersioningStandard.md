@@ -1,5 +1,8 @@
 # Unified Versioning Standard
 
+> [!NOTE]
+> **Historical cross-project proposal.** FORGELINE currently follows [PR Versioning](ReleaseVersioning.md): one PATCH increment per PR, no automatic tag or release publication. The proposal below retains its original adoption-dependent scope.
+
 **Status:** Proposed project-wide policy\
 **Applies to:** .NET-based software projects, including Depot, DepotManager, rtaime, FORGELINE / ForgeLine Engine, Singularity, Sentum, and related tools where adopted\
 **Version of this document:** 1.0\

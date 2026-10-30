@@ -1,5 +1,7 @@
 # Logistics navigation diagnostics
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
 ## Implemented scope
 
 The developer navigation view is connected from the simulation through immutable presentation copies to the client HUD, six independently selectable world layers, and a one-shot local JSON export. It is disabled by default. Start the client with the explicit standalone option `--developer-navigation-diagnostics`; debug overlay visibility alone does not enable it.
@@ -43,7 +45,7 @@ Output is `%LOCALAPPDATA%/FORGELINE/Diagnostics/navigation-<unique-id>.json`. Th
 
 ## Qualification
 
-Release builds and targeted source tests run with .NET SDK 10.0.401. Current source tests cover the real delivery window, ownership transfer, successful replan provenance, and identical motion/query work with lookahead observation on/off. Client tests cover authorization, focus/session/selection turnover, independent layers, fresh export identity, bounded encoding, write failures and no-overwrite cleanup. Presentation tests cover immutable filtered copies, stale/dead/wrong-owner rejection, layer disable, and authoritative save/continuation parity.
+The recorded Release builds and targeted source tests used .NET SDK 10.0.401. For current setup, follow [global.json](../../global.json) and [Development](../Development.md). Source tests cover the real delivery window, ownership transfer, successful replan provenance, and identical motion/query work with lookahead observation on/off. Client tests cover authorization, focus/session/selection turnover, independent layers, fresh export identity, bounded encoding, write failures and no-overwrite cleanup. Presentation tests cover immutable filtered copies, stale/dead/wrong-owner rejection, layer disable, and authoritative save/continuation parity.
 
 Native WARP captures exercise the real world, terrain, mesh, HUD and diagnostic layers at 1280x720 with UI scales 1 and 2 (including scrolled rows), and 1920x1080 scale 1. The explicit capture entry point is `--navigation-diagnostics-capture <empty-output-directory> <runtime-assets> --developer-navigation-diagnostics`. It writes four images, one actual selected report and a qualification record. This developer fixture is separate from normal startup and is not invoked by the panel.
 
