@@ -103,12 +103,29 @@ def window_facts(pid=None,hwnd=None):
                                  owner(foreground) if foreground else None,bool(selected and user.IsWindowVisible(selected)),
                                  bool(selected and user.IsIconic(selected)))
 
+def resolve_executable(path):
+    value=Path(path)
+    require(value.is_absolute(),"Provider executable path must be absolute")
+    value=value.resolve(strict=True)
+    require(value.is_file() and value.suffix.lower()==".exe","Provider must name an existing explicit .exe file")
+    return str(value)
+
+def executable_hash(path):
+    return sha256_bytes(Path(path).read_bytes())
+
 def acquire(output,executable,native=None,expected_uuid=None,samples=3,interval=1.0,client_pid=None,client_hwnd=None):
     require(type(samples) is int and 1<=samples<=43201,'Sample count outside bounded diagnostic range')
     require(0.1<=interval<=5,'Diagnostic interval must be 0.1..5 seconds')
     output=Path(output);output.mkdir(parents=True,exist_ok=False)
-    series=DiagnosticSeries(samples);records=[];started=now();status='failed';failure=None
+    series=DiagnosticSeries(samples);started=now();status='failed';failure=None
+    before_hash=None;after_hash=None;version=None
     try:
+        executable=resolve_executable(executable)
+        before_hash=executable_hash(executable)
+        version_raw,version_command=run_record([str(executable),"--version"],output,"provider-version")
+        version_text=version_raw.decode("utf-8-sig").strip()
+        require(version_text,"Provider version output is unavailable")
+        version=dict(rawText=version_text,rawSha256=sha256_bytes(version_raw),commandRecord="provider-version.command.json")
         for i in range(samples):
             raw,command=run_record([str(executable),'--query-gpu='+FIELDS,'--format=csv,noheader,nounits'],output,f'sensor-{i:05d}')
             inventory=parse_inventory(raw);power=power_status();window=window_facts(client_pid,client_hwnd);at=now()
@@ -123,8 +140,15 @@ def acquire(output,executable,native=None,expected_uuid=None,samples=3,interval=
         status='diagnostic-complete'
     except Exception as error:failure=str(error)
     finally:
+        try:
+            after_hash=executable_hash(executable) if before_hash is not None else None
+            if before_hash is not None and after_hash!=before_hash:
+                status='failed';failure=(failure+'; ' if failure else '')+'Provider executable changed during acquisition'
+        except OSError as error:
+            status='failed';failure=(failure+'; ' if failure else '')+'Provider final executable hash unavailable: '+str(error)
         record=dict(kind='unbound-provider-acquisition',startedAtUtc=started,completedAtUtc=now(),status=status,failure=failure,
-                    samplesRetained=len(series.samples),physicalAcceptance='open',wave2Ready=False,
+                    samplesRetained=len(series.samples),providerVersion=version,executableSha256Before=before_hash,executableSha256After=after_hash,
+                    querySchema=FIELDS,physicalAcceptance='open',wave2Ready=False,
                     qualifiedPublication='blocked: renderer physical identity attestation unavailable')
         write_new(output/'attempt.json',record)
     require(status=='diagnostic-complete',failure or 'Acquisition failed')

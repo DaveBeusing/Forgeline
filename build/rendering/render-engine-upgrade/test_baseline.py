@@ -9,6 +9,10 @@ import provider as p
 import baseline
 ROW=b'GPU-aaaa-bbbb,00000000:30:00.0,GPU,596.53,41,180,11.08,0x0000000000000004\n'
 class Contracts(unittest.TestCase):
+    def setUp(self):
+        self.actual_resolve=p.resolve_executable
+        resolver=patch("provider.resolve_executable",side_effect=lambda value:value);resolver.start();self.addCleanup(resolver.stop)
+        patcher=patch("provider.executable_hash",return_value="a"*64);patcher.start();self.addCleanup(patcher.stop)
     def test_provider_real_shape(self):
         row=p.parse_inventory(ROW)[0];self.assertEqual(row['eventReasons']['reasons'],['software-power-cap']);self.assertEqual(row['powerWatts'],11.08)
     def test_provider_rejects_invalid(self):
@@ -105,6 +109,28 @@ class Contracts(unittest.TestCase):
             out=Path(root)/"run"
             with self.assertRaisesRegex(c.ContractError,"gap exceeds"):p.acquire(out,"fake",samples=2)
             self.assertEqual(len(json.loads((out/"latest-unbound.json").read_text())["samples"]),2)
+    def test_provider_version_failure_retained(self):
+        with tempfile.TemporaryDirectory() as root,patch("provider.run_record",side_effect=c.ContractError("version failed")) as runner:
+            out=Path(root)/"run"
+            with self.assertRaisesRegex(c.ContractError,"version failed"):p.acquire(out,"fake",samples=1)
+            self.assertEqual(runner.call_args.args[0],["fake","--version"])
+            result=json.loads((out/"attempt.json").read_text());self.assertEqual(result["samplesRetained"],0);self.assertIsNone(result["providerVersion"])
+    def test_provider_binary_change_retained(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as root,patch("provider.subprocess.run",return_value=subprocess.CompletedProcess(["fake"],0,ROW,b"")),patch("provider.power_status",return_value={"powerSource":"unknown"}),patch("provider.executable_hash",side_effect=["a"*64,"b"*64]):
+            out=Path(root)/"run"
+            with self.assertRaisesRegex(c.ContractError,"executable changed"):p.acquire(out,"fake",samples=1)
+            result=json.loads((out/"attempt.json").read_text());self.assertEqual(result["status"],"failed");self.assertEqual(result["executableSha256After"],"b"*64);self.assertIsNotNone(result["providerVersion"])
+            self.assertTrue((out/"provider-version.stdout").exists())
+    def test_executable_path_is_bound_once_for_hash_and_launch(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as root:
+            file=Path(root)/"provider.exe";file.write_bytes(b"test fixture")
+            for bad in ("provider.exe",str(Path(root)/"missing.exe")):
+                with self.subTest(bad=bad),self.assertRaises((c.ContractError,OSError)):self.actual_resolve(bad)
+            with patch("provider.resolve_executable",side_effect=self.actual_resolve),patch("provider.subprocess.run",return_value=subprocess.CompletedProcess(["fake"],0,ROW,b"")) as runner,patch("provider.power_status",return_value={"powerSource":"unknown"}),patch("provider.executable_hash",return_value="a"*64) as hasher:
+                p.acquire(Path(root)/"run",str(file),samples=1)
+                expected=str(file.resolve());self.assertTrue(all(call.args[0][0]==expected for call in runner.call_args_list));self.assertTrue(all(call.args[0]==expected for call in hasher.call_args_list))
     def test_unsupported_cpu_input_is_explicit(self):
         with self.assertRaises((ValueError,KeyError)):c.analyze_owner({'kind':'cpu-benchmark'})
 if __name__=='__main__':unittest.main()
