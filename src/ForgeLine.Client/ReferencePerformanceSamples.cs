@@ -21,7 +21,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
     private long _observations, _excluded, _duplicate, _missing, _zero, _missingFrequency;
     private ulong _unobservedFenceValues;
 
-    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null)
+    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null)
     {
         if (!double.IsFinite(milliseconds) || milliseconds <= 0 || allocatedBytes < 0)
             throw new ArgumentOutOfRangeException(nameof(milliseconds));
@@ -32,7 +32,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             frame?.CompositeCpuMilliseconds, diagnostics.DirectionalShadows?.CpuMilliseconds,
             diagnostics.Resources, diagnostics.Health, diagnostics.Memory, submission)
         { CpuSubmission = frame?.CpuSubmission, CompletedGpuFence = frame?.GpuSubmissionFence,
-            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = diagnostics.ResourceMemory });
+            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory });
         AddGpu(diagnostics);
     }
 

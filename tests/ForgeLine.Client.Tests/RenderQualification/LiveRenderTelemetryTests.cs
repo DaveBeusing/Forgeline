@@ -63,6 +63,27 @@ public sealed class LiveRenderTelemetryTests
         Assert.Equal("terrain-preparing", measured[1].GetProperty("state").GetString());
         Assert.False(report.RootElement.GetProperty("nativeFixtureBindingAvailable").GetBoolean());
     }
+    [Fact]
+    public void AggregateCompletionBudgetAcceptsItsExactBoundaryAndRejectsOneMoreSample()
+    {
+        Assert.Equal(65536, LiveRenderTelemetry.CompletionCapacityFor(57336, 4096));
+        Assert.Equal(65536, LiveRenderTelemetry.CompletionCapacityFor(61368, 64));
+        Assert.Throws<ArgumentOutOfRangeException>(() => LiveRenderTelemetry.CompletionCapacityFor(57337, 4096));
+        Assert.Throws<ArgumentOutOfRangeException>(() => LiveRenderTelemetry.CompletionCapacityFor(65536, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new LiveRenderTelemetry(new Source(), 65536));
+    }
+    [Fact]
+    public void MaximumWarmupsRetainStartupWithoutOverflowingTheCombinedPrefix()
+    {
+        using var collector = new LiveRenderTelemetry(new Source(), 1, warmups: 4096);
+        collector.Complete(collector.Begin(), "loading");
+        for (int i = 0; i < 4096; i++) collector.Complete(collector.Begin(), "gameplay");
+        collector.Complete(collector.Begin(), "gameplay");
+        Assert.True(collector.WindowCompleted); Assert.False(collector.Overflowed);
+        using var report = JsonDocument.Parse(collector.Export().ToJsonString());
+        Assert.Equal(4097, report.RootElement.GetProperty("beforeWindow").GetArrayLength());
+        Assert.Equal(1, report.RootElement.GetProperty("frames").GetArrayLength());
+    }
     private sealed class Source : IGraphicsRenderTelemetry
     {
         public bool TelemetryOverflowed => false;

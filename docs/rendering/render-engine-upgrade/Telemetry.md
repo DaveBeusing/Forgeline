@@ -10,11 +10,15 @@ resource budgets and fence deadlines are unchanged.
 FORGELINE_RENDER_TELEMETRY_OUTPUT explicitly enables a bounded stream on the
 actual ClientRenderHost render owner. FORGELINE_RENDER_TELEMETRY_WARMUPS and
 FORGELINE_RENDER_TELEMETRY_SAMPLES predeclare counts (defaults 64 and 512;
-maximum 4096 warmups and 65536 samples). Recording arms at the first gameplay
+maximum 4096 warmups; samples plus warmups, 4096 reserved startup observations
+and eight in-flight completions must fit a total budget of 65536). Recording arms at the first gameplay
 iteration, discards exactly the declared number of consecutive owner iterations,
 then retains exactly the declared number of consecutive iterations. Loading,
 suspended and terrain-pending observations before this window are retained in
-a separate fixed 4096-entry prefix. Those states inside the measured interval
+a separate prefix sized to 4096 startup entries plus the declared warmups.
+More than 4096 pre-arm startup observations explicitly invalidates the run.
+Unsupported aggregate settings are rejected before allocation instead of being
+silently clamped; 4096 warmups permit at most 57336 samples. Those states inside the measured interval
 remain measured states and fail gameplay-window validation; they are not skipped.
 Completed windows stop observation and native completion admission at the actual
 last submitted queue fence. Later gameplay cannot overwrite or overflow them.
@@ -134,11 +138,15 @@ acceptance remains OPEN until an actual measured workload identity/producer exis
 caller-supplied caseKey or fixtureFingerprint is insufficient. Strict final
 qualification and all independent CI/budget/lifecycle/human-review gates remain.
 
+The optional resource-memory struct flows directly from IGraphicsRenderTelemetry
+into explicit native reference samples. It is not added to GraphicsDiagnostics,
+so default production diagnostic objects retain their existing allocation size.
+
 ## Verification status
 
 During implementation, Client and Client.Tests Release builds passed with zero
-warnings/errors. Focused live tests initially passed 4/4; the fixed warmup/window
-case was subsequently added and requires the final rerun. Graphics telemetry tests
+warnings/errors. Focused live tests passed 5/5 before the later aggregate-budget correction;
+new exact-boundary/max-warmup cases require a revised-source rerun. Graphics telemetry tests
 passed 13/13, including real upload-fence separation, raw timing, logical bytes,
 image parity and a same-binary off/on/on/off protocol (64 warmups, 256 samples per
 cohort). Full raw overhead observations are written under artifacts/render-telemetry-overhead.
@@ -153,3 +161,19 @@ Full canonical validation, exact clean-source live smoke/export validation,
 independent final review and source-specific remote CI are separate required
 execution records. No sustained FPS, complete physical memory, human art approval,
 matched native/live fixture or hardware performance acceptance is claimed here.
+
+The complete canonical pipeline at product source
+`dead0c5ad23d141b76f10718f75342d62afbe72c` passed all 17 stages:
+version contracts, source references, Release build, both compiled maps/scenario
+contracts, clean runtime assets/contracts (2055 records), native client smoke,
+headless 1000/10000 smoke/stress, serial complete solution, reproducible publisher,
+and the natural terminal match. The full suite reports 4900 total, 4819 passed,
+81 explicit skips, zero failures (28m35.987s). Seed 2026 ended naturally at tick
+59098 with player 1 Victory/CommandCoreDestroyed in 343.382 seconds, within 80000.
+Raw commands/exits/logs are retained under artifacts/wave0-canonical-01/results.json.
+
+Subsequent bounded corrections reject impossible aggregate telemetry settings,
+reserve warmup-prefix headroom, and restore default diagnostic object layout.
+Those changes are not relabelled as the prior full canonical run; revised-source
+focused checks, actual live export, independent review and final exact-source CI
+are recorded separately. No second PATCH is allocated against the same base.

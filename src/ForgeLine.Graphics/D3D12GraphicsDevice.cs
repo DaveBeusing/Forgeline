@@ -278,7 +278,6 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                     GpuTimingUnavailableReason = _gpuTimingUnavailableReason,
                     IntermediateUnavailableReason = _sceneOutput.Enabled ? null : "Linear scene composition is disabled."
                 },
-                ResourceMemory = _telemetryActive ? ResourceMemory : null,
                 Memory = _configuration.EnableMemoryDiagnostics && _failure is null ? CaptureMemoryBudget() : null,
                 Resources =
                     new GraphicsResourceDiagnostics(

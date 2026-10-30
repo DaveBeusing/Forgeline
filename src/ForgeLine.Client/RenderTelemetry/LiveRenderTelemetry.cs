@@ -19,7 +19,10 @@ internal sealed class LiveRenderTelemetry : IDisposable
     private readonly int _owner = Environment.CurrentManagedThreadId;
     private readonly string _streamId = Guid.NewGuid().ToString("N");
     private int _count, _gpuCount;
-    private readonly LiveTelemetryObservation[] _beforeWindow = new LiveTelemetryObservation[4096];
+    private const int StartupObservationBudget = 4096;
+    private const int NativeCompletionHeadroom = 8;
+    private const int MaximumCompletions = 65536;
+    private readonly LiveTelemetryObservation[] _beforeWindow;
     private readonly int _warmups;
     private int _beforeCount, _warmupsRemaining;
     private bool _armed, _finished;
@@ -30,13 +33,21 @@ internal sealed class LiveRenderTelemetry : IDisposable
     internal bool Overflowed => _overflow || _source.TelemetryOverflowed;
     internal LiveRenderTelemetry(IGraphicsRenderTelemetry source, int capacity, string? output = null, JsonObject? context = null, int warmups = 0, string? runtimeFingerprint = null, GraphicsDeviceInfo? actualDevice = null)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(capacity, 1);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(capacity, 65536);
+        int completionCapacity = CompletionCapacityFor(capacity, warmups);
         _source = source; _frames = new LiveTelemetryFrame[capacity]; _gpu = new GraphicsRawGpuTiming[capacity];
+        _beforeWindow = new LiveTelemetryObservation[checked(StartupObservationBudget + warmups)];
+        _warmups = _warmupsRemaining = warmups;
+        _output = output; _context = context; _runtimeFingerprint = runtimeFingerprint; _actualDevice = actualDevice; source.EnableRenderTelemetry(completionCapacity);
+    }
+    internal static int CompletionCapacityFor(int samples, int warmups)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(samples, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(warmups);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(warmups, 4096);
-        _warmups = _warmupsRemaining = warmups;
-        _output = output; _context = context; _runtimeFingerprint = runtimeFingerprint; _actualDevice = actualDevice; source.EnableRenderTelemetry(Math.Min(65536, capacity + 4096 + warmups + 8));
+        int reserved = checked(StartupObservationBudget + warmups + NativeCompletionHeadroom);
+        if (samples > MaximumCompletions - reserved)
+            throw new ArgumentOutOfRangeException(nameof(samples), "Samples, warmups, startup observations and native completion headroom must fit the 65,536-observation budget.");
+        return checked(samples + reserved);
     }
     internal static LiveRenderTelemetry? FromEnvironment(IGraphicsDevice graphics, RuntimeAssetCatalog? runtimeAssets)
     {
@@ -75,6 +86,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         if (!_armed && state == "gameplay") _armed = true;
         if (!_armed || _warmupsRemaining > 0)
         {
+            if (!_armed && _beforeCount >= StartupObservationBudget) _overflow = true;
             if (_beforeCount == _beforeWindow.Length) _overflow = true;
             else _beforeWindow[_beforeCount++] = new(start.Tick, end, state, process, thread);
             if (_armed) _warmupsRemaining--;

@@ -353,7 +353,7 @@ internal static class VisualReferenceCapture
                         meshes.ObserveFrameDiagnostics(sampleDiagnostics);
                         performance.DrainRawGpu(graphics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics });
+                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory);
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
