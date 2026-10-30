@@ -238,3 +238,37 @@ budget pass. PhysicalAllocationBytes remains unavailable, not zero.
 Exact-source remote build-test remains required before integration. No sustained
 FPS, generic performance improvement, driver/synchronization repair, broader
 hardware support, product release or Product Owner approval is claimed.
+
+## CI serial scope integration
+
+The first remote render-qualification check at PR head
+477535d51c3ed08c22131bba69a0c464918d1f50 failed before functional checks because
+its workflow routed every changed file through the historical parallel-only
+RenderPerformanceAndVisualQualification lane. The new serial foundation necessarily
+changes that lane's frozen client/device files. The original failed job is retained:
+https://github.com/DaveBeusing/Forgeline/actions/runs/41072323239/job/124119332075.
+
+The contracts workflow now selects strict scope checking using actual full Git
+base/head changes, including deletions with rename detection disabled. Its default
+still invokes the unchanged legacy validator. A changed canonical upgrade record
+requires explicit serial-foundation-proposal metadata for dependency-free package 0,
+an exact actual event base, verified baseline ancestry, unchanged accepted historical
+manifest bytes, and exact equality with a pinned bounded bootstrap ownership set.
+Only this workflow file is added to the reviewed package scope; broad src/ ownership,
+other workflows, mixed-package changes, unknown/stale proposals and unowned paths
+are rejected. A malformed/failed proposal never falls back to legacy checks.
+
+The emitted scope artifact retains exact base/head, record path/hash, full changed
+paths and proposal-only mode. This validates a reviewable CI scope proposal, not
+master acceptance, Product Owner approval or physical-run admission. The existing
+isolated PATCH check, historical positive/negative contracts and all later tests
+remain active. Invoke-RenderQualification/check_readiness trusted-master and manual
+native admission logic are unchanged. No additional PATCH is allocated for this
+same-base integration repair. Git-backed negative tests cover stale/unknown/broad/
+unowned/mixed/renamed/deleted/tampered/malformed paths and legacy fallback behavior.
+
+Local CI integration checks passed 71 qualification tests, including 11 Git-backed
+serial proposal/legacy routing cases; the unchanged historical ownership suite
+passed nine tests. The new workflow still executes all historical checks and
+subsequent functional/native contract steps. Its ownership command is the only
+workflow line changed by this integration repair.

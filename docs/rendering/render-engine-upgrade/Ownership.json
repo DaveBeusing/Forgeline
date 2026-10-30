@@ -29,7 +29,8 @@
         "src/ForgeLine.Client/RenderTelemetry/",
         "tests/ForgeLine.Graphics.Tests/RenderTelemetry/",
         "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
-        "src/ForgeLine.Client/ClientApplication.cs"
+        "src/ForgeLine.Client/ClientApplication.cs",
+        ".github/workflows/render-qualification.yml"
       ]
     },
     {
@@ -119,5 +120,11 @@
         "docs/RendererFeatureInventory.md"
       ]
     }
-  ]
+  ],
+  "ciScopeProposal": {
+    "kind": "serial-foundation-proposal",
+    "package": "0_CompleteRenderTelemetry",
+    "baseSha": "f34d695fcaa813616da8747a49d030e418081e04",
+    "workflow": ".github/workflows/render-qualification.yml"
+  }
 }
