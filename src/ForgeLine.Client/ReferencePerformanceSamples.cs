@@ -21,7 +21,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
     private long _observations, _excluded, _duplicate, _missing, _zero, _missingFrequency;
     private ulong _unobservedFenceValues;
 
-    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null)
+    internal void AddCpu(int index, double milliseconds, long allocatedBytes, GraphicsDiagnostics diagnostics, object? submission = null, GraphicsResourceMemoryTelemetry? resourceMemory = null, GraphicsCpuFrameIntervals? actualSubmission = null)
     {
         if (!double.IsFinite(milliseconds) || milliseconds <= 0 || allocatedBytes < 0)
             throw new ArgumentOutOfRangeException(nameof(milliseconds));
@@ -32,7 +32,7 @@ internal sealed class ReferencePerformanceSamples(int capacity, ulong minimumFen
             frame?.CompositeCpuMilliseconds, diagnostics.DirectionalShadows?.CpuMilliseconds,
             diagnostics.Resources, diagnostics.Health, diagnostics.Memory, submission)
         { CpuSubmission = frame?.CpuSubmission, CompletedGpuFence = frame?.GpuSubmissionFence,
-            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory });
+            PresentMilliseconds = frame?.PresentMilliseconds, FrameWaitMilliseconds = frame?.FrameWaitMilliseconds, ResourceMemory = resourceMemory, ActualSubmission = actualSubmission });
         AddGpu(diagnostics);
     }
 
@@ -152,6 +152,7 @@ internal sealed record ReferenceCpuSample(int Index, double Milliseconds, long A
     GraphicsResourceDiagnostics Resources, GraphicsHealthDiagnostics Health, GraphicsMemoryDiagnostics? Memory, object? Submission)
 {
     public GraphicsResourceMemoryTelemetry? ResourceMemory { get; init; }
+    public GraphicsCpuFrameIntervals? ActualSubmission { get; init; }
     public ulong? CpuSubmission { get; init; }
     public ulong? CompletedGpuFence { get; init; }
     public double? PresentMilliseconds { get; init; }

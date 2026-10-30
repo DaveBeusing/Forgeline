@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "render-baseline-ownership",
+  "baselineSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+  "serializedVersionException": "Directory.Build.props",
+  "packages": [
+    {
+      "id": "0_CompleteBaselineAdmissionContracts",
+      "wave": 0,
+      "dependsOn": [],
+      "owns": [
+        "src/ForgeLine.Client/Program.cs",
+        "src/ForgeLine.Client/ClientRenderHost.cs",
+        "src/ForgeLine.Client/VisualReferenceCapture.cs",
+        "src/ForgeLine.Client/ReferencePerformanceSamples.cs",
+        "src/ForgeLine.Client/ReferenceCaptureManifest.cs",
+        "src/ForgeLine.Client/RenderTelemetry/",
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/",
+        "tests/ForgeLine.Client.Tests/ReferencePerformanceSamplesTests.cs",
+        "tests/ForgeLine.Client.Tests/RenderQualification/",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/",
+        "tests/ForgeLine.Presentation.Tests/BattlefieldStatusNativeTests.cs",
+        "tests/ForgeLine.Presentation.Tests/BattlefieldStatusOverlayTests.cs",
+        "build/rendering/qualification/",
+        "build/rendering/render-engine-upgrade/",
+        "docs/rendering/render-engine-upgrade/BaselineOwnership.json",
+        "docs/rendering/render-engine-upgrade/Admission.md",
+        "docs/rendering/render-engine-upgrade/Telemetry.md",
+        "docs/rendering/render-engine-upgrade/Baseline.md",
+        "docs/rendering/render-engine-upgrade/MeasurementProtocol.md",
+        "docs/rendering/render-engine-upgrade/evidence/admission/",
+        "docs/rendering/render-engine-upgrade/evidence/baseline/",
+        ".github/workflows/render-qualification.yml",
+        "Directory.Packages.props",
+        "docs/DocumentationIndex.md"
+      ]
+    },
+    {
+      "id": "1_QualifyRepeatableBaseline",
+      "wave": 1,
+      "dependsOn": [
+        "0_CompleteBaselineAdmissionContracts"
+      ],
+      "owns": [
+        "build/rendering/render-engine-upgrade/",
+        "docs/rendering/render-engine-upgrade/Baseline.md",
+        "docs/rendering/render-engine-upgrade/MeasurementProtocol.md",
+        "docs/rendering/render-engine-upgrade/evidence/baseline/"
+      ]
+    }
+  ],
+  "ciScopeProposal": {
+    "kind": "serial-baseline-contract-proposal",
+    "package": "0_CompleteBaselineAdmissionContracts",
+    "baseSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+    "workflow": ".github/workflows/render-qualification.yml"
+  }
+}

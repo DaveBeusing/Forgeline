@@ -7,6 +7,7 @@ namespace ForgeLine.Graphics;
 internal sealed partial class D3D12GraphicsDevice : IGraphicsRenderTelemetry
 {
     private static long s_telemetryGeneration;
+    private readonly string _telemetryIdentitySession = Guid.NewGuid().ToString("N");
     private readonly ulong _telemetryGeneration = checked((ulong)Interlocked.Increment(ref s_telemetryGeneration));
     private CompletedGpuTimingQueue? _completedTelemetry;
     private GraphicsCpuFrameIntervals _cpuIntervals;
@@ -14,6 +15,17 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsRenderTelemetry
     private ulong _telemetryLastFence = ulong.MaxValue;
     public bool TelemetryOverflowed { get { VerifyOwner(); return _completedTelemetry?.Overflowed ?? false; } }
     public GraphicsCpuFrameIntervals CpuIntervals { get { VerifyOwner(); return _cpuIntervals; } }
+    public GraphicsDeviceTelemetryIdentity? DeviceIdentity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            using var process = Process.GetCurrentProcess();
+            uint rawMask = _commandQueue.GetDescription().NodeMask;
+            return new(_device.AdapterLuid.ToString("x16", System.Globalization.CultureInfo.InvariantCulture), _device.NodeCount, rawMask,
+                rawMask == 0 && _device.NodeCount == 1 ? 1u : rawMask, _telemetryGeneration, Environment.ProcessId, process.StartTime.ToUniversalTime().ToFileTimeUtc(), _telemetryIdentitySession);
+        }
+    }
     public void EnableRenderTelemetry(int capacity = 8192)
     {
         ThrowIfDisposed(); ThrowIfRecording();

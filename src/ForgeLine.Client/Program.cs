@@ -52,6 +52,8 @@ internal static class Program
             return RunSkinCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--ui-typography-capture")
             return RunTypographyCapture(args[1], args[2]);
+        if (args.Length == 2 && args[0] == "--reference-host-fixture-request")
+            return RunReferenceHostFixture(args[1]);
         if (args.Length == 2 && args[0] == "--reference-capture-request")
             return RunReferenceCapture(args[1]);
         return ClientBootstrap.Run(args, processEntryTimestamp);
@@ -89,6 +91,9 @@ internal static class Program
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunTypographyCapture(string output, string runtimeRoot) => UiTypographyCapture.Run(output, runtimeRoot);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int RunReferenceHostFixture(string path) => ReferenceFixtureHostCapture.Run(path);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int RunReferenceCapture(string path) => VisualReferenceCapture.Run(path);

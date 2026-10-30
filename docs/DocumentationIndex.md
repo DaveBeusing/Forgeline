@@ -2,7 +2,7 @@
 
 [Documentation hub](README.md) · [Repository overview](../README.md) · [Writing conventions](DocumentationGuide.md)
 
-This catalog links **all 407 Markdown documents** in the repository. Choose a topic below, then expand its document list. Existing filenames and historical records remain in place.
+This catalog links **all 409 Markdown documents** in the repository. Choose a topic below, then expand its document list. Existing filenames and historical records remain in place.
 
 > [!NOTE]
 > A guide can include dated measurements. A qualification record applies to its named source and environment; a runbook or plan is not proof of execution. [Project Context](ProjectContext.md#source-precedence) defines precedence, and [PR Versioning](ReleaseVersioning.md) owns the active version policy.
@@ -19,7 +19,7 @@ This catalog links **all 407 Markdown documents** in the repository. Choose a to
 | [Graphics and measurement](#graphics-and-measurement) | 17 |
 | [Content and authoring](#content-and-authoring) | 54 |
 | [Navigation design and diagnostics](#navigation-design-and-diagnostics) | 13 |
-| [Rendering lanes and source-bound records](#rendering-lanes-and-source-bound-records) | 49 |
+| [Rendering lanes and source-bound records](#rendering-lanes-and-source-bound-records) | 51 |
 | [Qualification archives and integration records](#qualification-archives-and-integration-records) | 23 |
 | [Architecture decisions](#architecture-decisions) | 51 |
 | [Implementation plans](#implementation-plans) | 9 |
@@ -365,7 +365,7 @@ This catalog links **all 407 Markdown documents** in the repository. Choose a to
 ## Rendering lanes and source-bound records
 
 <details>
-<summary>Browse 49 documents</summary>
+<summary>Browse 51 documents</summary>
 
 | Document | Kind | Repository path |
 | :--- | :--- | :--- |
@@ -406,6 +406,8 @@ This catalog links **all 407 Markdown documents** in the repository. Choose a to
 | [Render qualification checkpoint](rendering/qualification/Qualification.md) | Qualification / record | `docs/rendering/qualification/Qualification.md` |
 | [Reproducible render qualification](rendering/qualification/README.md) | Guide / contract | `docs/rendering/qualification/README.md` |
 | [Native rendering scaling qualification](rendering/qualification/ScalingQualification.md) | Qualification / record | `docs/rendering/qualification/ScalingQualification.md` |
+| [RenderEngine baseline status](rendering/render-engine-upgrade/Baseline.md) | Qualification / record | `docs/rendering/render-engine-upgrade/Baseline.md` |
+| [RenderEngine measurement protocol](rendering/render-engine-upgrade/MeasurementProtocol.md) | Guide / contract | `docs/rendering/render-engine-upgrade/MeasurementProtocol.md` |
 | [Render-owner telemetry foundation](rendering/render-engine-upgrade/Telemetry.md) | Guide / contract | `docs/rendering/render-engine-upgrade/Telemetry.md` |
 | [Fence-safe direct-queue upload and binding state](rendering/resource-scheduling/Decision.md) | Guide / contract | `docs/rendering/resource-scheduling/Decision.md` |
 | [Resource scheduling qualification evidence](rendering/resource-scheduling/evidence/README.md) | Qualification / record | `docs/rendering/resource-scheduling/evidence/README.md` |

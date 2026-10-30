@@ -21,6 +21,7 @@ internal sealed record VisualReferenceCaptureRequest
     public required string Commit { get; init; }
     public required string RuntimeRoot { get; init; }
     public string? Driver { get; init; }
+    public string? AdapterBindingDirectory { get; init; }
     public bool Software { get; init; }
     public int Warmups { get; init; } = 32;
     public int Samples { get; init; } = 128;
@@ -127,6 +128,7 @@ internal static class VisualReferenceCapture
                 AllowSoftwareAdapterFallback = request.Software });
             if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
                 throw new InvalidOperationException("Capture adapter does not match the requested lane.");
+            var adapterCheckpoint = ReferenceAdapterCheckpoint.PublishAndWait(request.AdapterBindingDirectory, graphics, runtimeFingerprint, window.NativeHandle.Value.ToInt64(), () => platform.PumpEvents());
             double startupMilliseconds = Stopwatch.GetElapsedTime(startupStart).TotalMilliseconds;
             long startupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - startupAllocationStart;
             var lighting = SceneLightingSettings.Default;
@@ -152,8 +154,11 @@ internal static class VisualReferenceCapture
                     long setupStart = Stopwatch.GetTimestamp();
                     long setupAllocationStart = GC.GetAllocatedBytesForCurrentThread();
                     var beforeSetup = graphics.Diagnostics;
-                    var terrainProfile = fixture.ResolveTerrainProfile(TerrainPresentationProfile.CreateCentralDivide(catalog));
-                    if (request.SurfaceMarks.Length > 0) terrainProfile = terrainProfile.WithSurfaceMarks(new TerrainSurfaceMarks(request.SurfaceMarks));
+                    uint resolvedRasterDpi = request.RasterDpi != 0 ? request.RasterDpi : display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
+                    ReferenceFixtureRecipe? sharedFixture = uiScenario == UiReferenceScenario.World
+                        ? new(fixture, terrain, catalog, request, display, quality, zoom, resolvedRasterDpi, uiScale, runtimeFingerprint) : null;
+                    var terrainProfile = sharedFixture?.TerrainProfile ?? fixture.ResolveTerrainProfile(TerrainPresentationProfile.CreateCentralDivide(catalog));
+                    if (sharedFixture is null && request.SurfaceMarks.Length > 0) terrainProfile = terrainProfile.WithSurfaceMarks(new TerrainSurfaceMarks(request.SurfaceMarks));
                     using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, lighting: lighting,
                         surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures, residency: profile.TerrainResidency,
                         environment: profile.Environment, presentationProfile: terrainProfile) { DebugChunksEnabled = false };
@@ -187,17 +192,17 @@ internal static class VisualReferenceCapture
                     if (request.CameraPath != ReferenceCameraPath.Fixed) key += $"-{request.CameraPath}";
                     if (uiScenario != UiReferenceScenario.World || uiScale != 1)
                         key += FormattableString.Invariant($"-Ui{uiScenario}-Scale{uiScale:0.00}");
+                    if (sharedFixture is not null && key != sharedFixture.CaseKey) throw new InvalidDataException("Shared world recipe key differs from native case inputs.");
                     Console.WriteLine($"[reference:capture] {key}");
                     var effectiveZoom = uiScenario == UiReferenceScenario.MinimapStrategic ? RtsReferenceZoom.Strategic : zoom;
-                    var camera = new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, effectiveZoom) with
+                    var camera = sharedFixture is not null ? new RtsCamera(sharedFixture.CameraSettings) : new RtsCamera(RtsVisualReference.CreateCameraSettings(fixture.Target, effectiveZoom) with
                         { InitialYawRadians = request.YawDegrees == 45 ? RtsVisualReference.YawRadians : request.YawDegrees * MathF.PI / 180,
                           InitialDistance = request.InspectionDistanceMeters == 0 ? RtsVisualReference.GetDistance(effectiveZoom) : request.InspectionDistanceMeters });
-                    double captureVisualSeconds = fixture.Snapshot.Tick.Value * fixture.Snapshot.TickDuration.TotalSeconds;
-                    uint rasterDpi = request.RasterDpi != 0 ? request.RasterDpi :
-                        display.Height == 2160 ? 192u : display.Height == 1440 ? 144u : 96u;
-                    var (snapshot, panel) = UiReferenceStates.Hud(fixture.Snapshot, uiScenario, display.Width, display.Height, rasterDpi, uiScale);
+                    double captureVisualSeconds = sharedFixture?.VisualSeconds ?? fixture.Snapshot.Tick.Value * fixture.Snapshot.TickDuration.TotalSeconds;
+                    uint rasterDpi = resolvedRasterDpi;
+                    var (snapshot, panel) = sharedFixture is not null ? (sharedFixture.Snapshot, sharedFixture.Panel) : UiReferenceStates.Hud(fixture.Snapshot, uiScenario, display.Width, display.Height, rasterDpi, uiScale);
                     FrontendSurfaceView? frontendView = frontend is null ? null : UiReferenceStates.Frontend(uiScenario, display.Width, display.Height, rasterDpi, uiScale);
-                    var world = ReferenceSnapshotHistory.Create(snapshot, fixture.PreviousSnapshot);
+                    var world = sharedFixture?.CreateWorld() ?? ReferenceSnapshotHistory.Create(snapshot, fixture.PreviousSnapshot);
                     string fixtureFingerprint = ReferenceSnapshotHistory.Fingerprint(fixture.Fingerprint, fixture.PreviousSnapshot);
                     if (ObjectActionRingCapture.IsRing(uiScenario))
                         panel=ObjectActionRingCapture.View(snapshot,uiScenario,world,camera,GameplayHudLayout.Create(display.Width,display.Height,rasterDpi,uiScale),rasterDpi,uiScale);
@@ -208,15 +213,15 @@ internal static class VisualReferenceCapture
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
                     particles.Prepare(world, camera, display.Width, display.Height, .1);
                     var selected = panel.Ring.Group is not null ? snapshot.PlayerActions!.Tactical!.SelectedEntities.ToArray() : fixture.Snapshot.Instances.ToArray().Where(x => x.Selectable.IsSelectable).Take(3).Select(x => x.Entity).ToArray();
-                    var indicators = new DebugDraw { Enabled = true };
-                    foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
+                    var indicators = sharedFixture?.Indicators ?? new DebugDraw { Enabled = true };
+                    if (sharedFixture is null) foreach (var instance in fixture.Snapshot.Instances.ToArray().Where(x => selected.Contains(x.Entity)))
                     {
                         if (fixture.Kind is VisualReferenceSceneKind.CommandCoreProduction or VisualReferenceSceneKind.InfantryRifleProduction or VisualReferenceSceneKind.InfantryEngineerProduction or VisualReferenceSceneKind.InfantryRepeated or VisualReferenceSceneKind.InfantryBattleProduction)
                             RtsWorldMarkerVisualization.DrawSelected(indicators, instance, new(0, .8f, .2f, 1), terrain);
                         else
                             indicators.Circle(instance.Transform.Position + Vector3.UnitY, 5, new(0, .8f, .2f, 1));
                     }
-                    var information = RtsInformationLayerView.Empty with { SelectedEntities = selected,
+                    var information = sharedFixture?.Information ?? RtsInformationLayerView.Empty with { SelectedEntities = selected,
                         Cursor = uiScenario == UiReferenceScenario.Targeting ? RtsCursorKind.Attack : RtsCursorKind.Default,
                         HasPointer = uiScenario == UiReferenceScenario.Targeting, PointerPosition = new(display.Width * .5f, display.Height * .5f) };
                     var targeting = uiScenario == UiReferenceScenario.Targeting ? new TacticalTargetingView(TacticalTargetingMode.Attack, 2, 1, 1, 0)
@@ -344,7 +349,7 @@ internal static class VisualReferenceCapture
                     for (int i = 0; i < cpu.Length; i++)
                     {
                         if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
-                        camera.ApplyState(ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
+                        camera.ApplyState(sharedFixture?.SampleCameras[i] ?? ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
                         long start = Stopwatch.GetTimestamp(); PrepareTerrain(); RecordFrame();
                         cpu[i] = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
@@ -353,13 +358,14 @@ internal static class VisualReferenceCapture
                         meshes.ObserveFrameDiagnostics(sampleDiagnostics);
                         performance.DrainRawGpu(graphics);
                         performance.AddCpu(i, cpu[i], allocatedBytes, sampleDiagnostics,
-                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory);
+                            new { objects = meshes.SubmissionMetrics, assetPreparation = meshes.AssetFrameMetrics, decals = fixture.Snapshot.DecalMetrics, terrain = ground.LastDiagnostics, instances = meshes.LastDiagnostics, particles = particles.Diagnostics }, resourceMemory: (graphics as IGraphicsRenderTelemetry)?.ResourceMemory, actualSubmission: (graphics as IGraphicsRenderTelemetry)?.CpuIntervals);
                         if (sampleDiagnostics.Frame is { } frame && frame.GpuSubmissionFence > lastFence)
                         {
                             lastFence = frame.GpuSubmissionFence;
                             if (sampleDiagnostics.GpuFrameMilliseconds is { } milliseconds) gpu.Add(milliseconds);
                         }
                     }
+                    (graphics as IGraphicsRenderTelemetry)?.StopRenderTelemetry();
                     graphics.WaitForIdle();
                     var measured = graphics.Diagnostics;
                     performance.AddGpu(measured);
@@ -446,6 +452,7 @@ internal static class VisualReferenceCapture
                         frontendView?.Layout, GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen);
                     captures.Add(new { submission = meshes.SubmissionMetrics, key, image, imageSha256 = FileHash(Path.Combine(request.OutputRoot, image)),
                         pixelSha256 = Convert.ToHexString(SHA256.HashData(rgba)), fixture.Kind, fingerprint = fixtureFingerprint,
+                        recipeFingerprint = sharedFixture?.Fingerprint, recipeInputs = sharedFixture?.IdentityInputs, recipeInputBytesBase64 = sharedFixture?.InputBytesBase64,
                         ui = new { scenario = uiScenario, fixtureVersion = 3, layoutContract = GameplayHudLayout.ContractVersion,
                             notifications = frontend is null ? ActionableAlertLayout.Resolve(snapshot,
                                 GameplayHudLayout.Create(display.Width, display.Height, rasterDpi, uiScale), panel.IsOpen) : (NotificationStackLayout?)null,
@@ -492,6 +499,7 @@ internal static class VisualReferenceCapture
                         logicalProcessors = Environment.ProcessorCount, cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
                         configuration = typeof(Program).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration },
                     runtimeFingerprint, request.Driver, software = request.Software, fixtureVersion = VisualReferenceScene.FixtureVersion,
+                    adapterIdentity = (graphics as IGraphicsRenderTelemetry)?.DeviceIdentity, adapterBinding = adapterCheckpoint?.Evidence,
                     hostWindowDpi = window.Dpi, executionRequirement = "Thread-scoped display/system requirement during explicit capture; user sleep/lock and occlusion checks remain authoritative.",
                     clientAssemblySha256 = FileHash(typeof(Program).Assembly.Location),
                     presentationAssemblySha256 = FileHash(typeof(GameplayHudRenderer).Assembly.Location),

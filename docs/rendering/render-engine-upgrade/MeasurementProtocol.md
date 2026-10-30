@@ -1,5 +1,7 @@
 # Measurement protocol - diagnostic preparation
 
+[Documentation](../../README.md) - [Complete catalog](../../DocumentationIndex.md)
+
 Status: physical baseline admission OPEN; wave 2 NOT READY. This protocol does not authorize a performance claim or render optimization.
 
 The selected execution baseline is `6b38707e29753bee64a014b7e23ef8bd150e970a` (`remote:origin/master`). The initiative planning baseline remains `f34d695fcaa813616da8747a49d030e418081e04`. Both identities must remain in evidence. Runtime and executable hashes must be frozen before any qualifying run; a source SHA alone does not establish a matched binary.

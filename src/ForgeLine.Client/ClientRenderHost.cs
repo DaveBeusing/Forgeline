@@ -134,7 +134,7 @@ internal readonly record struct ClientRenderFrame(
     NotificationExpansion NotificationExpansion = default, NavigationDiagnosticsView NavigationDiagnostics = default,
     TacticalDisplaySettings TacticalDisplay = default);
 
-internal sealed class ClientRenderHost : IDisposable
+internal sealed partial class ClientRenderHost : IDisposable
 {
     private static readonly TimeSpan IdleWait =
         TimeSpan.FromMilliseconds(16);
@@ -198,7 +198,8 @@ internal sealed class ClientRenderHost : IDisposable
         SceneAtmosphereSettings? sceneAtmosphere = null,
         ParticleSettings? particles = null,
         RenderQualitySettings? renderQuality = null,
-        TerrainPresentationProfile? terrainProfile = null)
+        TerrainPresentationProfile? terrainProfile = null,
+        ReferenceFixtureRecipe? referenceFixture = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -221,6 +222,12 @@ internal sealed class ClientRenderHost : IDisposable
         _runtimeAssets =
             runtimeAssets;
         _terrainProfile = terrainProfile;
+        _referenceFixture = referenceFixture;
+        if (referenceFixture is not null)
+        {
+            _fixtureSequence = new(referenceFixture.FrameCount);
+            _fixtureFrames = new ReferenceFixtureFrameObservation[referenceFixture.Samples];
+        }
         _sceneLighting =
             sceneLighting ??
             SceneLightingSettings.Default;
@@ -427,17 +434,24 @@ internal sealed class ClientRenderHost : IDisposable
                     "Render camera settings were not configured.");
 
             using IGraphicsDevice? ownedGraphics = existingDevice is null
-                ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget) : null;
+                ? GraphicsDeviceFactory.CreateForWindowTarget(initialTarget, _referenceFixture is null ? null : new()
+                { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = _referenceFixture.Software, AllowSoftwareAdapterFallback = _referenceFixture.Software }) : null;
             IGraphicsDevice graphics = existingDevice ?? ownedGraphics!;
-            using var liveTelemetry = LiveRenderTelemetry.FromEnvironment(graphics, _runtimeAssets);
-            var qualitySettings = ClientGraphicsOverrides.Read(_renderQuality with
+            using var liveTelemetry = _referenceFixture is null ? LiveRenderTelemetry.FromEnvironment(graphics, _runtimeAssets)
+                : new LiveRenderTelemetry((IGraphicsRenderTelemetry)graphics, _referenceFixture.Samples,
+                    Path.Combine(_referenceFixture.OutputRoot, "owner.json"), warmups: _referenceFixture.Warmups,
+                    runtimeFingerprint: _referenceFixture.RuntimeFingerprint, actualDevice: graphics.Diagnostics.Device);
+            if (_referenceFixture is { } adapterFixture)
+                _fixtureAdapterBinding = ReferenceAdapterCheckpoint.PublishAndWait(adapterFixture.AdapterBindingDirectory, graphics, adapterFixture.RuntimeFingerprint, initialTarget.NativeHandle.ToInt64(), () => Volatile.Read(ref _stopping) == 0)?.Evidence;
+            var qualitySettings = _referenceFixture?.Settings ?? ClientGraphicsOverrides.Read(_renderQuality with
             {
                 Atmosphere = _renderQuality.Atmosphere ?? (_sceneAtmosphere.Quality != AtmosphereQuality.Disabled ? _sceneAtmosphere.Quality : null),
                 Particles = _renderQuality.Particles ?? (_particleSettings != ParticleSettings.Default ? _particleSettings.Quality : null)
             });
             var composition = ClientRenderConfiguration.Resolve(graphics, qualitySettings,
-                initialTarget.Width, initialTarget.Height, _sceneLighting, _sceneAtmosphere.Graphics);
+                initialTarget.Width, initialTarget.Height, _sceneLighting, _referenceFixture?.Atmosphere ?? _sceneAtmosphere.Graphics);
             composition.Apply(graphics);
+            if (_referenceFixture is not null) _fixtureComposition = composition;
             RenderQualityProfile qualityProfile = composition.Profile;
             SceneLightingSettings lighting = composition.Lighting;
             GraphicsAtmosphereSettings atmosphere = composition.Atmosphere;
@@ -489,7 +503,7 @@ internal sealed class ClientRenderHost : IDisposable
             if (_runtimeAssets is not null) frontendRenderer.PrepareSkin(_runtimeAssets);
 
             var renderWorld =
-                new RenderWorld();
+                _referenceFixture?.CreateWorld() ?? new RenderWorld();
             var renderCamera =
                 new RtsCamera(
                     cameraSettings);
@@ -517,6 +531,20 @@ internal sealed class ClientRenderHost : IDisposable
                 0.0;
             var surface = new ClientRenderSurface(initialTarget.Width, initialTarget.Height, initialTarget.Suspended);
 
+            Action<IGraphicsCommandContext>? fixtureRecord = null;
+            Action? fixturePrepareReadback = null;
+            if (_referenceFixture is { } fixtureSetup)
+            {
+                renderCamera.ApplyState(fixtureSetup.InitialCamera);
+                particleRenderer.Prepare(renderWorld, renderCamera, initialTarget.Width, initialTarget.Height, 0);
+                particleRenderer.Prepare(renderWorld, renderCamera, initialTarget.Width, initialTarget.Height, .1);
+                particleRenderer.Prepare(renderWorld, renderCamera, initialTarget.Width, initialTarget.Height, .1);
+                var setupShadow = shadowSettings.Enabled ? DirectionalShadowProjection.Create(fixtureSetup.InitialCamera, lighting, shadowSettings) : (GraphicsDirectionalShadowFrame?)null;
+                int setupWidth = Math.Max(1, (int)Math.Ceiling(initialTarget.Width * (double)qualityProfile.ResolutionScale));
+                int setupHeight = Math.Max(1, (int)Math.Ceiling(initialTarget.Height * (double)qualityProfile.ResolutionScale));
+                terrainRenderer.Prepare(renderCamera, setupWidth, setupHeight, setupShadow);
+                instanceRenderer.Prepare(renderCamera, renderWorld, new(setupWidth, setupHeight, 1, setupShadow, shadowSettings.MaximumCasters, fixtureSetup.VisualSeconds, true), particleRenderer);
+            }
             if (_asynchronousStartup)
                 _startup.End(StartupPhase.GameplayRenderer, sessionId: _startup.CurrentSessionId);
             _started.Set();
@@ -537,6 +565,17 @@ internal sealed class ClientRenderHost : IDisposable
                     break;
                 }
 
+                int fixtureOrdinal = -1;
+                if (_referenceFixture is not null)
+                {
+                    if (Volatile.Read(ref _fixtureCaptureRequested) != 0 && fixtureRecord is not null && fixturePrepareReadback is not null)
+                    {
+                        graphics.WaitForIdle(); liveTelemetry?.DrainGpu();
+                        CaptureFixtureReadback(graphics, fixtureRecord, fixturePrepareReadback, instanceRenderer);
+                        continue;
+                    }
+                    if (!_fixtureSequence!.TryRead(out fixtureOrdinal)) continue;
+                }
                 LiveTelemetryStart liveStart = liveTelemetry?.Begin(new(signalWaitStart, signalWaitEnd)) ?? default;
                 ClientRenderFrame? frame =
                     TakeLatestFrame();
@@ -573,7 +612,7 @@ internal sealed class ClientRenderHost : IDisposable
                 renderCamera.ApplyState(
                     current.Camera);
 
-                if (renderWorld.Update(
+                if (_referenceFixture is null && renderWorld.Update(
                         snapshots))
                 {
                     snapshotObservedAt =
@@ -625,7 +664,8 @@ internal sealed class ClientRenderHost : IDisposable
                     RenderInterpolation.CalculateAlpha(
                         sinceSnapshot,
                         snapshot.TickDuration);
-                double particleDelta = Stopwatch.GetElapsedTime(lastParticleFrame,now).TotalSeconds;
+                if (_referenceFixture is not null) renderAlpha = 1;
+                double particleDelta = _referenceFixture is not null ? 0 : Stopwatch.GetElapsedTime(lastParticleFrame,now).TotalSeconds;
 
                 RebuildDraw(
                     gameplayDraw,
@@ -637,7 +677,7 @@ internal sealed class ClientRenderHost : IDisposable
                     current.DebugOverlay.Enabled,
                     current.DebugLines,
                     current.DebugLabels);
-                if (current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
+                if (_referenceFixture is null && current.PreAlphaUx.Mode == PreAlphaUxMode.None &&
                     current.Frontend is null && !current.SurfaceSuspended)
                 {
                     selectedOrderOverlay.Draw(
@@ -702,7 +742,9 @@ internal sealed class ClientRenderHost : IDisposable
                 GraphicsDirectionalShadowFrame? preparedShadow = shadowSettings.Enabled
                     ? DirectionalShadowProjection.Create(current.Camera, lighting, shadowSettings) : null;
                 long terrainStarted = Stopwatch.GetTimestamp();
-                bool terrainReady = terrainRenderer.PrepareStep(renderCamera, worldWidth, worldHeight, preparedShadow);
+                bool terrainReady;
+                if (_referenceFixture is not null) { terrainRenderer.Prepare(renderCamera, worldWidth, worldHeight, preparedShadow); terrainReady = true; }
+                else terrainReady = terrainRenderer.PrepareStep(renderCamera, worldWidth, worldHeight, preparedShadow);
                 long terrainEndedAt = Stopwatch.GetTimestamp();
                 double terrainPrepareMs = Stopwatch.GetElapsedTime(terrainStarted, terrainEndedAt).TotalMilliseconds;
                 if (!terrainReady)
@@ -736,20 +778,18 @@ internal sealed class ClientRenderHost : IDisposable
                 }
                 lastParticleFrame = now;
                 long assetsStarted = Stopwatch.GetTimestamp();
-                instanceRenderer.Prepare(renderCamera, renderWorld, new(
+                if (_referenceFixture is null || !instanceRenderer.AssetsPrepared) instanceRenderer.Prepare(renderCamera, renderWorld, new(
                     worldWidth, worldHeight, renderAlpha, preparedShadow, shadowSettings.MaximumCasters,
-                    (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, current.MetricsActive), particleRenderer);
+                    _referenceFixture?.VisualSeconds ?? (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, _referenceFixture is not null || current.MetricsActive), particleRenderer);
                 double assetPrepareMs = Stopwatch.GetElapsedTime(assetsStarted).TotalMilliseconds;
                 ObjectActionRingView inputRing = default;
                 long livePrepareEndedAt = Stopwatch.GetTimestamp();
-                graphics.RenderFrame(
-                    GraphicsColor.ForgeLineClear,
-                    context =>
+                Action<IGraphicsCommandContext> recordFrame = context =>
                     {
                         var worldPasses = new ClientWorldPassRecorder(terrainRenderer, instanceRenderer, particleRenderer,
                             renderWorld, renderCamera, renderAlpha,
-                            (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, particleDelta,
-                            current.PreAlphaUx.Mode is PreAlphaUxMode.Paused or PreAlphaUxMode.Help || !current.MetricsActive);
+                            _referenceFixture?.VisualSeconds ?? (double)(renderStartedAt - visualMotionStartedAt) / Stopwatch.Frequency, particleDelta,
+                            _referenceFixture is not null || current.PreAlphaUx.Mode is PreAlphaUxMode.Paused or PreAlphaUxMode.Help || !current.MetricsActive);
                         ClientWorldPassSequence.Record(context,
                             atmosphere.Enabled ? SceneAtmosphereSettings.CreateView(renderCamera, context.Width, context.Height) : null,
                             preparedShadow, shadowSettings, ref worldPasses);
@@ -769,11 +809,19 @@ internal sealed class ClientRenderHost : IDisposable
                         selectedOrderRenderer.Render(
                             context, renderCamera, selectedOrderDraw,
                             RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
-                        gameplayOverlayRenderer.Render(
+                        if (_referenceFixture is not null) gameplayOverlayRenderer.Render(context, renderCamera, gameplayDraw);
+                        else gameplayOverlayRenderer.Render(
                             context,
                             renderCamera,
                             gameplayDraw,
                             RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
+                        if (_referenceFixture is not null)
+                        {
+                            gameplayHudRenderer.Render(context, renderCamera, snapshot, terrain.WorldBounds, current.InformationLayer,
+                                current.ActionPanel, current.TacticalTargeting, current.ActiveFormation, CombatGroupOverviewView.Empty, default, current.Dpi, current.UiScale,
+                                runtimeMetrics: new RuntimeMetricsView(60, 20, RuntimeSimulationState.Running), showRuntimeMetrics: false);
+                            return;
+                        }
                         var ringLayout = GameplayHudLayout.Create(context.Width, context.Height, current.Dpi, current.UiScale);
                         if (current.InformationLayer.MinimapEnabled &&
                             !current.InformationLayer.MinimapBounds.IsEmpty &&
@@ -837,7 +885,18 @@ internal sealed class ClientRenderHost : IDisposable
                                 frontend,
                                 current.UiScale);
                         }
-                    });
+                    };
+                graphics.RenderFrame(GraphicsColor.ForgeLineClear, recordFrame);
+                if (_referenceFixture is not null)
+                {
+                    fixtureRecord = recordFrame;
+                    fixturePrepareReadback = () =>
+                    {
+                        terrainRenderer.Prepare(renderCamera, worldWidth, worldHeight, preparedShadow);
+                        if (!instanceRenderer.AssetsPrepared) instanceRenderer.Prepare(renderCamera, renderWorld,
+                            new(worldWidth, worldHeight, 1, preparedShadow, shadowSettings.MaximumCasters, _referenceFixture.VisualSeconds, true), particleRenderer);
+                    };
+                }
 
                 presentedLastIteration = current.MetricsActive && graphics.PresentedFrameCount > presentedBefore;
                 if (graphics.PresentedFrameCount > presentedBefore)
@@ -939,6 +998,8 @@ internal sealed class ClientRenderHost : IDisposable
                         renderFinishedAt;
                 }
                 CompleteLiveTelemetry(liveTelemetry, liveStart, "gameplay", terrainStarted, livePrepareEndedAt);
+                if (_referenceFixture is not null && graphics.PresentedFrameCount > presentedBefore)
+                    AcknowledgeFixtureFrame(fixtureOrdinal, renderCamera.CaptureState(), width, height, snapshot, (IGraphicsRenderTelemetry)graphics, instanceRenderer, diagnostics.Surface.BufferCount, gameplayHudRenderer.LastRenderedVertexCount);
             }
 
             graphics.WaitForIdle();

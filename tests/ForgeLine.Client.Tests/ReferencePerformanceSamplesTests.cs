@@ -53,6 +53,20 @@ public sealed class ReferencePerformanceSamplesTests
         Assert.Throws<ArgumentException>(() => (request with { RunProfile = (ReferenceRunProfile)99 }).Validate());
     }
 
+    [Fact]
+    public void NativeCpuRowsRetainActualFenceGenerationSeparateFromCpuOrdinal()
+    {
+        var samples = new ReferencePerformanceSamples(2, 0);
+        var actual = new GraphicsCpuFrameIntervals(1, new(10, 20), new(18, 20), new(10, 12), true, 999, 7, 3);
+        samples.AddCpu(0, 1, 0, Diagnostics(0, null), actualSubmission: actual);
+        using var result = JsonDocument.Parse(JsonSerializer.Serialize(samples.Report(Diagnostics(0, null)), VisualReferenceCapture.JsonOptions));
+        var row = result.RootElement.GetProperty("cpuFrames")[0].GetProperty("actualSubmission");
+        Assert.Equal(1UL, row.GetProperty("submission").GetUInt64());
+        Assert.Equal(999UL, row.GetProperty("submittedFence").GetUInt64());
+        Assert.Equal(7UL, row.GetProperty("generation").GetUInt64());
+        Assert.Equal(3UL, row.GetProperty("resourceGeneration").GetUInt64());
+    }
+
     private static GraphicsDiagnostics Diagnostics(ulong fence, double? milliseconds) => new(new("contract", 0, false, "test", false), new(1,1,3,0,false,"Immediate",false,false,0,0))
     {
         GpuFrameMilliseconds = milliseconds, TimestampFrequencyHz = 1000000,

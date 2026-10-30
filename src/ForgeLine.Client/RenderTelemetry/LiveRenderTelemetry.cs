@@ -17,6 +17,8 @@ internal sealed class LiveRenderTelemetry : IDisposable
     private readonly LiveTelemetryFrame[] _frames;
     private readonly GraphicsRawGpuTiming[] _gpu;
     private readonly int _owner = Environment.CurrentManagedThreadId;
+    private readonly uint _nativeOwner = RenderOwnerThreadIdentity.GetCurrentThreadId();
+    private readonly object _clockAnchor = RenderOwnerThreadIdentity.ClockAnchor();
     private readonly string _streamId = Guid.NewGuid().ToString("N");
     private int _count, _gpuCount;
     private const int StartupObservationBudget = 4096;
@@ -166,10 +168,14 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["sourceSha"] = ClientBuildIdentity.SourceRevision;
         document["runtimeFingerprint"] = _runtimeFingerprint;
         document["actualDevice"] = JsonSerializer.SerializeToNode(_actualDevice, JsonOptions);
+        document["adapterIdentity"] = JsonSerializer.SerializeToNode(_source.DeviceIdentity, JsonOptions);
         document["scope"] = "live-client";
         document["gpuStreamScope"] = "independent-live-client";
         document["streamId"] = _streamId;
         document["frequencyHz"] = Stopwatch.Frequency;
+        document["clockAnchor"] = JsonSerializer.SerializeToNode(_clockAnchor, JsonOptions);
+        document["ownerThread"] = JsonSerializer.SerializeToNode(new { managedThreadId = _owner, nativeThreadId = _nativeOwner,
+            processId = Environment.ProcessId, timestampClock = "Stopwatch/QPC", highResolution = Stopwatch.IsHighResolution }, JsonOptions);
         document["overflowed"] = Overflowed;
         document["serviceIntervalsAvailable"] = true;
         document["window"] = JsonSerializer.SerializeToNode(new { arm = "first-gameplay-iteration", warmups = _warmups,
