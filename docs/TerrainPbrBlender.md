@@ -1,5 +1,7 @@
 # Saved terrain PBR sources
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The eight Central Divide terrain material IDs already resolve seven complete,
 original periodic 4K sets. Preserve this integrated artwork in seven genuine
 Blender 5.2.2 material masters and derive the compiler inputs by reopening and

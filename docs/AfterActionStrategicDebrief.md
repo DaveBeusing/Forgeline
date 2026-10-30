@@ -1,5 +1,7 @@
 # After-action strategic debrief
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The finished-match overlay shows the authoritative local result, termination reason and a bounded timeline. It uses existing completed-action evidence from GameplayProgressJournal. It does not reconstruct strategy from final inventories or expose headless balance reports.
 
 ## Controls and failure behavior

@@ -1,5 +1,7 @@
 # Environment asset variation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Compiler 1.13.0 carries optional version-1 `scatter` metadata on mesh records in
 the existing signed runtime manifest and FLAS metadata. Null metadata is omitted,
 so source definitions and historical authored-map identities remain valid.

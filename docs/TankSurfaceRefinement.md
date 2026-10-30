@@ -1,5 +1,7 @@
 # Tank armor finish and native review
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Current qualification base is `a391a5bb0c0e25f079fa394613a5f84dfe7e9728`, version 0.1.432.
 The PR prepares exactly one PATCH to 0.1.433. The initial audit used
 `a6fe118583be842e00416bcb100d1210f3240a00` before logistics PR 273 integrated.
@@ -8,6 +10,17 @@ Tank PR 231 and procedural-atlas PR 235 are integrated; their historical native
 observations do not establish acceptance of the current renderer. No related
 open tank branch or PR existed at the audit. Logistics-building PR 273 is integrated in the current base and remains outside
 this source family; its complete source and reference-scene additions are preserved.
+
+<details>
+<summary>On this page</summary>
+
+- [Demonstrated gap and bounded change](#demonstrated-gap-and-bounded-change)
+- [Review loads and scope of evidence](#review-loads-and-scope-of-evidence)
+- [Integration gate](#integration-gate)
+- [Observed current-base results](#observed-current-base-results)
+- [Distribution verification](#distribution-verification)
+
+</details>
 
 ## Demonstrated gap and bounded change
 

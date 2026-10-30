@@ -1,5 +1,7 @@
 # Directorate raised conveyor visual kit
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 **Scope:** visual design, blockout geometry, authored sockets and module identities.  
 **Status:** versioned art/source contract. The JSON and greybox references on this page are preproduction inputs; current compiled assets and live behavior are described by [conveyor construction](ConveyorConstructionPlacementAndUX.md) and [conveyor simulation](ConveyorSimulationAndVehicleInterop.md). Native visual acceptance remains pending.
 **Canonical source:** [`conveyor-kit.v1.json`](../assets/source/infrastructure/directorate/conveyors/conveyor-kit.v1.json).  
@@ -9,6 +11,20 @@ The earlier logistics design already fixed a 4 m short unit, 8 m standard unit,
 cardinal-only 90° corners and a **minimum 5 m free vehicle clearance**. This art
 contract gives those decisions exact module envelopes and authored port frames.
 It does not change Cargo/Supply Trucks, route authority or real inventory rules.
+
+<details>
+<summary>On this page</summary>
+
+- [Engine space, dimensions and tolerances](#engine-space-dimensions-and-tolerances)
+- [Shape vocabulary and silhouettes](#shape-vocabulary-and-silhouettes)
+- [Port and placement conventions](#port-and-placement-conventions)
+- [State language and player readability](#state-language-and-player-readability)
+  - [Variant identity and reuse](#variant-identity-and-reuse)
+- [Materials, texture and LOD contract](#materials-texture-and-lod-contract)
+- [Review and acceptance checklist](#review-and-acceptance-checklist)
+- [Model production handoff](#model-production-handoff)
+
+</details>
 
 ## Engine space, dimensions and tolerances
 

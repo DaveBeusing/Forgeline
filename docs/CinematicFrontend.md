@@ -1,5 +1,7 @@
 # Cinematic frontend presentation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The title layer is an original static composition of the existing Directorate industrial
 buildings, three Main Battle Tanks and Central Divide materials. It replaces the abstract
 schematic when optional artwork is ready. It is illustrative title art, not a live match,
@@ -43,7 +45,7 @@ Top/bottom shading and opaque semantic control surfaces retain text contrast on 
 
 ## Reproduction and evidence
 
-```
+```text
 ForgeLine.Client.exe --author-menu-background <new-output.png> assets/runtime
 ForgeLine.Client.exe --cinematic-menu-capture <empty-output-directory> <runtime-root>
 ```

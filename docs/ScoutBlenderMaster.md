@@ -1,5 +1,22 @@
 # Scout Blender master
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Current synchronization (0.1.436)](#current-synchronization-01436)
+- [Result and integration decision](#result-and-integration-decision)
+- [Original audit and measured 0.1.434 checkpoint](#original-audit-and-measured-01434-checkpoint)
+- [Preserved source and presentation contracts](#preserved-source-and-presentation-contracts)
+- [Native authoring and exact export](#native-authoring-and-exact-export)
+- [Installed native observations](#installed-native-observations)
+- [Build, package and verification](#build-package-and-verification)
+- [Source epochs and evidence](#source-epochs-and-evidence)
+- [Reproduction](#reproduction)
+
+</details>
+
 ## Current synchronization (0.1.436)
 
 PR 280 is synchronized with master f151362883134eda0fe50f8fb70d9102b3635446 (0.1.435), including resource-deposit PR 279 and infantry PR 277. All 94 master scene enum IDs are preserved. Resource-deposit scenes retain 90–93, infantry scenes retain 84–89, and Scout appends at 94–98. The resource-deposit, infantry and Scout dispatch paths are retained. The branch contains exactly one PATCH increment to 0.1.436.

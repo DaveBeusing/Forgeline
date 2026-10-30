@@ -1,5 +1,7 @@
 # Battlefield status readability
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Owned unit status is copied at the completed-tick presentation boundary. The existing selection summary and combat-group member projection carry suppression, artillery mission status and an active resupply flag. Selection strength comes from UnitCombatReadiness. There is no separate maintenance statistic.
 
 The capture rejects foreign, destroyed and stale-generation entities before reading operational facts. It carries no target, enemy type, position, stock or command reference. Multi-selection does not borrow an individual member's details. The existing intelligence contact, attack-location, sensor-range and selected-order paths retain their authority and visibility rules.

@@ -1,5 +1,39 @@
 # Combat Orders, Tactical Behavior, and Readiness
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Combat Orders](#combat-orders)
+- [Bounded unit order sequences and patrol](#bounded-unit-order-sequences-and-patrol)
+  - [Completion, priorities and formation](#completion-priorities-and-formation)
+  - [Intelligence, observation and recovery](#intelligence-observation-and-recovery)
+- [Phase Ownership](#phase-ownership)
+- [Attack](#attack)
+- [AttackMove](#attackmove)
+- [Stop and Hold Position](#stop-and-hold-position)
+- [Retreat / Disengage](#retreat--disengage)
+- [Fire Policy](#fire-policy)
+- [Combat Groups and Target Assignment](#combat-groups-and-target-assignment)
+- [Pursuit Leash](#pursuit-leash)
+- [Automatic Resupply](#automatic-resupply)
+- [Unit Readiness](#unit-readiness)
+- [Group Readiness](#group-readiness)
+- [Suppression and Recovery](#suppression-and-recovery)
+- [Read Models and Diagnostics](#read-models-and-diagnostics)
+- [Tactical Test Opponent](#tactical-test-opponent)
+- [Development Battle](#development-battle)
+- [Correctness Coverage](#correctness-coverage)
+- [Performance Coverage](#performance-coverage)
+- [Deferred Work](#deferred-work)
+- [Human Player Tactical Controls](#human-player-tactical-controls)
+- [Active-state recovery qualification](#active-state-recovery-qualification)
+- [Explicit engagement policies](#explicit-engagement-policies)
+
+</details>
+
 ## Purpose
 
 Phase 5 connects player combat intent, movement and formations, battlefield intelligence, target acquisition, weapons, Fuel/Ammunition, battlefield resupply, destruction, and derived readiness into one authoritative fixed-tick battlefield loop.

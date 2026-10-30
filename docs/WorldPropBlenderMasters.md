@@ -1,5 +1,25 @@
 # World prop Blender masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and current review status](#scope-and-current-review-status)
+- [Ownership and adoption](#ownership-and-adoption)
+- [Straight-pipe axis correction](#straight-pipe-axis-correction)
+- [Gameplay and review fixtures](#gameplay-and-review-fixtures)
+- [Reproduction](#reproduction)
+- [Acceptance boundaries](#acceptance-boundaries)
+- [Native authoring and runtime checkpoint](#native-authoring-and-runtime-checkpoint)
+- [Original functional qualification](#original-functional-qualification)
+  - [Native player observations](#native-player-observations)
+  - [Headless and installed package](#headless-and-installed-package)
+  - [Commit and integration boundaries](#commit-and-integration-boundaries)
+- [Current integration synchronization](#current-integration-synchronization)
+
+</details>
+
 ## Scope and current review status
 
 Starting integration base: master a524b0a8164390abe1e9cb38170e690f46147574,

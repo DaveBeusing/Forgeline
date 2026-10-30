@@ -1,5 +1,26 @@
 # World anchored action menus
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Current sector hover and selection inspector](#current-sector-hover-and-selection-inspector)
+- [Hover geometry structural qualification](#hover-geometry-structural-qualification)
+- [Current Operations obstacle ownership](#current-operations-obstacle-ownership)
+- [Current radial material and motion contract](#current-radial-material-and-motion-contract)
+- [Action parity](#action-parity)
+- [Qualification status](#qualification-status)
+- [Implementation checkpoint](#implementation-checkpoint)
+- [Geometry and lifetime](#geometry-and-lifetime)
+- [Integration checkpoint](#integration-checkpoint)
+- [Native iteration](#native-iteration)
+- [Native test-owner isolation](#native-test-owner-isolation)
+- [Global cursor anchor and contextual navigation](#global-cursor-anchor-and-contextual-navigation)
+- [Logistics order visibility and quantity editor](#logistics-order-visibility-and-quantity-editor)
+
+</details>
+
 ## Current sector hover and selection inspector
 
 A hovered ring sector receives a lower-luminance fill at the same 0.30 material alpha and a dedicated high-contrast 1.5–4 physical-pixel arc inside **only** its outer radius. Pressed, disabled and pending retain distinct visual identities. This arc is decorative: input remains the published annular sector geometry, and inactive animation owns no pointer capture.

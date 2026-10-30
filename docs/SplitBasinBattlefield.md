@@ -1,10 +1,26 @@
 # Split Basin
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Split Basin is a 2,048 × 2,048 m Directorate battlefield loaded through the same compiled scenario registry as Central Divide. The original map remains the default. Select Split Basin with Up/Down in New Game, or use the client/headless option `--scenario split-basin`. The stable composition key is `split-basin.directorate.v1`; the map key is `battlefield.split_basin`.
 
 ![Compiled Split Basin geography](SplitBasinBattlefield.svg)
 
 The view is generated from the reloaded artifact, sampled terrain, explicit build areas, blockers, resources, roads and Command Cores. North is at the top. Decoration does not establish cover or traversability.
+
+<details>
+<summary>On this page</summary>
+
+- [Geography and economy](#geography-and-economy)
+- [Identity and compatibility](#identity-and-compatibility)
+- [Reproduction](#reproduction)
+- [Qualification and limits](#qualification-and-limits)
+- [Current technology integration](#current-technology-integration)
+- [Historical qualification before the technology merge](#historical-qualification-before-the-technology-merge)
+- [Bridge operation](#bridge-operation)
+- [Explicit tactical geography](#explicit-tactical-geography)
+
+</details>
 
 ## Geography and economy
 

@@ -1,5 +1,7 @@
 # Directorate Command Core production brief
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The current production source and reproduction workflow are documented in
 [CommandCoreBlenderProduction.md](CommandCoreBlenderProduction.md). The brief
 below records the earlier parametric-kit milestone; its triangle counts,
@@ -37,6 +39,18 @@ Socket additions are named authoring anchors only, with no new gameplay logic.
 
 Visual acceptance requires production D3D12 renders at 120/420/1000m, normal
 role read and state distinction. Compilation is not final art approval.
+
+<details>
+<summary>On this page</summary>
+
+- [Editable sources and reproduction](#editable-sources-and-reproduction)
+- [Qualification method](#qualification-method)
+- [Local qualification, 11 October 2026](#local-qualification-11-october-2026)
+- [Visual observations and acceptance still pending](#visual-observations-and-acceptance-still-pending)
+- [Blender source preservation](#blender-source-preservation)
+- [Bounded Blender surface review](#bounded-blender-surface-review)
+
+</details>
 
 ## Editable sources and reproduction
 

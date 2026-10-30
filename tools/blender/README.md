@@ -1,5 +1,7 @@
 # Blender authoring entrypoint
 
+[Documentation](../../docs/README.md) · [Complete catalog](../../docs/DocumentationIndex.md)
+
 The pinned toolchain is **Blender 5.2.2 release, x64**. `toolchain.json` defines the
 exact version; other patches and prerelease builds fail. PowerShell **7.4+** and
 Windows/Linux x64 are required. Windows native execution is qualified; Linux
@@ -11,6 +13,21 @@ Blender, its bundled Python and `bpy` are authoring dependencies only. No extern
 Python, pip, virtual environment, addon download or runtime/client/headless
 reference is introduced. Existing production exporters and assets remain unchanged.
 See [asset ownership](../../docs/AssetPipeline.md).
+
+<details>
+<summary>On this page</summary>
+
+- [Preproduction conveyor kit](#preproduction-conveyor-kit)
+- [Installation and discovery](#installation-and-discovery)
+- [Script contract](#script-contract)
+- [Validation and CI](#validation-and-ci)
+- [Production source import/export](#production-source-importexport)
+- [Surface and LOD preparation](#surface-and-lod-preparation)
+- [Rigid motion authoring](#rigid-motion-authoring)
+- [Infantry skeletal masters](#infantry-skeletal-masters)
+- [Logistics truck masters](#logistics-truck-masters)
+
+</details>
 
 ## Preproduction conveyor kit
 

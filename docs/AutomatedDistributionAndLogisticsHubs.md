@@ -1,5 +1,33 @@
 # Automated Distribution and Logistics Hubs
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Logistics Hubs](#logistics-hubs)
+- [Stock Policies](#stock-policies)
+- [Request Lifecycle](#request-lifecycle)
+  - [Deterministic lifecycle and fairness matrix](#deterministic-lifecycle-and-fairness-matrix)
+- [Source Selection](#source-selection)
+- [Shipment Quantity](#shipment-quantity)
+- [Resource Reservations](#resource-reservations)
+- [Physical Cargo Transport](#physical-cargo-transport)
+- [Truck Assignment](#truck-assignment)
+- [Priority and Fairness](#priority-and-fairness)
+  - [Player operational priority and live effectiveness](#player-operational-priority-and-live-effectiveness)
+- [Retry and Failure Handling](#retry-and-failure-handling)
+- [Diagnostics](#diagnostics)
+- [Determinism and Tick Ownership](#determinism-and-tick-ownership)
+- [Validation](#validation)
+- [Battlefield Supply Integration Boundary](#battlefield-supply-integration-boundary)
+- [Human Player Stock Policies](#human-player-stock-policies)
+- [Logistics setup](#logistics-setup)
+- [Authorized player-facing active requests](#authorized-player-facing-active-requests)
+
+</details>
+
 ## Purpose
 
 Automated distribution maintains configured regional stock levels by creating and dispatching physical Cargo Truck deliveries over the authoritative logistics network.
@@ -150,7 +178,6 @@ The shared player action surface exposes automated-distribution policy for one s
 The panel reads current stock, existing policy values, request state, assigned Cargo Truck, failure reason, and bottleneck reason from immutable completed-tick read models. Submission is not delivery: `AutomatedDistributionSystem` still creates requests, reserves real source stock and route capacity, assigns eligible Cargo Trucks, and relies on `CargoTransportSystem` for physical loading, movement, and unloading.
 
 Player commands validate target ownership before delegating to the existing stock-policy commands. Invalid thresholds, foreign targets, stale policy entities, unavailable source stock, missing routes, saturated capacity, unavailable trucks, and full destinations remain authoritative failures rather than UI-side exceptions or resource grants.
-
 
 ## Logistics setup
 

@@ -1,5 +1,7 @@
 # Global production overview
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Open Operations by clicking the resource/power strip, then choose QUEUES. The view shares the existing unit-factory queue and action ring. FOLD keeps only the header and counts; OPEN restores the rows. Hidden panel space becomes available to world input immediately. CLOSE and OPS leave the view through the normal transient-panel lifecycle.
 
 ## Reading and acting

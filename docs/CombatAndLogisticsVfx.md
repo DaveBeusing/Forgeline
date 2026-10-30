@@ -1,5 +1,31 @@
 # Combat, Destruction, and Logistics VFX
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Source layout](#source-layout)
+- [Combat event bindings](#combat-event-bindings)
+- [Surface and impact language](#surface-and-impact-language)
+- [Explosion and destruction language](#explosion-and-destruction-language)
+- [Damage-state effects](#damage-state-effects)
+- [Socket anchors](#socket-anchors)
+- [Logistics bindings](#logistics-bindings)
+- [Pooling and reuse](#pooling-and-reuse)
+- [Distance and strategic zoom](#distance-and-strategic-zoom)
+- [Renderer path](#renderer-path)
+- [Visibility and readability](#visibility-and-readability)
+- [Diagnostics](#diagnostics)
+- [Validation](#validation)
+- [Current boundaries](#current-boundaries)
+- [Authored effect textures](#authored-effect-textures)
+- [Bounded GPU particle runtime](#bounded-gpu-particle-runtime)
+- [Industrial effects and shared decals](#industrial-effects-and-shared-decals)
+
+</details>
+
 ## Purpose
 
 ForgeLine VFX are a presentation consequence of authoritative simulation state. They communicate fire, impacts, damage, destruction, cargo handling, and battlefield resupply without determining hits, damage, transfers, movement, or destruction.
@@ -197,7 +223,6 @@ Final audio is separate. Repair effects remain deferred until repair gameplay ex
 ## Authored effect textures
 
 All 36 existing effect mesh sources now have normalized face UVs and sample the shared RGBA effect atlas through the ten stable material families. Emissive bindings are present for fire, flashes, sparks, projectiles and logistics transfer. Cell UV transforms, retained atlas mip depth and ordered alpha coverage avoid opaque rectangular backgrounds while preserving the existing pool, lifetime and distance budgets. See [effect source layout](../assets/source/vfx/textures/README.md).
-
 
 ## Bounded GPU particle runtime
 

@@ -1,5 +1,7 @@
 # UI typography
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Typeface and precompiled resources
 
 The Windows frontend and all normal gameplay HUD text use DejaVu Sans Regular/Bold, font version 2.35. Exact upstream revisions, font hashes and complete redistribution terms are in `assets/source/ui/fonts/README.md`, `metrics.json` and `LICENSE.txt`. The publisher copies the full notice to `ThirdPartyNotices/DejaVuFonts.txt`. Original TTF files, Python and font-authoring libraries do not ship and are never discovered from system fonts.

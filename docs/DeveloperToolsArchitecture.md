@@ -1,5 +1,23 @@
 # Developer tools foundation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and integration](#scope-and-integration)
+- [Build and capability](#build-and-capability)
+- [Existing command-line entry points](#existing-command-line-entry-points)
+- [Assembly direction and composition](#assembly-direction-and-composition)
+- [Requests, results and revision domains](#requests-results-and-revision-domains)
+- [Parameter registry](#parameter-registry)
+- [Initial state, history and presets](#initial-state-history-and-presets)
+- [File ownership handoff](#file-ownership-handoff)
+- [Current integration and acceptance](#current-integration-and-acceptance)
+- [Historical foundation acceptance](#historical-foundation-acceptance)
+
+</details>
+
 ## Scope and integration
 
 The foundation starts at master 20a6e0f6cbf4dbfadf5f2143a7a782b0db3b2c26

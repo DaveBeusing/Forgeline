@@ -1,5 +1,7 @@
 # Deterministic command replay
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The existing versioned journal and headless playback are the replay foundation.
 Use the current matching scenario/content and authoritative simulation schema;
 the journal is not a renderer recording or a cross-hardware lockstep guarantee.

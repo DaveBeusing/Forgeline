@@ -1,5 +1,32 @@
 # Building Placement and Construction
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Building definitions and footprints](#building-definitions-and-footprints)
+- [Placement grid and visible access](#placement-grid-and-visible-access)
+- [Placement preview](#placement-preview)
+- [Authoritative placement validation](#authoritative-placement-validation)
+- [Build command](#build-command)
+- [Resource reservation policy](#resource-reservation-policy)
+- [Construction state and progress](#construction-state-and-progress)
+- [Cancellation](#cancellation)
+- [Completion and capability activation](#completion-and-capability-activation)
+  - [Shared completed-building combat initialization](#shared-completed-building-combat-initialization)
+- [Construction diagnostics](#construction-diagnostics)
+- [Extractor placement](#extractor-placement)
+- [Tests and invariants](#tests-and-invariants)
+- [Current boundaries](#current-boundaries)
+- [Player action boundary](#player-action-boundary)
+- [Production presentation boundary](#production-presentation-boundary)
+- [Rotation during active placement](#rotation-during-active-placement)
+- [Paid construction templates](#paid-construction-templates)
+
+</details>
+
 ## Purpose
 
 Hold Shift when clicking a current valid placement to continue placing that building after its matching authoritative acceptance. Each click submits at most one request; held buttons cannot repeat. Submission acceptance only acknowledges the queue, and a pending request blocks further placement with explicit pending feedback. A rejected command keeps placement intent but invalidates the preview. A successful unmodified click ends placement. Releasing Shift after the click does not change the submitted continuation intent; the next unmodified successful click ends the sequence.
@@ -312,13 +339,11 @@ This slice intentionally does not implement:
 
 Those systems can build on `BuildingDefinition`, authoritative footprint occupancy, `ConstructionSite`, and `CompletedBuilding` without replacing the construction lifecycle.
 
-
 ## Player action boundary
 
 Catalog selection does not authorize construction. The palette reads immutable `PlayerActionSnapshot` data published at the completed-tick boundary and only selects a `BuildingId` for the existing placement controller. Placement still requires a current valid preview, and the eventual `BuildCommand` is revalidated authoritatively.
 
 Pointer input inside the action palette is captured before placement and world-selection processing. Switching to a production action mode cancels an active placement intent so panel input cannot become an unintended world click. Session changes invalidate the panel's transient mode and selection state.
-
 
 ## Production presentation boundary
 

@@ -1,5 +1,7 @@
 # Developer presets and reproduction
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Preset document
 
 Developer builds can save, import, export and validate a bounded JSON start

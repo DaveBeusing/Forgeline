@@ -1,5 +1,44 @@
 # ForgeLine Architecture
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Dependency Direction](#dependency-direction)
+- [Fundamental Rules](#fundamental-rules)
+- [Observability and Analysis Boundary](#observability-and-analysis-boundary)
+- [Persistence and Replay Boundary](#persistence-and-replay-boundary)
+- [Project Responsibilities](#project-responsibilities)
+  - [Low-Level Infrastructure](#low-level-infrastructure)
+  - [Simulation Foundation](#simulation-foundation)
+  - [Simulation Domains](#simulation-domains)
+  - [Game and Presentation](#game-and-presentation)
+  - [Tools](#tools)
+- [Simulation Baseline](#simulation-baseline)
+- [Shared Match Runtime Composition](#shared-match-runtime-composition)
+- [Headless Runtime](#headless-runtime)
+- [Rendering and Interaction Boundary](#rendering-and-interaction-boundary)
+  - [Presentation Lifetime Decision](#presentation-lifetime-decision)
+  - [Strategic map interaction boundary](#strategic-map-interaction-boundary)
+- [Performance Direction](#performance-direction)
+- [Hierarchical Navigation](#hierarchical-navigation)
+- [Artillery Authority Boundary](#artillery-authority-boundary)
+- [Tactical Combat and Readiness Boundary](#tactical-combat-and-readiness-boundary)
+- [Battlefield and Strategic Infrastructure Boundary](#battlefield-and-strategic-infrastructure-boundary)
+- [Skirmish Opponent Authority Boundary](#skirmish-opponent-authority-boundary)
+- [Interactive Execution Ownership](#interactive-execution-ownership)
+- [World presentation asset boundary](#world-presentation-asset-boundary)
+- [Render scratch ownership](#render-scratch-ownership)
+- [Runtime asset build and deployment](#runtime-asset-build-and-deployment)
+- [Compiled UI ownership](#compiled-ui-ownership)
+- [Developer tools foundation](#developer-tools-foundation)
+- [Explicit tactical geography and perception](#explicit-tactical-geography-and-perception)
+- [Copied contextual information](#copied-contextual-information)
+
+</details>
+
 ## Purpose
 
 ForgeLine Engine is the custom RTS engine for FORGELINE. Its architecture is optimized for large-scale deterministic-friendly simulation, high entity counts, predictable simulation cost, efficient multithreading, large worlds, hierarchical navigation, industrial/logistics simulation, headless execution, testability, replayability, and future multiplayer support.
@@ -241,8 +280,6 @@ See `docs/PresentationExtractionAndDebugging.md` for extraction timing, snapshot
 
 **Re-evaluate when.** Revisit the boundary when independent simulation execution is introduced, when networking/replay requires a different command transport, when snapshot copy cost is measured as material, or when a new player control needs data not represented by the bounded contracts. New controls extend these contracts rather than restoring live dynamic reads.
 
-
-
 ### Strategic map interaction boundary
 
 The minimap is presentation-owned navigation and command input. Camera jump/drag modifies only the presentation camera. Move, Attack, Attack Move, Retreat, and Fire Mission requests originating from the minimap reuse the same movement/tactical request and command boundaries as world-space interaction; the minimap does not schedule simulation commands directly.
@@ -250,7 +287,6 @@ The minimap is presentation-owned navigation and command input. Camera jump/drag
 Strategic overlays consume `StrategicOverlaySnapshot`, not developer-debug state. Logistics, Supply, Sensors, Navigation, and logical Power information is copied at the completed-tick boundary. Direct enemy entity targeting remains limited to identified intelligence. Detected contacts remain opaque keys/last-known intelligence suitable only for command paths that already support them.
 
 Power-network presentation reflects logical `PowerNetworkId` membership and operational state only. No physical transmission topology is modeled, so no physical power lines may be inferred or rendered from logical network membership.
-
 
 ## Performance Direction
 
@@ -264,7 +300,6 @@ Performance-sensitive decisions are benchmark-driven. The architecture targets a
 The simulation benchmark host includes empty and light fixed-tick workloads, representative sequential-versus-parallel scheduler range workloads, and spatial-query/update workloads over 10,000 indexed entries. Benchmark timing remains observational rather than a CI timing gate.
 
 These are engineering targets, not product promises.
-
 
 ## Hierarchical Navigation
 
@@ -290,11 +325,9 @@ See `docs/HierarchicalNavigation.md` for movement classes, request/result owners
 
 Multi-unit movement groups sit above this hierarchy. A group owns one strategic route/corridor and projects line, column, wedge, or compact formation slots around the active route direction. Stable per-member slot assignment, conservative speed harmonization, blocked-slot projection, lateral compression, and longitudinal cohort fallback remain game simulation concerns; local avoidance and final transform mutation remain in `GroundMovementSystem`. See `docs/FormationMovementAndGroupOrders.md` for the complete lifecycle and scale behavior.
 
-
 ## Artillery Authority Boundary
 
 Indirect fire extends the combat/intelligence boundary without reintroducing hidden entity access. `FireMissionCommand` creates a request; `ArtilleryFireMissionSystem` resolves that request after the Sensors phase to either a currently visible coordinate or a stored intelligence contact position. The resulting `FireMissionState` contains a fixed coordinate, not a target entity. Ballistic shell travel, terrain impact, area damage, Ammunition consumption, and Health/destruction remain authoritative fixed-tick simulation. Battlefield Supply may replenish the same Ammunition inventory after Combat, allowing a `NoAmmo` mission to resume on a later tick. See `docs/ArtilleryAndIndirectFire.md`.
-
 
 ## Tactical Combat and Readiness Boundary
 
@@ -307,7 +340,6 @@ Phase-5 tactical behavior preserves the command/simulation split. Combat command
 `CombatReadinessSystem` runs in `SnapshotEvents` and derives unit/group summaries from authoritative Health, inventory quantities, mobility, weapon state, supply state, and surviving members. Readiness is observation, not a substitute source of gameplay truth.
 
 See `docs/CombatOrdersAndReadiness.md`. Directorate faction data, stable unit definitions, cross-catalog content validation, deterministic unit-production queues, and generic unit entity composition live here because they coordinate existing economy, logistics, movement, combat, intelligence, and supply domains without moving ownership out of those domains.
-
 
 ## Battlefield and Strategic Infrastructure Boundary
 
@@ -322,7 +354,6 @@ Paid repair is owned by that same infrastructure system and restoration loop. Re
 `MatchObjectiveSystem` owns match completion state. Command Core objective registration adds the normal combat-target components required by the existing targeting, damage, and entity-lifecycle systems rather than introducing objective-specific damage. Presentation may visualize map landmarks and infrastructure state, but it never decides reachability, restoration, or victory.
 
 See `docs/CentralDivideBattlefield.md`.
-
 
 ## Skirmish Opponent Authority Boundary
 
@@ -339,7 +370,6 @@ The existing combat-command layer remains the group authority. Attack and Attack
 Headless integration uses SkirmishScenarioHarness to compose the same authoritative systems for two symmetric opponents. Deterministic scenarios verify knowledge boundaries and bounded Build–Supply–Conquer progression in regular CI. Terminal full-match soak execution uses the same composition outside the regular CI duration budget until long-horizon logistics endurance is reliable enough for a deterministic merge gate.
 
 See docs/SkirmishOpponent.md.
-
 
 ## Interactive Execution Ownership
 

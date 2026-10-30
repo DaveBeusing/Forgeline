@@ -1,9 +1,26 @@
 # Directorate operational building production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Starting master: `63569ac2031b4b89c57c55c02b2aa20244d34df9` (0.1.349).
 Repository, remote branches, open/closed PRs, gameplay/presentation, tests, CI,
 architecture and repository policy were reviewed before source authoring. No
 matching open PR or reusable remote operational-building branch existed.
+
+<details>
+<summary>On this page</summary>
+
+- [Inventory and dimensional brief](#inventory-and-dimensional-brief)
+- [Editable sources and export ownership](#editable-sources-and-export-ownership)
+- [State, mechanics and circulation](#state-mechanics-and-circulation)
+- [Materials and provenance](#materials-and-provenance)
+- [Qualification](#qualification)
+- [Review images and acceptance boundaries](#review-images-and-acceptance-boundaries)
+- [Reproduce and validate](#reproduce-and-validate)
+- [Integration with industrial building production](#integration-with-industrial-building-production)
+- [Integration with logistics building production](#integration-with-logistics-building-production)
+
+</details>
 
 ## Inventory and dimensional brief
 
@@ -136,7 +153,6 @@ No still image or finite benchmark establishes human art signoff, moving-camera
 LOD acceptance, live unit spawning, extended device/resize soak, sustained
 60 FPS or complete borderless acceptance. Required GitHub checks are inspected
 only after the branch is published.
-
 
 Native capture baseline is `eebfbb15006e723109fab269eaba51cda2842265`; final
 source/camera revision is `db6a121fbb53804ad533719cec085e56d5d492a2`. Final runtime
@@ -277,7 +293,6 @@ Gameplay/content tests retain the authoritative definitions; no simulation file
 is changed. Version advances once from 0.1.349 to 0.1.350; remote build-test,
 rendering/asset workflows and final art/borderless gates still require inspection
 when published. No merge or release is implied by local qualification.
-
 
 Final full Release suite: 1,779 total, 1,770 successful, nine optional skips,
 zero failures, 8m34.452s. Command:

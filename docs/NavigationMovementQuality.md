@@ -1,5 +1,28 @@
 # Navigation and Movement Quality
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Goal and Baseline](#goal-and-baseline)
+- [Implemented Changes](#implemented-changes)
+  - [Local route search](#local-route-search)
+  - [Cached regional routes and work accounting](#cached-regional-routes-and-work-accounting)
+  - [Precise arrival and collision safety](#precise-arrival-and-collision-safety)
+  - [Mechanical presentation continuity](#mechanical-presentation-continuity)
+- [Regression Coverage](#regression-coverage)
+- [Reproduction](#reproduction)
+- [Acceptance Boundaries](#acceptance-boundaries)
+- [Remaining Design Work](#remaining-design-work)
+  - [Clearance-aware continuous routes](#clearance-aware-continuous-routes)
+  - [Vehicle motion character](#vehicle-motion-character)
+  - [Dense formations and traffic](#dense-formations-and-traffic)
+  - [Visual and command readability](#visual-and-command-readability)
+- [Related Documentation](#related-documentation)
+
+</details>
+
 ## Goal and Baseline
 
 Improve route-search efficiency, precise local arrival, obstacle safety and mechanical visual continuity without replacing hierarchical navigation, changing unit speed balance or coupling simulation to rendering.

@@ -1,5 +1,7 @@
 # World environment rendering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The production client combines bounded terrain GPU residency, existing four-layer materials, instanced vegetation and scene-depth atmosphere. Appearance consumes copied presentation inputs. Authoritative heightfields, navigation, collision, cover, simulation time, intelligence and Fog of War remain unchanged.
 
 ## Terrain residency
@@ -67,9 +69,7 @@ The clean rendering-source Windows x64 development package passes two-publish ma
 
 Exact final-head CI supplies repository-wide checks. Physical-monitor readability, accepted art goldens, long traversal/resize soak, real device removal and sustained live 60 FPS remain unqualified. Documentation-only evidence updates after the rendering source do not change the measured binaries.
 
-
 Short live tracks now use the shared presentation decal pool for vehicles owned by the viewing faction. They use existing movement history and eight-tick sampling, without regenerating terrain control maps or authoring enemy movement trails. Broad public surface wear remains owned by ITerrainSurfaceMarkSource. Impact marks align their plane with the sampled terrain normal; they do not deform height or navigation. See [combat and industrial rendering](CombatIndustrialRendering.md).
-
 
 ## Chunk decoration rendering
 

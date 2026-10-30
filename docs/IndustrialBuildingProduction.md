@@ -1,5 +1,26 @@
 # Directorate industrial building production
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and retained contracts](#scope-and-retained-contracts)
+- [Dimensional and visual brief](#dimensional-and-visual-brief)
+- [Editable sources and exports](#editable-sources-and-exports)
+- [Material and anchor contracts](#material-and-anchor-contracts)
+- [State integration](#state-integration)
+- [Qualification procedure](#qualification-procedure)
+- [Recorded qualification](#recorded-qualification)
+  - [Matched High / 1920x1080 cost](#matched-high--1920x1080-cost)
+  - [Original before/after images](#original-beforeafter-images)
+  - [Reproduce final native matrix](#reproduce-final-native-matrix)
+  - [Remaining acceptance](#remaining-acceptance)
+  - [Build, test and canonical smoke results](#build-test-and-canonical-smoke-results)
+  - [Reproducible package and installed smoke](#reproducible-package-and-installed-smoke)
+
+</details>
+
 ## Scope and retained contracts
 
 The five existing Extractor, Smelter, Electronics Plant, Fuel Refinery and
@@ -139,7 +160,6 @@ matched quality/resolution/driver and no overlapping GPU workload. Compare full
 resolution images and resource/CPU/GPU distributions with the baseline, not WARP
 performance. Structural tests and captures do not replace final human art signoff.
 
-
 ## Recorded qualification
 
 The baseline capture is `2b3f585868b99210ff8fe9a893bf301fd1aa93db` (0.1.349-dev+2b3f585868b99210ff8fe9a893bf301fd1aa93db); final model capture is
@@ -263,7 +283,6 @@ Physical-monitor DPI changes, arbitrary moving-camera LOD transitions, deposit-
 conforming terrain seating and an extended device/resize soak are not qualified
 by these frozen galleries. The local D3D12 debug layer is unavailable; zero
 reported debug messages with the layer disabled is not debug-layer validation.
-
 
 ### Build, test and canonical smoke results
 

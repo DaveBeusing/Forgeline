@@ -1,5 +1,23 @@
 # Compiled UI atlases and skin rendering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and contract](#scope-and-contract)
+- [Authoring and color](#authoring-and-color)
+- [Ownership and preparation](#ownership-and-preparation)
+- [Drawing and painter order](#drawing-and-painter-order)
+- [Budgets and diagnostics](#budgets-and-diagnostics)
+- [Qualification](#qualification)
+- [Frontend consumer update](#frontend-consumer-update)
+- [Battlefield consumer update](#battlefield-consumer-update)
+- [Economic HUD consumers](#economic-hud-consumers)
+- [Tactical consumers](#tactical-consumers)
+
+</details>
+
 ## Scope and contract
 
 Based on master `810011c8471a4cc5e1291c96411e47a7008fe9b2` (0.1.374),

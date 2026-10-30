@@ -1,10 +1,23 @@
 # Biome and ecology fields
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ForgeLine.World provides static environment queries over an immutable ITerrainQuery
 and the versioned world-generation recipe. No ECS, window, graphics, weather,
 hydrology, erosion, vegetation instances or material/shader integration is added.
 Existing terrain queries, authored map bytes, scenario loading, navigation and
 save/replay schemas retain their existing behavior.
+
+<details>
+<summary>On this page</summary>
+
+- [Inputs and ownership](#inputs-and-ownership)
+- [Continuous climate and soil](#continuous-climate-and-soil)
+- [Biome rules and surface constraints](#biome-rules-and-surface-constraints)
+- [Compact rasters, cache and identity](#compact-rasters-cache-and-identity)
+- [Reference and validation](#reference-and-validation)
+
+</details>
 
 ## Inputs and ownership
 

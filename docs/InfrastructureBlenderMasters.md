@@ -1,5 +1,7 @@
 # Road, bridge and crossing Blender sources
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Current master includes world-prop PR #283 at
 `34c69dd97db417d1982fd7bf75cb1baa197082f6` (0.1.438). This branch uses
 0.1.439 and reuses its six shared transition definitions and native masters.

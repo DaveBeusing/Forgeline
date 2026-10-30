@@ -1,8 +1,25 @@
 # Resource deposit Blender masters
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The canonical geometry now uses [modular cluster sources](ResourceDepositClusterGeometry.md).
 The preserved sources, screenshots and results below remain historical evidence
 of their original geometry and revisions; they do not qualify the replacement clusters.
+
+<details>
+<summary>On this page</summary>
+
+- [Current review status](#current-review-status)
+- [Infantry integration validation](#infantry-integration-validation)
+- [Visible change and gameplay boundary](#visible-change-and-gameplay-boundary)
+- [Audit and synchronization](#audit-and-synchronization)
+- [Authoring and source ownership](#authoring-and-source-ownership)
+- [Reproduction](#reproduction)
+- [Observed validation](#observed-validation)
+- [Runtime, images and package evidence](#runtime-images-and-package-evidence)
+- [Remaining acceptance gates](#remaining-acceptance-gates)
+
+</details>
 
 ## Current review status
 

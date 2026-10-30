@@ -1,5 +1,26 @@
 # Resource Deposits and Extraction
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Resource definitions](#resource-definitions)
+- [Deposit state](#deposit-state)
+- [Extractor association](#extractor-association)
+- [Fixed-tick extraction](#fixed-tick-extraction)
+- [Ownership and eligibility](#ownership-and-eligibility)
+- [Output handoff](#output-handoff)
+- [Power integration](#power-integration)
+- [Diagnostics and read models](#diagnostics-and-read-models)
+- [Headless validation](#headless-validation)
+- [Benchmarks](#benchmarks)
+- [Architectural boundaries](#architectural-boundaries)
+- [Vertical Slice resource presentation](#vertical-slice-resource-presentation)
+
+</details>
+
 ## Purpose
 
 FORGELINE models raw resources as finite physical deposits in the simulation world. Extraction is authoritative fixed-tick simulation state and remains independent of rendering, UI, storage, transport, processing, and market systems.

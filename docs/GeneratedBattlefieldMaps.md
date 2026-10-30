@@ -1,5 +1,7 @@
 # Generated battlefield maps
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The generated map path is explicitly selected. Authored Central Divide and Split Basin still use ScenarioRegistry's pinned registrations and BattlefieldMapArtifact format 4 with its unchanged 4 MiB limit. Generated packages are not registered by searching directories or reading save-supplied paths.
 
 ## Pipeline and supported recipes

@@ -1,5 +1,7 @@
 # Directorate Main Battle Tank production brief
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The bounded [armor finish refinement](TankSurfaceRefinement.md) records the current
 static armor UV migration, isolated tank review loads and separate acceptance gates.
 
@@ -61,6 +63,20 @@ tangents, socket and range coverage, aim/recoil alignment, pause/session reset,
 LOD/state rendering, repeated tanks, native reference displays and canonical
 1,000-instance smoke. Static camera evidence is not artistic approval or
 continuous lifecycle/physical-display acceptance. Results follow qualification.
+
+<details>
+<summary>On this page</summary>
+
+- [Editable source and reproduction](#editable-source-and-reproduction)
+- [Runtime mapping and detail levels](#runtime-mapping-and-detail-levels)
+- [Rigid motion and authority](#rigid-motion-and-authority)
+- [Local qualification](#local-qualification)
+- [Native reference evidence](#native-reference-evidence)
+- [Visual observations and pending acceptance](#visual-observations-and-pending-acceptance)
+- [Blender source preservation](#blender-source-preservation)
+- [Bounded Blender surface review](#bounded-blender-surface-review)
+
+</details>
 
 ## Editable source and reproduction
 

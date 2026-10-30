@@ -1,5 +1,25 @@
 # Simulation Runtime
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Fixed-Tick Semantics](#fixed-tick-semantics)
+- [Canonical Phase Order](#canonical-phase-order)
+- [Command Boundary](#command-boundary)
+- [Simulation State and ECS](#simulation-state-and-ecs)
+- [Parallel Simulation Jobs](#parallel-simulation-jobs)
+- [Random Number Ownership](#random-number-ownership)
+- [Metrics](#metrics)
+- [Headless Execution](#headless-execution)
+- [Deterministic-Friendly Contract](#deterministic-friendly-contract)
+- [Interactive Execution Owner](#interactive-execution-owner)
+  - [Control transitions without gameplay advancement](#control-transitions-without-gameplay-advancement)
+
+</details>
+
 ## Purpose
 
 ForgeLine Simulation provides the deterministic-friendly execution boundary shared by interactive and headless game composition.
@@ -157,7 +177,6 @@ Required practices are:
 - keep headless and interactive simulation execution on the same runtime contracts.
 
 Rollback, replay persistence, savegame persistence, networking, and domain gameplay commands remain outside this runtime foundation and must preserve these contracts when introduced.
-
 
 ## Interactive Execution Owner
 

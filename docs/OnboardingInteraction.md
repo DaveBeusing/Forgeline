@@ -1,5 +1,7 @@
 # Early logistics guidance
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The optional opening guide stays at the top left of the available safe area. Its
 panel uses alpha 0.84 and opaque text, a 220 ms SmoothStep collapse, HINT > restore
 and Shift+F12. Reduced Motion and interrupted presentation settle the logical

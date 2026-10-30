@@ -1,5 +1,38 @@
 # Cargo Transport Operations
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Cargo Truck Definition](#cargo-truck-definition)
+- [Transport Orders](#transport-orders)
+- [Lifecycle](#lifecycle)
+  - [Idle](#idle)
+  - [ToOrigin](#toorigin)
+  - [Loading](#loading)
+  - [ToDestination](#todestination)
+  - [Unloading](#unloading)
+  - [Waiting](#waiting)
+  - [Failed](#failed)
+- [Partial-Load Policy](#partial-load-policy)
+  - [AllowPartial](#allowpartial)
+  - [RequireRequestedQuantity](#requirerequestedquantity)
+- [Origin and Destination Inventory Resolution](#origin-and-destination-inventory-resolution)
+- [Route Integration](#route-integration)
+- [Route Versioning and Rerouting](#route-versioning-and-rerouting)
+- [Destination Capacity](#destination-capacity)
+- [Vehicle Destruction and Cargo Loss](#vehicle-destruction-and-cargo-loss)
+- [Resource Conservation](#resource-conservation)
+- [Diagnostics](#diagnostics)
+- [Validation](#validation)
+- [Current Boundary](#current-boundary)
+- [Player-Facing Cargo Status](#player-facing-cargo-status)
+- [Autonomous propulsion Fuel service](#autonomous-propulsion-fuel-service)
+
+</details>
+
 ## Purpose
 
 Physical cargo transport connects aggregate inventories through visible ground transport vehicles without turning individual resource units into world entities.

@@ -1,5 +1,7 @@
 # Graphical battlefield HUD
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The player HUD contains the right-aligned resource/power strip, notifications,
 minimap, guidance, assigned-group overview, Operations and the existing single/group
 action rings. The rectangular ActionBar/Action Dock, global mode bar, contextual
@@ -14,6 +16,18 @@ available global actions; no new key binding is introduced. Mouse item release
 executes its existing action once. Parameters, Next item, Back and paging retain
 the established request/controller semantics. Missing sectors, center and gaps
 remain world input. Central outside dismissal preserves the original world gesture.
+
+<details>
+<summary>On this page</summary>
+
+- [Selection and result information](#selection-and-result-information)
+- [Shared responsive layout](#shared-responsive-layout)
+- [Rendering and asset ownership](#rendering-and-asset-ownership)
+- [Historical resource qualification](#historical-resource-qualification)
+- [Subsequent economic content integration](#subsequent-economic-content-integration)
+- [Subsequent tactical integration](#subsequent-tactical-integration)
+
+</details>
 
 ## Selection and result information
 

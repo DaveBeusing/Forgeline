@@ -1,5 +1,7 @@
 # Startup Timing and Readiness
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Startup diagnostics are automatic for interactive launches and owned by the Windows client. They do not change simulation ticks, command ordering, snapshot hashes, splash duration or readiness decisions.
 
 ## Collection and correlations

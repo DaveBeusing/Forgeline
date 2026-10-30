@@ -1,5 +1,21 @@
 # Renderer feature inventory
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and evidence](#scope-and-evidence)
+- [End-to-end matrix](#end-to-end-matrix)
+- [Capture coverage](#capture-coverage)
+- [Fallback semantics](#fallback-semantics)
+- [Pass and shader registration](#pass-and-shader-registration)
+- [Limits retained after classification](#limits-retained-after-classification)
+- [Documentation corrections and remaining work](#documentation-corrections-and-remaining-work)
+- [Observed validation gaps](#observed-validation-gaps)
+
+</details>
+
 ## Scope and evidence
 
 Code baseline: `421d5a21416b6bf3fc1675311d49d161d87f57da` (`master`,

@@ -1,5 +1,41 @@
 # Save, Load, Replay, and Recovery
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Guided practice compatibility](#guided-practice-compatibility)
+- [Recovery Model](#recovery-model)
+- [Compiled Scenario Compatibility](#compiled-scenario-compatibility)
+- [File Format](#file-format)
+- [Save Payload](#save-payload)
+- [Replay Payload](#replay-payload)
+- [Supported Recorded Commands](#supported-recorded-commands)
+- [Headless Usage](#headless-usage)
+- [Failure Handling](#failure-handling)
+- [Determinism Boundary](#determinism-boundary)
+- [Validation](#validation)
+- [Match composition migration](#match-composition-migration)
+- [Intentional pause and host pacing](#intentional-pause-and-host-pacing)
+- [Reliability evidence](#reliability-evidence)
+- [Operations control checkpoints](#operations-control-checkpoints)
+- [Tactical supply and accepted convoy checkpoints](#tactical-supply-and-accepted-convoy-checkpoints)
+  - [Active logistics raid reconstruction](#active-logistics-raid-reconstruction)
+- [Opponent progression compatibility](#opponent-progression-compatibility)
+- [Conveyor routing compatibility](#conveyor-routing-compatibility)
+- [Connected vehicle routing compatibility](#connected-vehicle-routing-compatibility)
+- [Bridge combat and repair compatibility](#bridge-combat-and-repair-compatibility)
+- [Queued unit orders and patrol compatibility](#queued-unit-orders-and-patrol-compatibility)
+- [Fleet scheduling compatibility](#fleet-scheduling-compatibility)
+- [Cover and visual occlusion compatibility](#cover-and-visual-occlusion-compatibility)
+- [Committed inbound storage compatibility](#committed-inbound-storage-compatibility)
+- [Cooperative replay verification](#cooperative-replay-verification)
+- [Generated map package identity](#generated-map-package-identity)
+
+</details>
+
 ## Purpose
 
 FORGELINE persists match recovery data from authoritative simulation state and deterministic inputs. Persistence never serializes renderer, window, UI, audio, or presentation ownership.
@@ -229,7 +265,6 @@ Each active checkpoint serializes saves and replay documents, reconstructs with 
 
 The active-detour recovery fixture uses a reproducible 64 m flat battlefield with a wall across the direct path, normal player movement and the production navigation/movement systems. It verifies an active refined route outside the blocked span, save/replay hash equality immediately and after 1, 8, 20 and 620 cumulative ticks, then normal arrival with no pending or active route.
 
-
 ### Active logistics raid reconstruction
 
 The bounded raid intent is an ordinary authoritative component. Member and target generations, contact cursor, last known/ordered coordinates and stable tick deadlines participate in the complete hash. Candidate rankings and debug caches are derived. Existing tactical player commands and internal opponent scheduling regenerate the intent without a new external command codec.
@@ -344,7 +379,6 @@ See [committed inbound admission](adr/CommittedInboundStorageAdmission.md).
 ## Cooperative replay verification
 
 Headless load and replay now use the existing shutdown token. PlayReplayCancellable and PlayDeveloperReplayCancellable retain isolated reconstruction, capability and final full-hash checks, with optional completed-tick progress and bounded intermediate comparison samples. See [Deterministic command replay](DeterministicCommandReplay.md) for command admission semantics, sample normalization, stop behavior and determinism limits. Envelope 1, payload 11 and authoritative schema 18 remain unchanged.
-
 
 ## Generated map package identity
 

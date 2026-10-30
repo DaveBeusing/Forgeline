@@ -1,5 +1,7 @@
 # Conveyor models and belt motion
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Implementation baseline: master `165b7d644e6660c34cb03fa725a0d6e0bf34f024`
 (0.1.446), including the existing conveyor visual-kit design from PR #291.
 Final integration also includes master
@@ -10,6 +12,19 @@ Tests, runtime/camera smokes, clearance qualification, LOD acceptance and CI tes
 runs were deliberately not executed at the user's request. Manual review remains
 outstanding. No conveyor simulation, construction UX or building transfer rule
 is added by this source package.
+
+<details>
+<summary>On this page</summary>
+
+- [Delivered source kit](#delivered-source-kit)
+- [Units, origin and sockets](#units-origin-and-sockets)
+- [States and animation](#states-and-animation)
+- [Collision, selection, supports and terrain](#collision-selection-supports-and-terrain)
+- [Materials and LOD handoff](#materials-and-lod-handoff)
+- [Build result](#build-result)
+- [Re-authoring and manual review](#re-authoring-and-manual-review)
+
+</details>
 
 ## Delivered source kit
 

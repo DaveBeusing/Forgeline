@@ -1,11 +1,35 @@
 # Conveyor simulation and vehicle interoperability
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Reliability qualification: **0.1.462**, [PR #341](https://github.com/DaveBeusing/Forgeline/pull/341),
 based on `master` `b397bd6f19384e4a8a20aea11f9291f918201943`.
 The original finite-flow implementation arrived in [PR #302](https://github.com/DaveBeusing/Forgeline/pull/302).
 The executable contracts and measured workloads below supersede its compile-only
 qualification. Automated behavior, hosted CI and native visual/hardware acceptance
 are recorded separately; an unreached required gate is not a pass.
+
+<details>
+<summary>On this page</summary>
+
+- [Flow authority](#flow-authority)
+- [Activated building ports](#activated-building-ports)
+- [Trucks, stock policy and recovery](#trucks-stock-policy-and-recovery)
+- [Vehicle clearance and presentation](#vehicle-clearance-and-presentation)
+- [Persistence and reconstruction](#persistence-and-reconstruction)
+- [Material accounting and production chains](#material-accounting-and-production-chains)
+- [Historical implementation evidence](#historical-implementation-evidence)
+- [Active-network measurements](#active-network-measurements)
+  - [Allocation correction and equivalent workloads](#allocation-correction-and-equivalent-workloads)
+- [Historical integration dependencies](#historical-integration-dependencies)
+- [Synchronized integration checkpoint](#synchronized-integration-checkpoint)
+- [Reproduction and acceptance boundaries](#reproduction-and-acceptance-boundaries)
+- [Bounded player priority routing](#bounded-player-priority-routing)
+  - [Arbitration and starvation bound](#arbitration-and-starvation-bound)
+  - [Commands, snapshots and recovery](#commands-snapshots-and-recovery)
+  - [Acceptance still required](#acceptance-still-required)
+
+</details>
 
 ## Flow authority
 
@@ -187,6 +211,7 @@ real BuildCommands and unmodified construction costs.
 For each resource independently, the ledger checks:
 
 `closing inventory = opening inventory + extracted quantity - committed recipe inputs
+
 + committed recipe outputs - construction costs - recorded unit consumption`.
 
 Inventory totals include source stock, production input and output inventories,

@@ -1,5 +1,23 @@
 # UI motion and interface audio
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Notification entry and inline detail tracks](#notification-entry-and-inline-detail-tracks)
+- [World-anchored radial visual track](#world-anchored-radial-visual-track)
+- [Notification and context-hint motion](#notification-and-context-hint-motion)
+- [Motion vocabulary](#motion-vocabulary)
+- [Intent and results](#intent-and-results)
+- [Settings and compatibility](#settings-and-compatibility)
+- [Audio ownership and content](#audio-ownership-and-content)
+- [Qualification](#qualification)
+- [Sliding onboarding exception](#sliding-onboarding-exception)
+- [Operations panel skin motion](#operations-panel-skin-motion)
+
+</details>
+
 ## Notification entry and inline detail tracks
 
 New cards reveal from the right edge to their settled right-aligned bounds
@@ -12,7 +30,6 @@ alpha and full-intensity severity cues are retained. Reduced motion, Low
 quality, changed presentation geometry, focus loss, a >250-ms time discontinuity
 or a reset session settle the track immediately. This feature adds no sound
 and does not acknowledge or delete a critical alert.
-
 
 Own single buildings and units now use [world anchored action rings](WorldAnchoredActionMenus.md). Selection release opens categories; the global mode bar and bound keys open the same ring. Click an item to act immediately. Parameters exposes existing priority, mode, thresholds and queue cancellation before activation; Next item selects the edited item. Back / previous / next page remain fixed controls. The inner hole and gaps allow world input; outside clicks dismiss centrally. The inspector remains informational. Multi-selection uses the same [group action rings](GroupActionMenus.md). Closed/fading rings own no input; alpha transitions last 160 ms and reduced/Low modes settle immediately.
 

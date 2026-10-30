@@ -1,11 +1,25 @@
 # Resource deposit variant rendering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Final integration base: `master` at `c8da15fce589b661de2813683b22aa77fa1bd7e2`
 (product 0.1.457), including the field producer and renderer inventory. Geometry,
 visual-language and PBR source PRs are integrated.
 This change binds those assets through the existing instanced renderer. No new
 renderer, pass, vertex format, simulation component, authoritative resource rule,
 HUD action, cargo behavior, save format or gameplay picking volume is introduced.
+
+<details>
+<summary>On this page</summary>
+
+- [Copied selection and stable identity](#copied-selection-and-stable-identity)
+- [LOD, bounds, visibility and lifetime](#lod-bounds-visibility-and-lifetime)
+- [Failure matrix](#failure-matrix)
+- [Diagnostics and review scenes](#diagnostics-and-review-scenes)
+- [Field integration](#field-integration)
+- [Execution and manual acceptance — NOT EXECUTED](#execution-and-manual-acceptance--not-executed)
+
+</details>
 
 ## Copied selection and stable identity
 

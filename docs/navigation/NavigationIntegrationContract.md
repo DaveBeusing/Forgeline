@@ -1,5 +1,34 @@
 # Navigation integration contract
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Revision and current state](#revision-and-current-state)
+- [Exclusive implementation slots](#exclusive-implementation-slots)
+- [Snapshot ownership and thread access](#snapshot-ownership-and-thread-access)
+- [Existing-data adapters and order identity](#existing-data-adapters-and-order-identity)
+- [Work accounting and search failure contract](#work-accounting-and-search-failure-contract)
+- [Collision, traffic and motion contract](#collision-traffic-and-motion-contract)
+- [Mapping to existing simulation phases](#mapping-to-existing-simulation-phases)
+- [State capture and restore](#state-capture-and-restore)
+- [Visibility, configuration and completion boundary](#visibility-configuration-and-completion-boundary)
+- [Public C# signature directory](#public-c-signature-directory)
+  - [Navigation configuration and state transfer](#navigation-configuration-and-state-transfer)
+  - [World snapshot](#world-snapshot)
+  - [Search kernel and route output](#search-kernel-and-route-output)
+  - [Physical geometry](#physical-geometry)
+  - [Regional publications](#regional-publications)
+  - [Game bindings and adapters](#game-bindings-and-adapters)
+  - [Traffic and reservations](#traffic-and-reservations)
+  - [Fixed-tick motion proposals](#fixed-tick-motion-proposals)
+  - [Fleet scheduling](#fleet-scheduling)
+  - [Copied diagnostics](#copied-diagnostics)
+- [Connected fleet phases and state](#connected-fleet-phases-and-state)
+
+</details>
+
 ## Revision and current state
 
 Contract revision **4** is `NavigationIntegrationContract.Revision`. The namespace roots remain `ForgeLine.Navigation` and `ForgeLine.Game`. Folders express ownership; no project or dependency is added.

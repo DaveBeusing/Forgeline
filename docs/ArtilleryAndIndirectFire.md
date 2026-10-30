@@ -1,5 +1,44 @@
 # Artillery and Indirect Fire
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Core Authority Rule](#core-authority-rule)
+- [Artillery Weapon Definition](#artillery-weapon-definition)
+- [Fire Mission Commands](#fire-mission-commands)
+- [Target Information Rules](#target-information-rules)
+  - [Coordinate Mission](#coordinate-mission)
+  - [Contact Mission](#contact-mission)
+- [Range Validation](#range-validation)
+- [Mission Lifecycle](#mission-lifecycle)
+  - [Ordered](#ordered)
+  - [Acquiring](#acquiring)
+  - [Firing](#firing)
+  - [WaitingReload](#waitingreload)
+  - [NoAmmo](#noammo)
+  - [Complete](#complete)
+  - [Cancelled](#cancelled)
+- [Ammunition](#ammunition)
+- [Battlefield Resupply](#battlefield-resupply)
+- [Projectile Travel Model](#projectile-travel-model)
+- [Dispersion](#dispersion)
+- [Terrain Impact](#terrain-impact)
+- [Area Damage](#area-damage)
+- [Armor Interaction](#armor-interaction)
+- [Combat Events](#combat-events)
+- [Diagnostics](#diagnostics)
+- [Debug Visualization](#debug-visualization)
+- [Phase Ordering](#phase-ordering)
+- [Correctness Coverage](#correctness-coverage)
+- [Performance Coverage](#performance-coverage)
+- [Deferred Refinements](#deferred-refinements)
+- [Human Player Fire Missions](#human-player-fire-missions)
+
+</details>
+
 ## Purpose
 
 FORGELINE indirect fire connects battlefield intelligence, coordinate-based fire missions, authoritative Ammunition, ballistic shell travel, terrain impact, radial damage, and battlefield resupply.

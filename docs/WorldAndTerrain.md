@@ -1,6 +1,32 @@
 # World and Terrain
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Terrain appearance continues to belong to Presentation and compiled material assets. Surface detail, slope-adaptive UVs, smoother blend regions and decorative plant motion do not change the authoritative heightfield, terrain normals, navigation, collision, concealment or intelligence. See [World Asset Presentation](WorldAssetPresentation.md) for authoring and [Bounded Terrain Surface Refinement](adr/BoundedTerrainSurfaceRefinement.md) for ownership and qualification.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [World Coordinate System](#world-coordinate-system)
+- [Chunk and Region Dimensions](#chunk-and-region-dimensions)
+- [Heightfield Semantics](#heightfield-semantics)
+- [Terrain World](#terrain-world)
+- [Terrain Mesh Generation](#terrain-mesh-generation)
+- [Rendering Ownership](#rendering-ownership)
+- [Material and Shader](#material-and-shader)
+- [Frustum Culling](#frustum-culling)
+- [Debug Visualization](#debug-visualization)
+- [Camera Traversal](#camera-traversal)
+- [Headless Use](#headless-use)
+- [Validation](#validation)
+- [Benchmarks](#benchmarks)
+- [Canonical Vertical Slice operational geography](#canonical-vertical-slice-operational-geography)
+- [Vertical Slice presentation baseline](#vertical-slice-presentation-baseline)
+- [Deterministic generation contracts](#deterministic-generation-contracts)
+- [Biome terrain materials](#biome-terrain-materials)
+
+</details>
 
 ## Purpose
 
@@ -225,7 +251,6 @@ diagnostics and bounded caching; rendering/scatter integration remains separate.
 The opt-in [seeded landform factory](ProceduralTerrain.md) implements a separate
 versioned height evaluator, flat/drainage masks and headless diagnostics on those
 contracts. Existing authored maps continue to use their original recipes.
-
 
 ## Biome terrain materials
 

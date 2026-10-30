@@ -1,5 +1,7 @@
 # Strategic map balance audit
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The offline audit extends existing compiled-map qualification. It reads authored
 geometry and the registered, digest-checked artifacts; it never starts a client,
 allocates a match, advances ticks or changes navigation, resources or rules.

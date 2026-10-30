@@ -1,5 +1,33 @@
 # Skirmish Opponent
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Authority and Knowledge Boundary](#authority-and-knowledge-boundary)
+- [Decision Layers](#decision-layers)
+- [Strategic State](#strategic-state)
+- [Opening and Economy](#opening-and-economy)
+- [Expansion](#expansion)
+- [Production and Force Composition](#production-and-force-composition)
+- [Reconnaissance and Intelligence](#reconnaissance-and-intelligence)
+- [Combat Groups and Formations](#combat-groups-and-formations)
+- [Defense, Offense, Resupply, and Retreat](#defense-offense-resupply-and-retreat)
+- [Configuration](#configuration)
+- [Diagnostics](#diagnostics)
+- [Headless Validation](#headless-validation)
+- [Current Limitations](#current-limitations)
+- [Bounded logistics raids](#bounded-logistics-raids)
+  - [Executed scenario and acceptance limits](#executed-scenario-and-acceptance-limits)
+- [Core progression and production recovery](#core-progression-and-production-recovery)
+  - [Reading a blocked decision](#reading-a-blocked-decision)
+  - [Delivery and remaining manual work](#delivery-and-remaining-manual-work)
+- [Named fair difficulty policies](#named-fair-difficulty-policies)
+
+</details>
+
 ## Purpose
 
 The vertical-slice skirmish opponent is a deterministic-friendly strategic controller for the Directorate on the Central Divide battlefield. Its purpose is to exercise the complete Build-Supply-Conquer loop through the same authoritative simulation rules and command paths available to a player.
@@ -186,7 +214,6 @@ The normal gameplay profile keeps the product-facing starting stock, default str
 The first opponent deliberately does not include build-order search or economic optimization, opponent modeling, personalities, diplomacy, doctrine variants, learned behavior, dynamic difficulty, deception planning, advanced multi-front force allocation, persistent named task forces across strategic replans, predictive artillery against stale contacts, or campaign scripting.
 
 These are future strategy-layer capabilities and must preserve the same knowledge and authority boundaries if added.
-
 
 ## Bounded logistics raids
 

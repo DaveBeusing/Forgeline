@@ -1,5 +1,7 @@
 # Frontend layout contract
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 `ForgeLine.UI` owns focus, list windows and hit testing. `ForgeLine.Presentation` exposes the
 passive `FrontendGeometry`/`FrontendRegion` value contract and renders it. This uses the
 existing UI → Presentation reference without adding a reverse reference. The Client platform
@@ -7,6 +9,18 @@ owner resolves one physical-pixel layout and passes its exact value through
 `FrontendSurfaceView.Layout` to the render owner. A renderer-only caller may resolve a default
 96-DPI layout; normal window frontend and modal input always publish their actual layout.
 `GameplayHudLayout` and its command/action dock are independent.
+
+<details>
+<summary>On this page</summary>
+
+- [Regions and state](#regions-and-state)
+- [Responsive rules](#responsive-rules)
+- [Old-to-new mapping](#old-to-new-mapping)
+- [Lifecycle](#lifecycle)
+- [Menu sections and full-screen presentation](#menu-sections-and-full-screen-presentation)
+- [Production skin integration](#production-skin-integration)
+
+</details>
 
 ## Regions and state
 
@@ -76,7 +90,6 @@ Use `ForgeLine.Client.exe --frontend-layout-capture <empty-output-directory>` fo
 native captures of all seven screens across the complete matrix, real windowed/borderless
 DPI/size sampling and zero-size GPU-surface restore. Capture warms resized surfaces before
 readback. It uses shipped resources only and does not compile/import assets.
-
 
 ## Menu sections and full-screen presentation
 

@@ -1,10 +1,32 @@
 # Logistics Capacity and Disruption
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The [vehicle loading queue](VehicleQueues.md) controls local physical admission.
 It is separate from graph throughput, warehouse stock reservations and the
 distribution order backlog. A free throughput window does not imply a free
 waiting place or service bay. Cancellation removes the logical assignment;
 physical exclusion persists while a vehicle or wreck obstructs entry or exit.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Capacity Model](#capacity-model)
+- [Capacity Admission](#capacity-admission)
+- [Load States](#load-states)
+- [Congestion and Route Choice](#congestion-and-route-choice)
+- [Structural Versioning Versus Dynamic Load](#structural-versioning-versus-dynamic-load)
+- [Backlog](#backlog)
+- [Bottleneck Diagnosis](#bottleneck-diagnosis)
+- [Infrastructure Disruption](#infrastructure-disruption)
+- [Restoration](#restoration)
+- [Downstream Consequences](#downstream-consequences)
+- [Diagnostics and Debug Visualization](#diagnostics-and-debug-visualization)
+- [Headless and Deterministic-Friendly Behavior](#headless-and-deterministic-friendly-behavior)
+- [Validation](#validation)
+
+</details>
 
 ## Purpose
 

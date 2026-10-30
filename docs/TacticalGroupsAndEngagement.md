@@ -1,5 +1,7 @@
 # Tactical groups and engagement rules
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Select units or recall a numbered group, open Combat in the existing action ring, then page to HOLD FIRE, RETURN FIRE or FIRE AT WILL. HOLD remains the existing zero-pursuit Hold Position order; ATTACK MOVE remains an explicit destination command. Fire rules and movement intent are independent, so changing a rule does not make a held group advance or replace a retreat, queue or individual order.
 
 Only owned, controllable, living direct-weapon units accept policy edits. Cargo/Supply vehicles and artillery without a direct weapon retain their own behavior; partial selection results use the existing accepted/rejected feedback. Return Fire waits for real damage-derived retaliation and legitimate current intelligence. It cannot reveal or chase a hidden enemy. Empty ammunition remains empty; no readiness, supply, fuel or range is granted. Explicit artillery missions retain their own setup, ammunition and cancellation controls.

@@ -1,5 +1,27 @@
 # Inventory and Storage
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Ownership model](#ownership-model)
+- [Quantity semantics](#quantity-semantics)
+- [Capacity](#capacity)
+- [Accepted-resource filters](#accepted-resource-filters)
+- [Remove and transfer semantics](#remove-and-transfer-semantics)
+- [Reservations](#reservations)
+- [Storage depots](#storage-depots)
+- [Extractor integration](#extractor-integration)
+- [Diagnostics and read models](#diagnostics-and-read-models)
+- [Failure and stale-handle behavior](#failure-and-stale-handle-behavior)
+- [Headless validation](#headless-validation)
+- [Benchmarks](#benchmarks)
+- [Architectural boundaries](#architectural-boundaries)
+
+</details>
+
 ## Purpose
 
 FORGELINE inventories are authoritative simulation-owned aggregate resource stores. They provide the shared storage contract used by extraction, construction, and industrial production now, with logistics, supply, and transport systems building on the same contract later.

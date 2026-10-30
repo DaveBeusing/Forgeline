@@ -1,5 +1,7 @@
 # Biome terrain materials
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The opt-in `terrain.biome.v1` presentation profile derives existing terrain material
 weights from an immutable environment query and copied infrastructure masks. It
 does not modify heightfields, navigation, gameplay identity, saves or decoration.

@@ -1,5 +1,7 @@
 # Studio Startup Splash
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Status and ownership
 
 The reusable startup splash domain lives in `ForgeLine.Presentation`. It is not part of simulation time, world state, ECS, or gameplay snapshots. The studio presentation is defined by `UndefinedBehaviorStudioSplash.Create()`.

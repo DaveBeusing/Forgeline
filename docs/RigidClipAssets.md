@@ -1,5 +1,7 @@
 # Rigid clip assets
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 [Decision and bounds](adr/BoundedRigidClips.md). The separate [bounded infantry skin subset](InfantrySkinAssets.md) extends the same evaluator in compiler 1.12.0; the rigid rules below remain unchanged.
 
 Compiler 1.11.0 adds optional `animation` assets from glTF 2.0 `.gltf` or `.glb` files. Each definition supplies a stable ID, for example `animation.test.arm_cycle`, type `animation` and source `rigid_clip.glb`. A mesh may list one ID in `animationReferences`; it becomes a typed dependency and participates in source hashes, external-buffer hashes, incremental invalidation, manifest sealing and deployment integrity. Existing production assets retain their original mechanical behavior and need no migration.

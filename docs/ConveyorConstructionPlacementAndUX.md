@@ -1,5 +1,7 @@
 # Conveyor construction, placement and UX
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Draw route connects a source building to a destination building without manually
 placing either adapter. Eligible buildings expose their actual directed ports;
 the construction service owns route geometry, placement validation and payment.
@@ -10,6 +12,23 @@ The original fixed-grid construction implementation was introduced from master
 `d7c45792` (0.1.450). Its recorded commands retain their original planner. New
 interactive routes explicitly select automatic directed routing so freely placed
 buildings no longer need matching horizontal 4m grid phases.
+
+<details>
+<summary>On this page</summary>
+
+- [V1 interaction and layout](#v1-interaction-and-layout)
+  - [Shared placement grid and crossing belts](#shared-placement-grid-and-crossing-belts)
+  - [Connection feedback and snapping](#connection-feedback-and-snapping)
+- [Deterministic geometry decisions](#deterministic-geometry-decisions)
+  - [Automatic terrain height](#automatic-terrain-height)
+  - [Shared routing rules](#shared-routing-rules)
+- [Building ports and connectivity](#building-ports-and-connectivity)
+- [Paid edits and command flow](#paid-edits-and-command-flow)
+- [Automated acceptance](#automated-acceptance)
+- [Manual acceptance checklist, not executed](#manual-acceptance-checklist-not-executed)
+- [Connections in paid construction templates](#connections-in-paid-construction-templates)
+
+</details>
 
 ## V1 interaction and layout
 

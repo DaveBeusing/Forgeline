@@ -1,5 +1,7 @@
 # Deterministic world generation contracts
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ForgeLine.World owns the portable version-1 contracts. They require no renderer,
 window, Simulation, Game or compiler dependency. No terrain, climate, geography,
 resource, vegetation or prop generator is implemented by these contracts.

@@ -1,5 +1,7 @@
 # Strategic logistics capacity
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Controls and network meaning
 
 Choose LOG in the existing minimap selector. Repeated LOG clicks filter All networks, Local conveyors, Regional Cargo, Field service orders, then All networks. F10 cycles these views before the existing Supply/Sensors/Navigation/Power/All views; OFF removes the overlay. Existing mode numeric identities are preserved. F11 remains independent minimap visibility. No additional binding, routing rule or action hierarchy is introduced.

@@ -1,5 +1,18 @@
 # Final image quality review
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Visual targets and baseline](#visual-targets-and-baseline)
+- [Evidence policy](#evidence-policy)
+- [Qualification at 0.1.344](#qualification-at-01344)
+- [Remaining acceptance limits](#remaining-acceptance-limits)
+- [Software adapter regression](#software-adapter-regression)
+
+</details>
+
 ## Visual targets and baseline
 
 Integration baseline is master a4eb694 (0.1.343), including the material,

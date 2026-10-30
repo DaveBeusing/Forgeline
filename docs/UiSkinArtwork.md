@@ -1,5 +1,19 @@
 # Directorate skin artwork
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Scope and identity](#scope-and-identity)
+- [Visual contract](#visual-contract)
+- [Families and scaling](#families-and-scaling)
+- [State composition](#state-composition)
+- [Provenance and review](#provenance-and-review)
+- [Consumer handoff](#consumer-handoff)
+
+</details>
+
 ## Scope and identity
 
 The foundation is based on master `27d80f8b04d77404b5287e66d533dcfea3788250`

@@ -1,5 +1,18 @@
 # Developer simulation actions
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Ownership and availability](#ownership-and-availability)
+- [Operations](#operations)
+- [Recording, saves and replay](#recording-saves-and-replay)
+- [Integration handoff](#integration-handoff)
+- [Historical Game-package acceptance](#historical-game-package-acceptance)
+
+</details>
+
 ## Ownership and availability
 
 `MatchRuntime` creates one Game-owned `DeveloperCommandGateway` in a Developer
@@ -126,7 +139,6 @@ runtime's scenario and owner thread exist, and before accepting actions.
 The following results belong to the original Game package, before client
 integration. No new test or functional acceptance is implied by this
 documentation update. The integrated product still requires manual user approval.
-
 
 Implementation builds and package acceptance are separate. Acceptance for this
 package uses the smallest existing Game cases that demonstrate real inventory

@@ -1,5 +1,7 @@
 # Graphical tactical interface
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 The tactical interface uses the existing Directorate atlas for minimap panels, selector controls, layer glyphs, permitted map symbols, primary/hover footprint corners, targeting and transient order glyphs. World Health/Fuel/Ammunition frames use copied, current, owned single-entity facts. Windows installs one native pointer from the existing cursor art. No second pointer, new command or intelligence authority is introduced.
 
 ## Rendering and interaction

@@ -1,5 +1,29 @@
 # Spatial Index and World Queries
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Coordinate and Cell Model](#coordinate-and-cell-model)
+- [Spatial Entries](#spatial-entries)
+- [Lifecycle](#lifecycle)
+- [Query Semantics](#query-semantics)
+- [Filtering](#filtering)
+- [Result Ordering](#result-ordering)
+- [Allocation Behavior](#allocation-behavior)
+- [Diagnostics](#diagnostics)
+- [Debug Visualization](#debug-visualization)
+- [Movement and Static Entries](#movement-and-static-entries)
+- [Correctness Validation](#correctness-validation)
+- [Benchmarks](#benchmarks)
+- [Current Performance Characteristics](#current-performance-characteristics)
+- [Current Limits](#current-limits)
+- [Architecture Rule](#architecture-rule)
+
+</details>
+
 ## Purpose
 
 `ForgeLine.World` provides the canonical spatial indexing foundation for simulation systems that need nearby-entity queries without scanning the complete ECS population.

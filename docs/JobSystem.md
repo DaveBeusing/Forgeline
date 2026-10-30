@@ -1,5 +1,24 @@
 # Job System
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Worker Lifecycle](#worker-lifecycle)
+- [Job Submission](#job-submission)
+- [Dependencies and Fences](#dependencies-and-fences)
+- [Waiting and Barriers](#waiting-and-barriers)
+- [Exceptions](#exceptions)
+- [Shutdown](#shutdown)
+- [Instrumentation](#instrumentation)
+- [Simulation Integration](#simulation-integration)
+- [Deterministic-Friendly Rules](#deterministic-friendly-rules)
+- [Validation and Benchmarks](#validation-and-benchmarks)
+
+</details>
+
 ## Purpose
 
 `ForgeLine.Jobs` provides the engine's lightweight persistent-worker scheduler for simulation-oriented CPU work.

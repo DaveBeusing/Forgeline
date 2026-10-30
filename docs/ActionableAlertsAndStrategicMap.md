@@ -1,5 +1,23 @@
 # Actionable Alerts and Strategic Map
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Current interactive notification stack](#current-interactive-notification-stack)
+- [Current notification and context-hint presentation](#current-notification-and-context-hint-presentation)
+- [Strategic layers](#strategic-layers)
+- [Costs and qualification](#costs-and-qualification)
+- [Graphical alert integration](#graphical-alert-integration)
+- [Graphical tactical integration](#graphical-tactical-integration)
+- [Minimap hover and alert coexistence](#minimap-hover-and-alert-coexistence)
+- [Contextual Operations access](#contextual-operations-access)
+- [Sustained cargo fleet capacity warning](#sustained-cargo-fleet-capacity-warning)
+- [Operational attention controls](#operational-attention-controls)
+
+</details>
+
 ## Current interactive notification stack
 
 FOCUS on an actionable row advances through the current authorized alert identities in
@@ -27,7 +45,6 @@ settle instead of retaining stale gestures. Active critical conditions stay
 visible until resolved, with no timer-based dismissal. Older qualification
 screenshots and measurements below are historical; current-source native
 D3D12/WARP and human visual approval remain distinct gates.
-
 
 The alert stack keeps the existing critical/warning/information text, icons and command-result cards. Current Core Destroyed, Core Damaged, Critical Supply, Blocked Production and Constrained Power conditions have at most eight copied records including a confirmed Cargo fleet shortage, current Core Under Attack and observed Work Completed. Their identity is session, player, condition, onset tick and observed cause. Live cleared conditions disappear immediately. Attention resolution requires three seconds of completed healthy ticks; brief same-cause recurrence keeps its identity, with a five-second recurrence cooldown after confirmed resolution. Critical recurrence and a changed cause bypass that cooldown. Fresh sessions or tick rollback reset lifecycle state. Pausing preserves the last completed capture. Terminal alerts remain visible but cannot activate navigation. No history, sound, dismissal command or per-tick popup is introduced.
 

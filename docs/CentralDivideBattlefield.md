@@ -1,5 +1,25 @@
 # Prototype Battlefield: Central Divide
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Strategic Layout](#strategic-layout)
+- [Terrain and Navigation](#terrain-and-navigation)
+- [Logistics Corridor](#logistics-corridor)
+- [Strategic Infrastructure Lifecycle](#strategic-infrastructure-lifecycle)
+- [Resources and Expansion](#resources-and-expansion)
+- [Command Core Objectives](#command-core-objectives)
+- [Debug Visualization](#debug-visualization)
+- [Validation](#validation)
+- [Runtime world and infrastructure presentation](#runtime-world-and-infrastructure-presentation)
+- [Bridge combat and paid repair](#bridge-combat-and-paid-repair)
+- [Explicit tactical geography](#explicit-tactical-geography)
+
+</details>
+
 ## Purpose
 
 `Central Divide` is the canonical FORGELINE vertical-slice battlefield. It is a 3,072 × 3,072 meter two-player map designed to force the production, logistics, intelligence, terrain, disruption, and combined-arms systems to interact in one scenario.

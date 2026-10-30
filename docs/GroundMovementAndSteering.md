@@ -1,11 +1,33 @@
 # Ground Movement and Local Steering
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 Building service uses the [physical loading queue](VehicleQueues.md). Assigned
 local row motion preserves predecessor spacing and stable individual targets.
 Local admission transfers motion ownership to the existing exclusive dock;
 service retains its settled position, heading and speed checks. Ordinary passing
 remains available outside the queue strip. Queue membership does not teleport
 vehicles or replace physical exit clearance.
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Simulation Ownership](#simulation-ownership)
+- [Components](#components)
+- [Fixed-Tick Semantics and Arrival](#fixed-tick-semantics-and-arrival)
+- [Heading and Turning](#heading-and-turning)
+- [Terrain Following](#terrain-following)
+- [Neighborhood Queries and Local Separation](#neighborhood-queries-and-local-separation)
+- [Static Obstacle Steering and Swept Clearance](#static-obstacle-steering-and-swept-clearance)
+- [Progress and Stuck Detection](#progress-and-stuck-detection)
+- [Spatial Occupancy and Chunk Crossing](#spatial-occupancy-and-chunk-crossing)
+- [Diagnostics and Debug Visualization](#diagnostics-and-debug-visualization)
+- [Parallelism Policy](#parallelism-policy)
+- [Validation](#validation)
+- [Current Limitations](#current-limitations)
+
+</details>
 
 ## Purpose
 

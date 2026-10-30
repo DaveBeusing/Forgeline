@@ -1,10 +1,27 @@
 # Infantry and battlefield production
 
+[Documentation](README.md) Â· [Complete catalog](DocumentationIndex.md)
+
 Rifle Squad and Combat Engineer now have distinct editable four-member figure
 kits, individual leader equipment, three physical LODs, optional skeletal motion and
 dedicated damaged/critical/discarded-equipment meshes. Four other existing unit
 families gain collapsed vehicle wrecks. Broken roads/bridges, fractured rubble,
 a scorched barrier and a burst pipe extend existing environment conventions.
+
+<details>
+<summary>On this page</summary>
+
+- [Verified baseline and scope](#verified-baseline-and-scope)
+- [Source and physical contracts](#source-and-physical-contracts)
+- [Motion, state and intelligence](#motion-state-and-intelligence)
+- [Materials, provenance and compile](#materials-provenance-and-compile)
+- [Native evidence and matched cost](#native-evidence-and-matched-cost)
+- [Tests, window modes and open acceptance](#tests-window-modes-and-open-acceptance)
+- [Native image review](#native-image-review)
+- [Reproduce](#reproduce)
+- [Package delivery check](#package-delivery-check)
+
+</details>
 
 ## Verified baseline and scope
 
@@ -232,7 +249,7 @@ both camera metadata and filename. It changes no default gameplay camera.
 A reproducible local 0.1.353-dev/win-x64 package passes file-hash comparison and
 runtime integrity with the existing asset root. The produced archive is
 33,761,159 bytes. Its source/evidence revision is eb3ffc2. An installed-package
-Windowed1600×900 smoke exits successfully, with 11 instance draws, 938/1551 visible
+Windowed1600ï¿½900 smoke exits successfully, with 11 instance draws, 938/1551 visible
 instances and zero texture/material binding failures. Repository and installed
 startup both use the canonical existing smoke path; generated package files stay
 under artifacts, outside source ownership. The package is local and is not a

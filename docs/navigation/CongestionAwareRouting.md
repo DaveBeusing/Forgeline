@@ -1,5 +1,18 @@
 # Connected vehicle routing and endpoint selection
 
+[Documentation](../README.md) · [Complete catalog](../DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Product scope](#product-scope)
+- [Search and result lifecycle](#search-and-result-lifecycle)
+- [Observed congestion and selection](#observed-congestion-and-selection)
+- [Work, ownership and persistence](#work-ownership-and-persistence)
+- [Compilation and manual acceptance](#compilation-and-manual-acceptance)
+
+</details>
+
 ## Product scope
 
 MatchRuntime connects VehicleRoutingKernel through

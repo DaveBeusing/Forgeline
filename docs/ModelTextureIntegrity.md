@@ -1,5 +1,7 @@
 # Production model and texture integrity
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Baseline and scope
 
 Review date: 23 October 2026. Integration base:

@@ -1,5 +1,23 @@
 # Entity Component Foundation
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
+<details>
+<summary>On this page</summary>
+
+- [Purpose](#purpose)
+- [Entity Identity and Lifetime](#entity-identity-and-lifetime)
+- [Component Ownership](#component-ownership)
+- [Queries](#queries)
+  - [Dense iteration](#dense-iteration)
+  - [Stable iteration](#stable-iteration)
+- [Mutation Rules During Iteration](#mutation-rules-during-iteration)
+- [Diagnostics](#diagnostics)
+- [Allocation and Performance Expectations](#allocation-and-performance-expectations)
+- [Explicitly Unsupported Features](#explicitly-unsupported-features)
+
+</details>
+
 ## Purpose
 
 The ForgeLine ECS is a deliberately narrow, data-oriented foundation for simulation entities. It provides stable entity identity, lifecycle management, typed component storage, basic queries, deterministic-friendly iteration, diagnostics, correctness coverage, and focused microbenchmarks.

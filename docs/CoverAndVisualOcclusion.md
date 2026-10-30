@@ -1,5 +1,7 @@
 # Cover and visual occlusion
 
+[Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
+
 ## Player operation
 
 Open the Sensors strategic layer (cycle layers with F10) to find authored ground gameplay areas. Green outlines mark infantry cover; amber outlines mark visual screens. The labels describe public map data, not enemy occupancy. Sensor rings remain maximum ranges rather than guarantees of identification.
