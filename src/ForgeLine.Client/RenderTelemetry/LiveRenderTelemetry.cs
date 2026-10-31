@@ -30,6 +30,9 @@ internal sealed class LiveRenderTelemetry : IDisposable
     private bool _armed, _finished;
     private ulong _firstMeasuredFence;
     private bool _overflow, _disposed;
+    internal bool ObserveAbsoluteReadBrackets { get; set; }
+    internal LiveTelemetryCounterEnd? LastAbsoluteRead { get; private set; }
+    internal OwnerCycleObservations? OwnerCycles { get; set; }
     private object? _failedFixtureAttempt;
     private LiveSessionOrigin? _sessionOrigin;
     private object? _producerAdapterBinding, _producerRuntimeSeal;
@@ -46,7 +49,10 @@ internal sealed class LiveRenderTelemetry : IDisposable
         _sessionOrigin = origin;
     }
     internal int Count => _count;
+    internal LiveTelemetryFrame? LastObservedFrame => _count>0 ? _frames[_count-1] : null;
     internal bool WindowCompleted => _finished;
+    internal ReferencePostWindowControl? PostWindowControl { get; set; }
+    internal ClientRenderConfiguration? ObservedComposition { get; set; }
     internal bool Overflowed => _overflow || _source.TelemetryOverflowed;
     internal LiveRenderTelemetry(IGraphicsRenderTelemetry source, int capacity, string? output = null, JsonObject? context = null, int warmups = 0, string? runtimeFingerprint = null, GraphicsDeviceInfo? actualDevice = null)
     {
@@ -100,9 +106,11 @@ internal sealed class LiveRenderTelemetry : IDisposable
         long counterStart = Stopwatch.GetTimestamp();
         long process = GC.GetTotalAllocatedBytes(precise: true);
         long counterEnd = Stopwatch.GetTimestamp();
+        long threadStart=ObserveAbsoluteReadBrackets ? Stopwatch.GetTimestamp() : 0;
         long thread = GC.GetAllocatedBytesForCurrentThread();
+        long threadEnd=ObserveAbsoluteReadBrackets ? Stopwatch.GetTimestamp() : 0;
         return new(Stopwatch.GetTimestamp(), process, thread)
-        { ServiceStartTick = serviceStart, BeginProcessCounter = new(counterStart, counterEnd), SignalWait = signalWait };
+        { ServiceStartTick = serviceStart, BeginProcessCounter = new(counterStart, counterEnd), BeginThreadCounter=new(threadStart,threadEnd), SignalWait = signalWait };
     }
     internal void Complete(in LiveTelemetryStart start, string state, long prepareStart = 0, long prepareEnd = 0, LiveSimulationProvenance? simulation = null)
     {
@@ -110,10 +118,15 @@ internal sealed class LiveRenderTelemetry : IDisposable
         if (_failedFixtureAttempt is not null) throw new InvalidOperationException("A failed fixture window cannot consume another observation.");
         if (_finished) { DrainGpu(); return; }
         long end = Stopwatch.GetTimestamp();
-        long thread = GC.GetAllocatedBytesForCurrentThread() - start.ThreadBytes;
+        long threadStart=ObserveAbsoluteReadBrackets ? Stopwatch.GetTimestamp() : 0;
+        long threadAbsolute=GC.GetAllocatedBytesForCurrentThread();
+        long threadEnd=ObserveAbsoluteReadBrackets ? Stopwatch.GetTimestamp() : 0;
+        long thread = threadAbsolute - start.ThreadBytes;
         long endCounterStart = Stopwatch.GetTimestamp();
-        long process = GC.GetTotalAllocatedBytes(precise: true) - start.ProcessBytes;
+        long processAbsolute=GC.GetTotalAllocatedBytes(precise: true);
+        long process = processAbsolute - start.ProcessBytes;
         long endCounterEnd = Stopwatch.GetTimestamp();
+        if(ObserveAbsoluteReadBrackets)LastAbsoluteRead=new(processAbsolute,threadAbsolute,new(endCounterStart,endCounterEnd),new(threadStart,threadEnd),end);
         var observer = new LiveObserverIntervals(start.BeginProcessCounter, new(endCounterStart, endCounterEnd),
             new(endCounterEnd, endCounterEnd), new(endCounterEnd, endCounterEnd));
         if (!_armed && state == "gameplay") _armed = true;
@@ -228,6 +241,9 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["runtimeSeal"] = JsonSerializer.SerializeToNode(_producerRuntimeSeal, JsonOptions);
         document["scope"] = "live-client";
         document["gpuStreamScope"] = "independent-live-client";
+        if(OwnerCycles is not null)document["ownerCycles"]=JsonSerializer.SerializeToNode(OwnerCycles.Export(),JsonOptions);
+        if(ObservedComposition is not null)document["observedComposition"]=JsonSerializer.SerializeToNode(ObservedComposition,VisualReferenceCapture.JsonOptions);
+        if(PostWindowControl is not null)document["postWindowControl"]=JsonSerializer.SerializeToNode(PostWindowControl.Evidence(),JsonOptions);
         document["streamId"] = _streamId;
         document["frequencyHz"] = Stopwatch.Frequency;
         document["clockAnchor"] = JsonSerializer.SerializeToNode(_clockAnchor, JsonOptions);
@@ -238,7 +254,7 @@ internal sealed class LiveRenderTelemetry : IDisposable
         document["serviceIntervalsAvailable"] = true;
         document["window"] = JsonSerializer.SerializeToNode(new { arm = "first-gameplay-iteration", warmups = _warmups,
             samples = _frames.Length, completed = _finished, contiguous = true, idleWaitIncluded = false,
-            scope = "complete-active-render-owner-iteration; independent platform and simulation owners excluded" }, JsonOptions);
+            scope = "legacy active payload/service brackets; excludes compiler lead-in, ACK/backedge tail, idle wait and independent owners; owner-cycle-v1 is separate" }, JsonOptions);
         document["beforeWindow"] = JsonSerializer.SerializeToNode(_beforeWindow.AsSpan(0, _beforeCount).ToArray(), JsonOptions);
         document["includes"] = new JsonArray("prepare", "host", "renderFrame", "present", "fenceWait");
         document["gpuCompletions"] = JsonSerializer.SerializeToNode(_gpu.AsSpan(0, _gpuCount).ToArray(), JsonOptions);
@@ -273,6 +289,7 @@ internal readonly record struct LiveTelemetryStart(long Tick, long ProcessBytes,
 {
     internal long ServiceStartTick { get; init; }
     internal GraphicsTimestampInterval BeginProcessCounter { get; init; }
+    internal GraphicsTimestampInterval BeginThreadCounter { get; init; }
     internal GraphicsTimestampInterval SignalWait { get; init; }
 }
 internal readonly record struct LiveObserverIntervals(GraphicsTimestampInterval BeginProcessCounter,

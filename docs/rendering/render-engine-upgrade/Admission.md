@@ -124,6 +124,25 @@ The offline comparator requires all eight original records. It checks metadata a
 
 A separate `owner_trace.py` diagnostic supervises pinned `dotnet-trace` attachment to the actual renderer PID/native owner thread. Tool/parser acquisition, version checks and payload verification finish before launching the renderer. Attachment begins after existing renderer/fixture initialization and setup metrics, before the first warmup; this does not claim all first-use caches are warm. The unchanged outer command deadline applies throughout, with at most ten seconds for initialized-owner session readiness. The original adapter checkpoint still has its thirty-second limit. Trace completion keeps the producer alive for post-trace lifetime observation. A compatible original trace clock and resolved native-owner stacks inside measured intervals are required for attribution; missing coverage remains unavailable. Profiled and staged runs are diagnostic-only and are rejected as qualifying timing cohorts.
 
-Optional manual focus uses an explicit, bounded external setup hold. The tools never activate a window. The operator release binds the actual checkpoint hash, run, PID and HWND; independent Win32 observations before and after release determine control. Startup not-foreground observations remain in the journal. Setup callbacks run outside the serialized provider-query lock, so waiting for the operator does not suspend observation. This does not establish a final controlled point after every ordinary measured window; that separate producer-control contract remains open.
+Optional manual focus uses an explicit, bounded external setup hold. The tools never activate a window. The operator release binds the actual checkpoint hash, run, PID and HWND; independent Win32 observations before and after release determine control. Startup not-foreground observations remain in the journal. Setup callbacks run outside the serialized provider-query lock, so waiting for the operator does not suspend observation. That legacy setup hold alone does not establish a final controlled point after an ordinary measured window. The separately selected ordinary-control v1 handoff below now provides a fresh-query durable point; actual qualification remains open.
 
 The new CI proposal route hard-pins only this package's exact paths plus the controlled version exception. Historical ownership records and `qualification.py` are unchanged. CI scope validation grants no policy, measurement or merge approval. The allocation-population ledger, previously reviewed hardware/allocation policies, controlled physical captures, native/host bit-exact parity, useful actual warm-owner sampled sites and reviewed baseline handoff remain separate open dependencies. No baseline or wave 2 optimization is accepted by these diagnostics.
+
+
+## Additive workload observation contract
+
+Owner-cycle/workload/ordinary post-window v1 is an opt-in observation contract;
+see [MeasurementProtocol](MeasurementProtocol.md#owner-cycle-and-ordinary-control-observation-v1).
+Legacy payload/counter meanings and CollectorOff are preserved. Full-cycle totals
+overlap the payload and include idle/crossing work; copied owner facts expose
+conservative operation/arrival envelopes, not finite byte-policy approval.
+Native reference does not invent host-cycle/process totals. Unsupported Developer
+composition, missing activation, incomplete/faulted/overflowed observations and
+unbound providers stay explicit unavailable evidence.
+
+The new CI scope proposal recognizes only the literal package1 footprint against
+accepted86a6f5cc4390aa9363eaada54c02522def0a83f6; the reviewed diagnostics predecessor
+is already on master. Historical scope routes and validators remain intact. Scope
+permission is not policy, baseline or merge approval. Capacity-derived allocation
+policies, pixel-repeatability diagnosis, physical controls and original wave2
+remain open. The detailed PR449 report remains local by the current session publication choice.

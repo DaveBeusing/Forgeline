@@ -34,6 +34,9 @@ internal sealed class ReferenceFixtureRecipe
     internal object IdentityInputs { get; }
     internal string InputBytesBase64 { get; }
     internal string CaseKey { get; }
+    internal int OwnerObservationVersion { get; }
+    internal int OwnerCycleCapacity { get; }
+    internal string? PostWindowControlDirectory { get; }
     internal int RepeatCaptures { get; }
     internal bool CaptureStageDiagnostics { get; }
     internal bool CaptureShadowDiagnostics { get; }
@@ -80,6 +83,7 @@ internal sealed class ReferenceFixtureRecipe
         _lines = Indicators.Lines.ToArray(); _labels = Indicators.Labels.ToArray();
         CameraPath = request.CameraPath; Samples = request.Samples;
         Warmups = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;
+        OwnerObservationVersion=request.OwnerObservationVersion;OwnerCycleCapacity=request.OwnerCycleCapacity;PostWindowControlDirectory=request.PostWindowControlDirectory;
         CollectorMode = request.CollectorMode; RepeatCaptures = request.RepeatCaptures; AdapterBindingDirectory = request.AdapterBindingDirectory;
         Software = request.Software; OutputRoot = request.OutputRoot;
         CaptureStageDiagnostics = request.CaptureStageDiagnostics; CaptureShadowDiagnostics = request.CaptureShadowDiagnostics;

@@ -51,6 +51,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
     private readonly int _capacity;
     private readonly TimeProvider _time;
     private long _nextTickAt;
+    private readonly OwnerWorkloadProbe? _workload;
 
     private ExceptionDispatchInfo? _failure;
     private long _nextHostSequence;
@@ -69,7 +70,8 @@ internal sealed partial class ClientSimulationHost : IDisposable
         int boundaryCapacity = DefaultBoundaryCapacity,
         bool asynchronousStartup = false,
         TimeProvider? timeProvider = null,
-        DeveloperSessionAccess? developerAccess = null)
+        DeveloperSessionAccess? developerAccess = null,
+        bool observeWorkload = false)
     {
         _scenario =
             scenario ??
@@ -101,6 +103,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
         _matchStateEntity =
             scenario.BattlefieldRuntime.MatchStateEntity;
         InitializeSessionControls(developerAccess);
+        _workload=observeWorkload ? new OwnerWorkloadProbe(SessionId.Value,boundaryCapacity,compositionSupported:!ClientBuildIdentity.DeveloperToolsEnabled) : null;
 
         _thread =
             new Thread(SimulationLoop)
@@ -135,13 +138,29 @@ internal sealed partial class ClientSimulationHost : IDisposable
     internal ClientSimulationTelemetry CaptureTelemetry() => new(SessionId,
         checked((ulong)Volatile.Read(ref _completedTicks)),
         IsTerminalFrozen ? RuntimeSimulationState.Stopped :
-        IsPaused ? RuntimeSimulationState.Paused : RuntimeSimulationState.Running);
+        IsPaused ? RuntimeSimulationState.Paused : RuntimeSimulationState.Running)
+        { Workload = _workload?.Capture() ?? default };
 
     private void AdvanceOneTick()
     {
-        _simulation.AdvanceOneTick();
-        Interlocked.Increment(ref _completedTicks);
-        _lastCompletedTick = _simulation.CurrentTick;
+        long observed=_workload?.Begin((int)SimulationWorkloadOperation.Tick) ?? 0;
+        bool success=false;
+        try
+        {
+            _simulation.AdvanceOneTick();
+            Interlocked.Increment(ref _completedTicks);
+            _lastCompletedTick = _simulation.CurrentTick;
+            success=true;
+        }
+        finally { _workload?.End((int)SimulationWorkloadOperation.Tick,observed,success); }
+    }
+
+    private void ExecuteObservedControlCommand(ISimulationCommand command)
+    {
+        long observed=_workload?.Begin((int)SimulationWorkloadOperation.Control) ?? 0;
+        bool success=false;
+        try { _simulation.ExecuteControlCommand(command); success=true; }
+        finally { _workload?.End((int)SimulationWorkloadOperation.Control,observed,success); }
     }
 
     public bool IsTerminalFrozen =>
@@ -424,18 +443,24 @@ internal sealed partial class ClientSimulationHost : IDisposable
     public bool TryReadSubmissionCompletion(
         out ClientSubmissionCompletion completion)
     {
+        _workload?.BeginTransport(1);bool success=false;
+        try
+        {
         if (!_completions.TryDequeue(
                 out completion))
         {
-            return false;
+            success=true;return false;
         }
 
         lock (_boundaryGate)
         {
             _completionCount--;
+            ObserveTransportOccupancy(SimulationWorkloadEvent.CompletionDequeued);
         }
 
-        return true;
+        success=true;return true;
+        }
+        finally { _workload?.EndTransport(1,success); }
     }
 
     public void ThrowIfFaulted()
@@ -490,6 +515,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
     {
         try
         {
+            _workload?.BindOwner();
             InitializeOwnerSnapshot();
             NotifyProgress();
             UpdateTerminalState();
@@ -578,6 +604,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
         }
         catch (Exception exception)
         {
+            _workload?.Fault();
             Interlocked.CompareExchange(
                 ref _failure,
                 ExceptionDispatchInfo.Capture(
@@ -608,6 +635,10 @@ internal sealed partial class ClientSimulationHost : IDisposable
 
     private void DrainMessages()
     {
+        long observation=_workload?.Begin((int)SimulationWorkloadOperation.Drain) ?? 0;
+        bool success=false;
+        try
+        {
         DrainPauseOwners();
         DrainDeveloperAccess();
         int budget = _capacity;
@@ -624,8 +655,30 @@ internal sealed partial class ClientSimulationHost : IDisposable
                     _inFlightSubmissions++;
                 }
                 DeveloperMessageDequeued(message);
+                ObserveTransportOccupancy(SimulationWorkloadEvent.Drained);
             }
 
+            ProcessObservedMessage(message);
+        }
+        success=true;
+        }
+        finally { _workload?.End((int)SimulationWorkloadOperation.Drain,observation,success); }
+    }
+
+    private void ProcessObservedMessage(in HostMessage message)
+    {
+        SimulationWorkloadOperation operation=message.Kind switch
+        {
+            HostMessageKind.Submission=>SimulationWorkloadOperation.Submission,
+            HostMessageKind.Pause or HostMessageKind.Resume=>SimulationWorkloadOperation.PauseResume,
+            HostMessageKind.AcknowledgeTerminal=>SimulationWorkloadOperation.Terminal,
+            HostMessageKind.SmokeCompletion=>SimulationWorkloadOperation.Smoke,
+            _=>SimulationWorkloadOperation.Bookkeeping
+        };
+        long observation=_workload?.Begin((int)operation) ?? 0;
+        bool success=false;
+        try
+        {
             switch (message.Kind)
             {
                 case HostMessageKind.Submission:
@@ -660,7 +713,9 @@ internal sealed partial class ClientSimulationHost : IDisposable
                         $"Unsupported simulation host message '{message.Kind}'.");
                     break;
             }
+            success=true;
         }
+        finally { _workload?.End((int)operation,observation,success); }
     }
 
     private void ProcessSubmission(
@@ -728,8 +783,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
                 _matchStateEntity,
                 message.ObservedTick);
 
-        _simulation.ExecuteControlCommand(
-            command);
+        ExecuteObservedControlCommand(command);
         NotifyProgress();
 
         if (!command.Accepted)
@@ -793,6 +847,10 @@ internal sealed partial class ClientSimulationHost : IDisposable
     private bool TryQueue(
         in HostMessage message)
     {
+        _workload?.BeginTransport(0,(int)SimulationWorkloadEvent.Attempted);
+        bool admitted=false;
+        try
+        {
         ThrowIfDisposed();
         ThrowIfFaulted();
 
@@ -817,17 +875,27 @@ internal sealed partial class ClientSimulationHost : IDisposable
             _messages.Enqueue(
                 message);
             _queuedCount++;
+            ObserveTransportOccupancy(SimulationWorkloadEvent.Admitted);
+            admitted=true;
             _signal.Set();
         }
 
+        admitted=true;
         return true;
+        }
+        finally { if(!admitted)_workload?.Event((int)SimulationWorkloadEvent.Rejected);_workload?.EndTransport(0); }
     }
+
+    private void ObserveTransportOccupancy(SimulationWorkloadEvent? kind=null) => _workload?.QueueState(_queuedCount,_inFlightSubmissions,_completionCount,kind.HasValue ? (int)kind.Value : null);
 
     private void PublishCompletion(
         ulong sequence,
         ClientSubmissionFailure failure,
         PlayerCommandSubmissionReceipt? receipt)
     {
+        _workload?.BeginTransport(2);bool success=false;
+        try
+        {
         lock (_boundaryGate)
         {
             _inFlightSubmissions--;
@@ -837,14 +905,20 @@ internal sealed partial class ClientSimulationHost : IDisposable
                     sequence,
                     failure,
                     receipt));
+            ObserveTransportOccupancy(SimulationWorkloadEvent.CompletionPublished);
         }
 
-        NotifyProgress();
+        NotifyProgress();success=true;
+        }
+        finally { _workload?.EndTransport(2,success); }
     }
 
     private void RejectRemainingSubmissions(
         ClientSubmissionFailure failure)
     {
+        long observation=_workload?.Begin((int)SimulationWorkloadOperation.Drain) ?? 0;bool success=false;
+        try
+        {
         while (_messages.TryDequeue(
                    out HostMessage message))
         {
@@ -858,6 +932,7 @@ internal sealed partial class ClientSimulationHost : IDisposable
                     _inFlightSubmissions++;
                 }
                 DeveloperMessageDequeued(message);
+                ObserveTransportOccupancy(SimulationWorkloadEvent.Drained);
             }
 
             if (message.Kind ==
@@ -870,6 +945,9 @@ internal sealed partial class ClientSimulationHost : IDisposable
             }
             else RejectDeveloperMessage(message, failure);
         }
+        success=true;
+        }
+        finally { _workload?.End((int)SimulationWorkloadOperation.Drain,observation,success); }
     }
 
     private bool HasCompletedTick(

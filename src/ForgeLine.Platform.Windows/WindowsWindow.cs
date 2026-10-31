@@ -15,6 +15,7 @@ internal sealed class WindowsWindow : IWindow
     private static ushort s_windowClassAtom;
 
     private readonly WindowConfiguration _configuration;
+    private PlatformWorkloadProbe? _workload;
     private readonly Queue<WindowEvent> _events = new(16);
     private readonly Queue<PlatformInputEvent> _inputEvents = new(64);
     private readonly WindowLifecycleState _lifecycle = new();
@@ -293,6 +294,17 @@ internal sealed class WindowsWindow : IWindow
         }
     }
 
+    internal void AttachWorkloadObservations(PlatformWorkloadProbe probe)
+    {
+        EnsureOwnerThread();
+        if(_workload is not null && !ReferenceEquals(_workload,probe))throw new InvalidOperationException("A window workload observation identity cannot be replaced.");
+        _workload=probe;probe.BindWindow(_handle.ToInt64(),_events.Count,_inputEvents.Count);
+    }
+    private void EnqueueObservedInput(PlatformInputEvent value)
+    {
+        _inputEvents.Enqueue(value);_workload?.Enqueued(input:true,_inputEvents.Count);
+    }
+
     public bool TryDequeueEvent(out WindowEvent windowEvent)
     {
         EnsureOwnerThread();
@@ -304,6 +316,7 @@ internal sealed class WindowsWindow : IWindow
         }
 
         windowEvent = _events.Dequeue();
+        _workload?.Dequeued(input:false,_events.Count);
         return true;
     }
 
@@ -318,6 +331,7 @@ internal sealed class WindowsWindow : IWindow
         }
 
         inputEvent = _inputEvents.Dequeue();
+        _workload?.Dequeued(input:true,_inputEvents.Count);
         return true;
     }
 
@@ -343,6 +357,7 @@ internal sealed class WindowsWindow : IWindow
         _cursor = 0;
         _icons?.Dispose();
         _icons = null;
+        _workload?.DiscardInput(_inputEvents.Count);
         _inputEvents.Clear();
 
         if (_selfHandle.IsAllocated)
@@ -480,18 +495,18 @@ internal sealed class WindowsWindow : IWindow
             case WindowsNative.WmKillFocus:
                 _ = WindowsNative.SetCursor(WindowsNative.LoadCursor(0, new nint(WindowsNative.CursorArrow)));
                 _isFocused = false;
-                _inputEvents.Enqueue(PlatformInputEvent.FocusLost());
+                EnqueueObservedInput(PlatformInputEvent.FocusLost());
                 EnqueueEvent(WindowEventKind.FocusLost);
                 return 0;
 
             case 0x0102: // WM_CHAR preserves text order, layout and normal key repeat.
-                if (_isFocused) _inputEvents.Enqueue(PlatformInputEvent.Text((char)wParam));
+                if (_isFocused) EnqueueObservedInput(PlatformInputEvent.Text((char)wParam));
                 return 0;
 
             case WindowsNative.WmKeyDown:
                 if (TryMapKey(wParam, lParam, out PlatformKey keyDown))
                 {
-                    _inputEvents.Enqueue(
+                    EnqueueObservedInput(
                         PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyDown, keyDown));
                     return 0;
                 }
@@ -501,7 +516,7 @@ internal sealed class WindowsWindow : IWindow
             case WindowsNative.WmKeyUp:
                 if (TryMapKey(wParam, lParam, out PlatformKey keyUp))
                 {
-                    _inputEvents.Enqueue(
+                    EnqueueObservedInput(
                         PlatformInputEvent.KeyChanged(PlatformInputEventKind.KeyUp, keyUp));
                     return 0;
                 }
@@ -518,14 +533,14 @@ internal sealed class WindowsWindow : IWindow
                 };
                 if (WindowsNative.TrackMouseEvent(ref tracking) == 0)
                 {
-                    _inputEvents.Enqueue(PlatformInputEvent.PointerLeft());
+                    EnqueueObservedInput(PlatformInputEvent.PointerLeft());
                     return 0;
                 }
-                _inputEvents.Enqueue(PlatformInputEvent.PointerMoved(moveX, moveY));
+                EnqueueObservedInput(PlatformInputEvent.PointerMoved(moveX, moveY));
                 return 0;
 
             case WindowsNative.WmMouseLeave:
-                _inputEvents.Enqueue(PlatformInputEvent.PointerLeft());
+                EnqueueObservedInput(PlatformInputEvent.PointerLeft());
                 return 0;
 
             case WindowsNative.WmMouseWheel:
@@ -592,7 +607,7 @@ internal sealed class WindowsWindow : IWindow
         nint lParam)
     {
         (int x, int y) = DecodePointerPosition(lParam);
-        _inputEvents.Enqueue(PlatformInputEvent.MouseButtonChanged(kind, button, x, y));
+        EnqueueObservedInput(PlatformInputEvent.MouseButtonChanged(kind, button, x, y));
     }
 
     private void EnqueueMouseWheel(nuint wParam, nint lParam)
@@ -607,7 +622,7 @@ internal sealed class WindowsWindow : IWindow
         }
 
         int delta = unchecked((short)(((ulong)wParam >> 16) & 0xFFFF));
-        _inputEvents.Enqueue(PlatformInputEvent.MouseWheel(x, y, delta));
+        EnqueueObservedInput(PlatformInputEvent.MouseWheel(x, y, delta));
     }
 
     private static PlatformMouseButton DecodeXButton(nuint wParam)
@@ -1068,6 +1083,7 @@ internal sealed class WindowsWindow : IWindow
                 _isFocused,
                 _lifecycle.IsMinimized,
                 _lifecycle.CurrentMode));
+        _workload?.Enqueued(input:false,_events.Count);
     }
 
     private static uint GetWindowStyle(bool resizable)

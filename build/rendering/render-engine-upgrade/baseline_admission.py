@@ -417,6 +417,10 @@ def evaluate(cohort,root,repo,trusted_master):
         require(r['payloadInventoryBefore']['sha256']==attempt['payloadInventoryBeforeSha256'] and r['payloadInventoryAfter']['sha256']==attempt['payloadInventoryAfterSha256'],'Actual launcher payload references differ')
         request=load(directory,r['request']);require(sha256_bytes((directory/r['request']['path']).read_bytes())==attempt['requestSha256'],'Actual request differs from launched bytes')
         require(request.get('captureStageDiagnostics',False) is False and request.get('ownerTraceControlDirectory') is None,'Intrusive stage/owner-trace requests are separate diagnostics, never baseline timing')
+        observation_version=request.get('ownerObservationVersion',0)
+        require(type(observation_version) is int and observation_version in (0,1),'Unknown actual owner-observation version')
+        require(type(protocol.get('ownerObservationVersion',0)) is int and observation_version==protocol.get('ownerObservationVersion',0),'Actual owner-observation interval differs from frozen protocol')
+        if observation_version==0:require(policies['allocation-budget'].get('allocationInterval') in (None,'legacy-payload'),'A cycle policy cannot be applied to legacy payload evidence')
         cold=case is not None and case['runProfile']=='RendererCold';count=128 if cold else 512;warmups=0 if cold else 64
         require(request['outputRoot']==scheduled[key]['launchOutputPath'],'Actual launched output path differs from predeclared attempt')
         require(request['commit']==source and request['samples']==count and request['warmups']==(64 if cold else warmups),'Actual launched window differs from freeze')
@@ -454,7 +458,7 @@ def evaluate(cohort,root,repo,trusted_master):
             payload=[(f['endTick']-f['startTick'])*1000/owner['frequencyHz'] for f in cpu]
             measured_start,measured_end=sample_times(owner['clockAnchor'],cpu,owner['frequencyHz']);pixel=None
             for f in cpu:
-                for name in ('processAllocatedBytes','threadAllocatedBytes'):require(integer(f[name],name)<=policies['allocation-budget']['maximumPerSample'][name],'Gameplay full-process/thread allocation budget exceeded')
+                for name in (() if observation_version==1 else ('processAllocatedBytes','threadAllocatedBytes')):require(integer(f[name],name)<=policies['allocation-budget']['maximumPerSample'][name],'Gameplay full-process/thread allocation budget exceeded')
                 for name in MEMORY_COUNTERS:require(integer(f['memory'][name],name)<=policies['gpu-memory-budget']['maximumPerSample'][name],'Gameplay logical memory budget exceeded')
         elif collector:
             require(frozen_extra is not None and frozen_extra['mode']=='observer-on-off' and (producer=='collector-on')==(arm=='A'),'Actual control arm was changed after freeze')
@@ -490,7 +494,7 @@ def evaluate(cohort,root,repo,trusted_master):
             measured_start,measured_end=sample_times(owner['clockAnchor'],cpu,owner['frequencyHz'])
             if not cold:
                 for f in cpu:
-                    for name in ('processAllocatedBytes','threadAllocatedBytes'):
+                    for name in (() if observation_version==1 else ('processAllocatedBytes','threadAllocatedBytes')):
                         require(integer(f[name],name)<=policies['allocation-budget']['maximumPerSample'][name],'Exact full-frame allocation exceeds reviewed maximum')
                     for name in MEMORY_COUNTERS:
                         require(integer(f['memory'][name],name)<=policies['gpu-memory-budget']['maximumPerSample'][name],'Logical memory exceeds reviewed maximum')
@@ -512,14 +516,49 @@ def evaluate(cohort,root,repo,trusted_master):
             if case.get('coverage')=='mixed-material-skin-mechanics-effects':validate_mixed_consumption(cpu,case,'native')
             payload=[f['milliseconds'] for f in cpu]
             measured_start,measured_end=sample_times(perf['clockAnchor'],[f['measuredInterval'] for f in cpu],perf['cpuTimestampFrequencyHz'])
-        require(start<=measured_start<measured_end<=end,'Original sampled window lies outside actual command')
+        cycle_result=None
+        if observation_version==1:
+            from owner_observations import validate_cycles,cycle_times,validate_cycle_budget
+            from post_window_control import validate_ready,validate_retained,json_exact
+            # This is an additive endpoint contract. Legacy default timing and policy inputs remain unchanged.
+            post=directory/'post-window';ready_raw=(post/'ready.json').read_bytes();ready=validate_ready(ready_raw,native_bytes)
+            actual_frequency=owner['frequencyHz'] if gameplay or producer=='host' or producer=='collector-on' else probe['frequencyHz'] if collector else perf['cpuTimestampFrequencyHz']
+            require(type(ready.get('frequencyHz')) is int and ready['frequencyHz']==actual_frequency,'Ordinary ready frequency differs from actual original producer clock')
+            actual_composition=owner.get('observedComposition') if gameplay else dict(profile=fixture['profile'],lighting=fixture['lighting'],atmosphere=fixture['atmosphere']) if producer=='host' or collector else capture.get('observedComposition')
+            profile_raw=base64.b64decode(ready['caseIdentity']['profileInputBytesBase64'],validate=True)
+            require(actual_composition is not None and json_exact(parse_json_bytes(profile_raw),actual_composition),'Post-window actual composition differs from producer final evidence')
+            if producer=='native':
+                require(ready['endpointKind']=='native-legacy-frame' and ready['lastCycleEndTick'] is None,'Native cannot invent a ClientRenderHost owner-cycle endpoint')
+                last_submission={n:cpu[-1]['actualSubmission'][n] for n in ('submission','submittedFence','generation','resourceGeneration')}
+                measured_last=cpu[-1]['measuredInterval']['endTick'];cycle_last=None
+                control=manifest.get('postWindowControl')
+            else:
+                cycle_data=fixture['ownerCycles'] if collector or producer=='host' else owner['ownerCycles']
+                cycle_frames=owner['frames'] if producer!='collector-off' else cpu
+                require(cycle_data.get('preciseCountersAvailable') is (producer!='collector-off'),'Owner-cycle precise mode differs from actual Full/On/Off producer')
+                cycle_result=validate_cycles(cycle_data,cycle_frames,expected_session=owner['frames'][-1]['simulation']['expectedSession'] if gameplay else None,expected_hwnd=checkpoint['nativeWindowHandle'],producer_kind='actual-live-session' if gameplay else 'authored-world-fixture',warmups=warmups,prefix_frames=owner.get('beforeWindow') if gameplay else None)
+                if producer in ('host','gameplay') and not cold:validate_cycle_budget(cycle_result,policies['allocation-budget'])
+                require(ready['endpointKind']=='owner-cycle-v1','Host control endpoint is not the actual v1 full cycle')
+                measured_start,measured_end=cycle_times(owner['clockAnchor'] if producer!='collector-off' else probe['clockAnchor'],owner['frequencyHz'] if producer!='collector-off' else probe['frequencyHz'],cycle_result)
+                last_submission=cycle_result['lastSubmission'];cycle_last=cycle_result['lastTick']
+                measured_last=(owner['frames'] if producer!='collector-off' else cpu)[-1]['endTick']
+                control=owner.get('postWindowControl') if gameplay else fixture.get('postWindowControl')
+            expected_case=dict(kind='actual-live-session' if gameplay else 'native-reference' if producer=='native' else 'authored-world-fixture',
+                caseKey='session-'+str(owner['frames'][-1]['simulation']['expectedSession']) if gameplay else capture['key'] if producer=='native' else fixture['key'],
+                recipeAvailable=not gameplay,recipeFingerprint=None if gameplay else capture['recipeFingerprint'] if producer=='native' else fixture['recipeFingerprint'],
+                profileFingerprint=sha256_bytes(profile_raw).upper(),simulationSession=owner['frames'][-1]['simulation']['expectedSession'] if gameplay else None,
+                sessionOriginFingerprint=owner['sessionOrigin']['fingerprint'] if gameplay else None,profileInputBytesBase64=base64.b64encode(profile_raw).decode())
+            verified_control=validate_retained(post,native_bytes,binding,last_submission=last_submission,last_measured_end=measured_last,last_cycle_end=cycle_last,
+                case_identity=expected_case,sample_count=count,command_completed_at=attempt['commandCompletedAtUtc'])
+            require(control is not None and control.get('completed') is True and digest(control['receipt']['readySha256'],'producer ready')==verified_control['readySha256'] and digest(control['receipt']['ackSha256'],'producer ACK')==verified_control['ackSha256'],'Producer final ordinary control receipt differs')
+        require(start<=measured_start<measured_end<=end,'Original sampled/full-cycle window lies outside actual command')
         rows=read_journal(directory/'sensors');require(all(row['sample']['command']['argv']==sensor_argv and row['sample']['command']['exitCode']==0 and row['sample']['command']['timedOut'] is False for row in rows),'Physical journal query/tool/exit differs from actual binding provider')
         validate_controls(rows,measured_start,measured_end,binding,policies['hardware-stability-policy'],load(directory,r['preWindowControl']),checkpoint['nativeWindowHandle'])
         actual_device=owner['actualDevice'] if producer in ('host','gameplay') else fixture['device'] if collector else capture['graphics']['device']
         require(actual_device.get('isSoftwareAdapter') is False,'Software adapter cannot qualify physical baseline')
         clock_frequency=owner['frequencyHz'] if producer in ('host','gameplay') else probe['frequencyHz'] if collector else perf['cpuTimestampFrequencyHz']
         measured=measured_distributions(producer,cpu,gpu,clock_frequency,setup=manifest.get('setupMilliseconds') if producer=='host' else capture.get('run') if producer=='native' else None)
-        observed[key]=dict(measured=measured,device=actual_device,cpu=distribution(payload),gpu=distribution([(g['endTick']-g['startTick'])*1000/g['frequencyHz'] for g in gpu]),pixel=pixel,profile=case['effectiveProfile'] if case is not None else None)
+        observed[key]=dict(ownerCycleBundleCpu=distribution([sample['bundleReadEndTicks']*1000/clock_frequency for sample in cycle_result['samples']]) if cycle_result is not None else None,measured=measured,device=actual_device,cpu=distribution(payload),gpu=distribution([(g['endTick']-g['startTick'])*1000/g['frequencyHz'] for g in gpu]),pixel=pixel,profile=case['effectiveProfile'] if case is not None else None)
         chronology.append((start,end,pair,arm));actual_order.append((start,key))
     expected={(p,a,c,producer) for p,a,c,producer in product(range(1,protocol['pairs']+1),('A','B'),cases,('native','host'))}
     for extra_id,extra in extras.items():
@@ -543,7 +582,7 @@ def evaluate(cohort,root,repo,trusted_master):
                 for statistic in ('mean','p50','p95','p99','maximum'):stable_pair(a[metric][statistic],b[metric][statistic])
             require(observed[(p,'A',c,'native')]['device']==observed[(p,'A',c,'host')]['device']==observed[(p,'B',c,'native')]['device']==observed[(p,'B',c,'host')]['device'],'Actual native/host device/debug capabilities differ')
             require(observed[(p,'A',c,'native')]['pixel']==observed[(p,'A',c,'host')]['pixel'] and observed[(p,'B',c,'native')]['pixel']==observed[(p,'B',c,'host')]['pixel'],'Actual host/native fixed recipe pixels differ')
-    overhead=[]
+    overhead=[];cycle_overhead=[]
     for extra_id,extra in extras.items():
         for p in range(1,protocol['pairs']+1):
             a=observed[(p,'A',extra_id,'gameplay' if extra['mode']=='actual-live-gameplay' else 'collector-on')]
@@ -555,7 +594,12 @@ def evaluate(cohort,root,repo,trusted_master):
             else:
                 require(a['pixel']==b['pixel'],'Actual collector-on/off fixed recipe pixels differ')
                 overhead.append(dict(id=extra_id,pair=p,on=a['cpu'],off=b['cpu'],meanOverheadPercent=(a['cpu']['mean']/b['cpu']['mean']-1)*100,
-                    scope='Separate common-probe collector overhead experiment; not an allocation budget or ordinary GPU-instrumentation-off claim'))
+                    scope='Legacy common-probe duration only; excludes optional v1 condition-edge observation cost; not an allocation budget or all-instrumentation-off claim'))
+                if a['ownerCycleBundleCpu'] is not None or b['ownerCycleBundleCpu'] is not None:
+                    require(a['ownerCycleBundleCpu'] is not None and b['ownerCycleBundleCpu'] is not None,'Collector arms select different common v1 interval contracts')
+                    on,off=a['ownerCycleBundleCpu'],b['ownerCycleBundleCpu']
+                    require(off['mean']>0,'V1 common bundle duration is unavailable')
+                    cycle_overhead.append(dict(id=extra_id,pair=p,on=on,off=off,meanOverheadPercent=(on['mean']/off['mean']-1)*100,scope='V1 shared ReadEnd-to-ReadEnd arrival bundles include idle cycles and one condition-edge observer per cycle; initial priming outside; not summed with legacy common probe; descriptive only'))
     analysis={'|'.join(map(str,key)):row for key,row in observed.items()}
     ready=False;analysis_status='open: reviewed original phase/pass/wait/cold/allocation-site ranking and both wave2 lane dispositions required'
     if cohort.get('reviewedAnalysis') is not None:
@@ -568,5 +612,5 @@ def evaluate(cohort,root,repo,trusted_master):
         except (ValueError,KeyError,TypeError,OSError,IndexError) as error:
             analysis_status='open: '+str(error)
     return dict(schemaVersion=1,kind='baseline-admission',status='baseline-controls-accepted',baselineControlsAccepted=True,physicalAcceptance='accepted-controls-only',wave2Ready=ready,baselineAnalysisStatus=analysis_status,measuredAnalysis=analysis,
-                sourceSha=source,trustedMasterSource=trusted_master,cases=len(cases),pairs=protocol['pairs'],attempts=len(runs),requiredCi=imports,collectorOverhead=overhead,
+                sourceSha=source,trustedMasterSource=trusted_master,cases=len(cases),pairs=protocol['pairs'],attempts=len(runs),requiredCi=imports,collectorOverhead=overhead,ownerCycleCollectorOverhead=cycle_overhead,
                 scope='Baseline-only A/A controls; no optimization ranking, future-candidate, lifecycle or human art acceptance inferred',logicalMemoryCounters=list(MEMORY_COUNTERS),physicalAllocationCoverage='unavailable; not confused with logical budget accounting')

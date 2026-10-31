@@ -44,3 +44,105 @@ Source S is the immutable producer build/payload; accepted protocol P must later
 [The versioned raw-QPC contract](evidence/qualification/RawQpcCorrelationContract.md) separates UTC anchor sanity from raw integer ordering for one reviewed Windows CoreCLR/runtime/parser path. Proof is derived only after all existing original evidence gates and actual target-runtime module paths; an arbitrary TraceEvent4 parser build or caller assertion is insufficient. The exact retained parser/dependency hashes and source remain pinned. Unsupported or unproven paths keep generic conservative boundary uncertainty; invalid/foreign explicit proof fails.
 
 For supported proof only, strict integer interior events may match; exact endpoint ties remain ambiguous. UTC/frequency compatibility, loss checks and process/source/runtime/native-thread bindings are unchanged. The analyzer revision and contract byte hash are new analysis provenance, separate from producer/parser source `ec5db189`. No producer rebuild, timestamp fitting, old-result replacement, retroactive runtime hash or physical/baseline/wave 2 acceptance follows from reanalysis.
+
+
+## Owner-cycle and ordinary control observation v1
+
+The additive selection is `ownerObservationVersion: 1` in an actual capture
+request, or `FORGELINE_RENDER_OWNER_OBSERVATION_VERSION=1` for an actual live
+session with its existing telemetry output. Default version0 preserves the old
+collector. Later protocol/policy acceptance must freeze this version explicitly;
+full-cycle budget admission is unavailable until a genuinely reviewed allocation
+policy explicitly selects `allocationInterval: owner-cycle-v1`. Legacy payload
+maxima retain their interval and cannot authorize new full-cycle limits;
+historical observer-overhead measurements do not qualify its cost. The old common
+probe excludes condition-edge work. A separate v1 ReadEnd-to-ReadEnd bundle
+distribution includes intervening idle cycles and one condition-edge observation
+per cycle in both arms; initial priming is outside. These overlapping reports
+are not summed and introduce no new numeric acceptance threshold.
+
+One preallocated condition-edge witness precedes captured-loop construction.
+Adjacent cycles share the identical stored edge as previous END and next START;
+the final sampled edge follows presentation ACK and common-probe tail. A terminal
+finally closes incomplete work before final GPU-idle/teardown. First priming,
+idle/no-payload work, stop, faults and storage overflow remain explicit. Storage
+capacity (default8192, maximum65536) is not a workload or allocation policy.
+
+Full/On record cumulative exact process/thread counters, separately bracketed
+because the two reads are not simultaneous. Existing Begin/Complete absolute
+values are reused without duplicate reads or changed legacy endpoints. Lead,
+payload and tail can be derived where both endpoints exist; their sum is a cycle
+and **cycle plus payload must never be added**. Off uses the same common copied
+facts/clock path but makes no optional precise/thread allocation-counter calls;
+its exact allocation fields remain null. Native reference retains its actual
+legacy measured endpoint and explicitly has no ClientRenderHost cycle or exact
+process-total collector.
+
+A warm first bundle starts immediately after the source-joined final warmup
+cycle, including intervening idle cycles. A cold first bundle starts at its own
+full cycle, never the entire menu/startup prefix; its preceding-measured-success anchor is unavailable. Later bundles
+include every idle/no-payload cycle since the previous retained success. The
+selected v1 allocation-policy input is the exact cumulative bundle delta, not
+only its final payload-bearing cycle. Individual cycle/legacy decompositions
+remain separate and overlapping. A cold
+first edge can precede simulation/audio activation. Missing before-facts remain
+unavailable while exact counter data is retained separately; they are not zero
+work or whole-session evidence.
+
+Copied workload facts contain source identity/session/native owner, read brackets,
+monotonic starts/completions and in-flight ordinals. Concurrent transport has
+separate cumulative start/end counts, not a single-owner ordinal. Touching work is
+started(after) minus completed(before); nested operations are not summed as
+independent byte charges. Platform facts distinguish removed native messages,
+WM_QUIT, dispatch, pumps, arrivals/dequeues/discards, initial observed queue depth
+and high water. Synchronous native callbacks (including SendMessage) can run
+outside Translate/Dispatch; a returned dispatch does not prove callback success
+when the existing window callback catches an exception. Those source-ledger
+terms remain unresolved; pump/dispatch counts are not a complete Platform
+allocator bound. Library/runtime/first-use/error and teardown byte terms also
+remain OPEN until the complete source-derived ledger is reviewed. Simulation callbacks and platform providers flow upward as copied
+values; no render access to mutable ECS/platform queues is introduced.
+
+Simulation slots0..7 are tick, executed control, drain, submission, pause/resume,
+terminal acknowledgement, smoke control and status publication. Transport event
+slots0..5 are attempted/admitted/rejected/drained/completion-publication/dequeue;
+transport span slots0..2 are whole admission, completion dequeue and completion
+publication. Public composition is supported; compiled Developer transports are
+explicitly unsupported. Pre-host restore/initial status and lifecycle work are
+outside activation. Outer legacy CompletedTicks/State reads are not the same
+instant as the coherent workload vector. NotifyProgress and caller-created
+delegates remain separate ledger terms; these vectors do not claim every
+simulation allocation belongs to a tick.
+
+Audio slots0..2 are initialization, UI play/world iteration, and UI recovery/world
+output attempt. UI events0/1 count Update calls and Update enabled changes, not
+every generation increment; UI events2/3 count completed play success/failure.
+World events0/1/2/4 count blocks, handled failures, accepted Publish calls and
+owner-observed reset changes. World iterations are observed independently of
+blocks; waits of2/10ms are not rate caps and output attempts may reset. Sampled
+latest-published immutable snapshot population/high water covers observations at
+render-owner fact reads, not every publication or transient ECS maximum.
+
+Ordinary post-window control is separate from diagnostic trace holds. After the
+sealed final cycle (or native legacy endpoint), before readbacks, the producer
+publishes actual source/runtime/run/checkpoint/PID/HWND/case/profile bytes and the
+final submission/fence/device/resource generation tuple. The launcher snapshots
+that ready before starting a **new** query. A query already in flight cannot ACK.
+The journal row and constant-size prefix are flushed and fsynced before the
+source-owned receipt is returned; ACK verification recomputes the actual journal
+prefix and last row and joins original raw CSV/provider UUID+PCI and Win32 facts.
+
+There is one absolute existing five-second coverage cutoff derived from the
+selected original endpoint, plus the original command deadline. Ready, query and
+ACK never start fresh budgets. The final consumer independently joins the actual
+last frame/cycle/count/composition and applies hardware coverage to the selected
+full-cycle interval. Default/legacy endpoints retain their old interpretation.
+The actual gameplay close guard is nonblocking on the platform owner; it preserves
+smoke completion scheduling and the one-minute progress timeout while waiting for
+ordinary control completion. Native waiting continues event pumping.
+
+These are observations and control integrity, not approved byte ceilings,
+continuous visibility, hardware stability, repeatable pixels or baseline/wave2
+admission. The detailed PR449 report remains local by the current session publication choice.
+No new physical capture or
+trace is implied by CPU regression results.

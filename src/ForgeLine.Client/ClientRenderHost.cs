@@ -8,6 +8,7 @@ using ForgeLine.Graphics;
 using ForgeLine.Presentation;
 using ForgeLine.Simulation;
 using ForgeLine.World;
+using ForgeLine.Platform.Windows;
 
 namespace ForgeLine.Client;
 
@@ -149,6 +150,10 @@ internal sealed partial class ClientRenderHost : IDisposable
     private readonly LiveSessionOrigin? _sessionOrigin;
     private readonly ClientFrontendRenderHost? _frontendOwner;
     private readonly Func<ClientSimulationTelemetry>? _simulationTelemetry;
+    private readonly Func<PlatformWorkloadTelemetry>? _platformWorkload;
+    private readonly int _ownerObservationVersion, _ownerCycleCapacity;
+    private OwnerCycleObservations? _ownerCycles;
+    private int _observedInstanceHighWater;
     private readonly ClientRenderPublication _publication = new();
     private object _frameGate => _publication.Gate;
     private ObjectActionRingView _latestActionRing;
@@ -200,7 +205,8 @@ internal sealed partial class ClientRenderHost : IDisposable
         ParticleSettings? particles = null,
         RenderQualitySettings? renderQuality = null,
         TerrainPresentationProfile? terrainProfile = null,
-        ReferenceFixtureRecipe? referenceFixture = null, LiveSessionOrigin? sessionOrigin = null)
+        ReferenceFixtureRecipe? referenceFixture = null, LiveSessionOrigin? sessionOrigin = null,
+        int ownerObservationVersion = 0,int ownerCycleCapacity = 8192,Func<PlatformWorkloadTelemetry>? platformWorkload = null)
     {
         _startup = startup ?? StartupDiagnostics.Disabled;
         _asynchronousStartup = asynchronousStartup;
@@ -208,6 +214,10 @@ internal sealed partial class ClientRenderHost : IDisposable
         _sessionOrigin = sessionOrigin;
         _frontendOwner = transitionHost;
         _simulationTelemetry = simulationTelemetry;
+        _platformWorkload=platformWorkload;
+        _ownerObservationVersion=referenceFixture?.OwnerObservationVersion ?? ownerObservationVersion;
+        _ownerCycleCapacity=referenceFixture?.OwnerCycleCapacity ?? ownerCycleCapacity;
+        if(_ownerObservationVersion is not (0 or 1))throw new ArgumentOutOfRangeException(nameof(ownerObservationVersion));
         if (transitionHost is not null && !asynchronousStartup)
             throw new ArgumentException("A renderer continuation requires asynchronous startup.", nameof(asynchronousStartup));
         initialTarget.Validate();
@@ -464,6 +474,7 @@ internal sealed partial class ClientRenderHost : IDisposable
             var composition = ClientRenderConfiguration.Resolve(graphics, qualitySettings,
                 initialTarget.Width, initialTarget.Height, _sceneLighting, _referenceFixture?.Atmosphere ?? _sceneAtmosphere.Graphics);
             composition.Apply(graphics);
+            ConfigurePostWindowControl(liveTelemetry,composition);
             if (_referenceFixture is not null) { _fixtureComposition = composition; _fixtureDevice = graphics.Diagnostics.Device; }
             RenderQualityProfile qualityProfile = composition.Profile;
             SceneLightingSettings lighting = composition.Lighting;
@@ -486,8 +497,29 @@ internal sealed partial class ClientRenderHost : IDisposable
             var dockFeedback = new UiInteractionFeedback();
             var ringMotion = new ObjectActionRingMotion();
             var frontendFeedback = new UiInteractionFeedback();
-            using var uiAudio = new WaveOutUiAudio();
-            using var worldAudio = new WaveOutWorldAudio(expectedSession: _expectedSession);
+            using var uiAudio = new WaveOutUiAudio(observeWorkload:_ownerObservationVersion==1);
+            using var worldAudio = new WaveOutWorldAudio(expectedSession: _expectedSession,observeWorkload:_ownerObservationVersion==1);
+            if(_ownerObservationVersion==1)
+            {
+                if(_referenceFixture is null && liveTelemetry is null)throw new InvalidOperationException("Live owner observations require the explicit telemetry output stream.");
+                OwnerWorkloadFacts CaptureFacts()
+                {
+                    long started=Stopwatch.GetTimestamp();
+                    OwnerWorkloadSnapshot simulation=_simulationTelemetry?.Invoke().Workload ?? default;
+                    PlatformWorkloadTelemetry platform=_platformWorkload?.Invoke() ?? default;
+                    var ui=uiAudio.Workload;var audio=worldAudio.Workload;
+                    OwnerSnapshotPopulation population=default;
+                    PresentationSnapshot? immutable=_referenceFixture?.Snapshot;
+                    if(immutable is not null || snapshots.TryReadLatest(out immutable))
+                    {
+                        _observedInstanceHighWater=Math.Max(_observedInstanceHighWater,immutable.InstanceCount);
+                        population=new(true,immutable.SessionId.Value,immutable.Tick.Value,immutable.SimulationEntityCount,immutable.InstanceCount,_observedInstanceHighWater,_referenceFixture is null ? "latest-published-observed" : "actual-authored-recipe");
+                    }
+                    return new(started,Stopwatch.GetTimestamp(),simulation,platform,ui,audio,_referenceFixture is not null,_platformWorkload is not null,population);
+                }
+                _ownerCycles=new(_ownerCycleCapacity,liveTelemetry is not null,CaptureFacts);
+                if(liveTelemetry is not null){liveTelemetry.ObserveAbsoluteReadBrackets=true;liveTelemetry.OwnerCycles=_ownerCycles;}
+            }
             using var gameplayOverlayRenderer =
                 new DebugDrawRenderer(
                     graphics,
@@ -565,7 +597,10 @@ internal sealed partial class ClientRenderHost : IDisposable
 
             bool presentedLastIteration = false;
             long terrainDeferredFrames = 0;
-            while (Volatile.Read(ref _stopping) == 0)
+            bool cycleLoopCompleted=false;
+            try
+            {
+            while (Volatile.Read(ref _stopping) == 0 && ObserveOwnerCycleEdge(_ownerCycles,this))
             {
                 // Active rendering is paced by the device, not an extra 16 ms
                 // mailbox sleep. Suspended/occluded/empty work still sleeps.
@@ -591,7 +626,10 @@ internal sealed partial class ClientRenderHost : IDisposable
                     if (!_fixtureSequence!.TryRead(out fixtureOrdinal)) continue;
                 }
                 long collectorControlStart = _fixtureCollectorControl is null ? 0 : Stopwatch.GetTimestamp();
+                OwnerWorkloadFacts beginFacts=_ownerCycles?.Facts() ?? default;
                 LiveTelemetryStart liveStart = liveTelemetry?.Begin(new(signalWaitStart, signalWaitEnd)) ?? default;
+                OwnerWorkloadFacts beginFactsAfter=_ownerCycles?.Facts() ?? default;
+                _ownerCycles?.BeginPayload(liveStart,beginFacts,beginFactsAfter);
                 ClientRenderFrame? frame =
                     TakeLatestFrame();
 
@@ -1032,10 +1070,20 @@ internal sealed partial class ClientRenderHost : IDisposable
                             telemetry.SessionId.Value, telemetry.CompletedTicks, telemetry.State == RuntimeSimulationState.Running) : null);
                 if (_referenceFixture is not null && graphics.PresentedFrameCount > presentedBefore)
                     AcknowledgeFixtureFrame(fixtureOrdinal, renderCamera.CaptureState(), width, height, snapshot, (IGraphicsRenderTelemetry)graphics, instanceRenderer, diagnostics.Surface.BufferCount, gameplayHudRenderer.LastRenderedVertexCount, particleRenderer.Diagnostics);
+                if(_referenceFixture is not null && graphics.PresentedFrameCount>presentedBefore)
+                    _ownerCycles?.FixtureFrame(fixtureOrdinal,_referenceFixture.Warmups,_referenceFixture.Samples,((IGraphicsRenderTelemetry)graphics).LastSubmission!.Value);
                 if (_fixtureCollectorControl is not null && fixtureOrdinal < _referenceFixture!.Warmups + _referenceFixture.Samples)
-                    _fixtureCollectorControl.Record(fixtureOrdinal, collectorControlStart, Stopwatch.GetTimestamp(),
+                {
+                    long commonProbeEnd=Stopwatch.GetTimestamp();
+                    _fixtureCollectorControl.Record(fixtureOrdinal, collectorControlStart, commonProbeEnd,
                         ((IGraphicsRenderTelemetry)graphics).LastSubmission!.Value, renderCamera.CaptureState(), width, height);
+                    _ownerCycles?.CommonProbeEnd(commonProbeEnd);
+                }
             }
+
+            cycleLoopCompleted=true;
+            }
+            finally { _ownerCycles?.Close(cycleLoopCompleted); }
 
             graphics.WaitForIdle();
             if (_referenceFixture is not null && liveTelemetry is not null) liveTelemetry.ValidateFixtureCorrespondence(_fixtureFrames!);
@@ -1064,10 +1112,21 @@ internal sealed partial class ClientRenderHost : IDisposable
         }
     }
 
+    private static bool ObserveOwnerCycleEdge(OwnerCycleObservations? observation,ClientRenderHost owner)
+    {
+        observation?.Edge();owner.ObservePostWindowControl(observation);return true;
+    }
+
     private void CompleteLiveTelemetry(LiveRenderTelemetry? collector, in LiveTelemetryStart start,
         string state, long prepareStart = 0, long prepareEnd = 0, LiveSimulationProvenance? simulation = null)
     {
+        OwnerWorkloadFacts before=_ownerCycles?.Facts() ?? default;
+        int previous=collector?.Count ?? 0;
         collector?.Complete(start, state, prepareStart, prepareEnd, simulation);
+        OwnerWorkloadFacts after=_ownerCycles?.Facts() ?? default;
+        int? payload=collector is not null && collector.Count>previous ? previous : null;
+        _ownerCycles?.EndPayload(state,payload,collector?.LastAbsoluteRead,before,after,collector?.WindowCompleted==true);
+        if(payload.HasValue && collector?.LastObservedFrame is { } observed)_ownerCycles?.Submission(observed);
         if (collector?.WindowCompleted == true) Volatile.Write(ref _telemetryWindowPending, 0);
     }
 
