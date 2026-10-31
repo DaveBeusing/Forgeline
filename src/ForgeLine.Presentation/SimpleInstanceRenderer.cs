@@ -180,6 +180,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
     public void Prepare(RtsCamera camera, RenderWorld world, in RenderPreparationRequest request, ParticleVfxRenderer? particles = null)
     {
         ThrowIfDisposed();
+        _contentEvidence?.Invalidate();
         ArgumentNullException.ThrowIfNull(camera);
         ArgumentNullException.ThrowIfNull(world);
         if (_graphics.IsRecording) throw new InvalidOperationException("Prepare assets before command recording.");
@@ -253,6 +254,7 @@ public sealed partial class SimpleInstanceRenderer : IDisposable
         finally { _runtimeAssets?.EndRecord(); }
         if (world.CurrentSnapshot?.ChunkDecorations is not null)
             (_decorations ?? throw new InvalidOperationException("Prepare decoration before recording.")).Render(context, camera, world, presentationSeconds);
+        if (_contentEvidence is not null) RecordMainContentEvidence(context);
     }
 
     public void RenderShadow(IGraphicsCommandContext context, RtsCamera camera, RenderWorld world, float alpha,

@@ -25,18 +25,25 @@ public sealed class TerrainLifetimeTests
     }
 
     [Fact]
-    public void DisposalObservesCancelledCpuWorkAndCannotPublishIntoTheNextMap()
+    public async Task DisposalObservesCancelledCpuWorkAndCannotPublishIntoTheNextMap()
     {
-        using var entered = new ManualResetEventSlim();
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var worker = new TerrainPreparationWorker();
         var oldSource = new TerrainPreparedSource(TerrainPreparationTests.FlatWorld(0), new(), new([]), new());
-        worker.Start([0], (index, token) =>
+        try
         {
-            entered.Set(); token.WaitHandle.WaitOne(); token.ThrowIfCancellationRequested();
-            return oldSource.Build(index, token);
-        });
-        Assert.True(entered.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
-        worker.Dispose(); Assert.False(worker.Busy); Assert.Equal(0, worker.PendingCount); Assert.Null(worker.Harvest());
+            worker.Start([0], (index, token) =>
+            {
+                entered.SetResult(true); token.WaitHandle.WaitOne(); token.ThrowIfCancellationRequested();
+                return oldSource.Build(index, token);
+            });
+            Assert.True(await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+        }
+        finally
+        {
+            worker.Dispose();
+        }
+        Assert.False(worker.Busy); Assert.Equal(0, worker.PendingCount); Assert.Null(worker.Harvest());
         var changed = new TerrainWorld(new(), [new(new(0, 0), new TerrainHeightfield(65, 256, Enumerable.Repeat(37f, 65 * 65).ToArray()))]);
         var fresh = new TerrainPreparedSource(changed, new(), new([]), new()).Build(0, CancellationToken.None);
         Assert.All(fresh.Vertices, v => Assert.Equal(37, v.Position.Y));

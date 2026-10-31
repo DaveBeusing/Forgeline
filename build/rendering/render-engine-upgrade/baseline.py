@@ -1,4 +1,4 @@
-"""Fail-closed wave 1 diagnostic entry point; no accepted benchmark admission."""
+"""Diagnostic acquisition and evidence-bound baseline controls; overall reviewed handoff is separate."""
 import argparse
 from datetime import datetime,timezone
 from pathlib import Path
@@ -11,7 +11,7 @@ def main(argv=None):
     p=sub.add_parser('plan');p.add_argument('--execution-source',required=True);p.add_argument('--planning-source',required=True);p.add_argument('--output',required=True)
     p=sub.add_parser('analyze-owner');p.add_argument('--input',required=True);p.add_argument('--output',required=True);p.add_argument('--historical',action='store_true')
     p=sub.add_parser('diagnose');p.add_argument('--output',required=True);p.add_argument('--nvidia-smi',required=True);p.add_argument('--manifest');p.add_argument('--global-json');p.add_argument('--uuid');p.add_argument('--pid',type=int);p.add_argument('--hwnd',type=lambda v:int(v,0));p.add_argument('--samples',type=int,default=3);p.add_argument('--interval',type=float,default=1)
-    p=sub.add_parser('admit');p.add_argument('--output',required=True)
+    p=sub.add_parser('admit');p.add_argument('--output',required=True);p.add_argument('--cohort');p.add_argument('--repository');p.add_argument('--trusted-master-source')
     args=parser.parse_args(argv)
     try:
         if args.command=='plan':
@@ -28,10 +28,16 @@ def main(argv=None):
                 native=native_identity(read_json(args.manifest),read_json(args.global_json)['sdk']['version'])
             acquire(args.output,args.nvidia_smi,native,args.uuid,args.samples,args.interval,args.pid,args.hwnd)
         else:
-            value=dict(kind='baseline-admission',status='blocked',physicalAcceptance='open',wave2Ready=False,
-                       reasons=['renderer-to-provider physical identity unavailable','previously reviewed hardware/allocation/GPU-memory policies unavailable',
-                                'exact-source required CI admission unverified','native-fixture live binding unavailable','qualified A/A cohorts unavailable'])
-            write_new(args.output,value);qualified_wave0_snapshot()
+            from baseline_admission import evaluate
+            try:
+                if not all((args.cohort,args.repository,args.trusted_master_source)):
+                    raise ContractError('Admission requires a hash-bound actual cohort, repository, and explicit accepted-master source; diagnostic labels alone cannot qualify')
+                cohort_path=Path(args.cohort).resolve()
+                value=evaluate(read_json(cohort_path),cohort_path.parent,args.repository,args.trusted_master_source)
+            except (OSError,ValueError,KeyError,TypeError,IndexError) as error:
+                write_new(args.output,dict(schemaVersion=1,kind='baseline-admission',status='blocked',physicalAcceptance='open',wave2Ready=False,reasons=[str(error)]))
+                raise ContractError(str(error)) from error
+            write_new(args.output,value)
         return 0
     except (OSError,ValueError,KeyError) as error:
         print(str(error),file=sys.stderr);return 2

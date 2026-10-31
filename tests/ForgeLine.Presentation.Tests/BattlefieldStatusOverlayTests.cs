@@ -79,7 +79,7 @@ public sealed class BattlefieldStatusOverlayTests
     [InlineData(1000)]
     public void SelectedEmptyArtillerySurvivesDenseFormationAndToggleAndStaleDataClear(float distance)
     {
-        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = distance });
+        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = distance, MaximumDistance = 1000 });
         var snapshot = Snapshot(100, enemy: false);
         var view = RtsInformationLayerView.Empty with { SelectedEntities = [new(100, 1)], OverlayMode = StrategicOverlayMode.Supply };
         var overlay = new BattlefieldStatusOverlay();
@@ -129,7 +129,43 @@ public sealed class BattlefieldStatusOverlayTests
         void Update() => overlay.Update(source, camera, view, new(0, 0, 1600, 900), 1, 1600, 900);
     }
 
-    internal static PresentationSnapshot Snapshot(int count, bool enemy = false, bool stale = false, bool wrongSession = false)
+    [Theory]
+    [InlineData(800, 450, 192u, 2f, 1000f)]
+    [InlineData(1600, 900, 192u, 2f, 1000f)]
+    [InlineData(800, 450, 96u, 1f, 120f)]
+    public void StatusFixtureUsesActualViewportClipAndUnclampedStrategicCamera(int width, int height, uint dpi, float scale, float distance)
+    {
+        var camera = new RtsCamera(new() { InitialTarget = Vector3.Zero, InitialDistance = distance, MaximumDistance = 1000 });
+        Assert.Equal(distance, camera.Distance);
+        var layout = GameplayHudLayout.Create(width, height, dpi, scale);
+        var position = StatusFixturePosition(camera, layout);
+        var overlay = new BattlefieldStatusOverlay();
+        var clip = StatusClip(layout);
+        var view = RtsInformationLayerView.Empty with { OverlayMode = StrategicOverlayMode.Supply };
+        overlay.Update(Snapshot(1, position: position), camera, view, clip, layout.Scale, width, height);
+        Assert.Equal(1, overlay.Count);
+        Assert.True(clip.Contains(overlay.Markers[0].Position));
+        Assert.True(overlay.Markers[0].Bounds.Bottom <= clip.Bottom);
+        overlay.Update(Snapshot(1, enemy: true, position: position), camera, view, clip, layout.Scale, width, height);
+        Assert.Equal(0, overlay.Count);
+    }
+    internal static HudRect StatusClip(GameplayHudLayout layout) => new(layout.SafeArea.X, layout.TopStatusBar.Bottom,
+        layout.SafeArea.Width, MathF.Max(0, layout.Minimap.Y - layout.TopStatusBar.Bottom));
+    internal static Vector3 StatusFixturePosition(RtsCamera camera, GameplayHudLayout layout)
+    {
+        var clip = StatusClip(layout);
+        Assert.False(clip.IsEmpty);
+        // Same actual marker anchor height consumed by BattlefieldStatusOverlay.
+        var instance = Snapshot(1).Instances[0];
+        float anchorY = PresentationBounds.ResolveLocalHalfExtents(instance).Y + 2;
+        float markerRadius = (camera.Distance >= 600 ? 7 : 9) * layout.Scale;
+        float labelHeight = 38 * layout.Scale;
+        Assert.True(clip.Height >= labelHeight, "Actual viewport must fit the complete label, not only its anchor.");
+        var center = new Vector2(clip.X + clip.Width * .5f, clip.Y + markerRadius + (clip.Height - labelHeight) * .5f);
+        Assert.True(camera.TryScreenPointToWorldOnHorizontalPlane(center, anchorY, layout.ViewportWidth, layout.ViewportHeight, out var anchor));
+        return anchor - Vector3.UnitY * anchorY;
+    }
+    internal static PresentationSnapshot Snapshot(int count, bool enemy = false, bool stale = false, bool wrongSession = false, Vector3 position = default)
     {
         var members = new CombatGroupMemberReadModel[count];
         var instances = new RenderInstance[count];
@@ -139,7 +175,7 @@ public sealed class BattlefieldStatusOverlayTests
             members[i] = new(entity, ControllableEntityCategory.Unit, true, 1, true,
                 BattlefieldSupplyStatus.Unsupplied, 0, 0, true, 1, 0, false, default, false, default, false, default)
                 { BattlefieldStatus = new(default, true, FireMissionStatus.NoAmmo, false) };
-            instances[i] = new(entity, RenderTransform.Identity, default, default, RenderVisibilityMask.World,
+            instances[i] = new(entity, RenderTransform.Identity with { Position = position }, default, default, RenderVisibilityMask.World,
                 Selectable: new(new(enemy ? 2UL : 1UL), ControllableEntityCategory.Unit));
         }
         var experience = default(PlayerExperienceSnapshot) with { Player = new(1), Tick = new(1), MatchStatus = PlayerMatchStatus.Active };

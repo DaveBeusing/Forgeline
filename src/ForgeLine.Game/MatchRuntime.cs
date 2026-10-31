@@ -175,7 +175,9 @@ public sealed class MatchRuntime : IDisposable
                 throw new ArgumentException("Invalid initial developer overrides: " + failure, nameof(initial));
             runtimeSettings = developerPlan!.Settings;
         }
-        else if (runtimeSettings.Composition.Identity is not null && ScenarioRegistry.Default.Descriptors.Any(d => d.Key == runtimeSettings.Composition.Key))
+        else if (runtimeSettings.Composition.Identity is not null &&
+            (runtimeSettings.Composition.Key is CentralDivideScenario.CompositionKey or SplitBasinBattlefield.CompositionKey) &&
+            ScenarioRegistry.Default.Descriptors.Any(d => d.Key == runtimeSettings.Composition.Key))
             developerPlan = DeveloperRestartBuilder.ForExisting(runtimeSettings);
 #else
         if (initial is not null) throw new InvalidOperationException("Developer initial overrides are unavailable publicly.");

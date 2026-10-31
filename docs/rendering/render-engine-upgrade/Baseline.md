@@ -1,8 +1,18 @@
 # Baseline status
 
-No qualified RenderEngine performance baseline has been established. Wave 1 delivers diagnostic acquisition, frozen-protocol preparation, strict admission refusal and source-labelled owner telemetry analysis. Physical baseline acceptance remains OPEN and wave 2 is NOT READY.
+[Documentation](../../README.md) - [Complete catalog](../../DocumentationIndex.md)
 
-Blocking admissions are exact renderer-to-sensor physical mapping, reviewed common hardware/allocation/GPU-memory policies, native-fixture live binding, exact-source required CI, frozen binary/runtime inventories, and complete controlled A/A cohorts. Native adapter names and caller-supplied hashes cannot close physical identity. No policy bounds or approval have been manufactured.
+The [admission contract implementation](Admission.md) adds actual device/session/fixture proof and strict controls without establishing measurements. No qualified RenderEngine performance baseline has been established. Wave 1 delivers diagnostic acquisition, frozen-protocol preparation, strict admission refusal and source-labelled owner telemetry analysis. Physical baseline acceptance remains OPEN and wave 2 is NOT READY.
+
+The [current admission delivery record](Admission.md#delivery-validation-and-retained-evidence) and [exact evidence index](evidence/admission/validation.json) distinguish source `5e6faeb` (17 canonical stages passed, one terrain fixture entry-barrier failure) from clean follow-up `05a1aedd` (all nine declared stages passed, full suite 4858 passed / 81 skipped / zero failed, reproducible publication and natural terminal match). It does not imply all 20 stages were rerun at the later source.
+
+Actual renderer/session identity, matched recipe, sensor journaling and strict baseline-control implementations now exist. Their functional contracts do not establish an accepted physical baseline. Reviewed common hardware/allocation policies, complete stable controlled A/A captures, native/host pixel parity, positive actual mixed-content coverage and reviewed baseline analysis remain open. Header-compatible sampled fixture stacks do not establish warm render-owner sites. Native adapter names or caller-supplied hashes cannot substitute for actual process/device binding. Neither original wave 2 lane may select an optimization from these diagnostic results.
+
+[The required Developer-package follow-up](Admission.md#required-developer-package-compatibility-follow-up) retains the first hosted failure and its clean-head three-case reproduction. The narrow Developer-only canonical tuning eligibility repair at `7fcfc5d4` passes new Public/Developer regressions and unchanged exported package validation for all five registered scenarios. This is compatibility evidence, not an accepted performance baseline; the earlier full-suite and publication records retain their own sources.
+
+## Historical diagnostic-toolkit delivery
+
+The following observations retain the earlier package's original source identities. Statements about unavailable producer capabilities describe that historical delivery; current implementation is documented in Admission.md. They are not new qualification runs for this PR.
 
 Functional canonical validation passed all 19 stages. [Literal commands, exits, source splits and raw-log hashes](evidence/baseline/canonical-validation.json) retain the exact observations. Release build completed with zero warnings/errors; the serial solution suite reported 4,907 total / 4,826 passed / 81 skipped / 0 failed in 27m40.288s. Both map compiles, scenario recovery, fresh 2,055 runtime assets, native smoke, headless 1k/10k, version/reference contracts and reproducible publication passed. The natural seed-2026 match reached Victory / CommandCoreDestroyed, winner 1, tick 59,098 before the 80,000 ceiling; CLI elapsed 354,032.5 ms. No assertion, terminal condition or deadline was relaxed.
 

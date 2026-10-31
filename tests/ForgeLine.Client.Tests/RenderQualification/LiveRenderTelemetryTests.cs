@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Diagnostics;
 using ForgeLine.Graphics;
 using Xunit;
 
@@ -132,6 +133,78 @@ public sealed class LiveRenderTelemetryTests
         Assert.True(observer.GetProperty("endProcessCounter").GetProperty("endTick").GetInt64() <= serviceEnd);
         Assert.True(observer.GetProperty("gpuDrain").GetProperty("endTick").GetInt64() <= serviceEnd);
         Assert.True(serviceStart <= start && end <= serviceEnd);
+    }
+    [Fact]
+    public void FailedFixtureAttemptDoesNotConsumeWarmupsOrSamplesAndCannotResume()
+    {
+        using var collector = new LiveRenderTelemetry(new Source(), 2, warmups: 2);
+        collector.RecordFixtureFailure(collector.Begin(), "fixture-not-presented");
+        Assert.Equal(0, collector.Count); Assert.False(collector.WindowCompleted);
+        using var report = JsonDocument.Parse(collector.Export().ToJsonString());
+        Assert.Equal(0, report.RootElement.GetProperty("beforeWindow").GetArrayLength());
+        Assert.Equal(2, report.RootElement.GetProperty("failedFixtureAttempt").GetProperty("warmupsRemaining").GetInt32());
+        Assert.Throws<InvalidOperationException>(() => collector.Begin());
+        Assert.Throws<InvalidOperationException>(() => collector.RecordFixtureFailure(default, "replacement"));
+    }
+    [Theory]
+    [InlineData(0)] [InlineData(1)] [InlineData(2)] [InlineData(3)] [InlineData(4)] [InlineData(5)] [InlineData(6)]
+    public void ActualCpuAckAndCompletedGpuTuplesMustJoinExactly(int defect)
+    {
+        var source = new SubmittedSource { Remaining = defect == 5 ? 0 : 1 };
+        using var collector = new LiveRenderTelemetry(source, 1);
+        var start = collector.Begin();
+        while (Stopwatch.GetTimestamp() <= start.Tick + 3) Thread.SpinWait(1);
+        source.CpuIntervals = new(1, new(start.Tick + 1, start.Tick + 2), new(start.Tick + 1, start.Tick + 2), new(start.Tick + 1, start.Tick + 1), true, 999, 7, 3);
+        collector.Complete(start, "gameplay");
+        var ack = new ReferenceFixtureFrameObservation(0, 0, default, 1920, 1080, 999, 7, 3, default, default, 3, 0, 0, 0);
+        ack = defect switch { 1 => ack with { Index = 1 }, 2 => ack with { Ordinal = 1 }, 3 => ack with { SubmittedFence = 1 },
+            4 => ack with { Generation = 8 }, 6 => ack with { ResourceGeneration = 4 }, _ => ack };
+        if (defect == 0) collector.ValidateFixtureCorrespondence([ack]);
+        else Assert.Throws<InvalidDataException>(() => collector.ValidateFixtureCorrespondence([ack]));
+    }
+    [Fact]
+    public void DuplicateCpuAndAckTupleCannotHideAnUnreferencedDistinctGpuCompletion()
+    {
+        var source = new SubmittedSource { Remaining = 2, IncrementFence = true };
+        using var collector = new LiveRenderTelemetry(source, 2);
+        for (int i = 0; i < 2; i++)
+        {
+            var start = collector.Begin();
+            while (Stopwatch.GetTimestamp() <= start.Tick + 3) Thread.SpinWait(1);
+            source.CpuIntervals = new((ulong)i + 1, new(start.Tick + 1, start.Tick + 2), new(start.Tick + 1, start.Tick + 2),
+                new(start.Tick + 1, start.Tick + 1), true, 999, 7, 3);
+            collector.Complete(start, "gameplay");
+        }
+        var first = new ReferenceFixtureFrameObservation(0, 0, default, 1920, 1080, 999, 7, 3, default, default, 3, 0, 0, 0);
+        Assert.Throws<InvalidDataException>(() => collector.ValidateFixtureCorrespondence([first, first with { Index = 1, Ordinal = 1 }]));
+    }
+    [Theory]
+    [InlineData(true, true)] [InlineData(false, true)] [InlineData(true, false)]
+    public void RealGameplayAttestationRequiresMatchingActualSessionAndProgress(bool matching, bool progressing)
+    {
+        using var collector = new LiveRenderTelemetry(new Source(), 2);
+        collector.BindSessionOrigin(LiveSessionOriginTests.Origin());
+        collector.Complete(collector.Begin(), "gameplay", simulation: new(7, 7, 10, 7, 10, true));
+        collector.Complete(collector.Begin(), "gameplay", simulation: new(7, matching ? 7UL : 8UL, 11, 7, progressing ? 11UL : 10UL, true));
+        using var json = JsonDocument.Parse(collector.Export().ToJsonString());
+        Assert.Equal(matching && progressing, json.RootElement.GetProperty("modeAttestationAvailable").GetBoolean());
+    }
+    private sealed class SubmittedSource : IGraphicsRenderTelemetry
+    {
+        internal int Remaining { get; init; } = 1;
+        internal bool IncrementFence { get; init; }
+        private int _read;
+        public bool TelemetryOverflowed => false;
+        public GraphicsCpuFrameIntervals CpuIntervals { get; set; }
+        public GraphicsResourceMemoryTelemetry ResourceMemory => default;
+        public void EnableRenderTelemetry(int capacity = 8192) { }
+        public void StopRenderTelemetry() { }
+        public bool TryReadGpuCompletion(out GraphicsRawGpuTiming sample)
+        {
+            ulong fence = 999UL + (IncrementFence ? (ulong)_read : 0);
+            sample = new(7, 3, fence, fence, 1000, 10, 20, 15, 18, null, null, null, null);
+            return _read++ < Remaining;
+        }
     }
     private sealed class Source : IGraphicsRenderTelemetry
     {

@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - build/rendering/qualification/**
+      - build/rendering/render-engine-upgrade/**
+      - docs/rendering/render-engine-upgrade/**
       - tests/ForgeLine.Presentation.Tests/RenderQualification/**
       - tests/ForgeLine.Graphics.Tests/RenderQualification/**
       - tests/ForgeLine.Client.Tests/RenderQualification/**
@@ -14,6 +16,8 @@ on:
     branches: [master]
     paths:
       - build/rendering/qualification/**
+      - build/rendering/render-engine-upgrade/**
+      - docs/rendering/render-engine-upgrade/**
       - tests/ForgeLine.Presentation.Tests/RenderQualification/**
       - tests/ForgeLine.Graphics.Tests/RenderQualification/**
       - tests/ForgeLine.Client.Tests/RenderQualification/**
@@ -80,7 +84,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           New-Item artifacts -ItemType Directory -Force | Out-Null
           $paths | Where-Object { $_ -ne 'Directory.Build.props' } | Set-Content artifacts/qualification-ownership.txt -Encoding utf8NoBOM
-          python build/rendering/qualification/ci_scope.py --base $env:QUALIFICATION_BASE_SHA --head $env:QUALIFICATION_HEAD_SHA --diff-file artifacts/qualification-ownership.txt --report artifacts/qualification-scope.json
+          python build/rendering/qualification/baseline_scope.py --base $env:QUALIFICATION_BASE_SHA --head $env:QUALIFICATION_HEAD_SHA --diff-file artifacts/qualification-ownership.txt --report artifacts/qualification-scope.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if ($paths -contains 'Directory.Build.props') {
             $before = (& git show "$($env:QUALIFICATION_BASE_SHA):Directory.Build.props") -join "`n"
@@ -98,6 +102,8 @@ jobs:
           }
       - name: Evidence integrity, statistics and hardware admission negatives
         run: python -m unittest discover -s build/rendering/qualification -p 'test_*.py' -v
+      - name: Baseline provider, identity and control contracts
+        run: python -m unittest discover -s build/rendering/render-engine-upgrade -p 'test_*.py' -v
       - name: Existing ownership positive and negative contracts
         run: python -m unittest discover -s build/rendering/parallelization -p 'test_*.py' -v
       - name: PowerShell command journaling and orchestration contracts

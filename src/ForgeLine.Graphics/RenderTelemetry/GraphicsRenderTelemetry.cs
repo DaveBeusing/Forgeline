@@ -9,6 +9,21 @@ public interface IGraphicsRenderTelemetry
     bool TelemetryOverflowed { get; }
     GraphicsCpuFrameIntervals CpuIntervals { get; }
     GraphicsResourceMemoryTelemetry ResourceMemory { get; }
+    GraphicsDeviceTelemetryIdentity? DeviceIdentity => null;
+    GraphicsTextureReadbackLayout? CaptureShadowLayout => null;
+    GraphicsFrameSubmission? LastSubmission => null;
+}
+
+public readonly record struct GraphicsFrameSubmission(ulong Submission, ulong SubmittedFence, ulong Generation, ulong ResourceGeneration);
+
+public readonly record struct GraphicsTextureReadbackLayout(int Width, int Height, int RowPitch, ulong Offset, string Format);
+
+// Additive physical-device identity; intentionally outside the historical GraphicsDeviceInfo digest.
+public readonly record struct GraphicsDeviceTelemetryIdentity(string AdapterLuidHex, uint NodeCount,
+    uint QueueNodeMask, uint EffectiveNodeMask, ulong Generation, int ProcessId, long ProcessStartedFileTimeUtc, string SessionId)
+{
+    public int SchemaVersion { get; init; } = 1;
+    public string Source { get; init; } = "ID3D12Device.AdapterLuid/NodeCount + ID3D12CommandQueue.GetDescription().NodeMask";
 }
 
 public readonly record struct GraphicsTimestampInterval(long StartTick, long EndTick);

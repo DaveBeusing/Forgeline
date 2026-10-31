@@ -16,6 +16,7 @@ internal sealed partial class D3D12GraphicsDevice
     private bool _captureFrameRecorded;
     public string? CaptureInputFingerprint { get; private set; }
     public ReadOnlyMemory<byte> CaptureShadowDepth { get; private set; }
+    public GraphicsTextureReadbackLayout? CaptureShadowLayout { get; private set; }
     internal void RecordCaptureInput(ReadOnlySpan<byte> values) => _captureInputHash?.AppendData(values);
 
     // Qualification only: a requested capture adds one copy and waits for completion.
@@ -40,6 +41,7 @@ internal sealed partial class D3D12GraphicsDevice
         _captureLifetime = lifetime;
         CaptureInputFingerprint = null;
         CaptureShadowDepth = ReadOnlyMemory<byte>.Empty;
+        CaptureShadowLayout = null;
         _captureShadowRecorded = false;
         _captureFrameRecorded = false;
         try
@@ -51,6 +53,9 @@ internal sealed partial class D3D12GraphicsDevice
                 _device.GetCopyableFootprints(_shadowTargets![_frameIndex].Description, 0, 1, 0,
                     footprints, new uint[1], new ulong[1], out shadowBytes);
                 _captureShadowFootprint = footprints[0];
+                var description = _shadowTargets![_frameIndex].Description;
+                CaptureShadowLayout = new(checked((int)description.Width), checked((int)description.Height),
+                    checked((int)_captureShadowFootprint.Footprint.RowPitch), _captureShadowFootprint.Offset, description.Format.ToString());
                 ID3D12Resource shadowReadback = _device.CreateCommittedResource(HeapType.Readback,
                     ResourceDescription.Buffer(shadowBytes), ResourceStates.CopyDest);
                 try { _captureShadowLifetime = RegisterResource(shadowReadback.Dispose, checked((long)shadowBytes)); }

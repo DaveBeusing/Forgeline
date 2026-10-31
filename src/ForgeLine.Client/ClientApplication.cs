@@ -519,7 +519,9 @@ internal sealed class ClientApplication
                 _settings.CreateSceneLightingSettings(),
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
                 transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
-                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings(), terrainProfile: loadedSession.TerrainProfile);
+                sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings(), terrainProfile: loadedSession.TerrainProfile,
+                sessionOrigin: string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_OUTPUT")) ? null : LiveSessionOrigin.Create(sessionRequest, scenario.RuntimeSettings, smokeTest, renderInstanceCount,
+                    _settings.CreateRenderQualitySettings(), _settings.CreateSceneLightingSettings(), _settings.SceneAtmosphere, _settings.Particles, camera.Settings));
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
