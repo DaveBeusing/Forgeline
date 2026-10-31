@@ -170,7 +170,7 @@ internal sealed partial class ClientSimulationHost
         AdjustDeveloperPause(ref paused);
         if (paused == IsPaused) return;
         var command = new SetMatchPausedCommand(_matchStateEntity, paused);
-        _simulation.ExecuteControlCommand(command);
+        ExecuteObservedControlCommand(command);
         if (!command.Accepted) throw new InvalidOperationException("The match rejected its host pause transition.");
         Volatile.Write(ref _paused, paused ? 1 : 0);
         if (!paused) RestartPacingInterval();
@@ -186,7 +186,7 @@ internal sealed partial class ClientSimulationHost
         if (_simulation.CurrentTick != SimulationTick.Zero && state.Lifecycle != MatchLifecyclePhase.Running)
         {
             // Re-publish an initialized paused/terminal restore through the existing recorded control path.
-            _simulation.ExecuteControlCommand(new SetMatchPausedCommand(_matchStateEntity, true));
+            ExecuteObservedControlCommand(new SetMatchPausedCommand(_matchStateEntity, true));
             _lastCompletedTick = _simulation.CurrentTick;
         }
         else AdvanceOneTick();
@@ -208,6 +208,10 @@ internal sealed partial class ClientSimulationHost
 
     private void PublishControlStatus()
     {
+        long observation=_workload?.Begin((int)SimulationWorkloadOperation.Bookkeeping) ?? 0;
+        bool success=false;
+        try
+        {
         ClientSimulationPauseReason reasons = _pauseReasons;
         if (IsTerminalFrozen) reasons |= ClientSimulationPauseReason.Terminal;
         if (Volatile.Read(ref _failure) is not null) reasons |= ClientSimulationPauseReason.Faulted;
@@ -222,6 +226,9 @@ internal sealed partial class ClientSimulationHost
             _requestedSpeed, achieved, checked((ulong)Volatile.Read(ref _completedTicks)), _lastCompletedTick,
             _simulation.Clock.TickDuration, reasons, IsPaused, _remainingSteps != 0,
             _requestedSteps, _completedSteps, _remainingSteps, _developerActivated, _menuPauseTransferred));
+        success=true;
+        }
+        finally { _workload?.End((int)SimulationWorkloadOperation.Bookkeeping,observation,success); }
     }
 
     partial void InitializeDeveloperSession(DeveloperSessionAccess? access, ref IDeveloperSessionController controller);

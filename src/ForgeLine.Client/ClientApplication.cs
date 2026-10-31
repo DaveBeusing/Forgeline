@@ -461,12 +461,18 @@ internal sealed class ClientApplication
             return window.IsOpen ? SessionReturnToMenuExitCode : 0;
         }
 
+        int ownerObservationVersion=OwnerObservationSettings.ReadEnvironment();
+        Func<ForgeLine.Platform.Windows.PlatformWorkloadTelemetry>? platformWorkload=null;
+        if(ownerObservationVersion==1 && _platform is ForgeLine.Platform.Windows.WindowsPlatform observedPlatform)
+        {
+            observedPlatform.EnableWorkloadObservations(window);platformWorkload=observedPlatform.CaptureWorkloadTelemetry;
+        }
         var developerAccess = DeveloperToolsCapability.Current.BindSession(scenario.Simulation.SessionId, DeveloperSessionToolsEnabled);
         using var simulationHost =
             new ClientSimulationHost(
                 scenario,
                 commandGateway,
-                snapshotBuffer, asynchronousStartup: true, developerAccess: developerAccess);
+                snapshotBuffer, asynchronousStartup: true, developerAccess: developerAccess,observeWorkload:ownerObservationVersion==1);
         bool snapshotReady = ClientSessionLoadingLoop.WaitForPresentation(
             pumpEvents: () =>
             {
@@ -520,6 +526,7 @@ internal sealed class ClientApplication
                 _startup, asynchronousStartup: true, expectedSession: simulationHost.SessionId,
                 transitionHost: sessionTransitionRenderer, simulationTelemetry: simulationHost.CaptureTelemetry,
                 sceneAtmosphere: _settings.SceneAtmosphere, particles: _settings.Particles, renderQuality: _settings.CreateRenderQualitySettings(), terrainProfile: loadedSession.TerrainProfile,
+                ownerObservationVersion:ownerObservationVersion,ownerCycleCapacity:ownerObservationVersion==1 ? OwnerObservationSettings.ReadCapacity() : 8192,platformWorkload:platformWorkload,
                 sessionOrigin: string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FORGELINE_RENDER_TELEMETRY_OUTPUT")) ? null : LiveSessionOrigin.Create(sessionRequest, scenario.RuntimeSettings, smokeTest, renderInstanceCount,
                     _settings.CreateRenderQualitySettings(), _settings.CreateSceneLightingSettings(), _settings.SceneAtmosphere, _settings.Particles, camera.Settings));
         bool playable = ClientSessionLoadingLoop.WaitForPresentation(
@@ -1207,7 +1214,7 @@ internal sealed class ClientApplication
                 if (smokeCompletionRequested &&
                     renderWorld.CurrentSnapshot?.PlayerExperience?.MatchStatus == PlayerMatchStatus.Victory)
                     smokeMatchCompleted = true;
-                if (smokeMatchCompleted && _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
+                if (smokeMatchCompleted && renderHost.PostWindowControlCompleted && _platform.Clock.GetElapsedTime(startedAt, now) >= SmokeTestDuration)
                     window.RequestClose();
             }
 

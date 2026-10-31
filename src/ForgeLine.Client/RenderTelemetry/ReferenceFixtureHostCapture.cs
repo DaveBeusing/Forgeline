@@ -36,10 +36,11 @@ internal static class ReferenceFixtureHostCapture
             using var power = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Actual Render Host Fixture", 1280, 720));
+            if(request.OwnerObservationVersion==1)platform.EnableWorkloadObservations(window);
             var target = new GraphicsWindowTarget(window.NativeHandle.Value, display.Width, display.Height, false);
             var snapshots = new PresentationSnapshotBuffer();
             using var host = new ClientRenderHost(target, terrain, snapshots, recipe.CameraSettings, catalog,
-                asynchronousStartup: true, renderQuality: recipe.Settings, terrainProfile: recipe.TerrainProfile, referenceFixture: recipe);
+                asynchronousStartup: true, renderQuality: recipe.Settings, terrainProfile: recipe.TerrainProfile, referenceFixture: recipe,platformWorkload:request.OwnerObservationVersion==1 ? platform.CaptureWorkloadTelemetry : null);
             var deadline = Stopwatch.StartNew();
             void WaitUntil(Func<bool> done)
             {

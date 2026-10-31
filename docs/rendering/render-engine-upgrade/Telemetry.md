@@ -28,8 +28,10 @@ The CPU envelope starts after the deliberate idle mailbox wait and before mailbo
 acquisition, surface/camera/snapshot/input-geometry/audio work. It ends after
 submission, retirement, existing diagnostics, qualification publication and
 production logging. Platform event processing and simulation execute on their
-independent owners and are explicitly excluded: this is the complete active
-render-owner iteration, not the sum of all application thread CPU time. Prepare,
+independent owners and are excluded from these legacy CPU intervals. The
+legacy payload/service brackets also omit compiler-created loop lead-in,
+ACK/common-probe/backedge tail and the deliberate idle wait; they do not prove a
+complete owner cycle or total application CPU time. Prepare,
 renderFrame, present and fenceWait retain actual monotonic intervals; overlap is
 allowed and must not be added. Process-wide precise GC and current-thread
 allocation observations conservatively bracket the same work; their counter

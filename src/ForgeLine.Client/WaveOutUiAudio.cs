@@ -62,6 +62,8 @@ internal sealed class WaveOutUiAudio : IDisposable
     private readonly Thread _owner;
     private readonly Func<IUiAudioOutput> _createOutput;
     private readonly UiAudioMailbox _mailbox = new();
+    private readonly OwnerWorkloadProbe? _workload;
+    internal OwnerWorkloadSnapshot Workload => _workload?.Capture() ?? default;
     private bool _enabled, _stopping;
     private float _volume;
     private long _generation;
@@ -69,9 +71,10 @@ internal sealed class WaveOutUiAudio : IDisposable
     internal UiAudioDiagnostics Diagnostics { get { lock (_gate) return _diagnostics with { Dropped = _mailbox.Dropped, QueueDepth = _mailbox.Count }; } }
     internal bool Available => Diagnostics.Available;
     internal bool OwnsNativeResources => Diagnostics.OwnsNativeResources;
-    internal WaveOutUiAudio(Func<IUiAudioOutput>? createOutput = null)
+    internal WaveOutUiAudio(Func<IUiAudioOutput>? createOutput = null,bool observeWorkload = false)
     {
         _createOutput = createOutput ?? (() => new WaveOutUiVoice());
+        _workload=observeWorkload ? new OwnerWorkloadProbe(0) : null;
         _owner = new Thread(Run) { IsBackground = true, Name = "ForgeLine UI Audio" };
         _owner.Start();
     }
@@ -82,7 +85,8 @@ internal sealed class WaveOutUiAudio : IDisposable
         {
             if (_stopping) return;
             bool enabled = active && settings.SoundEnabled && float.IsFinite(settings.SoundVolume) && settings.SoundVolume is > 0 and <= 1;
-            if (_enabled != enabled) { _generation++; _mailbox.Clear(); }
+            _workload?.Event(0);
+            if (_enabled != enabled) { _generation++; _mailbox.Clear(); _workload?.Event(1); }
             _enabled = enabled;
             _volume = settings.SoundVolume;
             if (enabled) _mailbox.Offer(new(cue, now));
@@ -104,12 +108,15 @@ internal sealed class WaveOutUiAudio : IDisposable
 
     private void Run()
     {
+        _workload?.BindOwner();
+        long initialization=_workload?.Begin(0) ?? 0;
         IUiAudioOutput? output = null;
         long generation = -1, played = 0, failures = 0;
         try
         {
             output = _createOutput();
             if (output is WaveOutUiVoice voice) voice.PrepareClips();
+            _workload?.End(0,initialization);
             while (true)
             {
                 _signal.WaitOne(10);
@@ -126,13 +133,16 @@ internal sealed class WaveOutUiAudio : IDisposable
                 }
                 if (generation != observed)
                 {
-                    output.StopPlayback();
-                    if (enabled && output is WaveOutUiVoice recovering) recovering.ResetRecovery();
+                    long recovery=_workload?.Begin(2) ?? 0;bool recovered=false;
+                    try { output.StopPlayback();if (enabled && output is WaveOutUiVoice recovering) recovering.ResetRecovery();recovered=true; }
+                    finally { _workload?.End(2,recovery,recovered); }
                     generation = observed;
                 }
                 if (request.Cue != UiAudioCue.None)
                 {
-                    bool success = output.TryPlay(request.Cue, volume);
+                    long playback=_workload?.Begin(1) ?? 0;bool completed=false,success=false;
+                    try { success=output.TryPlay(request.Cue,volume);completed=true; }
+                    finally { _workload?.End(1,playback,completed,eventKind:completed ? success ? 2 : 3 : null); }
                     if (success) played++; else failures++;
                     lock (_gate)
                     {
@@ -151,6 +161,7 @@ internal sealed class WaveOutUiAudio : IDisposable
         catch (Exception error) when (error is IOException or InvalidDataException or InvalidOperationException or
             UnauthorizedAccessException or DllNotFoundException or EntryPointNotFoundException)
         {
+            _workload?.Fault();
             Console.Error.WriteLine($"[ui:audio:owner-unavailable] {error.GetType().Name}");
         }
         finally

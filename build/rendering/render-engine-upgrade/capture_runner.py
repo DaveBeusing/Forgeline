@@ -53,6 +53,9 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         if gameplay:require(request.get('warmups')==64 and request.get('samples')==512,'Actual gameplay uses unchanged64/512 declared window')
         import re
         require(type(source) is str and re.fullmatch('[0-9a-f]{40}',source),'Exact capture source is required')
+        observation_version=request.get('ownerObservationVersion',0)
+        require(type(observation_version) is int and observation_version in (0,1),'Unsupported owner-observation contract version')
+        if observation_version==1:request['postWindowControlDirectory']=str(output/'post-window')
         request.update(outputRoot=str(output/'capture'),adapterBindingDirectory=str(output/'identity'))
         request_file=output/'actual-request.json';write_new(request_file,request)
         sensor_before=sha256_bytes(Path(sensor).read_bytes());client_before=sha256_bytes(Path(client).read_bytes())
@@ -61,6 +64,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
     except Exception as error:
         write_new(output/'attempt.json',dict(schemaVersion=1,kind='actual-baseline-capture-attempt',diagnosticOnly=diagnostic_only,status='failed',phase='preflight',startedAtUtc=started,completedAtUtc=now(),failures=[str(error)],qualified=False))
         raise
+    wake=threading.Event();post_control=None
     stop=threading.Event();ready=threading.Event();lock=threading.Lock();control={};failure=[];cleanup=[];child=None;status='failed';command_started=None;command_completed=None
     argv=[client,'--smoke-test'] if gameplay else [client,'--reference-host-fixture-request' if host else '--reference-capture-request',str(request_file)]
     child_env=None
@@ -68,12 +72,17 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         child_env=dict(os.environ)
         child_env.update(FORGELINE_RENDER_TELEMETRY_OUTPUT=str(output/'capture'/'owner.json'),FORGELINE_RENDER_TELEMETRY_CONTEXT='',
             FORGELINE_RENDER_TELEMETRY_SAMPLES='512',FORGELINE_RENDER_TELEMETRY_WARMUPS='64',FORGELINE_RENDER_TELEMETRY_ADAPTER_BINDING=str(output/'identity'))
+        if observation_version==1:
+            child_env.update(FORGELINE_RENDER_OWNER_OBSERVATION_VERSION='1',FORGELINE_RENDER_OWNER_CYCLE_CAPACITY=str(request.get('ownerCycleCapacity',8192)),
+                FORGELINE_RENDER_POST_WINDOW_CONTROL=str(output/'post-window'))
     with SensorJournal(output/'sensors') as journal:
         def sample():
+            requested_ready=post_control.begin_query() if post_control is not None else None
             raw=b'';err=b'';begin=now();tick=time.perf_counter();query_exit=None;query_timeout=False
             query_argv=[sensor,'--query-gpu='+FIELDS,'--format=csv,noheader,nounits']
             try:
                 with lock:
+                    begin=now()
                     result=subprocess.run(query_argv,capture_output=True,timeout=10,shell=False,
                                           creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
                 raw,err=result.stdout,result.stderr;query_exit=result.returncode;require(result.returncode==0,'Sensor query exit '+str(result.returncode))
@@ -85,12 +94,16 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                 value=dict(observedAtUtc=now(),acquisitionStartedAtUtc=begin,devices=[],failure='Sensor query timeout')
             except Exception as error:value=dict(observedAtUtc=now(),acquisitionStartedAtUtc=begin,devices=[],failure=str(error))
             value['command']=dict(argv=query_argv,exitCode=query_exit,timedOut=query_timeout,completedAtUtc=now())
-            journal.append(value,raw,err)
+            if requested_ready is not None:value['postWindowReadySha256']=sha256_bytes(requested_ready)
+            receipt=journal.append(value,raw,err)
+            if post_control is not None:post_control.finish_query(requested_ready,receipt)
             require(value.get('failure') is None,value.get('failure','Sensor failure'))
         def observe():
             try:
                 sample();ready.set()
-                while not stop.wait(1):sample()
+                while not stop.is_set():
+                    wake.wait(1);wake.clear()
+                    if not stop.is_set():sample()
             except Exception as error:failure.append(str(error));journal.failed=str(error);journal._snapshot();ready.set()
         observer=threading.Thread(target=observe,name='baseline-physical-observer',daemon=True);observer.start()
         try:
@@ -105,7 +118,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                     time.sleep(.01)
                 actual=parse_json_bytes(checkpoint.read_bytes())
                 context=dict(processId=child.pid,sourceSha=source,runtimeFingerprint=runtime.upper(),clientAssemblySha256=client_assembly_before.upper(),
-                             startedAtUtc=command_started,argv=argv,requestSha256=sha256_bytes(request_file.read_bytes()))
+                             startedAtUtc=command_started,timeoutSeconds=timeout_seconds,argv=argv,requestSha256=sha256_bytes(request_file.read_bytes()))
                 def control_before_release(_proof):
                     # Startup is not a controlled interval. Do not invalidate the observer while the
                     # explicit external operator handoff waits within the original producer budget.
@@ -121,12 +134,18 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                     write_new(output/'pre-window-control.json',facts)
                     require(not require_foreground or facts['status']=='controlled','Actual child is not foreground-controlled before window release')
                 binding=complete_checkpoint(checkpoint.parent,context,dll_path,sensor,control_before_release,query_lock=lock)
+                if observation_version==1:
+                    from post_window_control import PostWindowSupervisor
+                    post_control=PostWindowSupervisor(output/'post-window',checkpoint.read_bytes(),binding,deadline,lambda: child.poll() is None and not failure,wake)
                 while child.poll() is None:
                     require(time.monotonic()<deadline,'Declared capture command deadline exceeded')
                     require(not failure,'Physical observer/control failed: '+str(failure))
+                    if post_control is not None:post_control.poll()
                     time.sleep(.01)
                 command_completed=now()
-                exit_code=child.returncode;control.clear();require(exit_code==0,'Actual capture command failed with exit '+str(exit_code))
+                exit_code=child.returncode
+                require(post_control is None or post_control.completed,'Producer exited without an ordinary fresh-query durable ACK')
+                control.clear();require(exit_code==0,'Actual capture command failed with exit '+str(exit_code))
                 manifest_path=output/'capture'/('owner.json' if gameplay else 'fixture-manifest.json' if host else 'manifest.json')
                 require(manifest_path.is_file() and not (manifest_path.parent/'failure.json').exists(),'Producer did not retain a complete successful manifest')
                 manifest=parse_json_bytes(manifest_path.read_bytes())
@@ -143,7 +162,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                         require(owner.is_file() and sha256_bytes(owner.read_bytes())==str(manifest.get('ownerSha256','')).lower(),'Final owner stream missing or changed')
                     else:require(manifest.get('owner') is None and manifest.get('fixture',{}).get('collectorControl',{}).get('collectorEnabled') is False,'OFF must retain a real separate control probe and no fake owner')
                 elif not gameplay:require(type(manifest.get('captures')) is list and manifest['captures'],'Native producer has no actual captures')
-                stop.set();observer.join(15);require(not observer.is_alive(),'Sensor observer did not stop within its query bound')
+                stop.set();wake.set();observer.join(15);require(not observer.is_alive(),'Sensor observer did not stop within its query bound')
                 sample();require(not failure,'Physical observation failed')
                 require(runtime_fingerprint(request['runtimeRoot'])==runtime,'Sealed runtime assets changed during capture')
                 require(sha256_bytes(Path(sensor).read_bytes())==sensor_before and sha256_bytes(Path(client).read_bytes())==client_before and sha256_bytes(Path(client).with_suffix('.dll').read_bytes())==client_assembly_before,'Capture/provider executable or actual client assembly changed')
@@ -165,12 +184,12 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                     if command_completed is None:command_completed=now()
                 else:cleanup.append('producer-still-alive-after-bounded-cleanup')
         finally:
-            stop.set();observer.join(15)
+            stop.set();wake.set();observer.join(15)
             if observer.is_alive():failure.append('Observer query did not finish within bound')
             record=dict(schemaVersion=1,kind='actual-baseline-capture-attempt',diagnosticOnly=diagnostic_only,status=status,sourceSha=source,runtimeFingerprint=runtime,
                         startedAtUtc=started,completedAtUtc=now(),commandStartedAtUtc=command_started,commandCompletedAtUtc=command_completed,argv=argv,processId=child.pid if child else None,exitCode=child.returncode if child else None,
                         captureMode='actual-live-gameplay' if gameplay else 'reference-host-fixture' if host else 'native-reference',
-                        foregroundEnforced=require_foreground,failures=failure,cleanup=cleanup,requestSha256=sha256_bytes(request_file.read_bytes()),originalRequestSha256=sha256_bytes(original),
+                        postWindowControl=post_control.evidence() if post_control is not None else None,foregroundEnforced=require_foreground,failures=failure,cleanup=cleanup,requestSha256=sha256_bytes(request_file.read_bytes()),originalRequestSha256=sha256_bytes(original),
                         payloadInventoryBeforeSha256=sha256_bytes((output/'payload-inventory-before.json').read_bytes()),
                         payloadInventoryAfterSha256=sha256_bytes((output/'payload-inventory-after.json').read_bytes()) if (output/'payload-inventory-after.json').is_file() else None,
                         clientExecutableSha256=client_before,clientAssemblySha256=client_assembly_before,sensorExecutableSha256=sensor_before,providerVersionSha256=sha256_bytes(version_raw),

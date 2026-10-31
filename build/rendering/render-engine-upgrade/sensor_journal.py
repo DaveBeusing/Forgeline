@@ -1,10 +1,18 @@
 """Bounded append-only raw sensor journal with constant-size progress snapshots."""
 from __future__ import annotations
+from dataclasses import dataclass
 import base64
 from datetime import datetime,timezone
 import hashlib,json,os
 from pathlib import Path
 from baseline_contracts import ContractError,require,utc,write_new,parse_json_bytes
+
+@dataclass(frozen=True)
+class SensorJournalReceipt:
+    journal_path: Path
+    row_bytes: bytes
+    prefix_receipt_bytes: bytes
+
 
 class SensorJournal:
     def __init__(self,directory,capacity=43201,byte_budget=64*1024*1024):
@@ -25,17 +33,20 @@ class SensorJournal:
             require(self.bytes+len(data)<=self.byte_budget,'Sensor raw byte budget exhausted')
             self.stream.write(data);self.stream.flush();os.fsync(self.stream.fileno())
             self.digest.update(data);self.bytes+=len(data);self.count+=1;self.last=sample
-            self._snapshot()
+            receipt=self._snapshot()
             require(gap is None or gap<=5,'Sensor/control gap exceeds five seconds; raw failed observation retained')
+            return SensorJournalReceipt(self.path,data,receipt)
         except Exception as error:
             self.failed=str(error);self._snapshot();raise
     def _snapshot(self):
         value=dict(schemaVersion=1,kind='physical-sensor-journal-progress',qualified=False,rows=self.count,journal='observations.jsonl',
                    prefixBytes=self.bytes,prefixSha256=self.digest.hexdigest(),lastObservation=self.last,failure=self.failed)
+        data=json.dumps(value,separators=(',',':'),allow_nan=False).encode('utf-8')
         temporary=self.directory/'latest.pending'
         with temporary.open('xb') as stream:
-            stream.write(json.dumps(value,separators=(',',':'),allow_nan=False).encode('utf-8'));stream.flush();os.fsync(stream.fileno())
+            stream.write(data);stream.flush();os.fsync(stream.fileno())
         temporary.replace(self.directory/'latest.json')
+        return data
     def close(self):
         self.stream.close()
         write_new(self.directory/'final.json',dict(kind='physical-sensor-journal-final',rows=self.count,bytes=self.bytes,sha256=self.digest.hexdigest(),failure=self.failed,qualified=False))

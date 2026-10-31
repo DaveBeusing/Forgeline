@@ -266,7 +266,7 @@ Correctness tests run separately from timing. Finish builds, asset compilation a
 
 ### Opt-in render-owner telemetry
 
-The [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) adds `FORGELINE_RENDER_TELEMETRY_OUTPUT` with predeclared warmup/sample counts (defaults 64/512), bounded startup/in-flight headroom, raw completed GPU joins and logical resource-byte accounting. Follow that runbook for the exact enable/restore commands and strict validation. The stream covers the active render-owner iteration, excluding deliberate idle-mailbox wait and independent platform/simulation owners. It is not an approved matched native fixture or a complete physical-allocation budget pass. Preserve source/payload identity, startup states, incomplete windows, overflows and failed attempts.
+The [render-owner telemetry](rendering/render-engine-upgrade/Telemetry.md) adds `FORGELINE_RENDER_TELEMETRY_OUTPUT` with predeclared warmup/sample counts (defaults 64/512), bounded startup/in-flight headroom, raw completed GPU joins and logical resource-byte accounting. Follow that runbook for the exact enable/restore commands and strict validation. The legacy stream retains active payload/service brackets; compiler-created lead-in, ACK/backedge tail, deliberate idle-mailbox wait and independent platform/simulation owners are outside that legacy coverage. The separately selected owner-cycle v1 contract records a broader interval and must not be added to overlapping legacy totals. It is not an approved matched native fixture or a complete physical-allocation budget pass. Preserve source/payload identity, startup states, incomplete windows, overflows and failed attempts.
 
 ## Documentation maintenance
 

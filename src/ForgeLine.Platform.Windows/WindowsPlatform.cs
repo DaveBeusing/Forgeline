@@ -17,6 +17,7 @@ public sealed class WindowsPlatform : IPlatform
 
     private bool _disposed;
     private bool _quitRequested;
+    private PlatformWorkloadProbe? _workload;
 
     public WindowsPlatform()
     {
@@ -61,10 +62,23 @@ public sealed class WindowsPlatform : IPlatform
         return new WindowsWindow(configuration);
     }
 
+    public void EnableWorkloadObservations(IWindow window)
+    {
+        ThrowIfUnavailable();
+        if(window is not WindowsWindow native)throw new ArgumentException("Windows workload observations require the creating-owner window.",nameof(window));
+        _workload ??= new PlatformWorkloadProbe();
+        native.AttachWorkloadObservations(_workload);
+    }
+    // This optional copied-value provider may be read by another owner. It never
+    // exposes a mutable window/queue or changes the core IPlatform contract.
+    public PlatformWorkloadTelemetry CaptureWorkloadTelemetry() => _workload?.Capture() ?? default;
+
     public bool PumpEvents()
     {
         ThrowIfUnavailable();
-
+        _workload?.BeginPump();bool success=false;
+        try
+        {
         while (WindowsNative.PeekMessage(
                    out var message,
                    0,
@@ -72,17 +86,20 @@ public sealed class WindowsPlatform : IPlatform
                    0,
                    WindowsNative.PmRemove) != 0)
         {
+            _workload?.Removed(message.Message==WindowsNative.WmQuit);
             if (message.Message == WindowsNative.WmQuit)
             {
                 _quitRequested = true;
                 continue;
             }
 
-            _ = WindowsNative.TranslateMessage(ref message);
-            _ = WindowsNative.DispatchMessage(ref message);
+            DispatchObservedMessage(ref message);
         }
 
+        success=true;
         return !_quitRequested;
+        }
+        finally { _workload?.EndPump(success); }
     }
 
     public void WaitForEvents(TimeSpan maximumWait)
@@ -120,6 +137,9 @@ public sealed class WindowsPlatform : IPlatform
 
     private void PrepareForWindowCreation()
     {
+        _workload?.BeginPump(creation:true);bool success=false;
+        try
+        {
         while (WindowsNative.PeekMessage(
                    out var message,
                    0,
@@ -127,16 +147,25 @@ public sealed class WindowsPlatform : IPlatform
                    0,
                    WindowsNative.PmRemove) != 0)
         {
+            _workload?.Removed(message.Message==WindowsNative.WmQuit);
             // WM_QUIT is generated only after higher-priority messages are drained.
             // A quit-only filter can leave a previous window's quit pending.
             if (message.Message != WindowsNative.WmQuit)
             {
-                _ = WindowsNative.TranslateMessage(ref message);
-                _ = WindowsNative.DispatchMessage(ref message);
+                DispatchObservedMessage(ref message);
             }
         }
 
-        _quitRequested = false;
+        _quitRequested = false;success=true;
+        }
+        finally { _workload?.EndPump(success); }
+    }
+
+    private void DispatchObservedMessage(ref WindowsNative.NativeMessage message)
+    {
+        _workload?.BeginDispatch();bool success=false;
+        try { _=WindowsNative.TranslateMessage(ref message);_=WindowsNative.DispatchMessage(ref message);success=true; }
+        finally { _workload?.EndDispatch(success); }
     }
 
     private static void EnsurePerMonitorDpiAwareness()

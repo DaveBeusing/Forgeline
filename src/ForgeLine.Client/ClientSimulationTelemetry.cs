@@ -6,4 +6,7 @@ namespace ForgeLine.Client;
 internal readonly record struct ClientSimulationTelemetry(
     SimulationSessionId SessionId,
     ulong CompletedTicks,
-    RuntimeSimulationState State);
+    RuntimeSimulationState State)
+{
+    internal OwnerWorkloadSnapshot Workload { get; init; }
+}

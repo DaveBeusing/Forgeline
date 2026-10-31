@@ -110,11 +110,14 @@ internal sealed class WaveOutWorldAudio : IDisposable
     private bool _stop;
     private long _resetSerial;
     private WorldAudioDiagnostics _diagnostics;
+    private readonly OwnerWorkloadProbe? _workload;
+    internal OwnerWorkloadSnapshot Workload => _workload?.Capture() ?? default;
     internal WorldAudioDiagnostics Diagnostics { get { lock (_gate) return _diagnostics; } }
     private readonly record struct Packet(PresentationSnapshot? Snapshot, AudioListener Listener, WorldAudioSettings Settings, bool Active, long Timestamp);
-    internal WaveOutWorldAudio(Func<IWorldAudioOutput>? createOutput = null, Action<WorldPcmMixer>? load = null, SimulationSessionId? expectedSession = null)
+    internal WaveOutWorldAudio(Func<IWorldAudioOutput>? createOutput = null, Action<WorldPcmMixer>? load = null, SimulationSessionId? expectedSession = null,bool observeWorkload = false)
     {
         _expectedSession = expectedSession;
+        _workload=observeWorkload ? new OwnerWorkloadProbe(expectedSession?.Value ?? 0) : null;
         _createOutput = createOutput ?? (() => new WaveOutWorldOutput());
         _load = load ?? (m => { int clips = WorldAudioClips.Load(m); Console.WriteLine($"[world:audio:library] loaded={clips} expected=56"); lock (_gate) _diagnostics = _diagnostics with { LoadedClips = clips }; });
         _thread = new Thread(Run) { IsBackground = true, Name = "ForgeLine World Audio" }; _thread.Start();
@@ -129,6 +132,7 @@ internal sealed class WaveOutWorldAudio : IDisposable
         lock (_gate)
         {
             if (_stop) return;
+            _workload?.Event(2);
             if (_packet.Active != active || _packet.Settings.Enabled != settings.Enabled || (_packet.Settings.Master > 0) != (settings.Master > 0)) _resetSerial++;
             _packet = new(snapshot, listener, settings, active, Stopwatch.GetTimestamp()); _signal.Set();
         }
@@ -137,18 +141,22 @@ internal sealed class WaveOutWorldAudio : IDisposable
     { lock (_gate) { if (_stop) return; if (_packet.Active) _resetSerial++; _packet = _packet with { Active = false }; _signal.Set(); } }
     private void Run()
     {
+        _workload?.BindOwner();long initialization=_workload?.Begin(0) ?? 0;
         IWorldAudioOutput? output = null;
         var mixer = new WorldPcmMixer(); var playback = new WorldAudioPlayback(mixer, _expectedSession);
         short[] block = new short[WorldPcmMixer.BlockFrames * 2];
         long retryAt = 0, blocks = 0, failures = 0, resetSerial = -1; int attempts = 0; bool wasActive = false, retained = false;
         try
         {
-            _load(mixer);
+            _load(mixer);_workload?.End(0,initialization);
             while (true)
             {
+                long iteration=_workload?.Begin(1) ?? 0;bool completed=false;
+                try
+                {
                 _signal.WaitOne(2);
                 Packet packet; long serial;
-                lock (_gate) { if (_stop) break; packet = _packet; serial = _resetSerial; }
+                lock (_gate) { if (_stop) { completed=true;break; } packet = _packet; serial = _resetSerial; }
                 long now = Stopwatch.GetTimestamp();
                 bool active = packet.Active && now >= packet.Timestamp && Stopwatch.GetElapsedTime(packet.Timestamp, now) <= TimeSpan.FromMilliseconds(250);
                 bool requested = active && !retained && packet.Settings.Enabled && packet.Settings.Master > 0;
@@ -157,21 +165,28 @@ internal sealed class WaveOutWorldAudio : IDisposable
                 {
                     if (serial != resetSerial)
                     {
+                        _workload?.Event(4);
                         output?.Stop(); mixer.Clear();
                         playback.Update(packet.Snapshot, packet.Listener, packet.Settings, false, now);
                         resetSerial = serial; wasActive = false;
                     }
                     if (!requested && wasActive && output is not null) { output.Stop(); mixer.Clear(); }
                     bool previouslyActive = wasActive;
-                    if (requested && output is null && !retained && attempts < 4 && now >= retryAt) output = _createOutput();
+                    if (requested && output is null && !retained && attempts < 4 && now >= retryAt)
+                    {
+                        long opened=_workload?.Begin(2) ?? 0;
+                        try { output=_createOutput(); }
+                        // A handled device failure completes this attempt; Events1 retains its outcome.
+                        finally { _workload?.End(2,opened); }
+                    }
                     playback.Update(packet.Snapshot, packet.Listener, packet.Settings, active && output is not null && !retained, now);
                     if (!playback.Active && previouslyActive && output is not null) output.Stop();
                     wasActive = playback.Active;
-                    if (wasActive && output!.Ready) { mixer.Render(block); output.Write(block); blocks++; attempts = 0; }
+                    if (wasActive && output!.Ready) { mixer.Render(block); output.Write(block); blocks++; attempts = 0;_workload?.Event(0); }
                 }
                 catch (Exception error) when (error is InvalidOperationException or IOException or DllNotFoundException or EntryPointNotFoundException)
                 {
-                    failures++; attempts++; mixer.Clear();
+                    failures++; attempts++;_workload?.Event(1);mixer.Clear();
                     playback.Update(packet.Snapshot, packet.Listener, packet.Settings, false, now);
                     output?.Dispose(); retained = output is WaveOutWorldOutput native && native.OwnsNativeResources;
                     if (!retained) output = null;
@@ -180,10 +195,13 @@ internal sealed class WaveOutWorldAudio : IDisposable
                     Console.Error.WriteLine($"[world:audio:device-unavailable] attempt={attempts} retained={retained} error={error.GetType().Name}");
                 }
                 lock (_gate) _diagnostics = _diagnostics with { Blocks = blocks, Failures = failures, Voices = mixer.ActiveVoices, Loops = mixer.ActiveLoops, DroppedShots = mixer.DroppedShots, LimitedSamples = mixer.LimitedSamples, QueuedBuffers = (output as WaveOutWorldOutput)?.QueuedBuffers ?? 0, Available = output is not null && !retained };
+                completed=true;
+                }
+                finally { _workload?.End(1,iteration,completed); }
             }
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or JsonException or FormatException or KeyNotFoundException)
-        { Console.Error.WriteLine($"[world:audio:owner-unavailable] {error.GetType().Name}"); }
+        { _workload?.Fault();Console.Error.WriteLine($"[world:audio:owner-unavailable] {error.GetType().Name}"); }
         finally
         {
             output?.Dispose();

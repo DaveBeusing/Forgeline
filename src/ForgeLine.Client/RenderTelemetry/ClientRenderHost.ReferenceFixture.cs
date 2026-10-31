@@ -115,7 +115,7 @@ internal sealed partial class ClientRenderHost
             runtimeFingerprint = recipe.RuntimeFingerprint, key = recipe.CaseKey, recipeFingerprint = recipe.Fingerprint, recipeInputs = recipe.IdentityInputs, recipeInputBytesBase64 = recipe.InputBytesBase64,
             device = _fixtureDevice, profile = _fixtureComposition?.Profile, lighting = _fixtureComposition?.Lighting, atmosphere = _fixtureComposition?.Atmosphere,
             snapshotFingerprint = recipe.SnapshotFingerprint, adapterBinding = _fixtureAdapterBinding, frames = _fixtureFrames, readback = _fixtureReadbackEvidence,
-            collectorControl = _fixtureCollectorControl?.Export(), collectorMode = recipe.CollectorMode,
+            collectorControl = _fixtureCollectorControl?.Export(), ownerCycles = _ownerCycles?.Export(), postWindowControl = _postWindowControl?.Evidence(), collectorMode = recipe.CollectorMode,
             window = new { recipe.Warmups, recipe.Samples, contiguous = true, acknowledged = FixtureAcknowledged + 1 },
             nativePixelComparison = "Requires separate actual native capture with identical computed recipe and pixels; not granted by CLI context" };
     }

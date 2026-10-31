@@ -25,6 +25,9 @@ internal sealed record VisualReferenceCaptureRequest
     public string? Driver { get; init; }
     public string? AdapterBindingDirectory { get; init; }
     public string? OwnerTraceControlDirectory { get; init; }
+    public int OwnerObservationVersion { get; init; }
+    public int OwnerCycleCapacity { get; init; } = 8192;
+    public string? PostWindowControlDirectory { get; init; }
     public bool Software { get; init; }
     public int Warmups { get; init; } = 32;
     public int Samples { get; init; } = 128;
@@ -76,6 +79,7 @@ internal sealed record VisualReferenceCaptureRequest
             Scenes is null || Scenes.Any(s => s is not (VisualReferenceSceneKind.MainBattleTankProduction or VisualReferenceSceneKind.MainBattleTankFormation or VisualReferenceSceneKind.MainBattleTankSingle or VisualReferenceSceneKind.MainBattleTankHundred or VisualReferenceSceneKind.MainBattleTankThousand or VisualReferenceSceneKind.InfantrySkinning or VisualReferenceSceneKind.InfantrySkinningRepeated or VisualReferenceSceneKind.InfantrySkinningEngineer) &&
                 s is not (>= VisualReferenceSceneKind.InfantryRifleSingle and <= VisualReferenceSceneKind.InfantryEngineerThousand))))
             throw new ArgumentOutOfRangeException(nameof(MechanicalSeconds));
+        if(OwnerObservationVersion is not (0 or 1) || OwnerCycleCapacity is < 1 or > 65536)throw new ArgumentOutOfRangeException(nameof(OwnerObservationVersion));
         if (Warmups is < 3 or > 4096 || Samples is < 8 or > 8192) throw new ArgumentOutOfRangeException(nameof(Samples));
         if (RepeatCaptures is < 2 or > 128) throw new ArgumentOutOfRangeException(nameof(RepeatCaptures));
         if (RasterDpi is not (0 or 96 or 120 or 144 or 192)) throw new ArgumentOutOfRangeException(nameof(RasterDpi));
@@ -89,6 +93,7 @@ internal sealed record VisualReferenceCaptureRequest
             Scenes.Distinct().Count() != Scenes.Length || Profiles.Distinct().Count() != Profiles.Length ||
             Zooms.Distinct().Count() != Zooms.Length || Displays.Distinct().Count() != Displays.Length)
             throw new ArgumentException("Capture matrix contains an unsupported or duplicated entry.");
+        if(!string.IsNullOrWhiteSpace(PostWindowControlDirectory) && (OwnerObservationVersion!=1 || Scenes.Length!=1 || Profiles.Length!=1 || Displays.Length!=1 || Zooms.Length!=1 || UiScenarios.Length!=1 || UiScales.Length!=1))throw new ArgumentException("Ordinary post-window control v1 requires one immutable case per actual command.");
     }
 }
 
@@ -138,6 +143,8 @@ internal static class VisualReferenceCapture
             if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
                 throw new InvalidOperationException("Capture adapter does not match the requested lane.");
             var adapterCheckpoint = ReferenceAdapterCheckpoint.PublishAndWait(request.AdapterBindingDirectory, graphics, runtimeFingerprint, window.NativeHandle.Value.ToInt64(), () => platform.PumpEvents());
+            var postWindowControl=ReferencePostWindowControl.Create(request.PostWindowControlDirectory,request.AdapterBindingDirectory);
+            if(request.OwnerObservationVersion==1)platform.EnableWorkloadObservations(window);
             double startupMilliseconds = Stopwatch.GetElapsedTime(startupStart).TotalMilliseconds;
             long startupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - startupAllocationStart;
             var lighting = SceneLightingSettings.Default;
@@ -392,7 +399,7 @@ internal static class VisualReferenceCapture
                     (graphics as IGraphicsRenderTelemetry)?.EnableRenderTelemetry(Math.Min(65536, request.Samples + 8));
                     var performance = new ReferencePerformanceSamples(request.Samples, beforeSamples.Frame?.GpuSubmissionFence ?? 0);
                     var initialCamera = camera.CaptureState();
-                    var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;
+                    var cpu = new double[request.Samples]; var gpu = new List<double>(); ulong lastFence = 0;long lastMeasuredEndTick=0;
                     lastFence = beforeSamples.Frame?.GpuSubmissionFence ?? 0;
                     for (int i = 0; i < cpu.Length; i++)
                     {
@@ -400,7 +407,7 @@ internal static class VisualReferenceCapture
                         camera.ApplyState(sharedFixture?.SampleCameras[i] ?? ReferencePerformanceSamples.CameraPose(initialCamera, request.CameraPath, i, request.Samples));
                         long allocationStart = GC.GetAllocatedBytesForCurrentThread();
                         long start = Stopwatch.GetTimestamp(); PrepareTerrain(); RecordFrame();
-                        long cpuEndedAt = Stopwatch.GetTimestamp();
+                        long cpuEndedAt = Stopwatch.GetTimestamp();lastMeasuredEndTick=cpuEndedAt;
                         cpu[i] = Stopwatch.GetElapsedTime(start, cpuEndedAt).TotalMilliseconds;
                         long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
                         var sampleDiagnostics = graphics.Diagnostics;
@@ -415,6 +422,13 @@ internal static class VisualReferenceCapture
                         }
                     }
                     (graphics as IGraphicsRenderTelemetry)?.StopRenderTelemetry();
+                    if(postWindowControl is not null)
+                    {
+                        byte[] profileBytes=ReferenceFixtureRecipe.SerializeIdentityInputs(new ClientRenderConfiguration(profile,lighting,graphics.Atmosphere));
+                        string actualProfile=Convert.ToHexString(SHA256.HashData(profileBytes));
+                        postWindowControl.PublishReady(new("native-reference",key,sharedFixture is not null,sharedFixture?.Fingerprint,actualProfile,ProfileInputBytesBase64:Convert.ToBase64String(profileBytes)),request.Samples,lastMeasuredEndTick,null,((IGraphicsRenderTelemetry)graphics).LastSubmission ?? throw new InvalidDataException("Actual final native submission missing."));
+                        postWindowControl.WaitForAck(platform.PumpEvents);
+                    }
                     graphics.WaitForIdle();
                     var measured = graphics.Diagnostics;
                     performance.AddGpu(measured);
@@ -517,6 +531,7 @@ internal static class VisualReferenceCapture
                         seed = VisualReferenceScene.Seed, tick = fixture.Snapshot.Tick.Value, captureVisualSeconds, mechanicalSeconds = request.MechanicalSeconds, camera = camera.CaptureState(),
                         requestedDisplay = display, actualSurface = measured.Surface, hostWindow = window.ClientSize, hostWindowDpi = window.Dpi,
                         rasterDpi, uiScale, requestedQuality = quality, profile, lighting,
+                        observedComposition=request.OwnerObservationVersion==1 ? (object)new ClientRenderConfiguration(profile,lighting,graphics.Atmosphere) : null,
                         localHaze = graphics.Atmosphere.Enabled ? graphics.Atmosphere.LocalHaze : null, surfaceMarks = request.SurfaceMarks,
                         cpu = Distribution(cpu), gpu = Distribution(gpu.ToArray()), fps = Distribution(cpu.Select(x => 1000 / x).ToArray()),
                         performance = performance.Report(measured),
@@ -557,7 +572,10 @@ internal static class VisualReferenceCapture
                     startupMilliseconds, startupAllocatedBytes,
                     capturePath = "D3D12 swap-chain backbuffer readback before Present; full-resolution native output, independent of host-window clamp",
                     method = "Immutable presentation states; completed extraction tick and frozen visual seconds recorded per case, VSync off, particle age.2s. CPU includes frame reuse/Present. Distinct completed GPU fences. Readbacks/PNG export excluded. No live gameplay or sustained-motion FPS claim.",
-                    request.Warmups, request.Samples, request.ContinueAfterMismatch, failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
+                    request.Warmups, request.Samples, request.ContinueAfterMismatch,
+                    postWindowControl=postWindowControl?.Evidence(),ownerCycles=new {schemaVersion=1,available=false,reason="Native reference has no ClientRenderHost owner cycle or exact process-allocation collector"},
+                    platformWorkload=request.OwnerObservationVersion==1 ? (object)platform.CaptureWorkloadTelemetry() : null,
+                    failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
         }
         catch (Exception error)
         {

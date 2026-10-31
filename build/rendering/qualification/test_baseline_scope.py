@@ -8,7 +8,7 @@ class Repository:
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)/'repo';self.root.mkdir();self.run('init','-q')
         for path in (scope.ORIGINAL,scope.HISTORICAL):self.write(path,(ROOT/path).read_text(encoding='utf-8'))
         self.write('src/ForgeLine.Game/Unowned.cs','original');self.commit('base');self.base=self.head()
-        self.record=json.loads((ROOT/scope.RECORD).read_bytes());self.record['baselineSha']=self.base;self.record['ciScopeProposal']['baseSha']=self.base;self.checks=0
+        self.record=json.loads((ROOT/scope.RECORD).read_bytes());self.record.update(baselineSha=self.base,packages=[dict(id=scope.DIAGNOSTICS,wave=0,dependsOn=[],owns=list(scope.DIAGNOSTICS_OWNS)),dict(id=scope.MEASUREMENT,wave=1,dependsOn=[scope.DIAGNOSTICS],owns=list(scope.MEASUREMENT_OWNS))]);self.record['ciScopeProposal'].update(baseSha=self.base,package=scope.DIAGNOSTICS);self.checks=0
     def run(self,*args):return subprocess.check_output(['git','-C',str(self.root),*args],stderr=subprocess.STDOUT,text=True)
     def write(self,path,text):
         target=self.root/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(text,encoding='utf-8')
@@ -73,4 +73,24 @@ class BaselineScopeTests(unittest.TestCase):
     def test_unrelated_legacy_contract_route_unchanged(self):
         self.repo.write('docs/rendering/qualification/Example.md','legacy');self.repo.commit('legacy')
         result,report=self.repo.check();self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(report['mode'],'legacy-parallel')
+class WorkloadScopeTests(unittest.TestCase):
+    def setUp(self):
+        self.repo=Repository();self.addCleanup(self.repo.temp.cleanup)
+        self.repo.record.update(packages=[dict(id=scope.WORKLOAD,wave=1,dependsOn=[scope.DIAGNOSTICS],owns=list(scope.WORKLOAD_OWNS))])
+        self.repo.record['ciScopeProposal']['package']=scope.WORKLOAD
+    def test_one_row_exact_workload_proposal(self):
+        result,report=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Client/ClientSimulationHost.cs':'facts','src/ForgeLine.Platform.Windows/PlatformWorkloadTelemetry.cs':'facts','docs/Development.md':'wording','Directory.Build.props':'version'}))
+        self.assertEqual(result.returncode,0,result.stderr);self.assertTrue(report['proposalOnly'])
+    def test_wrong_dependency_extra_row_and_foreign_id_reject(self):
+        for mutate in [lambda r:r['packages'][0].update(dependsOn=[]),lambda r:r['packages'].append(copy.deepcopy(r['packages'][0])),lambda r:r['packages'][0].update(id='Foreign')]:
+            record=copy.deepcopy(self.repo.record);mutate(record)
+            with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+    def test_workload_cannot_take_graphics_or_self_authorize_broad_scope(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12FrameCapture.cs':'foreign'}));self.assertNotEqual(result.returncode,0)
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns'].append('src/')
+        with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+    def test_wrong_workload_baseline_rejects_even_when_ancestor(self):
+        self.repo.write('README.md','next base');self.repo.commit('next');eventbase=self.repo.head()
+        record=copy.deepcopy(self.repo.record);record['ciScopeProposal']['baseSha']=eventbase
+        result,_=self.repo.check(self.repo.proposal(record),base=eventbase);self.assertNotEqual(result.returncode,0)
 if __name__=='__main__':unittest.main()
