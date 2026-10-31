@@ -1,54 +1,41 @@
 {
   "schemaVersion": 1,
   "kind": "render-baseline-ownership",
-  "baselineSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+  "baselineSha": "0a95684307a9b13a314cf6b381991952c3c9a868",
   "serializedVersionException": "Directory.Build.props",
   "packages": [
     {
-      "id": "0_CompleteBaselineAdmissionContracts",
+      "id": "0_CompleteBaselineCaptureDiagnostics",
       "wave": 0,
       "dependsOn": [],
       "owns": [
+        "src/ForgeLine.Graphics/IGraphicsDevice.cs",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Graphics/D3D12SceneComposition.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/",
         "src/ForgeLine.Client/Program.cs",
         "src/ForgeLine.Client/ClientRenderHost.cs",
-        "src/ForgeLine.Client/ClientApplication.cs",
         "src/ForgeLine.Client/VisualReferenceCapture.cs",
-        "src/ForgeLine.Client/ReferencePerformanceSamples.cs",
         "src/ForgeLine.Client/ReferenceCaptureManifest.cs",
         "src/ForgeLine.Client/RenderTelemetry/",
-        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
-        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
-        "src/ForgeLine.Graphics/RenderTelemetry/",
-        "tests/ForgeLine.Client.Tests/ReferencePerformanceSamplesTests.cs",
-        "tests/ForgeLine.Client.Tests/RenderQualification/",
         "tests/ForgeLine.Graphics.Tests/RenderTelemetry/",
-        "tests/ForgeLine.Presentation.Tests/BattlefieldStatusNativeTests.cs",
-        "tests/ForgeLine.Presentation.Tests/BattlefieldStatusOverlayTests.cs",
-        "build/rendering/qualification/",
+        "tests/ForgeLine.Client.Tests/RenderQualification/",
         "build/rendering/render-engine-upgrade/",
-        "docs/rendering/render-engine-upgrade/BaselineOwnership.json",
+        "build/rendering/qualification/",
         "docs/rendering/render-engine-upgrade/Admission.md",
-        "docs/rendering/render-engine-upgrade/Telemetry.md",
         "docs/rendering/render-engine-upgrade/Baseline.md",
         "docs/rendering/render-engine-upgrade/MeasurementProtocol.md",
-        "docs/rendering/render-engine-upgrade/evidence/admission/",
-        "docs/rendering/render-engine-upgrade/evidence/baseline/",
-        ".github/workflows/render-qualification.yml",
-        "Directory.Packages.props",
+        "docs/rendering/render-engine-upgrade/BaselineOwnership.json",
+        "docs/rendering/render-engine-upgrade/evidence/qualification/",
         "docs/DocumentationIndex.md",
-        "src/ForgeLine.Presentation/SimpleInstanceRenderer.ContentEvidence.cs",
-        "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
-        "tests/ForgeLine.Presentation.Tests/ContentEvidence/",
-        "tests/ForgeLine.Presentation.Tests/TerrainResidency/TerrainLifetimeTests.cs",
-        "src/ForgeLine.Game/MatchRuntime.cs",
-        "tests/ForgeLine.Game.Tests/DeveloperTools/DeveloperPracticeInitializationTests.cs"
+        ".github/workflows/render-qualification.yml"
       ]
     },
     {
       "id": "1_QualifyRepeatableBaseline",
       "wave": 1,
       "dependsOn": [
-        "0_CompleteBaselineAdmissionContracts"
+        "0_CompleteBaselineCaptureDiagnostics"
       ],
       "owns": [
         "build/rendering/render-engine-upgrade/",
@@ -60,8 +47,8 @@
   ],
   "ciScopeProposal": {
     "kind": "serial-baseline-contract-proposal",
-    "package": "0_CompleteBaselineAdmissionContracts",
-    "baseSha": "143ce699a3f3505168fc4d82f64780d7cae32c3f",
+    "package": "0_CompleteBaselineCaptureDiagnostics",
+    "baseSha": "0a95684307a9b13a314cf6b381991952c3c9a868",
     "workflow": ".github/workflows/render-qualification.yml"
   }
 }

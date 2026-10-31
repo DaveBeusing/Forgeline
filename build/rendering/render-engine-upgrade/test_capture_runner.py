@@ -1,4 +1,4 @@
-import json,subprocess,tempfile,unittest
+import json,subprocess,tempfile,unittest,time
 from pathlib import Path
 from unittest.mock import patch
 import capture_runner as c
@@ -12,9 +12,11 @@ class CaptureRunnerTests(unittest.TestCase):
         return exe,sensor,request
     def test_exit_zero_without_manifest_is_retained_failure(self):self.run_mock(False)
     def test_real_launcher_path_retains_precommand_and_postcommand_sensors(self):self.run_mock(True)
-    def run_mock(self,produce_manifest,hang_after_handshake=False,change_assembly=False):
+    def run_mock(self,produce_manifest,hang_after_handshake=False,change_assembly=False,setup_hold=False,trace_control=False):
         with tempfile.TemporaryDirectory() as root:
             exe,sensor,request=self.fixture(root);output=Path(root)/'run';state={}
+            if trace_control:
+                value=json.loads(request.read_bytes());value['ownerTraceControlDirectory']=str(Path(root)/'external-trace');request.write_text(json.dumps(value))
             class Child:
                 pid=42;returncode=None
                 def __init__(self,argv,**kwargs):
@@ -28,7 +30,7 @@ class CaptureRunnerTests(unittest.TestCase):
                 def wait(self,timeout):
                     if self.returncode is None:raise subprocess.TimeoutExpired(["fake-child"],timeout)
                     return self.returncode
-            def handshake(directory,context,dll,smi,before_publish):
+            def handshake(directory,context,dll,smi,before_publish,**kwargs):
                 before_publish({})
                 if hang_after_handshake:raise ContractError("simulated child failure")
                 if produce_manifest:
@@ -37,9 +39,13 @@ class CaptureRunnerTests(unittest.TestCase):
                 if change_assembly:exe.with_suffix('.dll').write_bytes(b'changed managed assembly')
                 state['child'].returncode=0
                 return {}
-            with patch('capture_runner.run_record',return_value=(b'provider version',{})),patch('capture_runner.subprocess.run',return_value=subprocess.CompletedProcess([],0,RAW,b'')),patch('capture_runner.subprocess.Popen',Child),patch('capture_runner.power_status',return_value=dict(powerSource='ac')),patch('capture_runner.window_facts',side_effect=lambda pid=None,hwnd=None:dict(status='controlled' if pid else 'unavailable')),patch('capture_runner.complete_checkpoint',side_effect=handshake):
+            def hold(*args):
+                self.assertTrue(args[2]());time.sleep(1.25);state['focused']=True
+            def facts(pid=None,hwnd=None):
+                return dict(status='failed' if setup_hold and pid and not state.get('focused') else 'controlled' if pid else 'unavailable',ownerPid=pid,hwnd=hwnd)
+            with patch('capture_runner.run_record',return_value=(b'provider version',{})),patch('capture_runner.subprocess.run',return_value=subprocess.CompletedProcess([],0,RAW,b'')),patch('capture_runner.subprocess.Popen',Child),patch('capture_runner.power_status',return_value=dict(powerSource='ac')),patch('capture_runner.window_facts',side_effect=facts),patch('capture_runner.complete_checkpoint',side_effect=handshake),patch('diagnostic_control.hold_for_operator',side_effect=hold):
                 if produce_manifest and not change_assembly:
-                    result=c.run_capture(exe,request,output,sensor,'unused');self.assertEqual(result['status'],'structural-pass');self.assertFalse(result['qualified'])
+                    result=c.run_capture(exe,request,output,sensor,'unused',diagnostic_only=setup_hold,diagnostic_setup_hold=setup_hold);self.assertEqual(result['status'],'structural-pass');self.assertFalse(result['qualified']);self.assertEqual(result['diagnosticOnly'],setup_hold or trace_control)
                 else:
                     with self.assertRaises(ContractError):c.run_capture(exe,request,output,sensor,'unused')
                     record=json.loads((output/'attempt.json').read_bytes());self.assertEqual(record['status'],'failed')
@@ -48,6 +54,11 @@ class CaptureRunnerTests(unittest.TestCase):
                     if hang_after_handshake:self.assertIn('kill-requested',record['cleanup']);self.assertIsNotNone(record['commandCompletedAtUtc'])
             self.assertTrue((output/'sensors'/'final.json').exists())
             if produce_manifest:self.assertGreaterEqual(json.loads((output/'sensors'/'final.json').read_bytes())['rows'],2)
+            if setup_hold:
+                rows=[json.loads(line)['sample'] for line in (output/'sensors/observations.jsonl').read_text().splitlines()]
+                self.assertTrue(any(r.get('controlPhase')=='diagnostic-setup' and r['window']['status']=='failed' and not r.get('failure') for r in rows))
+    def test_direct_trace_handoff_request_is_always_marked_diagnostic(self):self.run_mock(True,trace_control=True)
+    def test_startup_foreground_loss_is_observed_during_hold_not_discarded_or_qualified(self):self.run_mock(True,setup_hold=True)
     def test_version_preflight_failure_retains_attempt_before_launch(self):
         with tempfile.TemporaryDirectory() as root:
             exe,sensor,request=self.fixture(root);output=Path(root)/"run"
@@ -73,6 +84,12 @@ class CaptureRunnerTests(unittest.TestCase):
             row=json.loads((out/"sensors"/"observations.jsonl").read_bytes())
             self.assertEqual(base64.b64decode(row["rawStdoutBase64"]),b"partial stdout");self.assertEqual(base64.b64decode(row["rawStderrBase64"]),b"partial stderr")
             self.assertTrue(row["sample"]["command"]["timedOut"]);self.assertIsNone(row["sample"]["command"]["exitCode"])
+    def test_output_inside_payload_is_rejected_without_creating_failure_artifacts(self):
+        with tempfile.TemporaryDirectory() as root:
+            exe,sensor,request=self.fixture(root);out=exe.parent/'would-mutate-payload'
+            before=c.payload_inventory(exe.parent)
+            with self.assertRaises(ContractError):c.run_capture(exe,request,out,sensor,'unused')
+            self.assertFalse(out.exists());self.assertEqual(before,c.payload_inventory(exe.parent))
     def test_runtime_seal_detects_changed_bytes(self):
         with tempfile.TemporaryDirectory() as root:
             path=Path(root)/'data';path.write_bytes(b'first');before=c.runtime_fingerprint(root);path.write_bytes(b'changed');self.assertNotEqual(c.runtime_fingerprint(root),before)

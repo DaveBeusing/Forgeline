@@ -77,6 +77,12 @@ public interface IGraphicsDevice : IDisposable
     // Explicit qualification readback on the creating thread; never part of ordinary frames.
     byte[] CaptureFrame(GraphicsColor clearColor, Action<IGraphicsCommandContext> recordCommands, bool captureShadowDepth = false) =>
         throw new NotSupportedException("Native frame capture is unsupported.");
+    IReadOnlyList<GraphicsStageFootprint> CaptureStageFootprints(GraphicsCaptureStages stages = GraphicsCaptureStages.All) =>
+        throw new NotSupportedException("Native stage footprint inspection is unsupported.");
+    // Additive opt-in stage readback; old implementations and CaptureFrame callers are unchanged.
+    GraphicsStageCapture CaptureFrameDiagnostics(GraphicsColor clearColor, Action<IGraphicsCommandContext> recordCommands,
+        GraphicsCaptureStages stages = GraphicsCaptureStages.All) =>
+        throw new NotSupportedException("Native stage capture is unsupported.");
     string? CaptureInputFingerprint => null;
     ReadOnlyMemory<byte> CaptureShadowDepth => ReadOnlyMemory<byte>.Empty;
 

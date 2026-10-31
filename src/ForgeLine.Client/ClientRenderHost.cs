@@ -585,7 +585,7 @@ internal sealed partial class ClientRenderHost : IDisposable
                     if (Volatile.Read(ref _fixtureCaptureRequested) != 0 && fixtureRecord is not null && fixturePrepareReadback is not null)
                     {
                         graphics.WaitForIdle(); liveTelemetry?.DrainGpu();
-                        CaptureFixtureReadback(graphics, fixtureRecord, fixturePrepareReadback, instanceRenderer);
+                        CaptureFixtureReadback(graphics, fixtureRecord, fixturePrepareReadback, instanceRenderer, renderCamera.CaptureState);
                         continue;
                     }
                     if (!_fixtureSequence!.TryRead(out fixtureOrdinal)) continue;

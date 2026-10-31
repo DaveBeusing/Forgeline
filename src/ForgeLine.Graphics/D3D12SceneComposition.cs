@@ -210,6 +210,7 @@ internal sealed partial class D3D12GraphicsDevice
         long started = System.Diagnostics.Stopwatch.GetTimestamp();
         _commandList.ResourceBarrierTransition(_sceneTargets![_frameIndex],
             ResourceStates.RenderTarget, ResourceStates.PixelShaderResource);
+        RecordPreCompositionCapture();
         if (_atmosphere.Enabled || ScaledScene)
         {
             _commandList.OMSetRenderTargets(new CpuDescriptorHandle(_rtvHeap.GetCPUDescriptorHandleForHeapStart(),
@@ -241,6 +242,7 @@ internal sealed partial class D3D12GraphicsDevice
         RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(constants));
         _commandList.SetGraphicsRoot32BitConstants(0, constants);
         _commandList.DrawInstanced(3, 1, 0, 0);
+        RecordPreOverlayCapture();
         if (_atmosphere.Enabled || ScaledScene)
         {
             _commandList.ResourceBarrierTransition(_depthTarget!, ResourceStates.PixelShaderResource, ResourceStates.DepthWrite);

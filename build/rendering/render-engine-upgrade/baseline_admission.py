@@ -49,6 +49,10 @@ def signature(case):return (case['scene'],case['quality'],case['zoom'],integer(c
 
 def validate_protocol(protocol):
     require(type(protocol.get('schemaVersion')) is int and protocol['schemaVersion']==1 and protocol.get('kind')=='accepted-baseline-control-protocol','Accepted baseline protocol missing')
+    return validate_protocol_body(protocol)
+
+def validate_protocol_body(protocol):
+    """Pure case/window semantics; this function does not assert approval or committed trust."""
     require(protocol.get('comparison')=='identical-instrumented-source-A/A' and protocol.get('preserveAllAttempts') is True,'Baseline must preserve every A/A attempt')
     require(type(protocol.get('pairs')) is int and protocol['pairs']>=5,'At least five predeclared pairs required')
     require(type(protocol.get('regressionPercent')) is int and protocol['regressionPercent']==15,'The existing15percent control threshold cannot change')
@@ -396,6 +400,7 @@ def evaluate(cohort,root,repo,trusted_master):
         key=(pair,arm,r['caseId'],producer);require(key not in observed,'Duplicate attempt identity; winning reruns cannot replace failures')
         directory=local(root,r['directory']);attempt=load(directory,r['attempt'])
         require(attempt.get('status')=='structural-pass' and attempt.get('exitCode')==0 and not attempt.get('failures') and attempt.get('sourceSha')==source,'Retained capture failed or belongs to another source')
+        require(attempt.get('diagnosticOnly',False) is False,'Separate stage/attach/setup diagnostics cannot be admitted as qualification timing')
         start,end=utc(attempt['commandStartedAtUtc']),utc(attempt['commandCompletedAtUtc']);require(start<end and utc(protocol['frozenAtUtc'])<=start,'Capture interval invalid or predates freeze')
         require(max(accepted_times)<=start,'Reviewed record bytes were not committed before capture')
         for kind,p in policies.items():validate_policy(p,kind,start)
@@ -403,6 +408,7 @@ def evaluate(cohort,root,repo,trusted_master):
         require(payload_before==payload_after==protocol['payloadInventory'],'Complete binary/runtime payload inventory changed or differs from freeze')
         require(r['payloadInventoryBefore']['sha256']==attempt['payloadInventoryBeforeSha256'] and r['payloadInventoryAfter']['sha256']==attempt['payloadInventoryAfterSha256'],'Actual launcher payload references differ')
         request=load(directory,r['request']);require(sha256_bytes((directory/r['request']['path']).read_bytes())==attempt['requestSha256'],'Actual request differs from launched bytes')
+        require(request.get('captureStageDiagnostics',False) is False and request.get('ownerTraceControlDirectory') is None,'Intrusive stage/owner-trace requests are separate diagnostics, never baseline timing')
         cold=case is not None and case['runProfile']=='RendererCold';count=128 if cold else 512;warmups=0 if cold else 64
         require(request['outputRoot']==scheduled[key]['launchOutputPath'],'Actual launched output path differs from predeclared attempt')
         require(request['commit']==source and request['samples']==count and request['warmups']==(64 if cold else warmups),'Actual launched window differs from freeze')

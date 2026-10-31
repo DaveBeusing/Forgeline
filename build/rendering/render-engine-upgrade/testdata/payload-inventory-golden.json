@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "path": "z.txt",
+      "text": "plain"
+    },
+    {
+      "path": "\u00e9.txt",
+      "text": "accent"
+    },
+    {
+      "path": "\ud83d\ude00.txt",
+      "text": "astral"
+    },
+    {
+      "path": "\ue000.txt",
+      "text": "private"
+    }
+  ],
+  "expected": [
+    {
+      "path": "z.txt",
+      "bytes": 5,
+      "sha256": "a116c9ed46d6207734a43317d30fd88f52ac8634c37d904bbf4e41d865f90475"
+    },
+    {
+      "path": "\u00e9.txt",
+      "bytes": 6,
+      "sha256": "a3a7f053ae2eadb1fb93bcbd4a39b00985b64ede4f337d64025982f9efb97f54"
+    },
+    {
+      "path": "\ud83d\ude00.txt",
+      "bytes": 6,
+      "sha256": "2e9f768344ff39ac7c1e41218b0a488a0fb666992777f7bfe03d09450df4f5b1"
+    },
+    {
+      "path": "\ue000.txt",
+      "bytes": 7,
+      "sha256": "715dc8493c36579a5b116995100f635e3572fdf8703e708ef1a08d943b36774e"
+    }
+  ]
+}

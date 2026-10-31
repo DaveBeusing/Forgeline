@@ -11,6 +11,8 @@ HISTORICAL="docs/rendering/parallelization/ParallelRenderOwnership.json"
 WORKFLOW=".github/workflows/render-qualification.yml"
 CONTRACT="0_CompleteBaselineAdmissionContracts"
 MEASUREMENT="1_QualifyRepeatableBaseline"
+DIAGNOSTICS="0_CompleteBaselineCaptureDiagnostics"
+DIAGNOSTICS_OWNS=('src/ForgeLine.Graphics/IGraphicsDevice.cs', 'src/ForgeLine.Graphics/D3D12FrameCapture.cs', 'src/ForgeLine.Graphics/D3D12SceneComposition.cs', 'src/ForgeLine.Graphics/RenderTelemetry/', 'src/ForgeLine.Client/Program.cs', 'src/ForgeLine.Client/ClientRenderHost.cs', 'src/ForgeLine.Client/VisualReferenceCapture.cs', 'src/ForgeLine.Client/ReferenceCaptureManifest.cs', 'src/ForgeLine.Client/RenderTelemetry/', 'tests/ForgeLine.Graphics.Tests/RenderTelemetry/', 'tests/ForgeLine.Client.Tests/RenderQualification/', 'build/rendering/render-engine-upgrade/', 'build/rendering/qualification/', 'docs/rendering/render-engine-upgrade/Admission.md', 'docs/rendering/render-engine-upgrade/Baseline.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'docs/rendering/render-engine-upgrade/BaselineOwnership.json', 'docs/rendering/render-engine-upgrade/evidence/qualification/', 'docs/DocumentationIndex.md', '.github/workflows/render-qualification.yml')
 # Reviewed hard pin: the proposal cannot authorize its own wider scope.
 CONTRACT_OWNS=('src/ForgeLine.Client/Program.cs', 'src/ForgeLine.Client/ClientRenderHost.cs', 'src/ForgeLine.Client/ClientApplication.cs', 'src/ForgeLine.Client/VisualReferenceCapture.cs', 'src/ForgeLine.Client/ReferencePerformanceSamples.cs', 'src/ForgeLine.Client/ReferenceCaptureManifest.cs', 'src/ForgeLine.Client/RenderTelemetry/', 'src/ForgeLine.Graphics/D3D12GraphicsDevice.cs', 'src/ForgeLine.Graphics/D3D12FrameCapture.cs', 'src/ForgeLine.Graphics/RenderTelemetry/', 'tests/ForgeLine.Client.Tests/ReferencePerformanceSamplesTests.cs', 'tests/ForgeLine.Client.Tests/RenderQualification/', 'tests/ForgeLine.Graphics.Tests/RenderTelemetry/', 'tests/ForgeLine.Presentation.Tests/BattlefieldStatusNativeTests.cs', 'tests/ForgeLine.Presentation.Tests/BattlefieldStatusOverlayTests.cs', 'build/rendering/qualification/', 'build/rendering/render-engine-upgrade/', 'docs/rendering/render-engine-upgrade/BaselineOwnership.json', 'docs/rendering/render-engine-upgrade/Admission.md', 'docs/rendering/render-engine-upgrade/Telemetry.md', 'docs/rendering/render-engine-upgrade/Baseline.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'docs/rendering/render-engine-upgrade/evidence/admission/', 'docs/rendering/render-engine-upgrade/evidence/baseline/', '.github/workflows/render-qualification.yml', 'Directory.Packages.props', 'docs/DocumentationIndex.md', 'src/ForgeLine.Presentation/SimpleInstanceRenderer.ContentEvidence.cs', 'src/ForgeLine.Presentation/SimpleInstanceRenderer.cs', 'tests/ForgeLine.Presentation.Tests/ContentEvidence/', 'tests/ForgeLine.Presentation.Tests/TerrainResidency/TerrainLifetimeTests.cs', 'src/ForgeLine.Game/MatchRuntime.cs', 'tests/ForgeLine.Game.Tests/DeveloperTools/DeveloperPracticeInitializationTests.cs')
 MEASUREMENT_OWNS=('build/rendering/render-engine-upgrade/', 'docs/rendering/render-engine-upgrade/Baseline.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'docs/rendering/render-engine-upgrade/evidence/baseline/')
@@ -23,7 +25,8 @@ def validate_record(record):
     require(record.get("serializedVersionException")=="Directory.Build.props","Unknown shared ownership exception")
     require(set(record)=={"schemaVersion","kind","baselineSha","serializedVersionException","packages","ciScopeProposal"},"Unknown baseline record fields")
     packages=record.get("packages");require(type(packages) is list and len(packages)==2,"Unknown/mixed baseline packages")
-    expected=[(CONTRACT,0,[],CONTRACT_OWNS),(MEASUREMENT,1,[CONTRACT],MEASUREMENT_OWNS)]
+    diagnostics=packages[0].get("id")==DIAGNOSTICS if type(packages[0]) is dict else False
+    expected=[(DIAGNOSTICS,0,[],DIAGNOSTICS_OWNS),(MEASUREMENT,1,[DIAGNOSTICS],MEASUREMENT_OWNS)] if diagnostics else [(CONTRACT,0,[],CONTRACT_OWNS),(MEASUREMENT,1,[CONTRACT],MEASUREMENT_OWNS)]
     for package,(name,wave,deps,paths) in zip(packages,expected):
         require(type(package) is dict and set(package)=={"id","wave","dependsOn","owns"},"Malformed baseline package")
         require(package["id"]==name and type(package["wave"]) is int and package["wave"]==wave and package["dependsOn"]==deps,"Unknown package/wave/dependency")
@@ -53,9 +56,10 @@ def select_scope(repo,base,head,report,diff_file):
     for historical in (ORIGINAL,HISTORICAL):require(blob(repo,base,historical)==blob(repo,head,historical),"Baseline route cannot alter historical ownership")
     if changed_record:
         require([status for status,path in changes if path==RECORD] in (["A"],["M"]),"Changed baseline record must be an explicit ordinary proposal")
-        proposal=dict(kind="serial-baseline-contract-proposal",package=CONTRACT,baseSha=base,workflow=WORKFLOW)
+        selected=record["packages"][0]["id"]
+        proposal=dict(kind="serial-baseline-contract-proposal",package=selected,baseSha=base,workflow=WORKFLOW)
         require(record.get("ciScopeProposal")==proposal,"Stale base, unknown package or malformed proposal; no fallback")
-        allowed=CONTRACT_OWNS;mode="serial-baseline-contract-proposal"
+        allowed=DIAGNOSTICS_OWNS if selected==DIAGNOSTICS else CONTRACT_OWNS;mode="serial-baseline-contract-proposal"
     else:
         require(blob(repo,head,RECORD)==raw,"Accepted baseline ownership bytes changed without proposal")
         allowed=MEASUREMENT_OWNS;mode="accepted-baseline-measurement-scope"

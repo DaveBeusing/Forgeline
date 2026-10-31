@@ -21,6 +21,8 @@ internal sealed record ReferenceAdapterCheckpoint(object Evidence)
         Directory.CreateDirectory(directory);
         var checkpoint = new { schemaVersion = 1, kind = "actual-renderer-identity-checkpoint", runId = Guid.NewGuid().ToString("N"),
             sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, adapterIdentity = identity,
+            ownerThread = new { processId = Environment.ProcessId, nativeThreadId = RenderOwnerThreadIdentity.GetCurrentThreadId(), managedThreadId = Environment.CurrentManagedThreadId },
+            clockAnchor = RenderOwnerThreadIdentity.ClockAnchor(),
             nativeWindowHandle, createdAtUtc = DateTimeOffset.UtcNow, clientAssemblySha256 = VisualReferenceCapture.FileHash(typeof(Program).Assembly.Location) };
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(checkpoint, VisualReferenceCapture.JsonOptions);
         string hash = Convert.ToHexString(SHA256.HashData(bytes));
