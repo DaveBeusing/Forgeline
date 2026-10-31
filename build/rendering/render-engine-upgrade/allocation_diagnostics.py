@@ -1,11 +1,81 @@
 """Separate pinned sampled-stack diagnostics. Never a timing or exact-byte budget substitute."""
 import base64,json,subprocess,sys
+from dataclasses import dataclass,asdict
+from pathlib import PureWindowsPath
 from datetime import datetime,timezone
 from pathlib import Path
 from baseline_contracts import require,read_json,write_new,sha256_bytes,utc
 from provider import run_record,resolve_executable
 
-def correlate(trace,owner,*,source_sha,runtime_fingerprint,producer_session):
+RAW_QPC_RULE='windows-coreclr-10.0.13-traceevent4-retained-parser-raw-qpc-v1'
+_RAW_PARSER_SOURCE='ec5db1892799977bea3b7908ce8b8688ce94b49b'
+_RAW_PARSER_BUILD='0.1.539-dev+'+_RAW_PARSER_SOURCE
+_RAW_PARSER_SHA='63808a724288c49f3c5be45412687f9861d21a9c53c18453af2d7604545f3d17'
+_RAW_DEPS_SHA='7ea4a4da11c3e5c561be35d934e5f7654ac14cc381f3773e0b3e02b54f79f157'
+_RAW_CONTRACT='docs/rendering/render-engine-upgrade/evidence/qualification/RawQpcCorrelationContract.md'
+
+@dataclass(frozen=True)
+class _VerifiedTraceExecution:
+    # Constructed by baseline admission ONLY after its original execution gates.
+    report_sha256: str
+    report_file_sha256: str
+    trace_sha256: str
+    source_sha: str
+    dependencies_sha256: str
+    execution_provenance_sha256: str
+
+@dataclass(frozen=True)
+class _RawQpcProof:
+    rule: str
+    report_sha256: str
+    owner_sha256: str
+    binding_sha256: str
+    target_runtime_modules: tuple
+    contract_sha256: str
+    execution: _VerifiedTraceExecution
+
+    def evidence(self):
+        return dict(**asdict(self),contractPath=_RAW_CONTRACT,
+            trust='Ordinary installed Windows CoreCLR runtime/module-version trust; historical runtime module contents are not cryptographically attested',
+            historicalRuntimeModuleHashesAvailable=False)
+
+def _report_hash(trace):
+    from baseline_contracts import canonical
+    return sha256_bytes(canonical({k:v for k,v in trace.items() if k!='producerBinding'}))
+
+def _derive_raw_qpc_proof(trace,owner,execution):
+    """Internal post-gate derivation, never consumes a caller sameClock assertion."""
+    from baseline_contracts import canonical
+    require(type(execution) is _VerifiedTraceExecution,'Original execution gates have not produced typed verified evidence')
+    require(execution.report_sha256==_report_hash(trace) and execution.trace_sha256==trace['traceSha256Before']==trace['traceSha256After'],'Verified execution belongs to another report/trace')
+    require(all(type(trace.get(k)) is int and trace[k]==0 for k in ('logEventsLost','sourceEventsLost','truncatedStacks')) and not trace.get('conversionNotices'),'Original trace reports loss/truncation')
+    binding=trace['producerBinding']
+    require(execution.source_sha==binding['sourceSha'],'Verified parser execution/source binding differs')
+    generic=correlate(trace,owner,source_sha=binding['sourceSha'],runtime_fingerprint=binding['runtimeFingerprint'],producer_session=binding['sessionId'])
+    require(generic['status']=='compatible-original-clocks','Original header/frequency/UTC/process/source clock gates did not pass')
+    if (trace.get('parser')!='TraceEvent4.0.0' or trace.get('parserBuildIdentity')!=_RAW_PARSER_BUILD or
+        trace.get('parserAssemblySha256')!=_RAW_PARSER_SHA or execution.dependencies_sha256!=_RAW_DEPS_SHA or
+        execution.source_sha!=_RAW_PARSER_SOURCE or trace['clock']['format']!='pinned-nettrace-fastserialization-trace-v4'):
+        return None # A different build/format needs its own reviewed source-path contract.
+    modules=set();versions=set();corelibs=set();roots=set()
+    for event in trace['events']:
+        require(event['processId']==trace['expectedPid'],'Target runtime module evidence contains another PID')
+        for frame in event.get('stack',[]):
+            module=frame.get('module')
+            if not isinstance(module,str) or not module:continue
+            path=PureWindowsPath(module)
+            # Only actual target-event module paths, never another process preflight/runtime string.
+            parts=path.parts
+            for index,part in enumerate(parts):
+                if part.casefold()!='microsoft.netcore.app':continue
+                if not path.is_absolute() or index<1 or parts[index-1].casefold()!='shared' or len(parts)!=index+3:return None
+                version,name=parts[index+1:];versions.add(version);modules.add(str(path));roots.add(str(path.parent).casefold())
+                if name.casefold()=='system.private.corelib.dll':corelibs.add(str(path.parent).casefold())
+    if versions!={'10.0.13'} or len(corelibs)!=1 or roots!=corelibs:return None
+    contract=Path(__file__).resolve().parents[3]/_RAW_CONTRACT
+    return _RawQpcProof(RAW_QPC_RULE,_report_hash(trace),sha256_bytes(canonical(owner)),sha256_bytes(canonical(binding)),tuple(sorted(modules)),sha256_bytes(contract.read_bytes()),execution)
+
+def correlate(trace,owner,*,source_sha,runtime_fingerprint,producer_session,raw_qpc_proof=None):
     """Only join already verified original clocks; unknown clocks remain explicit unavailable."""
     try:
         require(trace.get('status')=='diagnostic-pass','Trace is incomplete')
@@ -35,16 +105,32 @@ def correlate(trace,owner,*,source_sha,runtime_fingerprint,producer_session):
         delta=(utc(anchor['utc'])-origin).total_seconds()*frequency
         require(before-clock['syncTicks']-frequency/1000<=delta<=after-clock['syncTicks']+frequency/1000,'Original UTC/QPC anchors are incompatible')
         uncertainty=(after-before)+frequency/1000
+        if raw_qpc_proof is not None:
+            require(type(raw_qpc_proof) is _RawQpcProof and type(raw_qpc_proof.execution) is _VerifiedTraceExecution,'Invalid explicit raw-QPC proof; caller assertions cannot bypass generic uncertainty')
+            require(raw_qpc_proof.rule==RAW_QPC_RULE and raw_qpc_proof.report_sha256==_report_hash(trace)==raw_qpc_proof.execution.report_sha256 and
+                raw_qpc_proof.owner_sha256==sha256_bytes(canonical(owner)) and raw_qpc_proof.binding_sha256==sha256_bytes(canonical(binding)) and
+                raw_qpc_proof.execution.trace_sha256==trace['traceSha256Before'] and raw_qpc_proof.execution.source_sha==source_sha,
+                'Explicit raw-QPC proof belongs to another original trace/report/owner/binding')
+            expected=_derive_raw_qpc_proof(trace,owner,raw_qpc_proof.execution)
+            require(expected is not None and expected==raw_qpc_proof,'Explicit raw-QPC proof has unsupported/conflicting runtime/parser/contract evidence')
+        for frame in owner['frames']:
+            require(type(frame['startTick']) is int and type(frame['endTick']) is int and frame['startTick']<frame['endTick'],'Owner sample boundaries must be ordered original integers')
         joined=[]
         for event in trace['events']:
             require(event['processId']==thread['processId'],'Trace contains another process')
             if event['nativeThreadId']!=thread['nativeThreadId']:continue
             tick=event['timestampQpc'];require(type(tick) is int,'Raw trace tick unavailable')
-            matches=[f['index'] for f in owner['frames'] if f['startTick']<=tick<f['endTick']]
-            near=any(abs(tick-f[key])<=uncertainty for f in owner['frames'] for key in ('startTick','endTick'))
+            if raw_qpc_proof is None:
+                matches=[f['index'] for f in owner['frames'] if f['startTick']<=tick<f['endTick']]
+                near=any(abs(tick-f[key])<=uncertainty for f in owner['frames'] for key in ('startTick','endTick'))
+            else:
+                matches=[f['index'] for f in owner['frames'] if f['startTick']<tick<f['endTick']]
+                near=any(tick==f[key] for f in owner['frames'] for key in ('startTick','endTick'))
             require(len(matches)<=1,'Owner sample intervals overlap')
             joined.append(dict(timestampQpc=tick,frameIndex=None if near or not matches else matches[0],status='ambiguous-boundary' if near else 'matched' if matches else 'outside-window'))
-        return dict(status='compatible-original-clocks',uncertaintyTicks=uncertainty,events=joined,exactAllocationBytesAvailable=False)
+        return dict(status='compatible-original-clocks',uncertaintyTicks=0 if raw_qpc_proof is not None else uncertainty,
+            utcAnchorSanityUncertaintyTicks=uncertainty,boundaryRule='strict-integer-interior-exact-ties-ambiguous' if raw_qpc_proof is not None else 'conservative-utc-anchor-uncertainty',
+            rawQpcSourceProof=raw_qpc_proof.evidence() if raw_qpc_proof is not None else None,events=joined,exactAllocationBytesAvailable=False)
     except (ValueError,KeyError,TypeError) as error:return dict(status='unavailable',reason=str(error),exactAllocationBytesAvailable=False)
 
 def positive_sample(event):
