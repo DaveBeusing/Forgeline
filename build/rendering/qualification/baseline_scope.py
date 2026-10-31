@@ -12,6 +12,8 @@ WORKFLOW=".github/workflows/render-qualification.yml"
 CONTRACT="0_CompleteBaselineAdmissionContracts"
 MEASUREMENT="1_QualifyRepeatableBaseline"
 DIAGNOSTICS="0_CompleteBaselineCaptureDiagnostics"
+STABILITY='2_ResolveSceneLinearRepeatability'
+STABILITY_OWNS=('src/ForgeLine.Client/VisualReferenceCapture.cs', 'src/ForgeLine.Client/ClientRenderHost.cs', 'src/ForgeLine.Client/RenderTelemetry/ClientRenderHost.ReferenceFixture.cs', 'src/ForgeLine.Client/RenderTelemetry/ReferenceWorldInputDiagnostics.cs', 'tests/ForgeLine.Client.Tests/RenderQualification/ReferenceWorldInputDiagnosticsTests.cs', 'build/rendering/render-engine-upgrade/world_input_diagnostics.py', 'build/rendering/render-engine-upgrade/test_world_input_diagnostics.py', 'build/rendering/render-engine-upgrade/stage_diagnostics.py', 'build/rendering/render-engine-upgrade/test_stage_diagnostics.py', 'build/rendering/qualification/baseline_scope.py', 'build/rendering/qualification/test_baseline_scope.py', 'docs/rendering/render-engine-upgrade/BaselineOwnership.json', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md')
 WORKLOAD='1_ObserveBoundedAllocationWorkload'
 WORKLOAD_OWNS=('src/ForgeLine.Client/ClientSimulationHost.cs', 'src/ForgeLine.Client/ClientSimulationTelemetry.cs', 'src/ForgeLine.Client/ClientSimulationControls.cs', 'src/ForgeLine.Client/ClientRenderHost.cs', 'src/ForgeLine.Client/RenderTelemetry/', 'src/ForgeLine.Platform.Windows/WindowsPlatform.cs', 'src/ForgeLine.Platform.Windows/WindowsWindow.cs', 'src/ForgeLine.Platform.Windows/PlatformWorkloadTelemetry.cs', 'src/ForgeLine.Client/WaveOutUiAudio.cs', 'src/ForgeLine.Client/WaveOutWorldAudio.cs', 'src/ForgeLine.Client/WorldAudioPlayback.cs', 'tests/ForgeLine.Client.Tests/RenderQualification/', 'tests/ForgeLine.Platform.Windows.Tests/', 'build/rendering/render-engine-upgrade/', 'docs/rendering/render-engine-upgrade/Admission.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'src/ForgeLine.Client/VisualReferenceCapture.cs', 'build/rendering/qualification/baseline_scope.py', 'build/rendering/qualification/test_baseline_scope.py', 'docs/rendering/render-engine-upgrade/BaselineOwnership.json', 'src/ForgeLine.Client/ClientApplication.cs', 'docs/rendering/render-engine-upgrade/Telemetry.md', 'docs/Development.md')
 DIAGNOSTICS_OWNS=('src/ForgeLine.Graphics/IGraphicsDevice.cs', 'src/ForgeLine.Graphics/D3D12FrameCapture.cs', 'src/ForgeLine.Graphics/D3D12SceneComposition.cs', 'src/ForgeLine.Graphics/RenderTelemetry/', 'src/ForgeLine.Client/Program.cs', 'src/ForgeLine.Client/ClientRenderHost.cs', 'src/ForgeLine.Client/VisualReferenceCapture.cs', 'src/ForgeLine.Client/ReferenceCaptureManifest.cs', 'src/ForgeLine.Client/RenderTelemetry/', 'tests/ForgeLine.Graphics.Tests/RenderTelemetry/', 'tests/ForgeLine.Client.Tests/RenderQualification/', 'build/rendering/render-engine-upgrade/', 'build/rendering/qualification/', 'docs/rendering/render-engine-upgrade/Admission.md', 'docs/rendering/render-engine-upgrade/Baseline.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'docs/rendering/render-engine-upgrade/BaselineOwnership.json', 'docs/rendering/render-engine-upgrade/evidence/qualification/', 'docs/DocumentationIndex.md', '.github/workflows/render-qualification.yml')
@@ -28,9 +30,10 @@ def validate_record(record):
     require(set(record)=={"schemaVersion","kind","baselineSha","serializedVersionException","packages","ciScopeProposal"},"Unknown baseline record fields")
     packages=record.get("packages");require(type(packages) is list and len(packages) in (1,2),"Unknown/mixed baseline packages")
     workload=type(packages[0]) is dict and packages[0].get("id")==WORKLOAD
-    require(len(packages)==(1 if workload else 2),"Unknown/mixed baseline package rows")
+    stability=type(packages[0]) is dict and packages[0].get("id")==STABILITY
+    require(len(packages)==(1 if workload or stability else 2),"Unknown/mixed baseline package rows")
     diagnostics=packages[0].get("id")==DIAGNOSTICS if type(packages[0]) is dict else False
-    expected=[(WORKLOAD,1,[DIAGNOSTICS],WORKLOAD_OWNS)] if workload else [(DIAGNOSTICS,0,[],DIAGNOSTICS_OWNS),(MEASUREMENT,1,[DIAGNOSTICS],MEASUREMENT_OWNS)] if diagnostics else [(CONTRACT,0,[],CONTRACT_OWNS),(MEASUREMENT,1,[CONTRACT],MEASUREMENT_OWNS)]
+    expected=[(STABILITY,2,[WORKLOAD],STABILITY_OWNS)] if stability else [(WORKLOAD,1,[DIAGNOSTICS],WORKLOAD_OWNS)] if workload else [(DIAGNOSTICS,0,[],DIAGNOSTICS_OWNS),(MEASUREMENT,1,[DIAGNOSTICS],MEASUREMENT_OWNS)] if diagnostics else [(CONTRACT,0,[],CONTRACT_OWNS),(MEASUREMENT,1,[CONTRACT],MEASUREMENT_OWNS)]
     for package,(name,wave,deps,paths) in zip(packages,expected):
         require(type(package) is dict and set(package)=={"id","wave","dependsOn","owns"},"Malformed baseline package")
         require(package["id"]==name and type(package["wave"]) is int and package["wave"]==wave and package["dependsOn"]==deps,"Unknown package/wave/dependency")
@@ -63,8 +66,8 @@ def select_scope(repo,base,head,report,diff_file):
         selected=record["packages"][0]["id"]
         proposal=dict(kind="serial-baseline-contract-proposal",package=selected,baseSha=base,workflow=WORKFLOW)
         require(record.get("ciScopeProposal")==proposal,"Stale base, unknown package or malformed proposal; no fallback")
-        if selected==WORKLOAD:require(record["baselineSha"]==base,"Workload proposal baseline differs from actual event base")
-        allowed={DIAGNOSTICS:DIAGNOSTICS_OWNS,CONTRACT:CONTRACT_OWNS,WORKLOAD:WORKLOAD_OWNS}[selected];mode="serial-baseline-contract-proposal"
+        if selected in (WORKLOAD,STABILITY):require(record["baselineSha"]==base,"Workload proposal baseline differs from actual event base")
+        allowed={DIAGNOSTICS:DIAGNOSTICS_OWNS,CONTRACT:CONTRACT_OWNS,WORKLOAD:WORKLOAD_OWNS,STABILITY:STABILITY_OWNS}[selected];mode="serial-baseline-contract-proposal"
     else:
         require(blob(repo,head,RECORD)==raw,"Accepted baseline ownership bytes changed without proposal")
         allowed=MEASUREMENT_OWNS;mode="accepted-baseline-measurement-scope"

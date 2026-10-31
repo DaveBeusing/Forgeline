@@ -146,3 +146,87 @@ continuous visibility, hardware stability, repeatable pixels or baseline/wave2
 admission. The detailed PR449 report remains local by the current session publication choice.
 No new physical capture or
 trace is implied by CPU regression results.
+
+
+## Fixed-readback world-input inspector v1
+
+Stage diagnostics opt into this additive inspector on a reviewed new producer.
+Construct one inspector on the render owner during setup, then explicitly arm
+only each declared fixed readback. Stage-enabled but unarmed motion/helper calls
+produce no inspector reads or records. There are no hooks in the existing shared
+PrepareTerrain/RecordFrame definitions or the warm/sample loops.
+
+Native repetition0 brackets the existing post-window fixed-pose PrepareTerrain
+site and the existing CaptureFrame conditional preparation site; later native
+repetitions bracket only that conditional site. Host repetitions bracket their
+existing readback prepare call. The call counts and order are unchanged.
+BeforeSite records PreparationInvoked as null (not yet evaluated); AfterSite
+records the actual boolean, with false meaning prepared state was reused. Phases
+are BeforeSite, AfterSite and AfterCaptureAndClientRetire. Checked fixed storage
+is5*RepeatCaptures, at most640 rows for128 repeats; unrelated motion never consumes
+that capacity. Rejected armed phases, ownership, chronology or capture tuples are
+sticky invalid evidence, not correctable into a passing subset.
+
+Each <key>-readback-<NN>-world-inputs.json is written CreateNew before pixel
+comparison. Its sibling reference is worldInputDiagnostics={file,sha256,
+schemaVersion:1}. The file binds source/runtime/recipe bytes, actual camera,
+quality-profile bytes, render-owner IDs and its own original stage metadata
+file/hash. profileDomain=effective-quality-profile means RenderQualityProfile;
+it is NOT the ordinary post-window ready profileFingerprint domain, which hashes
+the full ClientRenderConfiguration. Native failure timedWindow.observedComposition
+and host owner.observedComposition preserve that separate full-composition proof.
+
+The final pre-capture AfterSite surface supplies the captured-slot join. The
+post-capture surface FrameIndex is the next slot and is never substituted for
+GraphicsStageCapture.FrameIndex. CompletedFence is supplied only by that actual
+completed stage capture, not a pre/after-Prepare diagnostic or lagging CPU/GPU
+metric. Each lane binds its own successful submission/fence/generations and
+presentation progression; independent processes need not share those numbers.
+Incomplete preparation/capture scopes retain an incomplete prefix even if the
+final manifest is absent. Persistence and logging errors must not replace the
+original producer failure; an unavailable prefix is not a complete record.
+
+Facts are copied from the existing public typed terrain, instance (including
+main/shadow/preparation/reuse/asset/skin/material), particle and graphics
+properties. One Graphics.Diagnostics read per phase can harvest completed timing
+or debug state and allocate; this is a sequential observation bracket, not an
+atomic hardware/input read. DXGI memory is cached250ms. Preserve null/lagged facts.
+No extra wait, drain, Prepare, Enable or ObserveFrameDiagnostics call is added.
+*Milliseconds leaves are separated as timingFacts. Other values are labelled
+stateAndActivityFacts: expected cumulative/per-draw activity is not an invariant.
+SkinUploadBytes is resident skin-slot accounting and UploadBytes logical submitted
+bytes. Public logical staging/pending bytes are separate from physical memory.
+Internal upload-arena state and actual full GPU bindings/contents remain unobserved.
+
+The offline consumer embeds a reviewed static schema derived passively from the
+public record metadata, including exact fields, CLR integer widths, booleans,
+enums and nullable properties. No target constructor/getter/static method is run
+for discovery, and no runtime reflection is required for validation. Nullable
+values remain explicit nulls; present record timing paths cannot be omitted.
+Every available phase device and surface/raster is joined to its own stage.
+Prior submitted state is monotonic; the last pre-capture snapshot names the
+immediate predecessor, not the captured/completed frame. Native0 may legitimately
+advance during its existing non-Fixed settle frames. Raw optional CPU interval
+records remain labelled potentially lagged observations, never equal-cost or
+state-invariance proof.
+
+The offline API world_input_diagnostics.validate_series(root,stage_refs,
+inspector_refs,required_version=1) requires all eight complete inspector records
+and their original stages, hashes, phase sequence, owner, camera and tuple joins.
+The stage comparator accepts inspector_references and inspector_version=1 for
+that selected mode. Missing selected-v1 records fail; old absent records retain
+historical/unavailable status and the old stage-only route stays usable.
+compare_inspector_lanes validates each lane independently, compares common
+source/runtime/recipe/quality-profile/pose and reports state/activity changes;
+physical UUID/PCI and exact pixels remain the separate strict stage comparator's
+responsibility. Timing differences are labelled separately. Neither changed nor
+equal aggregate facts establish a shader/driver/lifetime cause or identical GPU
+contents. A pixel mismatch remains a failure with no tolerance or winning rerun.
+
+This initial inspector does not resolve repeatability or complete package2.
+Before any physical diagnostic, separately freeze clean source/build/payload/runtime,
+no-frame preflight, storage, literal schedule, controls and original deadlines.
+A pixel-only continuation needs external finally-path after inventories for both
+commands before classification, preserving original run_capture failure/exit.
+Any causal production fix needs a reviewed exact ownership amendment. Numeric
+policies, qualification and original wave2 readiness remain open.

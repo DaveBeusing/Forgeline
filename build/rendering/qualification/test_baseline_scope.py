@@ -15,7 +15,8 @@ class Repository:
     def commit(self,message):self.run('add','.');self.run('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm',message)
     def head(self):return self.run('rev-parse','HEAD').strip()
     def proposal(self,record=None,extra=None):
-        self.write(scope.RECORD,json.dumps(record if record is not None else self.record));self.write('src/ForgeLine.Client/RenderTelemetry/Example.cs','owned')
+        actual=record if record is not None else self.record
+        self.write(scope.RECORD,json.dumps(actual));self.write('src/ForgeLine.Client/RenderTelemetry/ReferenceWorldInputDiagnostics.cs' if actual.get('ciScopeProposal',{}).get('package')==scope.STABILITY else 'src/ForgeLine.Client/RenderTelemetry/Example.cs','owned')
         for path,value in (extra or {}).items():self.write(path,value)
         self.commit('proposal');return self.head()
     def check(self,head=None,base=None):
@@ -93,4 +94,22 @@ class WorkloadScopeTests(unittest.TestCase):
         self.repo.write('README.md','next base');self.repo.commit('next');eventbase=self.repo.head()
         record=copy.deepcopy(self.repo.record);record['ciScopeProposal']['baseSha']=eventbase
         result,_=self.repo.check(self.repo.proposal(record),base=eventbase);self.assertNotEqual(result.returncode,0)
+class StabilityScopeTests(unittest.TestCase):
+    def setUp(self):
+        self.repo=Repository();self.addCleanup(self.repo.temp.cleanup)
+        self.repo.record.update(packages=[dict(id=scope.STABILITY,wave=2,dependsOn=[scope.WORKLOAD],owns=list(scope.STABILITY_OWNS))])
+        self.repo.record['ciScopeProposal']['package']=scope.STABILITY
+    def test_exact_stability_proposal_accepts_only_declared_files(self):
+        self.repo.write('src/ForgeLine.Client/RenderTelemetry/Example.cs','base unrelated helper');self.repo.commit('base helper');self.repo.base=self.repo.head();self.repo.record['baselineSha']=self.repo.base;self.repo.record['ciScopeProposal']['baseSha']=self.repo.base
+        self.repo.write(scope.RECORD,json.dumps(self.repo.record));self.repo.write('src/ForgeLine.Client/RenderTelemetry/ReferenceWorldInputDiagnostics.cs','new inspector');self.repo.write('Directory.Build.props','version');self.repo.commit('stability')
+        result,report=self.repo.check();self.assertEqual(result.returncode,0,result.stderr);self.assertTrue(report['proposalOnly'])
+    def test_stability_cannot_take_foreign_renderer_or_host_capture_path(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Client/RenderTelemetry/ReferenceFixtureHostCapture.cs':'foreign'}));self.assertNotEqual(result.returncode,0)
+    def test_stability_wrong_dependency_unknown_row_and_broadpath_reject(self):
+        for mutate in [lambda r:r['packages'][0].update(dependsOn=[scope.DIAGNOSTICS]),lambda r:r['packages'].append(copy.deepcopy(r['packages'][0])),lambda r:r['packages'][0]['owns'].append('src/ForgeLine.Client/RenderTelemetry/')]:
+            record=copy.deepcopy(self.repo.record);mutate(record)
+            with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+    def test_stability_stale_base_never_falls_back(self):
+        self.repo.record['ciScopeProposal']['baseSha']='a'*40
+        result,report=self.repo.check(self.repo.proposal());self.assertNotEqual(result.returncode,0);self.assertEqual(report['mode'],'serial-baseline-contract-proposal')
 if __name__=='__main__':unittest.main()

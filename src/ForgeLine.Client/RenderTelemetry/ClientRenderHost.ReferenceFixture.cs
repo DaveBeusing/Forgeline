@@ -14,6 +14,7 @@ internal sealed partial class ClientRenderHost
     private readonly ReferenceFixtureFrameObservation[]? _fixtureFrames;
     private int _fixtureCaptureRequested, _fixtureCaptureCompleted;
     private object? _fixtureReadbackEvidence;
+    private ReferenceWorldInputDiagnostics? _fixtureWorldInputInspector;
     private object? _fixtureAdapterBinding;
     private readonly ReferenceCollectorControl? _fixtureCollectorControl;
     private void RejectFixtureEarlyExit(string state) { if (_referenceFixture is not null) throw new InvalidDataException("Fixture attempt failed before successful presentation: " + state); }
@@ -63,13 +64,21 @@ internal sealed partial class ClientRenderHost
         if (recipe.CaptureStageDiagnostics) ReferenceStageDiagnostics.Preflight(graphics, recipe.OutputRoot, "host-fixed", recipe.RepeatCaptures);
         for (int repeat = 0; repeat < recipe.RepeatCaptures; repeat++)
         {
+            using var inputScope=_fixtureWorldInputInspector?.Arm(repeat);
+            _fixtureWorldInputInspector?.BeforeSite(WorldInputSite.HostReadbackPrepare);
             prepare();
+            _fixtureWorldInputInspector?.AfterSite(WorldInputSite.HostReadbackPrepare,true);
             ulong beforePresent = graphics.PresentedFrameCount;
             var beforeSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission;
             GraphicsStageCapture? stageCapture = recipe.CaptureStageDiagnostics ? graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, commands) : null;
             byte[] pixels = stageCapture?.FinalRgba ?? graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands, recipe.CaptureShadowDiagnostics);
             meshes.Submit(); meshes.Retire();
             ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, ((IGraphicsRenderTelemetry)graphics).LastSubmission);
+            _fixtureWorldInputInspector?.AfterCapture(stageCapture);
+            object? stages=stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, recipe.OutputRoot, "host-fixed", repeat,
+                "actual-render-host", recipe.RuntimeFingerprint, recipe.Fingerprint, recipe.InputBytesBase64, actualCamera(),
+                _fixtureComposition?.Profile ?? throw new InvalidDataException("Actual effective host profile unavailable."), graphics.CaptureInputFingerprint);
+            object? worldInputs=_fixtureWorldInputInspector?.Persist(stages);
             string hash = Convert.ToHexString(SHA256.HashData(pixels));
             string? shadowFile = null;
             if (recipe.CaptureShadowDiagnostics && !graphics.CaptureShadowDepth.IsEmpty)
@@ -78,13 +87,11 @@ internal sealed partial class ClientRenderHost
                 using var stream = new FileStream(Path.Combine(recipe.OutputRoot, shadowFile), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                 stream.Write(graphics.CaptureShadowDepth.Span);
             }
-            records.Add(new { repeat, pixelSha256 = hash, inputFingerprint = graphics.CaptureInputFingerprint,
+            records.Add(new { repeat, worldInputDiagnostics=worldInputs, pixelSha256 = hash, inputFingerprint = graphics.CaptureInputFingerprint,
                 actualCamera = actualCamera(), actualSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission,
                 shadowFile, shadowLayout = ((IGraphicsRenderTelemetry)graphics).CaptureShadowLayout,
                 shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)),
-                stageDiagnostics = stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, recipe.OutputRoot, "host-fixed", repeat,
-                    "actual-render-host", recipe.RuntimeFingerprint, recipe.Fingerprint, recipe.InputBytesBase64, actualCamera(),
-                    _fixtureComposition?.Profile ?? throw new InvalidDataException("Actual effective host profile unavailable."), graphics.CaptureInputFingerprint) });
+                stageDiagnostics = stages });
             if (original is null)
             {
                 original = pixels;
@@ -96,7 +103,7 @@ internal sealed partial class ClientRenderHost
                 actualSurface = graphics.Diagnostics.Surface, records = records.ToArray(), repeatPixelsEqual = allEqual,
                 pixelSha256 = Convert.ToHexString(SHA256.HashData(original)), image = "host-fixed.png",
                 imageSha256 = VisualReferenceCapture.FileHash(Path.Combine(recipe.OutputRoot, "host-fixed.png")),
-                timingScope = "All readbacks/PNG/hash serialization occur after the completed fixed sample window" };
+                worldInputInspectorVersion=recipe.CaptureStageDiagnostics ? 1 : (int?)null,timingScope = "All readbacks/PNG/hash serialization occur after the completed fixed sample window" };
             ReferenceCaptureManifest.Write(Path.Combine(recipe.OutputRoot, "host-readback.json"), JsonSerializer.Serialize(_fixtureReadbackEvidence, VisualReferenceCapture.JsonOptions));
             if (!equal)
             {

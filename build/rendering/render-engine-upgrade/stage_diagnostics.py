@@ -97,12 +97,16 @@ def difference(left,right,layout,bpp):
             start=(yy*width+xx)*bpp;near.append(dict(x=xx,y=yy,leftHex=left[start:start+bpp].hex(),rightHex=right[start:start+bpp].hex()))
     return dict(equal=False,differingBytes=count,firstDifference=dict(x=x,y=y,byteWithinTexel=byte,left=a,right=b),neighborhood=near)
 
-def compare_series(directory,references,expected_repeats=8):
+def compare_series(directory,references,expected_repeats=8,*,inspector_references=None,inspector_version=None):
     require(type(expected_repeats) is int and expected_repeats==8,'This frozen diagnostic retains all eight readbacks')
     require(type(references) is list and len(references)==expected_repeats,'All eight immutable stage records are required')
     require(len({r['path'] for r in references})==expected_repeats,'Readback references cannot repeat')
     captures=[read_capture(directory,r) for r in references];first=captures[0][0]
     immutable=('producer','sourceSha','runtimeFingerprint','recipeFingerprint','inputFingerprint','camera','effectiveProfile','deviceIdentity')
+    inspector=None
+    if inspector_version is not None or inspector_references is not None:
+        from world_input_diagnostics import validate_loaded
+        inspector=validate_loaded(directory,references,captures,inspector_references,inspector_version)
     previous=None;comparisons=[];all_equal=True;seen=set()
     for i,(record,logical) in enumerate(captures):
         require(type(record['repetition']) is int and record['repetition']==i,'Readback ordinal is missing/duplicated/reordered')
@@ -122,7 +126,7 @@ def compare_series(directory,references,expected_repeats=8):
         comparisons.append(dict(repetition=i,frameIndex=record['frameIndex'],submission=current,firstDivergentStage=earliest,stages=stages))
     return dict(schemaVersion=1,kind='offline-render-stage-comparison',qualified=False,status='equal' if all_equal else 'mismatch',
         sourceSha=first['sourceSha'],runtimeFingerprint=first['runtimeFingerprint'],recipeFingerprint=first['recipeFingerprint'],
-        repeatCount=len(captures),comparisons=comparisons,interpretation='First divergent observed boundary; not shader/driver cause, tolerance, speed or baseline acceptance')
+        repeatCount=len(captures),comparisons=comparisons,worldInputInspector=inspector if inspector is not None else dict(available=False,status='historical-unavailable'),interpretation='First divergent observed boundary; not shader/driver cause, tolerance, speed or baseline acceptance')
 
 def verified_lane_binding(directory,reference,actual):
     from baseline_admission import load

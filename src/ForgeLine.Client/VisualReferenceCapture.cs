@@ -343,10 +343,16 @@ internal static class VisualReferenceCapture
                         meshes.Submit(); meshes.Retire();
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                     }
+                    ReferenceWorldInputDiagnostics? worldInputInspector=request.CaptureStageDiagnostics && sharedFixture is not null
+                        ? ReferenceWorldInputDiagnostics.Create(request.OutputRoot,key,"native-reference",runtimeFingerprint,sharedFixture.Fingerprint,
+                            sharedFixture.InputBytesBase64,profile,request.RepeatCaptures,ground,meshes,particles,graphics,camera) : null;
                     GraphicsStageCapture? stageCapture = null;
                     byte[] CaptureFrame()
                     {
-                        if (!meshes.AssetsPrepared) PrepareTerrain();
+                        worldInputInspector?.BeforeSite(WorldInputSite.CaptureEnsurePrepared);
+                        bool invokePreparation=!meshes.AssetsPrepared;
+                        if (invokePreparation) PrepareTerrain();
+                        worldInputInspector?.AfterSite(WorldInputSite.CaptureEnsurePrepared,invokePreparation);
                         ulong beforePresent = graphics.PresentedFrameCount;
                         var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                         byte[] pixels;
@@ -358,6 +364,7 @@ internal static class VisualReferenceCapture
                         else pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
                         meshes.Submit(); meshes.Retire();
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
+                        worldInputInspector?.AfterCapture(stageCapture);
                         return pixels;
                     }
                     object CaptureInputRecord(int repetition, byte[] pixels)
@@ -370,14 +377,16 @@ internal static class VisualReferenceCapture
                             using var stream = new FileStream(Path.Combine(request.OutputRoot, file), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                             stream.Write(depth.Span);
                         }
-                        return new { repetition, frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
+                        object? stages=stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
+                            repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
+                            sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint);
+                        object? worldInputs=worldInputInspector?.Persist(stages);
+                        return new { repetition, worldInputDiagnostics=worldInputs, frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                             actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
                             pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)),
                             shadowFingerprint = depth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(depth.Span)),
                             shadowFile = file, shadowLayout = (graphics as IGraphicsRenderTelemetry)?.CaptureShadowLayout,
-                            stageDiagnostics = stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
-                                repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
-                                sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint) };
+                            stageDiagnostics = stages };
                     }
                     PrepareTerrain();
                     if (request.CaptureStageDiagnostics)
@@ -438,9 +447,15 @@ internal static class VisualReferenceCapture
                     timedWindowState = new { sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, key,
                         recipeFingerprint = sharedFixture?.Fingerprint, recipeInputs = sharedFixture?.IdentityInputs,
                         recipeInputBytesBase64 = sharedFixture?.InputBytesBase64, camera = initialCamera, profile, lighting,
+                        observedComposition = new ClientRenderConfiguration(profile,lighting,graphics.Atmosphere),
                         performance = performance.Report(measured) };
+                    byte[] rgba;bool repeatPixelsEqual;List<object> repeatFailures;ReadOnlyMemory<byte> shadowDepth;
+                    using(worldInputInspector?.Arm(0))
+                    {
                     camera.ApplyState(initialCamera);
+                    worldInputInspector?.BeforeSite(WorldInputSite.NativeFixedPoseRestore);
                     PrepareTerrain();
+                    worldInputInspector?.AfterSite(WorldInputSite.NativeFixedPoseRestore,true);
                     // Restore fixed pose and settle history only after the timed window.
                     if (request.CameraPath != ReferenceCameraPath.Fixed)
                         for (int i = 0; i < 3; i++) RecordFrame();
@@ -456,16 +471,21 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings, missing resource visuals or fallback meshes.");
                     captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                    byte[] rgba = CaptureFrame();
-                    bool repeatPixelsEqual = true;
-                    var repeatFailures = new List<object>();
-                    ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
+                    rgba = CaptureFrame();
+                    repeatPixelsEqual = true;
+                    repeatFailures = new List<object>();
+                    shadowDepth = graphics.CaptureShadowDepth;
                     captureInputs.Add(CaptureInputRecord(0, rgba));
+                    }
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
+                        byte[] repeated;
+                        using(worldInputInspector?.Arm(repetition))
+                        {
                         captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                        byte[] repeated = CaptureFrame();
+                        repeated = CaptureFrame();
                         captureInputs.Add(CaptureInputRecord(repetition, repeated));
+                        }
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
                             if (repeatPixelsEqual)
@@ -543,7 +563,7 @@ internal static class VisualReferenceCapture
                         resourceBatches = meshes.GetResourceBatchDiagnostics(),
                         materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
-                        captureInputs = captureInputs.ToArray(),
+                        worldInputInspectorVersion=request.CaptureStageDiagnostics ? 1 : (int?)null,captureInputs = captureInputs.ToArray(),
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);
                 }
