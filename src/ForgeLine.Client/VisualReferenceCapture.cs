@@ -24,12 +24,14 @@ internal sealed record VisualReferenceCaptureRequest
     public required string RuntimeRoot { get; init; }
     public string? Driver { get; init; }
     public string? AdapterBindingDirectory { get; init; }
+    public string? OwnerTraceControlDirectory { get; init; }
     public bool Software { get; init; }
     public int Warmups { get; init; } = 32;
     public int Samples { get; init; } = 128;
     public int RepeatCaptures { get; init; } = 8;
     public bool ContinueAfterMismatch { get; init; }
     public bool CaptureShadowDiagnostics { get; init; }
+    public bool CaptureStageDiagnostics { get; init; }
     public ReferenceCollectorMode CollectorMode { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
@@ -113,6 +115,7 @@ internal static class VisualReferenceCapture
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
                 ?? throw new ArgumentException("Empty capture request.");
             request.Validate();
+            if (request.OwnerTraceControlDirectory is not null) throw new NotSupportedException("Owner trace supervision requires the actual render-host producer.");
             if (request.CollectorMode != ReferenceCollectorMode.Full) throw new NotSupportedException("Collector controls are separate actual-host experiments, not native reference modes.");
             string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
             if (!identity.EndsWith(request.Commit, StringComparison.OrdinalIgnoreCase))
@@ -333,12 +336,19 @@ internal static class VisualReferenceCapture
                         meshes.Submit(); meshes.Retire();
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                     }
+                    GraphicsStageCapture? stageCapture = null;
                     byte[] CaptureFrame()
                     {
                         if (!meshes.AssetsPrepared) PrepareTerrain();
                         ulong beforePresent = graphics.PresentedFrameCount;
                         var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
-                        byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
+                        byte[] pixels;
+                        if (request.CaptureStageDiagnostics)
+                        {
+                            stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record);
+                            pixels = stageCapture.FinalRgba;
+                        }
+                        else pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
                         meshes.Submit(); meshes.Retire();
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                         return pixels;
@@ -357,9 +367,17 @@ internal static class VisualReferenceCapture
                             actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
                             pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)),
                             shadowFingerprint = depth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(depth.Span)),
-                            shadowFile = file, shadowLayout = (graphics as IGraphicsRenderTelemetry)?.CaptureShadowLayout };
+                            shadowFile = file, shadowLayout = (graphics as IGraphicsRenderTelemetry)?.CaptureShadowLayout,
+                            stageDiagnostics = stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
+                                repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
+                                sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint) };
                     }
                     PrepareTerrain();
+                    if (request.CaptureStageDiagnostics)
+                    {
+                        if (sharedFixture is null) throw new NotSupportedException("Stage diagnostics require the shared authored World recipe.");
+                        ReferenceStageDiagnostics.Preflight(graphics, request.OutputRoot, key, request.RepeatCaptures);
+                    }
                     double setupMilliseconds = Stopwatch.GetElapsedTime(setupStart).TotalMilliseconds;
                     long setupAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - setupAllocationStart;
                     int warmupFrames = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;

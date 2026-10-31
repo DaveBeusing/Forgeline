@@ -10,6 +10,12 @@ Actual renderer/session identity, matched recipe, sensor journaling and strict b
 
 [The required Developer-package follow-up](Admission.md#required-developer-package-compatibility-follow-up) retains the first hosted failure and its clean-head three-case reproduction. The narrow Developer-only canonical tuning eligibility repair at `7fcfc5d4` passes new Public/Developer regressions and unchanged exported package validation for all five registered scenarios. This is compatibility evidence, not an accepted performance baseline; the earlier full-suite and publication records retain their own sources.
 
+## Capture-diagnostics implementation status
+
+[Opt-in staged capture, original-input proposal preparation and separate owner-trace supervision](Admission.md#opt-in-capture-diagnostics-and-proposal-preparation) extend the diagnostic contracts. Their implementation does not resolve the retained one-channel native mismatch or prove controlled native/host parity. WARP functional assertions and CPU schema tests are separate from physical qualification. Actual no-frame preflight still creates a device, and an initialized-owner trace still needs compatible clocks and useful resolved warm-owner samples before attribution can be reported.
+
+The current package does not close the allocation workload ledger or approve numeric policies. Required subsequent work is bounded allocation observation, reviewed policy/protocol integration, then retained controlled qualification. Both original optimization lanes remain no-change/NOT READY until the baseline handoff is accepted.
+
 ## Historical diagnostic-toolkit delivery
 
 The following observations retain the earlier package's original source identities. Statements about unavailable producer capabilities describe that historical delivery; current implementation is documented in Admission.md. They are not new qualification runs for this PR.

@@ -4,6 +4,20 @@ using System.Text.Json;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;
 
+if (args.Length == 1 && args[0] == "--identity")
+{
+    var assembly = typeof(Program).Assembly;
+    string file = assembly.Location;
+    using var bytes = File.OpenRead(file);
+    Console.WriteLine(JsonSerializer.Serialize(new { schemaVersion = 1, kind = "allocation-parser-identity",
+        buildIdentity = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
+        assemblySha256 = Convert.ToHexStringLower(SHA256.HashData(bytes)),
+        dependenciesSha256 = Hash(Path.ChangeExtension(file, ".deps.json")),
+        runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+        scope = "Standalone parser process identity only; not the target renderer or its original clock" }));
+    return 0;
+}
+
 if (args.Length != 3 || !int.TryParse(args[2], out int expectedPid) || expectedPid <= 0)
 { Console.Error.WriteLine("Usage: AllocationTrace input.nettrace fresh-output-directory expected-process-id"); return 2; }
 string input = Path.GetFullPath(args[0]), output = Path.GetFullPath(args[1]);

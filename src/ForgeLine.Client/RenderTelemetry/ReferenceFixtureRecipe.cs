@@ -35,6 +35,9 @@ internal sealed class ReferenceFixtureRecipe
     internal string InputBytesBase64 { get; }
     internal string CaseKey { get; }
     internal int RepeatCaptures { get; }
+    internal bool CaptureStageDiagnostics { get; }
+    internal bool CaptureShadowDiagnostics { get; }
+    internal bool ContinueAfterMismatch { get; }
     internal ReferenceCollectorMode CollectorMode { get; }
     internal string? AdapterBindingDirectory { get; }
     internal string SnapshotFingerprint { get; }
@@ -79,6 +82,8 @@ internal sealed class ReferenceFixtureRecipe
         Warmups = request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups;
         CollectorMode = request.CollectorMode; RepeatCaptures = request.RepeatCaptures; AdapterBindingDirectory = request.AdapterBindingDirectory;
         Software = request.Software; OutputRoot = request.OutputRoot;
+        CaptureStageDiagnostics = request.CaptureStageDiagnostics; CaptureShadowDiagnostics = request.CaptureShadowDiagnostics;
+        ContinueAfterMismatch = request.ContinueAfterMismatch;
         RuntimeFingerprint = runtimeFingerprint ?? VisualReferenceCapture.RuntimeFingerprint(catalog.RuntimeRoot);
         SampleCameras = Enumerable.Range(0, Samples).Select(i => ReferencePerformanceSamples.CameraPose(InitialCamera, CameraPath, i, Samples)).ToArray();
         IdentityInputs = new
