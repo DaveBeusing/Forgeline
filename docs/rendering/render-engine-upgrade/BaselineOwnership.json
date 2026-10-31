@@ -39,7 +39,9 @@
         "src/ForgeLine.Presentation/SimpleInstanceRenderer.ContentEvidence.cs",
         "src/ForgeLine.Presentation/SimpleInstanceRenderer.cs",
         "tests/ForgeLine.Presentation.Tests/ContentEvidence/",
-        "tests/ForgeLine.Presentation.Tests/TerrainResidency/TerrainLifetimeTests.cs"
+        "tests/ForgeLine.Presentation.Tests/TerrainResidency/TerrainLifetimeTests.cs",
+        "src/ForgeLine.Game/MatchRuntime.cs",
+        "tests/ForgeLine.Game.Tests/DeveloperTools/DeveloperPracticeInitializationTests.cs"
       ]
     },
     {
