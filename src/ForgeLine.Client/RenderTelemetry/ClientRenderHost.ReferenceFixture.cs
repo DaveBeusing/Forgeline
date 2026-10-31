@@ -53,29 +53,47 @@ internal sealed partial class ClientRenderHost
         }
         _fixtureSequence!.Acknowledge(ordinal);
     }
-    private void CaptureFixtureReadback(IGraphicsDevice graphics, Action<IGraphicsCommandContext> commands, Action prepare, SimpleInstanceRenderer meshes)
+    private void CaptureFixtureReadback(IGraphicsDevice graphics, Action<IGraphicsCommandContext> commands, Action prepare, SimpleInstanceRenderer meshes,
+        Func<RtsCameraState> actualCamera)
     {
         var recipe = _referenceFixture!;
         byte[]? original = null;
         var records = new List<object>();
+        bool allEqual = true;
+        if (recipe.CaptureStageDiagnostics) ReferenceStageDiagnostics.Preflight(graphics, recipe.OutputRoot, "host-fixed", recipe.RepeatCaptures);
         for (int repeat = 0; repeat < recipe.RepeatCaptures; repeat++)
         {
             prepare();
             ulong beforePresent = graphics.PresentedFrameCount;
             var beforeSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission;
-            byte[] pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands);
+            GraphicsStageCapture? stageCapture = recipe.CaptureStageDiagnostics ? graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, commands) : null;
+            byte[] pixels = stageCapture?.FinalRgba ?? graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands, recipe.CaptureShadowDiagnostics);
             meshes.Submit(); meshes.Retire();
             ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, ((IGraphicsRenderTelemetry)graphics).LastSubmission);
             string hash = Convert.ToHexString(SHA256.HashData(pixels));
-            records.Add(new { repeat, pixelSha256 = hash, inputFingerprint = graphics.CaptureInputFingerprint });
+            string? shadowFile = null;
+            if (recipe.CaptureShadowDiagnostics && !graphics.CaptureShadowDepth.IsEmpty)
+            {
+                shadowFile = $"host-fixed-readback-{repeat:D2}.depth";
+                using var stream = new FileStream(Path.Combine(recipe.OutputRoot, shadowFile), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+                stream.Write(graphics.CaptureShadowDepth.Span);
+            }
+            records.Add(new { repeat, pixelSha256 = hash, inputFingerprint = graphics.CaptureInputFingerprint,
+                actualCamera = actualCamera(), actualSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission,
+                shadowFile, shadowLayout = ((IGraphicsRenderTelemetry)graphics).CaptureShadowLayout,
+                shadowFingerprint = graphics.CaptureShadowDepth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(graphics.CaptureShadowDepth.Span)),
+                stageDiagnostics = stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, recipe.OutputRoot, "host-fixed", repeat,
+                    "actual-render-host", recipe.RuntimeFingerprint, recipe.Fingerprint, recipe.InputBytesBase64, actualCamera(),
+                    _fixtureComposition?.Profile ?? throw new InvalidDataException("Actual effective host profile unavailable."), graphics.CaptureInputFingerprint) });
             if (original is null)
             {
                 original = pixels;
                 ReferenceCaptureImage.WritePng(Path.Combine(recipe.OutputRoot, "host-fixed.png"), recipe.Display.Width, recipe.Display.Height, pixels);
             }
             bool equal = original.AsSpan().SequenceEqual(pixels);
+            allEqual &= equal;
             _fixtureReadbackEvidence = new { adapterIdentity = ((IGraphicsRenderTelemetry)graphics).DeviceIdentity,
-                actualSurface = graphics.Diagnostics.Surface, records = records.ToArray(), repeatPixelsEqual = equal,
+                actualSurface = graphics.Diagnostics.Surface, records = records.ToArray(), repeatPixelsEqual = allEqual,
                 pixelSha256 = Convert.ToHexString(SHA256.HashData(original)), image = "host-fixed.png",
                 imageSha256 = VisualReferenceCapture.FileHash(Path.Combine(recipe.OutputRoot, "host-fixed.png")),
                 timingScope = "All readbacks/PNG/hash serialization occur after the completed fixed sample window" };
@@ -83,9 +101,10 @@ internal sealed partial class ClientRenderHost
             if (!equal)
             {
                 ReferenceCaptureImage.WritePng(Path.Combine(recipe.OutputRoot, $"failed-host-repeat-{repeat:D2}.png"), recipe.Display.Width, recipe.Display.Height, pixels);
-                throw new InvalidDataException("Repeated actual host fixture readback pixels differ; failed cohort retained.");
+                if (!recipe.ContinueAfterMismatch) throw new InvalidDataException("Repeated actual host fixture readback pixels differ; failed cohort retained.");
             }
         }
+        if (!allEqual) throw new InvalidDataException("Repeated actual host fixture pixels differ; all declared diagnostic records retained as failed evidence.");
         Volatile.Write(ref _fixtureCaptureRequested, 0);
         Volatile.Write(ref _fixtureCaptureCompleted, 1);
     }

@@ -28,6 +28,16 @@ class BaselineScopeTests(unittest.TestCase):
     def setUp(self):self.repo=Repository();self.addCleanup(self.repo.temp.cleanup)
     def test_initial_bounded_proposal(self):
         result,report=self.repo.check(self.repo.proposal());self.assertEqual(result.returncode,0,result.stderr);self.assertTrue(report['proposalOnly']);self.assertEqual(report['manifestSource'],self.repo.head())
+    def test_diagnostics_exact_new_graphics_and_evidence_paths(self):
+        result,report=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/IGraphicsDevice.cs':'additive','src/ForgeLine.Graphics/D3D12SceneComposition.cs':'hooks','docs/rendering/render-engine-upgrade/evidence/qualification/example.json':'{}','Directory.Build.props':'version'}))
+        self.assertEqual(result.returncode,0,result.stderr);self.assertTrue(report['proposalOnly'])
+    def test_historical_foundation_variant_still_supported(self):
+        record=copy.deepcopy(self.repo.record)
+        record['packages'][0]=dict(id=scope.CONTRACT,wave=0,dependsOn=[],owns=list(scope.CONTRACT_OWNS))
+        record['packages'][1]['dependsOn']=[scope.CONTRACT];record['ciScopeProposal']['package']=scope.CONTRACT
+        result,_=self.repo.check(self.repo.proposal(record));self.assertEqual(result.returncode,0,result.stderr)
+    def test_diagnostics_cannot_take_old_foundation_only_path(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Game/MatchRuntime.cs':'unowned'}));self.assertNotEqual(result.returncode,0)
     def test_stale_base_no_fallback(self):
         record=copy.deepcopy(self.repo.record);record['ciScopeProposal']['baseSha']='a'*40
         result,report=self.repo.check(self.repo.proposal(record));self.assertNotEqual(result.returncode,0);self.assertEqual(report['mode'],'serial-baseline-contract-proposal')

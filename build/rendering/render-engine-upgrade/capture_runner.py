@@ -20,7 +20,7 @@ def runtime_fingerprint(root):
 def payload_inventory(root):
     root=Path(root).resolve(strict=True);rows=[]
     import hashlib
-    for path in sorted(root.rglob('*'),key=lambda p:p.relative_to(root).as_posix()):
+    for path in sorted(root.rglob('*'),key=lambda p:p.relative_to(root).as_posix().encode('utf-16-be')):
         require(not path.is_symlink(),'Executable payload cannot contain symbolic links')
         if path.is_file():
             digest=hashlib.sha256()
@@ -29,8 +29,14 @@ def payload_inventory(root):
             rows.append(dict(path=path.relative_to(root).as_posix(),bytes=path.stat().st_size,sha256=digest.hexdigest()))
     require(rows,'Executable payload inventory is empty');return rows
 
-def run_capture(client_executable,request_path,output,sensor_executable,dll_path,*,host=False,gameplay=False,require_foreground=True,timeout_seconds=600):
-    output=Path(output).resolve();output.mkdir(parents=True,exist_ok=False)
+def run_capture(client_executable,request_path,output,sensor_executable,dll_path,*,host=False,gameplay=False,require_foreground=True,timeout_seconds=600,
+                diagnostic_only=False,diagnostic_setup_hold=False,diagnostic_before_release=None):
+    output=Path(output).resolve()
+    # Reject a known executable payload target BEFORE creating even an empty evidence directory.
+    candidate=Path(client_executable)
+    if candidate.is_file():
+        require(not output.is_relative_to(candidate.resolve(strict=True).parent),'Evidence output cannot mutate the executable payload directory')
+    output.mkdir(parents=True,exist_ok=False)
     started=now()
     try:
         require(not (host and gameplay),'Gameplay is an actual session mode, not an authored host fixture')
@@ -39,6 +45,10 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         require(not output.is_relative_to(Path(client).parent),'Evidence output cannot mutate the executable payload directory')
         payload_before=payload_inventory(Path(client).parent);write_new(output/'payload-inventory-before.json',payload_before)
         original=Path(request_path).read_bytes();request=parse_json_bytes(original)
+        require(type(diagnostic_only) is bool and type(diagnostic_setup_hold) is bool,'Diagnostic mode flags must be actual booleans')
+        diagnostic_only=diagnostic_only or request.get('captureStageDiagnostics') is True or request.get('ownerTraceControlDirectory') is not None
+        require(not diagnostic_setup_hold or diagnostic_only,'External setup hold is diagnostic-only')
+        require(diagnostic_before_release is None or diagnostic_only and callable(diagnostic_before_release),'Attach callback is diagnostic-only')
         runtime=runtime_fingerprint(request['runtimeRoot']);source=request['commit']
         if gameplay:require(request.get('warmups')==64 and request.get('samples')==512,'Actual gameplay uses unchanged64/512 declared window')
         import re
@@ -49,7 +59,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         client_assembly_before=sha256_bytes(Path(client).with_suffix('.dll').read_bytes())
         version_raw,_=run_record([sensor,'--version'],output,'provider-version')
     except Exception as error:
-        write_new(output/'attempt.json',dict(schemaVersion=1,kind='actual-baseline-capture-attempt',status='failed',phase='preflight',startedAtUtc=started,completedAtUtc=now(),failures=[str(error)],qualified=False))
+        write_new(output/'attempt.json',dict(schemaVersion=1,kind='actual-baseline-capture-attempt',diagnosticOnly=diagnostic_only,status='failed',phase='preflight',startedAtUtc=started,completedAtUtc=now(),failures=[str(error)],qualified=False))
         raise
     stop=threading.Event();ready=threading.Event();lock=threading.Lock();control={};failure=[];cleanup=[];child=None;status='failed';command_started=None;command_completed=None
     argv=[client,'--smoke-test'] if gameplay else [client,'--reference-host-fixture-request' if host else '--reference-capture-request',str(request_file)]
@@ -67,9 +77,9 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                     result=subprocess.run(query_argv,capture_output=True,timeout=10,shell=False,
                                           creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
                 raw,err=result.stdout,result.stderr;query_exit=result.returncode;require(result.returncode==0,'Sensor query exit '+str(result.returncode))
-                devices=parse_inventory(raw);power=power_status();window=window_facts(control.get('pid'),control.get('hwnd'))
-                value=dict(observedAtUtc=now(),acquisitionStartedAtUtc=begin,elapsedSeconds=time.perf_counter()-tick,devices=devices,power=power,window=window)
-                if require_foreground and control and window['status']!='controlled' and child is not None and child.poll() is None:value['failure']='Actual producer window foreground control failed'
+                devices=parse_inventory(raw);power=power_status();phase=dict(control);window=window_facts(phase.get('pid'),phase.get('hwnd'))
+                value=dict(observedAtUtc=now(),acquisitionStartedAtUtc=begin,elapsedSeconds=time.perf_counter()-tick,devices=devices,power=power,window=window,controlPhase='diagnostic-setup' if phase and phase.get('enforce') is False else 'controlled' if phase else 'startup-or-after-exit')
+                if require_foreground and phase and phase.get('enforce',True) and window['status']!='controlled' and child is not None and child.poll() is None:value['failure']='Actual producer window foreground control failed'
             except subprocess.TimeoutExpired as error:
                 raw,err=error.stdout or b'',error.stderr or b'';query_timeout=True
                 value=dict(observedAtUtc=now(),acquisitionStartedAtUtc=begin,devices=[],failure='Sensor query timeout')
@@ -97,11 +107,20 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
                 context=dict(processId=child.pid,sourceSha=source,runtimeFingerprint=runtime.upper(),clientAssemblySha256=client_assembly_before.upper(),
                              startedAtUtc=command_started,argv=argv,requestSha256=sha256_bytes(request_file.read_bytes()))
                 def control_before_release(_proof):
-                    control.update(pid=child.pid,hwnd=actual['nativeWindowHandle'])
+                    # Startup is not a controlled interval. Do not invalidate the observer while the
+                    # explicit external operator handoff waits within the original producer budget.
+                    if diagnostic_setup_hold:
+                        control.update(pid=child.pid,hwnd=actual['nativeWindowHandle'],enforce=False)
+                        from diagnostic_control import hold_for_operator
+                        hold_for_operator(output,checkpoint.read_bytes(),lambda: child.poll() is None and time.monotonic()<deadline and not failure)
+                    if diagnostic_before_release is not None:
+                        diagnostic_before_release(dict(checkpoint=actual,checkpointBytes=checkpoint.read_bytes(),commandContext=context,
+                                                       binding=_proof,processId=child.pid,commandDeadline=deadline,fail=failure.append,stillAlive=lambda: child.poll() is None))
+                    control.update(pid=child.pid,hwnd=actual['nativeWindowHandle'],enforce=True)
                     facts=window_facts(child.pid,actual['nativeWindowHandle'])
                     write_new(output/'pre-window-control.json',facts)
                     require(not require_foreground or facts['status']=='controlled','Actual child is not foreground-controlled before window release')
-                with lock:binding=complete_checkpoint(checkpoint.parent,context,dll_path,sensor,control_before_release)
+                binding=complete_checkpoint(checkpoint.parent,context,dll_path,sensor,control_before_release,query_lock=lock)
                 while child.poll() is None:
                     require(time.monotonic()<deadline,'Declared capture command deadline exceeded')
                     require(not failure,'Physical observer/control failed: '+str(failure))
@@ -148,7 +167,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         finally:
             stop.set();observer.join(15)
             if observer.is_alive():failure.append('Observer query did not finish within bound')
-            record=dict(schemaVersion=1,kind='actual-baseline-capture-attempt',status=status,sourceSha=source,runtimeFingerprint=runtime,
+            record=dict(schemaVersion=1,kind='actual-baseline-capture-attempt',diagnosticOnly=diagnostic_only,status=status,sourceSha=source,runtimeFingerprint=runtime,
                         startedAtUtc=started,completedAtUtc=now(),commandStartedAtUtc=command_started,commandCompletedAtUtc=command_completed,argv=argv,processId=child.pid if child else None,exitCode=child.returncode if child else None,
                         captureMode='actual-live-gameplay' if gameplay else 'reference-host-fixture' if host else 'native-reference',
                         foregroundEnforced=require_foreground,failures=failure,cleanup=cleanup,requestSha256=sha256_bytes(request_file.read_bytes()),originalRequestSha256=sha256_bytes(original),

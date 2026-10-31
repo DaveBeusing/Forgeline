@@ -49,6 +49,10 @@ def signature(case):return (case['scene'],case['quality'],case['zoom'],integer(c
 
 def validate_protocol(protocol):
     require(type(protocol.get('schemaVersion')) is int and protocol['schemaVersion']==1 and protocol.get('kind')=='accepted-baseline-control-protocol','Accepted baseline protocol missing')
+    return validate_protocol_body(protocol)
+
+def validate_protocol_body(protocol):
+    """Pure case/window semantics; this function does not assert approval or committed trust."""
     require(protocol.get('comparison')=='identical-instrumented-source-A/A' and protocol.get('preserveAllAttempts') is True,'Baseline must preserve every A/A attempt')
     require(type(protocol.get('pairs')) is int and protocol['pairs']>=5,'At least five predeclared pairs required')
     require(type(protocol.get('regressionPercent')) is int and protocol['regressionPercent']==15,'The existing15percent control threshold cannot change')
@@ -298,6 +302,8 @@ def verify_trace_execution(root,wrapper,report,source,actual_trace):
     deps=load(root,provenance['parserDependencies'])
     require('Microsoft.Diagnostics.Tracing.TraceEvent/4.0.0' in deps.get('libraries',{}),'Actual parser dependency payload is not pinned TraceEvent4.0.0')
     deps_path=provenance['parserDependenciesInventoryPath'];require(deps_path in parsers and parsers[deps_path]['sha256']==provenance['parserDependencies']['sha256'],'Parser dependency bytes differ from executed payload inventory')
+    from allocation_diagnostics import _VerifiedTraceExecution
+    return _VerifiedTraceExecution(sha256_bytes(canonical(report)),wrapper['report']['sha256'],actual_trace,source,provenance['parserDependencies']['sha256'],wrapper['executionProvenance']['sha256'])
 
 def validate_sampled_owner_diagnostic(root,ref,source,runtime,client_image_hash):
     wrapper=load(root,ref)
@@ -329,7 +335,7 @@ def validate_sampled_owner_diagnostic(root,ref,source,runtime,client_image_hash)
         for block in iter(lambda:stream.read(1024*1024),b''):digestor.update(block)
     actual_trace=digestor.hexdigest()
     require(actual_trace==digest(wrapper['trace']['sha256'],'original trace')==report.get('traceSha256Before')==report.get('traceSha256After'),'Actual original trace bytes differ from parser/command evidence')
-    verify_trace_execution(root,wrapper,report,source,actual_trace)
+    verified_execution=verify_trace_execution(root,wrapper,report,source,actual_trace)
     clock=report.get('clock',{})
     require(base64.b64decode(clock.get('headerBytesBase64',''),validate=True)==header and clock.get('headerSha256')==sha256_bytes(header),'Parser header differs from retained original trace')
     command_directory=local(root,wrapper['command']['path']).parent
@@ -338,11 +344,17 @@ def validate_sampled_owner_diagnostic(root,ref,source,runtime,client_image_hash)
     own=[e for e in report.get('events',[]) if e.get('processId')==pid and e.get('nativeThreadId')==native_tid and e.get('resolvedStackAvailable') is True]
     require(own and any(e.get('stack') for e in own),'No resolved sampled allocation stack belongs to the actual native render-owner thread')
     # Build correlation binding ONLY from independently checked command/process/image and immutable owner/trace bytes.
-    from allocation_diagnostics import correlate
+    from allocation_diagnostics import correlate,_derive_raw_qpc_proof
     bound=dict(report,producerBinding=dict(ownerSha256=sha256_bytes(canonical(owner)),traceSha256=actual_trace,sourceSha=source,runtimeFingerprint=owner['runtimeFingerprint'],
         sessionId=device['sessionId'],processId=pid,processStartedFileTimeUtc=device['processStartedFileTimeUtc']))
     correlation=correlate(bound,owner,source_sha=source,runtime_fingerprint=owner['runtimeFingerprint'],producer_session=device['sessionId'])
     require(correlation.get('status')=='compatible-original-clocks','Original trace/owner clock correlation unavailable; no warm-frame site attribution')
+    # Refine only AFTER every original provenance, process, header, loss and clock gate.
+    # No JSON/caller sameClock flag is read. Unknown builds/modules retain generic behavior.
+    raw_proof=_derive_raw_qpc_proof(bound,owner,verified_execution)
+    if raw_proof is not None:
+        correlation=correlate(bound,owner,source_sha=source,runtime_fingerprint=owner['runtimeFingerprint'],producer_session=device['sessionId'],raw_qpc_proof=raw_proof)
+        require(correlation.get('status')=='compatible-original-clocks','Explicit derived raw-QPC proof failed original identity/compatibility checks')
     matched={e['timestampQpc'] for e in correlation['events'] if e.get('status')=='matched' and e.get('frameIndex') is not None}
     require(any(e.get('timestampQpc') in matched for e in own),'No resolved actual native-owner allocation stack matches the declared measured window; startup/ambiguous/outside samples cannot qualify warm sites')
     return dict(status='verified-sampled-owner-sites',events=len(own),frameCorrelation=correlation,scope='Separate sampled stacks; source/thread attribution does not invent exact bytes or normal-run timing')
@@ -396,6 +408,7 @@ def evaluate(cohort,root,repo,trusted_master):
         key=(pair,arm,r['caseId'],producer);require(key not in observed,'Duplicate attempt identity; winning reruns cannot replace failures')
         directory=local(root,r['directory']);attempt=load(directory,r['attempt'])
         require(attempt.get('status')=='structural-pass' and attempt.get('exitCode')==0 and not attempt.get('failures') and attempt.get('sourceSha')==source,'Retained capture failed or belongs to another source')
+        require(attempt.get('diagnosticOnly',False) is False,'Separate stage/attach/setup diagnostics cannot be admitted as qualification timing')
         start,end=utc(attempt['commandStartedAtUtc']),utc(attempt['commandCompletedAtUtc']);require(start<end and utc(protocol['frozenAtUtc'])<=start,'Capture interval invalid or predates freeze')
         require(max(accepted_times)<=start,'Reviewed record bytes were not committed before capture')
         for kind,p in policies.items():validate_policy(p,kind,start)
@@ -403,6 +416,7 @@ def evaluate(cohort,root,repo,trusted_master):
         require(payload_before==payload_after==protocol['payloadInventory'],'Complete binary/runtime payload inventory changed or differs from freeze')
         require(r['payloadInventoryBefore']['sha256']==attempt['payloadInventoryBeforeSha256'] and r['payloadInventoryAfter']['sha256']==attempt['payloadInventoryAfterSha256'],'Actual launcher payload references differ')
         request=load(directory,r['request']);require(sha256_bytes((directory/r['request']['path']).read_bytes())==attempt['requestSha256'],'Actual request differs from launched bytes')
+        require(request.get('captureStageDiagnostics',False) is False and request.get('ownerTraceControlDirectory') is None,'Intrusive stage/owner-trace requests are separate diagnostics, never baseline timing')
         cold=case is not None and case['runProfile']=='RendererCold';count=128 if cold else 512;warmups=0 if cold else 64
         require(request['outputRoot']==scheduled[key]['launchOutputPath'],'Actual launched output path differs from predeclared attempt')
         require(request['commit']==source and request['samples']==count and request['warmups']==(64 if cold else warmups),'Actual launched window differs from freeze')

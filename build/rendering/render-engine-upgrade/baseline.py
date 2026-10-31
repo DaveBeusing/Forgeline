@@ -9,6 +9,8 @@ from provider import acquire
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='command',required=True)
     p=sub.add_parser('plan');p.add_argument('--execution-source',required=True);p.add_argument('--planning-source',required=True);p.add_argument('--output',required=True)
+    p=sub.add_parser('assemble-proposal');p.add_argument('--draft',required=True);p.add_argument('--repository',required=True);p.add_argument('--output',required=True)
+    p=sub.add_parser('validate-proposal');p.add_argument('--input',required=True);p.add_argument('--repository',required=True);p.add_argument('--output',required=True)
     p=sub.add_parser('analyze-owner');p.add_argument('--input',required=True);p.add_argument('--output',required=True);p.add_argument('--historical',action='store_true')
     p=sub.add_parser('diagnose');p.add_argument('--output',required=True);p.add_argument('--nvidia-smi',required=True);p.add_argument('--manifest');p.add_argument('--global-json');p.add_argument('--uuid');p.add_argument('--pid',type=int);p.add_argument('--hwnd',type=lambda v:int(v,0));p.add_argument('--samples',type=int,default=3);p.add_argument('--interval',type=float,default=1)
     p=sub.add_parser('admit');p.add_argument('--output',required=True);p.add_argument('--cohort');p.add_argument('--repository');p.add_argument('--trusted-master-source')
@@ -16,6 +18,20 @@ def main(argv=None):
     try:
         if args.command=='plan':
             value=freeze_plan(args.execution_source,args.planning_source,datetime.now(timezone.utc));write_new(args.output,value)
+        elif args.command=='assemble-proposal':
+            from baseline_proposals import assemble
+            try:
+                path=Path(args.draft).resolve();write_new(args.output,assemble(read_json(path),path.parent,args.repository))
+            except (OSError,ValueError,KeyError,TypeError,IndexError) as error:
+                write_new(args.output,dict(schemaVersion=1,kind='baseline-proposal-attempt',status='failed',accepted=False,qualified=False,operation=args.command,reason=str(error)))
+                raise ContractError(str(error)) from error
+        elif args.command=='validate-proposal':
+            from baseline_proposals import validate_bound_proposal
+            try:
+                path=Path(args.input).resolve();write_new(args.output,validate_bound_proposal(read_json(path),path.parent,args.repository))
+            except (OSError,ValueError,KeyError,TypeError,IndexError) as error:
+                write_new(args.output,dict(schemaVersion=1,kind='baseline-proposal-attempt',status='failed',accepted=False,qualified=False,operation=args.command,reason=str(error)))
+                raise ContractError(str(error)) from error
         elif args.command=='analyze-owner':
             raw=Path(args.input).read_bytes()
             from baseline_contracts import parse_json_bytes

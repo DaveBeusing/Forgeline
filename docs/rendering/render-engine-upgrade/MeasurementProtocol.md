@@ -28,3 +28,19 @@ Provider semantics: [NVIDIA query documentation](https://docs.nvidia.com/deploy/
 
 
 Recorded execution is summarized in [Baseline.md](Baseline.md): canonical commands are functional validation with explicit compiled/publisher source splits; CPU reports are unqualified single invocations and preserve their original schema/bytes. `analyze-owner` intentionally rejects CPU report schemas. Gzip files preserve their original SHA256 and can be decompressed for independent analysis without relabelling the source. The before/after executable/runtime input inventory is identical, but this alone does not satisfy physical, fixture, policy or repeated-control admissions. Snapshot rewriting/fsync grows with the accumulated series; a three-sample readiness check does not establish long-run observation cost. Both wave 2 lanes retain no-change dispositions until qualifying evidence is accepted.
+
+
+## Separate capture and owner-trace diagnostics
+
+See [the diagnostic producer and proposal contract](Admission.md#opt-in-capture-diagnostics-and-proposal-preparation) for the opt-in flags and original-byte evidence joins. Stage capture and sampled attachment are separate intrusive diagnostics, not timing cohorts. Freeze their literal requests, source/build/payload/runtime identities, expected capacity and attempt order before execution; preserve every failed attempt and the original zero-tolerance image rule. Do not install tools, restore packages or compile inside a live checkpoint deadline.
+
+An external focus hold, when explicitly declared, permits one operator focus action on the verified PID/HWND within the existing thirty-second checkpoint budget. Release files must be atomically published and include `schemaVersion: 1`, kind `diagnostic-setup-release`, the hold's exact `checkpointSha256`, `runId`, `processId`, `nativeWindowHandle`, action `operator-focus-only` and `completed: true`. Actual Win32 facts are checked independently. No refocus, resize, settings change or inferred continuous foreground state is authorized by the release.
+
+Source S is the immutable producer build/payload; accepted protocol P must later bind S without rebuilding it as P; results review R binds the original attempts. A complete unaccepted proposal and a schema-positive test do not replace committed approval or original-input validation. Both original wave 2 lanes retain no-change dispositions pending accepted baseline evidence. Capacity proposals, finite allocation bounds and stable operating ranges remain unresolved in their owning packages.
+
+
+## Supported retained raw-QPC correlation
+
+[The versioned raw-QPC contract](evidence/qualification/RawQpcCorrelationContract.md) separates UTC anchor sanity from raw integer ordering for one reviewed Windows CoreCLR/runtime/parser path. Proof is derived only after all existing original evidence gates and actual target-runtime module paths; an arbitrary TraceEvent4 parser build or caller assertion is insufficient. The exact retained parser/dependency hashes and source remain pinned. Unsupported or unproven paths keep generic conservative boundary uncertainty; invalid/foreign explicit proof fails.
+
+For supported proof only, strict integer interior events may match; exact endpoint ties remain ambiguous. UTC/frequency compatibility, loss checks and process/source/runtime/native-thread bindings are unchanged. The analyzer revision and contract byte hash are new analysis provenance, separate from producer/parser source `ec5db189`. No producer rebuild, timestamp fitting, old-result replacement, retroactive runtime hash or physical/baseline/wave 2 acceptance follows from reanalysis.

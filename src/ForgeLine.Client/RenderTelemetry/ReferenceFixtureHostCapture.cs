@@ -55,12 +55,23 @@ internal static class ReferenceFixtureHostCapture
             WaitUntil(() => host.RendererInitialized);
             double setupMilliseconds = Stopwatch.GetElapsedTime(setupStarted).TotalMilliseconds;
             long setupProcessAllocatedBytes = GC.GetTotalAllocatedBytes(precise: true) - setupAllocated;
+            ReferenceOwnerTraceHandoff? traceHandoff = null;
+            if (request.OwnerTraceControlDirectory is not null)
+            {
+                traceHandoff = ReferenceOwnerTraceHandoff.PublishReady(request.OwnerTraceControlDirectory,
+                    request.AdapterBindingDirectory ?? throw new InvalidDataException("Owner trace requires the actual checkpoint."), recipe.Fingerprint);
+                WaitUntil(traceHandoff.Attached);
+            }
             for (int ordinal = 0; ordinal < recipe.FrameCount; ordinal++)
             {
                 if (!platform.PumpEvents()) throw new OperationCanceledException("Host fixture window closed.");
                 host.PublishFixtureFrame(ordinal);
                 int expected = ordinal;
                 WaitUntil(() => host.FixtureAcknowledged == expected);
+            }
+            if (traceHandoff is not null)
+            {
+                traceHandoff.PublishWindowComplete(); WaitUntil(traceHandoff.Released);
             }
             host.RequestFixtureReadback(); WaitUntil(() => host.FixtureReadbackCompleted);
             host.RequestStop(); host.Dispose();
@@ -93,6 +104,10 @@ internal static class ReferenceFixtureHostCapture
             throw new NotSupportedException("Actual host fixture commands require one authored World case; special UI/material-reference modes are explicitly unsupported.");
         if (request.CollectorMode != ReferenceCollectorMode.Full && (request.RunProfile != ReferenceRunProfile.Warm || request.Warmups != 64 || request.Samples != 512))
             throw new NotSupportedException("Collector on/off is a separate fixed64/512 warm experiment.");
+        if (request.OwnerTraceControlDirectory is not null && (string.IsNullOrWhiteSpace(request.OwnerTraceControlDirectory) ||
+            request.AdapterBindingDirectory is null || request.CollectorMode != ReferenceCollectorMode.Full ||
+            request.RunProfile != ReferenceRunProfile.Warm || request.Warmups != 64 || request.Samples != 512 || request.CaptureStageDiagnostics))
+            throw new NotSupportedException("Owner trace is a separate actual-host Full64/512 warm diagnostic with stage copies disabled.");
         _ = LiveRenderTelemetry.CompletionCapacityFor(request.Samples, request.RunProfile == ReferenceRunProfile.RendererCold ? 0 : request.Warmups);
     }
 }

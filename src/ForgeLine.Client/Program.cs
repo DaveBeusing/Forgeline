@@ -52,6 +52,8 @@ internal static class Program
             return RunSkinCapture(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--ui-typography-capture")
             return RunTypographyCapture(args[1], args[2]);
+        if (args.Length == 2 && args[0] == "--reference-fixture-preflight-request")
+            return ReferenceFixturePreflight.Run(args[1]);
         if (args.Length == 2 && args[0] == "--reference-host-fixture-request")
             return RunReferenceHostFixture(args[1]);
         if (args.Length == 2 && args[0] == "--reference-capture-request")
