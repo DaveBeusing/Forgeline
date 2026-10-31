@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "kind": "developer-package-compatibility-evidence",
+  "qualified": false,
+  "wave2Ready": false,
+  "technicalSourceSha": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+  "originalHeadSha": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+  "hostedFailure": {
+    "pr": 448,
+    "runId": 41136767134,
+    "jobId": 124341030043,
+    "failedStep": 91,
+    "step": "Public and internal developer package boundaries",
+    "priorFullSuiteStep89Passed": true,
+    "priorReproduciblePublicPublishStep90Passed": true
+  },
+  "reproduction": {
+    "sourceSha": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+    "sourceTreeClean": true,
+    "purpose": "retain pre-repair Developer practice initialization failure",
+    "argv": [
+      "dotnet",
+      "test",
+      "--project",
+      "tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj",
+      "--configuration",
+      "Release",
+      "-p:ForgeLineEnableDeveloperTools=true",
+      "--",
+      "--filter-class",
+      "*PracticeScenarioTests",
+      "--filter-method",
+      "*RegisteredLessonsStartWithoutFakeSuccessAndRoundTrip"
+    ],
+    "startedAtUtc": "2026-10-30T23:59:52.455688+00:00",
+    "exitCode": 2,
+    "completedAtUtc": "2026-10-31T00:01:21.646469+00:00"
+  },
+  "focused": [
+    {
+      "name": "developer-new",
+      "argv": [
+        "dotnet",
+        "test",
+        "--project",
+        "tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj",
+        "--configuration",
+        "Release",
+        "-p:ForgeLineEnableDeveloperTools=true",
+        "--",
+        "--filter-class",
+        "*DeveloperPracticeInitializationTests"
+      ],
+      "exitCode": 0,
+      "passed": 9,
+      "sourceAtInvocation": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+      "sourceTreeClean": false,
+      "compiledChangesMatchCommit": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+      "timestampsUnavailable": true,
+      "log": "focused/admission-developer-practice-fixed-tests.log"
+    },
+    {
+      "name": "public-new",
+      "argv": [
+        "dotnet",
+        "test",
+        "--project",
+        "tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj",
+        "--configuration",
+        "Release",
+        "--",
+        "--filter-class",
+        "*DeveloperPracticeInitializationTests"
+      ],
+      "exitCode": 0,
+      "passed": 9,
+      "sourceAtInvocation": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+      "sourceTreeClean": false,
+      "compiledChangesMatchCommit": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+      "timestampsUnavailable": true,
+      "log": "focused/admission-public-practice-fixed-tests.log"
+    },
+    {
+      "name": "developer-existing",
+      "argv": [
+        "dotnet",
+        "test",
+        "--project",
+        "tests/ForgeLine.Game.Tests/ForgeLine.Game.Tests.csproj",
+        "--configuration",
+        "Release",
+        "--no-build",
+        "-p:ForgeLineEnableDeveloperTools=true",
+        "--",
+        "--filter-class",
+        "*PracticeScenarioTests",
+        "--filter-method",
+        "*RegisteredLessonsStartWithoutFakeSuccessAndRoundTrip"
+      ],
+      "exitCode": 0,
+      "passed": 3,
+      "sourceAtInvocation": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+      "sourceTreeClean": false,
+      "compiledChangesMatchCommit": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+      "timestampsUnavailable": true,
+      "log": "focused/admission-developer-existing-practice-fixed-tests.log"
+    },
+    {
+      "name": "strict-scope",
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "build/rendering/qualification",
+        "-p",
+        "test_baseline_scope.py"
+      ],
+      "exitCode": 0,
+      "passed": 13,
+      "sourceAtInvocation": "1a5e7d06fc5d9a726493aaf899a1576736d026b9",
+      "sourceTreeClean": false,
+      "compiledChangesMatchCommit": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+      "timestampsUnavailable": true,
+      "log": "focused/admission-developer-scope-tests.log"
+    }
+  ],
+  "packageCommands": [
+    {
+      "name": "public-publish",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Publish-PreAlpha.ps1",
+        "-Configuration",
+        "Release",
+        "-RuntimeAssetRoot",
+        "assets/runtime",
+        "-OutputRoot",
+        "artifacts/admission-developer-package-02-public"
+      ],
+      "startedAtUtc": "2026-10-31T00:05:13.916934+00:00",
+      "exitCode": 0,
+      "completedAtUtc": "2026-10-31T00:07:41.603035+00:00",
+      "stdoutSha256": "d86ead43a70b57934a01e93048feafe34860b2aafe41649ea00c3793e195a0e0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "developer-boundaries",
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./build/Test-DeveloperToolsPackages.ps1",
+        "-PublicRoot",
+        "C:\\Users\\david.beusing\\.codex\\worktrees\\render-baseline-wave1\\Forgeline\\artifacts\\admission-developer-package-02-public\\win-x64\\publish",
+        "-RuntimeAssetRoot",
+        "assets/runtime",
+        "-OutputRoot",
+        "artifacts/admission-developer-package-02-internal"
+      ],
+      "startedAtUtc": "2026-10-31T00:07:41.610419+00:00",
+      "exitCode": 0,
+      "completedAtUtc": "2026-10-31T00:09:02.562536+00:00",
+      "stdoutSha256": "a5b5b7fe7ecad2e8914c2f34944568f0979cfb3477a714780c9b4a5ae6d1b475",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "packageProvenance": {
+    "sourceSha": "7fcfc5d4003ddc9ea8e6335571eeab47e9e5c8c0",
+    "sourceTreeClean": true,
+    "freeBytes": 16421056512,
+    "publicRoot": "C:\\Users\\david.beusing\\.codex\\worktrees\\render-baseline-wave1\\Forgeline\\artifacts\\admission-developer-package-02-public",
+    "internalRoot": "C:\\Users\\david.beusing\\.codex\\worktrees\\render-baseline-wave1\\Forgeline\\artifacts\\admission-developer-package-02-internal",
+    "inputsBefore": {
+      "assets\\runtime\\manifest.json": "b29e581eb4afd5c264b1450630bda55d1b1f4d5fe26ce04e8b5332d9d72821c3",
+      "global.json": "4fe5b36c61f2157e5df4f690b1680ae71242cd0a8f864ad7570c801d9e3e31df",
+      "Directory.Build.props": "e7aaf3fe31554236350f88488ab49819f91efd4612e76750d8354435023c1b12"
+    },
+    "reason": "fresh contained roots absent; no prior artifacts replaced; unchanged supported sealed-runtime validate path",
+    "qualified": false,
+    "inputsAfter": {
+      "assets\\runtime\\manifest.json": "b29e581eb4afd5c264b1450630bda55d1b1f4d5fe26ce04e8b5332d9d72821c3",
+      "global.json": "4fe5b36c61f2157e5df4f690b1680ae71242cd0a8f864ad7570c801d9e3e31df",
+      "Directory.Build.props": "e7aaf3fe31554236350f88488ab49819f91efd4612e76750d8354435023c1b12"
+    },
+    "sourceUnchanged": true,
+    "sourceTreeCleanAfter": true
+  },
+  "rawBundle": {
+    "path": "developer-package-raw-records.json.gz",
+    "bytes": 634514,
+    "sha256": "a5249e965891aa8e2f5b5d3579208a2e44cdfc14d69165c8a25939e551c2473c",
+    "decompressedSha256": "3077e6a87784883806666b56c66f2444f5a28fcdd80e59e840dc43170add2d46"
+  },
+  "records": [
+    {
+      "path": "hosted-1a5/failed-step91.log",
+      "bytes": 12550,
+      "sha256": "818f1abfa864525136ae2752408bd485daa280545a8c277758bcfaef9ca8afd2"
+    },
+    {
+      "path": "pre-repair-1a5/command.json",
+      "bytes": 662,
+      "sha256": "2e6ced5ffc967d9d313616020008081ef4213832d4e19f5f224fa688ded037f7"
+    },
+    {
+      "path": "pre-repair-1a5/plan.json",
+      "bytes": 587,
+      "sha256": "7007485a4fc6365f86d222c04903a0cf30bdfe5fdbf1bfb2e19929ba171f536b"
+    },
+    {
+      "path": "pre-repair-1a5/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "pre-repair-1a5/stdout.log",
+      "bytes": 7510,
+      "sha256": "d1353c39516b0a2f17472dc766754b3e340a508aa5fbd9c03a015f6e43b24fc1"
+    },
+    {
+      "path": "packages-7fc/commands.json",
+      "bytes": 1533,
+      "sha256": "714fece2fcf3e73f88ab145b932640da3d6f98c1a934e65aebc17c55613adbd7"
+    },
+    {
+      "path": "packages-7fc/developer-boundaries.plan.json",
+      "bytes": 546,
+      "sha256": "f71f0a59e17b1dbbd4b0e1b7b1fe254d713b423c9d900979e8010bedaa14be04"
+    },
+    {
+      "path": "packages-7fc/developer-boundaries.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "packages-7fc/developer-boundaries.stdout.log",
+      "bytes": 8437,
+      "sha256": "a5b5b7fe7ecad2e8914c2f34944568f0979cfb3477a714780c9b4a5ae6d1b475"
+    },
+    {
+      "path": "packages-7fc/plan.json",
+      "bytes": 886,
+      "sha256": "4b86bfa8b2751e4d03721ad553f0f76a2f95de68e38f5824e1f4747c38254f88"
+    },
+    {
+      "path": "packages-7fc/public-publish.plan.json",
+      "bytes": 392,
+      "sha256": "a1b88252f9d33c02769fd820927d867ad828e41c94bf2a7500890801d4966bc8"
+    },
+    {
+      "path": "packages-7fc/public-publish.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "packages-7fc/public-publish.stdout.log",
+      "bytes": 4876,
+      "sha256": "d86ead43a70b57934a01e93048feafe34860b2aafe41649ea00c3793e195a0e0"
+    },
+    {
+      "path": "packages-7fc/result.json",
+      "bytes": 1265,
+      "sha256": "24f19b6af10adcf4bb55c5e720cdf051e486f1acb517856b6f3ed567b00e4530"
+    },
+    {
+      "path": "focused/admission-developer-practice-fixed-tests.log",
+      "bytes": 516,
+      "sha256": "381e5cf29420574480f7f05e19c16aaa93c3e7a724bf599a7a42860b17043188"
+    },
+    {
+      "path": "focused/admission-public-practice-fixed-tests.log",
+      "bytes": 497,
+      "sha256": "adc27f286b7c9910daa6277b1262bcce95d67982afea1e46d26dfa9303cfd52d"
+    },
+    {
+      "path": "focused/admission-developer-existing-practice-fixed-tests.log",
+      "bytes": 516,
+      "sha256": "6f24568254f0b98f7580f844fb704d03595c896d81854398b843e1ffb84979e7"
+    },
+    {
+      "path": "focused/admission-developer-scope-tests.log",
+      "bytes": 118,
+      "sha256": "8868379bb350fa0f761d4a6ed86b0a426db6cdc1d51e9b8104a57a78b1f47f9f"
+    },
+    {
+      "path": "public-7fc/FORGELINE-0.1.538-dev-win-x64.zip.provenance.json",
+      "bytes": 1194,
+      "sha256": "be95ff901306cc5ababc5f5a469a9b302b089cb59a48bd01e89f25920533c70d"
+    },
+    {
+      "path": "public-7fc/FORGELINE-0.1.538-dev-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "e6767f39dab9a07eaa988c61ec7901f0dc79530e67703f159cdf7fa3afb96b5a"
+    },
+    {
+      "path": "public-7fc/win-x64/publish/build-provenance.json",
+      "bytes": 1194,
+      "sha256": "be95ff901306cc5ababc5f5a469a9b302b089cb59a48bd01e89f25920533c70d"
+    },
+    {
+      "path": "public-7fc/win-x64/publish/manifest.sha256",
+      "bytes": 312291,
+      "sha256": "532c7b71ac84fc7a2f6b2ffc71a80389edbe9f850cfc93bb93e71f0f677a56bd"
+    },
+    {
+      "path": "public-7fc/win-x64/publish/assets/runtime/manifest.json",
+      "bytes": 2598661,
+      "sha256": "b29e581eb4afd5c264b1450630bda55d1b1f4d5fe26ce04e8b5332d9d72821c3"
+    },
+    {
+      "path": "public-7fc/asset-qualification.json",
+      "bytes": 2131,
+      "sha256": "9755b32074af88e12d139858a43a58534486948ac26e6e90c0ab962ef152f90e"
+    },
+    {
+      "path": "developer-7fc/build-provenance.json",
+      "bytes": 818,
+      "sha256": "665bff198a8665f2d63ba003fb3962f0a8866a04b737fa7b7adc6636cf4d0e8e"
+    },
+    {
+      "path": "source-7fc/src/ForgeLine.Game/MatchRuntime.cs",
+      "bytes": 32936,
+      "sha256": "414d767a2c2b19d767bfca1e317ac08e2a6c46a696861f6889bf18ee28344622"
+    },
+    {
+      "path": "source-7fc/tests/ForgeLine.Game.Tests/DeveloperTools/DeveloperPracticeInitializationTests.cs",
+      "bytes": 4577,
+      "sha256": "de43568992d93e5d9d42a3316597ebede64e9309cd547d804c85e7c86d4af3d5"
+    },
+    {
+      "path": "source-7fc/build/rendering/qualification/baseline_scope.py",
+      "bytes": 8727,
+      "sha256": "adb76d4a55cc29e9a33f27b7bfebd6245c6bccb06965e86679a24538c684796d"
+    },
+    {
+      "path": "source-7fc/docs/rendering/render-engine-upgrade/BaselineOwnership.json",
+      "bytes": 3009,
+      "sha256": "2fb150f1c1affb1c489b5f65c9445713f9c0a91871f81b1125e5bfe6b898dbf1"
+    }
+  ],
+  "interpretation": "Existing required Developer-package coupling repaired only at automatic canonical tuning selection. Strict two-key preset whitelist, all five scenarios, Public behavior and original package/CI checks preserved. Prior fullsuite/canonical and physical baseline remain separately source-labelled; no timing or policy acceptance."
+}

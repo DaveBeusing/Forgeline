@@ -8,6 +8,8 @@ The [current admission delivery record](Admission.md#delivery-validation-and-ret
 
 Actual renderer/session identity, matched recipe, sensor journaling and strict baseline-control implementations now exist. Their functional contracts do not establish an accepted physical baseline. Reviewed common hardware/allocation policies, complete stable controlled A/A captures, native/host pixel parity, positive actual mixed-content coverage and reviewed baseline analysis remain open. Header-compatible sampled fixture stacks do not establish warm render-owner sites. Native adapter names or caller-supplied hashes cannot substitute for actual process/device binding. Neither original wave 2 lane may select an optimization from these diagnostic results.
 
+[The required Developer-package follow-up](Admission.md#required-developer-package-compatibility-follow-up) retains the first hosted failure and its clean-head three-case reproduction. The narrow Developer-only canonical tuning eligibility repair at `7fcfc5d4` passes new Public/Developer regressions and unchanged exported package validation for all five registered scenarios. This is compatibility evidence, not an accepted performance baseline; the earlier full-suite and publication records retain their own sources.
+
 ## Historical diagnostic-toolkit delivery
 
 The following observations retain the earlier package's original source identities. Statements about unavailable producer capabilities describe that historical delivery; current implementation is documented in Admission.md. They are not new qualification runs for this PR.
