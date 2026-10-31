@@ -1,4 +1,4 @@
-import base64,copy,json,tempfile,unittest
+import base64,copy,json,tempfile,unittest,shutil
 from pathlib import Path
 from baseline_contracts import canonical,sha256_bytes
 from stage_diagnostics import STAGES,compare_series,read_capture,compare_lanes
@@ -49,6 +49,29 @@ class StageDiagnosticsTests(unittest.TestCase):
             r=self.record(i);r['producer']='actual-render-host';r['deviceIdentity'].update(processId=7,processStartedFileTimeUtc=20,sessionId='f'*32,generation=3,adapterLuidHex='0000000000015521');r['submission'].update(submission=i+100,submittedFence=1000+i*5,generation=3,resourceGeneration=8);r.update(completedFence=1001+i*5,frameIndex=(i+1)%3,presentedBefore=200+i,presentedAfter=201+i)
             raw=canonical(r);path=f'host-{i}.json';(self.root/path).write_bytes(raw);refs.append(dict(path=path,sha256=sha256_bytes(raw)))
         return refs
+    def sibling_lanes(self):
+        host=self.host_records();nested=[]
+        for name,refs in (('native',self.refs),('host',host)):
+            folder=self.root/name/'capture';folder.mkdir(parents=True);lane=[]
+            for i,ref in enumerate(refs):
+                record=json.loads((self.root/ref['path']).read_bytes())
+                for stage in record['stages']:shutil.copyfile(self.root/stage['file'],folder/stage['file'])
+                raw=canonical(record);path=folder/f'{i}.json';path.write_bytes(raw);lane.append(dict(path=path.relative_to(self.root).as_posix(),sha256=sha256_bytes(raw)))
+            nested.append(lane)
+        return nested
+    def test_real_producer_shaped_sibling_metadata_resolves_same_basenames_per_lane(self):
+        native,host=self.sibling_lanes()
+        with patch('stage_diagnostics.verified_lane_binding',return_value=('same-physical-uuid','same-full-pci')):
+            value=compare_lanes(self.root,native,host,{},{});self.assertEqual(value['status'],'equal');self.assertFalse(value['qualified'])
+        self.assertEqual(compare_series(self.root,native)['status'],'equal');self.assertEqual(compare_series(self.root,host)['status'],'equal')
+    def test_sibling_raw_path_traversal_alias_and_wrong_hash_are_rejected(self):
+        native,host=self.sibling_lanes();path=self.root/host[0]['path'];original=json.loads(path.read_bytes())
+        for mutate in (lambda r:r['stages'][0].update(file='../0-ShadowDepth.raw'),lambda r:r['stages'][1].update(file=r['stages'][0]['file']),lambda r:r['stages'][0].update(rawSha256='f'*64)):
+            record=copy.deepcopy(original);mutate(record);raw=canonical(record);path.write_bytes(raw);ref=dict(path=host[0]['path'],sha256=sha256_bytes(raw))
+            with self.assertRaises(ValueError):read_capture(self.root,ref)
+        path.write_bytes(canonical(original))
+        # A metadata reference remains cohort-relative, never raw-file-relative.
+        with self.assertRaises(ValueError):read_capture(self.root,dict(path='../host/capture/0.json',sha256=host[0]['sha256']))
     def test_cross_lane_uses_independent_process_fence_slot_identities(self):
         host=self.host_records()
         with patch('stage_diagnostics.verified_lane_binding',return_value=('actual-uuid','00000000:30:00.0')) as binding:

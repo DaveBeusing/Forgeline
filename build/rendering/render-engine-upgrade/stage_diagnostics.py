@@ -21,7 +21,8 @@ def bounded_bytes(path,limit):
     return path.read_bytes()
 
 def read_capture(directory,reference):
-    raw=bounded_bytes(local(directory,reference['path']),1024*1024)
+    metadata_path=local(directory,reference['path'])
+    raw=bounded_bytes(metadata_path,1024*1024)
     require(sha256_bytes(raw)==digest(reference['sha256'],'stage metadata'),'Stage metadata hash differs')
     r=parse_json_bytes(raw)
     require(type(r.get('schemaVersion')) is int and r['schemaVersion']==1 and r.get('kind')=='renderer-stage-readback' and r.get('qualified') is False,'Wrong diagnostic record contract')
@@ -56,7 +57,7 @@ def read_capture(directory,reference):
         bpp=FORMATS[stage].get(layout.get('format'));require(bpp is not None and type(row.get('bytesPerTexel')) is int and row['bytesPerTexel']==bpp,'Stage format/texel size differs')
         pitch=integer(layout.get('rowPitch'),'row pitch',1);offset=integer(layout.get('offset'),'placed offset')
         require(pitch>=width*bpp and pitch%256==0 and offset%512==0,'Malformed actual D3D12 footprint alignment')
-        file=local(directory,row['file']);require(file not in files,'Stage artifacts cannot alias');files.add(file)
+        file=local(metadata_path.parent,row['file']);require(file not in files,'Stage artifacts cannot alias');files.add(file)
         data=bounded_bytes(file,512*1024*1024)
         require(type(row.get('rawBytes')) is int and len(data)==row['rawBytes'] and sha256_bytes(data)==digest(row['rawSha256'],'raw stage'),'Raw stage bytes/hash differ')
         require(offset+(height-1)*pitch+width*bpp<=len(data),'Stage footprint escapes original retained bytes')

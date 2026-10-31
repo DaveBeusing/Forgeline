@@ -20,11 +20,22 @@ def hold_for_operator(output,checkpoint_bytes,still_allowed):
         require(record['before'].get('ownerPid')==pid and record['before'].get('hwnd')==hwnd,'External setup cannot target an unverified/foreign window')
         atomic_new(output/'diagnostic-setup-hold.json',record)
         release_path=output/'diagnostic-setup-release.json'
-        while not release_path.exists():
+        while True:
             require(time.monotonic()<deadline and still_allowed(),'Original thirty-second checkpoint budget/process/control no longer permits setup')
-            time.sleep(.01)
-        require(not release_path.is_symlink() and release_path.stat().st_size<=65536,'Setup release must be a bounded ordinary file')
-        raw=release_path.read_bytes();release=parse_json_bytes(raw)
+            try:
+                if not release_path.exists():
+                    time.sleep(.01);continue
+                require(not release_path.is_symlink() and release_path.stat().st_size<=65536,'Setup release must be a bounded ordinary file')
+                raw=release_path.read_bytes()
+            except PermissionError as error:
+                # Windows may temporarily deny a reader while a writer/observer owns a
+                # nonsharing handle. Only this I/O error retries; contract/JSON errors do not.
+                record['releaseReadErrorCount']=record.get('releaseReadErrorCount',0)+1
+                record.setdefault('releaseReadErrors',[]).append(dict(observedAtUtc=datetime.now(timezone.utc).isoformat(),
+                    errno=error.errno,winerror=getattr(error,'winerror',None),message=str(error)))
+                time.sleep(.01);continue
+            break
+        release=parse_json_bytes(raw)
         require(time.monotonic()<deadline and still_allowed(),'Setup release arrived after original checkpoint bound')
         require(type(release) is dict and all(release.get(k)==v and type(release[k]) is type(v) for k,v in identity.items()),'Setup release belongs to another checkpoint/PID/HWND')
         require(type(release.get('schemaVersion')) is int and release['schemaVersion']==1 and release.get('kind')=='diagnostic-setup-release','Wrong external setup release contract')
