@@ -77,8 +77,10 @@ public sealed class PracticeScenarioTests
     private static void Connect(MatchRuntime r,EntityId source,EntityId target)
     {
         var ports=ConveyorConstructionService.CapturePorts(r.Simulation.Entities,Player);
-        var output=Assert.Single(ports,p=>p.Building==source&&!p.Input);
-        var input=Assert.Single(ports,p=>p.Building==target&&p.Input);
+        var output=Assert.Single(ports,p=>p.Building==source&&!p.Input&&
+            (!p.Adaptable||p.Key=="east.primary"));
+        var input=Assert.Single(ports,p=>p.Building==target&&p.Input&&
+            (!p.Adaptable||p.Key=="west.primary"));
         var request=new ConveyorBuildRequest(ConveyorEdit.Build,ConveyorModule.Route,
             output.Position-Vector3.UnitY*5.8f,input.Position-Vector3.UnitY*5.8f,BuildingOrientation.North,0,true,
             SourcePortBuilding:source,DestinationPortBuilding:target,AutomaticRouting:true,SnapToSocket:true,AutomaticHeight:true);
@@ -103,7 +105,7 @@ public sealed class PracticeScenarioTests
         Assert.Equal(save.StateSha256,MatchAuthoritativeSnapshot.Capture(copy).ComputeSha256());
         Assert.Equal(save.StateSha256,MatchAuthoritativeSnapshot.Capture(replay).ComputeSha256());
         Assert.Equal(Snapshot(r).CompletedAtTicks,Snapshot(copy).CompletedAtTicks);
-        Assert.Equal(18,MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        Assert.Equal(20,MatchAuthoritativeSnapshot.CurrentSchemaVersion);
     }
 
     [Fact]

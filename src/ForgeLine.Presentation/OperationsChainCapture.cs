@@ -43,6 +43,7 @@ internal static class OperationsChainCapture
         if (!Authorized(root)) return entities.HasComponent<VisualIdentity>(root) ? null : baseline;
 
         var incoming = new Dictionary<EntityId, List<OperationsDiagnosisLink>>();
+        IReadOnlyList<ConveyorBuildingPort>? buildingPorts = null;
         var requests = new Dictionary<EntityId, List<LogisticsTransportRequestReadModel>>();
         bool currentFlow = scenario.Services.ConveyorFlow.ObservationTick == context.Tick;
         if (currentFlow)
@@ -238,7 +239,8 @@ internal static class OperationsChainCapture
                 {
                     if (resource.IsSpecified && candidate.Resource.IsSpecified && candidate.Resource != resource) continue;
                     if (candidate.Kind == OperationsDiagnosisLinkKind.ConveyorConnection && resource.IsSpecified &&
-                        !ConveyorSimulationSystem.Eligible(resource)) continue;
+                        (!AllowsConveyorResource(candidate.Source, input: false, resource) ||
+                         !AllowsConveyorResource(candidate.Destination, input: true, resource))) continue;
                     ResourceId observedResource = candidate.Resource.IsSpecified ? candidate.Resource : resource;
                     InventoryId sourceInventory = Inventory(candidate.Source, input: false, candidate.Kind);
                     InventoryId destinationInventory = Inventory(candidate.Destination, input: true, candidate.Kind);
@@ -278,6 +280,28 @@ internal static class OperationsChainCapture
             (!entities.TryGetComponent(entity, out CompletedBuilding building) || building.Owner == extraction.Player) &&
             (!entities.TryGetComponent(entity, out ConveyorPiece piece) || piece.Owner == extraction.Player) &&
             (!entities.TryGetComponent(entity, out UnitProductionFacility factory) || factory.Owner == extraction.Player);
+        bool AllowsConveyorResource(EntityId entity, bool input, ResourceId resource)
+        {
+            if (!Authorized(entity)) return false;
+            int mask = 0;
+            for (int index = 0; index < ConveyorSimulationSystem.EligibleResources.Count; index++)
+                if (ConveyorSimulationSystem.EligibleResources[index] == resource)
+                {
+                    mask = 1 << index;
+                    break;
+                }
+            if (mask == 0) return false;
+            if (entities.HasComponent<ConveyorFlowState>(entity)) return true;
+            buildingPorts ??= ConveyorConstructionService.CapturePorts(entities, extraction.Player);
+            for (int index = 0; index < buildingPorts.Count; index++)
+            {
+                var port = buildingPorts[index];
+                if (port.Building == entity && port.Input == input &&
+                    (scenario.Services.ConveyorFlow.AllowedResources(entities, port) & mask) != 0)
+                    return true;
+            }
+            return false;
+        }
         OperationsDiagnosisReason ObservedReason(ConveyorBlockObservation fact) =>
             fact.Cause.IsValid && !Authorized(fact.Cause) ? OperationsDiagnosisReason.Unknown : ConveyorReason(fact.Reason);
         InventoryId Inventory(EntityId entity, bool input, OperationsDiagnosisLinkKind kind)

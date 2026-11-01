@@ -30,13 +30,15 @@ public sealed class WorldPresentationTests
         string hash = MatchAuthoritativeSnapshot.Capture(scenario).ComputeSha256();
         const string historicalSchemaOne = "848FABF78754FA4136EB56D03B5059B5FAA2EC91F2C145CA2FFA022C7251549B";
         const string historicalSchemaTwo = "424C217FBDEB400FFAB3FC5A303C67467C9E3C7F68332AAA69110DF7DADC9729";
-        Assert.Equal(18, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        Assert.Equal(20, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
         Assert.NotEqual(historicalSchemaOne, hash);
         Assert.NotEqual(historicalSchemaTwo, hash);
         // Independently captured from the authoritative seed-831 match at tick 4 without an observer.
         Assert.NotEqual("C215439B40D364B018404DAEFDABD65039595E4AF88F087AB67F41878B31A407", hash);
         Assert.NotEqual("26F32C324EAEF026D560BD7354789A53524D9ECE454AC368109111CAEC33EF15", hash);
-        Assert.Equal("D5454ED28E1912748AC25D19085FC5FC80DAE092CC0AA341C54A916B44548257", hash);
+        Assert.NotEqual("D5454ED28E1912748AC25D19085FC5FC80DAE092CC0AA341C54A916B44548257", hash);
+        // Schema 20: independently captured without a presentation observer, seed 831 at tick 4.
+        Assert.Equal("233C04BDCCB997546FEAD940CE4542A0FB2A2CA43936AEDA59A19CF9B32B2E6A", hash);
         Assert.True(buffer.TryReadLatest(out var snapshot));
         var dressing = snapshot.Instances.ToArray().Where(x => x.Entity.Index >= 0xE000_0000U && x.Entity.Index < 0xF000_0000U).ToArray();
         int authoredDressing=scenario.Battlefield.WorldObjects.Count(x=>x.PresentationOnly);
