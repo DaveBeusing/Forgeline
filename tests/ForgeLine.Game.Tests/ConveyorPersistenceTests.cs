@@ -159,7 +159,7 @@ public sealed class ConveyorPersistenceTests
 
         ConveyorOwnedPiece wreck = Assert.Single(Carriers(runtime), row => row.Entity == target);
         var removeWreck = new ConveyorConstructionCommand(runtime.Services.Conveyors, Player,
-            EditRequest(wreck, ConveyorEdit.Remove), runtime.GetBase(Player).CommandCore, runtime.Simulation.CurrentTick);
+            EditRequest(wreck, ConveyorEdit.Replace), runtime.GetBase(Player).CommandCore, runtime.Simulation.CurrentTick);
         Submit(runtime, removeWreck);
         Assert.Equal(ConveyorFailure.Occupied, removeWreck.Result);
         Assert.True(runtime.Simulation.Entities.IsAlive(target));
