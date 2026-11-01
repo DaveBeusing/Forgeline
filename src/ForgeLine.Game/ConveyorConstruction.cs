@@ -424,7 +424,8 @@ public sealed class ConveyorConstructionService
                     socket.Input != mate.Input && Vector3.DistanceSquared(socket.Position, mate.Position) < .0004f &&
                     Vector3.Dot(socket.Facing, mate.Facing) < -.999f)) ||
                 ports.Any(port => port.Building == (socket.Input ? request.SourcePortBuilding : request.DestinationPortBuilding) &&
-                    port.Input != socket.Input && Vector3.DistanceSquared(port.Position, socket.Position) < .0004f &&
+                    port.Input != socket.Input && (!port.Adaptable || port.Status == ConveyorPortState.Free) &&
+                    Vector3.DistanceSquared(port.Position, socket.Position) < .0004f &&
                     Vector3.Dot(port.Facing, socket.Facing) < -.999f));
             if (!matches) return Fail(ConveyorFailure.PortMismatch);
             if (request.Module == ConveyorModule.Overpass) pieces.AddRange(ConveyorGeometry.Overpass(placement.Pivot, placement.Orientation));
@@ -493,14 +494,18 @@ public sealed class ConveyorConstructionService
             ConveyorPlacement? destinationAdapter=null;
             if(request.SourcePortBuilding.IsValid)
             {
-                var port=CapturePorts(entities,owner).FirstOrDefault(p=>p.Building==request.SourcePortBuilding && !p.Input);
+                var port=CapturePorts(entities,owner).FirstOrDefault(p=>p.Building==request.SourcePortBuilding && !p.Input &&
+                    (!p.Adaptable || p.Status==ConveyorPortState.Free) &&
+                    Vector3.DistanceSquared(p.Position,start+Vector3.UnitY*5.8f)<.0004f);
                 if(!port.Building.IsValid)return Fail(ConveyorFailure.PortMismatch);
                 pieces.Add(new(ConveyorModule.InputAdapter,start+port.Facing*2,ConveyorGeometry.Facing(port.Facing),request.Tier));
                 start+=port.Facing*4;
             }
             if(request.DestinationPortBuilding.IsValid)
             {
-                var port=CapturePorts(entities,owner).FirstOrDefault(p=>p.Building==request.DestinationPortBuilding && p.Input);
+                var port=CapturePorts(entities,owner).FirstOrDefault(p=>p.Building==request.DestinationPortBuilding && p.Input &&
+                    (!p.Adaptable || p.Status==ConveyorPortState.Free) &&
+                    Vector3.DistanceSquared(p.Position,end+Vector3.UnitY*5.8f)<.0004f);
                 if(!port.Building.IsValid)return Fail(ConveyorFailure.PortMismatch);
                 destinationAdapter=new(ConveyorModule.OutputAdapter,end+port.Facing*2,ConveyorGeometry.Facing(-port.Facing),request.Tier);
                 end+=port.Facing*4;
@@ -583,7 +588,9 @@ public sealed class ConveyorConstructionService
         else if (request.SourcePortBuilding.IsValid)
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
-                port.Building == request.SourcePortBuilding && !port.Input);
+                port.Building == request.SourcePortBuilding && !port.Input &&
+                (!port.Adaptable || port.Status == ConveyorPortState.Free) &&
+                Vector3.DistanceSquared(port.Position, start + Vector3.UnitY * 5.8f) < .0004f);
             if (!port.Building.IsValid || !request.AutomaticHeight && request.Tier!=0 ||
                 Vector3.DistanceSquared(port.Position, start + Vector3.UnitY * 5.8f) >= .0004f)
                 return Fail(ConveyorFailure.PortMismatch);
@@ -600,7 +607,9 @@ public sealed class ConveyorConstructionService
         else if (request.DestinationPortBuilding.IsValid)
         {
             ConveyorBuildingPort port = ports.FirstOrDefault(port =>
-                port.Building == request.DestinationPortBuilding && port.Input);
+                port.Building == request.DestinationPortBuilding && port.Input &&
+                (!port.Adaptable || port.Status == ConveyorPortState.Free) &&
+                Vector3.DistanceSquared(port.Position, end + Vector3.UnitY * 5.8f) < .0004f);
             if (!port.Building.IsValid || !request.AutomaticHeight && request.Tier!=0 ||
                 Vector3.DistanceSquared(port.Position, end + Vector3.UnitY * 5.8f) >= .0004f)
                 return Fail(ConveyorFailure.PortMismatch);
@@ -855,6 +864,7 @@ public sealed class ConveyorConstructionService
             if(carriers.Length==0)return false;
             ConveyorSocket socket=first?carriers[0].Sockets[0]:carriers[^1].Sockets[^1];
             return ports.Any(port=>port.Building==building && port.Input==input &&
+                (!port.Adaptable || port.Status==ConveyorPortState.Free) &&
                 Vector3.DistanceSquared(port.Position,socket.Position)<.0004f &&
                 Vector3.Dot(port.Facing,socket.Facing)<-.999f);
         }
