@@ -87,10 +87,10 @@ public sealed class ConveyorSnapSelectorTests
     [Fact]
     public void UnsupportedTierFailsAlignmentWithoutCreatingOffGridCoordinates()
     {
-        var highSocket = new ConveyorEndpoint(new Vector3(0, 2, 0),
-            EntityId.Invalid, 1, Vector3.UnitZ, false);
-        Assert.False(ConveyorSnapSelector.TryAlign(ConveyorModule.RampUp,
-            highSocket, out _));
+        var lowSocket = new ConveyorEndpoint(Vector3.Zero,
+            EntityId.Invalid, 0, Vector3.UnitZ, false);
+        Assert.False(ConveyorSnapSelector.TryAlign(ConveyorModule.RampDown,
+            lowSocket, out _));
     }
 
     [Fact]
