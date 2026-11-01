@@ -66,7 +66,8 @@ teleport across unconnected buildings.
 
 ## Conveyable material policy
 
-V1 admits explicitly registered **solid or packaged, inventory-backed** resources:
+Current local belts admit explicitly registered inventory-backed resources:
+the original solids/packages plus two interim refinery fluids until pipelines exist.
 
 | Resource family | V1 eligibility | Handling |
 | --- | --- | --- |
@@ -76,11 +77,13 @@ V1 admits explicitly registered **solid or packaged, inventory-backed** resource
 | Electronics | Yes | Protected packaged stock |
 | Ammunition | Yes | Sealed crates; no per-caliber simulation |
 | Other processed solid intermediates | Only when explicitly registered | Requires catalog declaration and compatible port |
-| Fuel, Volatiles and other fluid/gaseous stocks | No in V1 | Remain road/cargo; future pipelines require their own design |
+| Volatiles | Yes, interim | Actual Refinery ingredient via compatible local powered conveyors; regional Cargo Trucks remain available |
+| Fuel | Yes, interim | Actual Refinery output toward compatible owned storage; never the ammunition-only Supply Depot belt input |
+| Other fluid/gaseous stocks | No by default | Pipeline mechanics are not yet implemented |
 | Vehicles, personnel, completed units | No | Not aggregate conveyor inventory |
 | Oversize/special loads | No by default | Regional/special transport |
 
-**Catalog rule:** eligibility uses stable ResourceId values and the explicit five-ID
+**Catalog rule:** eligibility uses stable ResourceId values and the explicit seven-ID
 conveyor whitelist. It is not inferred from a display string, recipe, volume or model
 appearance. Unknown IDs fail closed. A change to the resource catalog must explicitly qualify new materials.
 Do not silently treat all inventory resources as belt-compatible.
