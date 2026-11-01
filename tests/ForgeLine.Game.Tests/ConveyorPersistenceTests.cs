@@ -74,10 +74,11 @@ public sealed class ConveyorPersistenceTests
         Assert.True(gateway.Results.TryRead(out var result));
         BuildingDemolitionTargetResult accepted = Assert.Single(result.DemolitionTargets!);
         Assert.True(accepted.Accepted);
-        ConveyorCargoRecovery recovered = Assert.Single(accepted.CargoRecovery!);
-        Assert.Equal(held, recovered.Held, 8);
-        Assert.Equal(held * 0.5, recovered.Recovered, 8);
-        Assert.Equal(held * 0.5, recovered.Lost, 8);
+        ConveyorCargoRecovery[] recovered = Assert.IsType<ConveyorCargoRecovery[]>(accepted.CargoRecovery);
+        Assert.NotEmpty(recovered);
+        Assert.Equal(held, recovered.Sum(item => item.Held), 8);
+        Assert.Equal(held * 0.5, recovered.Sum(item => item.Recovered), 8);
+        Assert.Equal(held * 0.5, recovered.Sum(item => item.Lost), 8);
         Assert.False(runtime.Simulation.Entities.IsAlive(target.Entity));
         Assert.True(ConveyorSalvageStock.FindInventory(runtime.Simulation.Entities, Player).IsSpecified);
         AssertRoundTripsAndContinues(runtime);
