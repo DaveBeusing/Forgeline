@@ -82,7 +82,7 @@ internal sealed class ConveyorEndpointPicker
             }
             if (port.Input != input)
             {
-                incompatible |= distance <= radius * radius;
+                incompatible |= distance <= radius * radius * .25f;
                 continue;
             }
             if (!Usable(port, player, input)) continue;
@@ -102,7 +102,7 @@ internal sealed class ConveyorEndpointPicker
                     !TryScreenDistance(socket.Position, projection, pointer, width, height, out float distance)) continue;
                 if (socket.Input != input)
                 {
-                    incompatible |= distance <= radius * radius;
+                    incompatible |= distance <= radius * radius * .25f;
                     continue;
                 }
                 int rise = row.Piece.Placement.RiseMeters != 0 ? 0 :
