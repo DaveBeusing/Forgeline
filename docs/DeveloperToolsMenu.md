@@ -36,10 +36,12 @@ older Public build exists. Runtime assets retain their normal build path.
 Session activation is supplied by the existing client composition; no saved
 preference or extra runtime permission flag is needed.
 
-In an activated Developer client, start or load a match and press unmodified
-**F1** to open Visualization directly. Escape → DEVELOPER TOOLS remains an
-alternative entry. F1 or Escape closes the developer surface back to Pause;
-Escape from Pause resumes through the existing host pause boundary.
+In an activated Developer client, start or load a match and use
+**Escape → DEVELOPER TOOLS** to open the full developer console. F1 instead
+opens or closes a separate compact nonmodal statistics selector. Escape first
+closes that selector when visible; the ordinary Pause menu remains the sole
+full-console entry. Escape from the full console returns to Pause, then resumes
+through the existing host pause boundary.
 F1/F12 no longer have legacy help assignments. Shift+F12 belongs only to the
 optional match guide. F3-F9 have no default gameplay/developer assignments and
 cannot be reassigned.
@@ -54,16 +56,18 @@ the ordinary pause menu before a subsequent Escape can resume gameplay.
 DeveloperToolsCapability.Current and ephemeral session activation gate entry.
 Public builds compile neither menu implementation nor inspector implementation;
 PauseMenuModel also refuses its developer entry without compiled capability.
-ClientApplication applies the same session capability to the F1 menu, its
-diagnostic checkboxes and unmodified F2 world-debug master. Visualization now
-owns the former developer Shift+F functions: performance metrics, Rendering,
+ClientApplication applies the same session capability to privileged F1 statistics
+switches, full-menu controls and unmodified F2 world-debug master. Visualization
+in the full developer menu still owns the former developer Shift+F functions: performance metrics, Rendering,
 Navigation, World, Logistics, Sensors, Combat and Entities, plus the navigation
 diagnostic panel and each of its six layers. The old live Shift+F1/F2/F4-F11
 handlers are disconnected; report export is an explicit menu button.
-Public builds have no F1 developer entry or metrics shortcut. F10/F11 retain
+Public builds expose only an F1 FPS/frame-time switch with no simulation debug
+capture or privileged inspectors. They have no developer menu entry. F10/F11 retain
 their normal player overlay/minimap behavior even when navigation diagnostics
 are enabled. These changes grant no simulation action capability. A session activation
-loss closes the menu, clears drafts/results/targets and disables development views.
+loss closes the full menu and statistics selector, clears privileged overlay selections,
+drafts/results/targets and disables development views.
 Player preferences never activate this permission.
 
 ## Display and requests
@@ -111,8 +115,9 @@ The inspector reads only the existing immutable presentation snapshot. It shows
 full index/generation, owner/type, captured tick and available selection health,
 Fuel/Ammunition and supply data. Missing facts say Unavailable. It does not read
 live ECS, infer hidden enemy data, or retain a target from another session.
-Visualization changes the single existing DebugOverlayController. Only its selected
-simulation categories are requested through PresentationInteractionState. Rendering
+Visualization in the full menu and the compact F1 selector both change the same
+existing DebugOverlayController. Only selected simulation categories are requested
+through PresentationInteractionState. Rendering
 alone requests no heavy simulation debug capture. Missing snapshots say Unavailable;
 captured diagnostics identify their tick and older data is labeled explicitly.
 Opening a paused menu cannot itself produce a newer completed simulation snapshot.
