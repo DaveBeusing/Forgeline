@@ -98,7 +98,7 @@ public sealed class RtsConveyorConstructionController
         bool left=input.IsMouseButtonDown(PlatformMouseButton.Left);
         bool click=(left || input.TryGetMousePressPosition(PlatformMouseButton.Left,out _)) && !_leftDown;
         _leftDown=left;
-        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_lastFreeGrid=null;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
+        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_lastFreeGrid=null;_snapWarning=ConveyorSnapFailure.None;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
         if(_awaiting)return;
         if(input.WasKeyPressed(PlatformKey.Q))Orientation=(BuildingOrientation)(((int)Orientation+3)%4);
         if(input.WasKeyPressed(PlatformKey.E))Orientation=(BuildingOrientation)(((int)Orientation+1)%4);
@@ -118,6 +118,7 @@ public sealed class RtsConveyorConstructionController
         if(_anchorPointer.HasValue && _anchor is {} anchor)target=anchor;
         EntityId destination=default;
         _endpoints.ResetFailure();
+        _snapWarning=ConveyorSnapFailure.None;
         ConveyorEndpoint? previousSnap = _snappedEndpoint;
         _snappedEndpoint=null;
         bool snapModule=false;
@@ -135,16 +136,20 @@ public sealed class RtsConveyorConstructionController
             _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,
                 Module==ConveyorModule.OutputAdapter,out var mate,
                 includeBuildings:Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter,
-                previous:previousSnap) &&
-            ConveyorSnapSelector.TryAlign(Module,mate,out ConveyorPlacement aligned))
+                previous:previousSnap))
         {
-            target=aligned.Pivot;
-            Orientation=aligned.Orientation;
-            Tier=aligned.Tier;
-            _snappedEndpoint=mate;_endpointTick=snapshot!.Tick;snapModule=true;
-            if(mate.Input)destination=mate.Building;else _sourcePort=mate.Building;
+            if (ConveyorSnapSelector.TryAlign(Module,mate,out ConveyorPlacement aligned))
+            {
+                target=aligned.Pivot;
+                Orientation=aligned.Orientation;
+                Tier=aligned.Tier;
+                _snappedEndpoint=mate;_endpointTick=snapshot!.Tick;snapModule=true;
+                if(mate.Input)destination=mate.Building;else _sourcePort=mate.Building;
+            }
+            else _snapWarning=ConveyorSnapFailure.Incompatible;
         }
-        _snapWarning = _endpoints.LastFailure;
+        if (_snapWarning == ConveyorSnapFailure.None)
+            _snapWarning = _endpoints.LastFailure;
         // Only the marker eases; real preview parts, route requests, exact
         // attachments and simulation snapshots always use the canonical target.
         if (_snappedEndpoint is { } selected)
@@ -252,9 +257,12 @@ public sealed class RtsConveyorConstructionController
             PlacementContextState.MissingMaterials:PlacementContextState.Invalid,"CONVEYOR",reason,controls,costs,
             snapshot?.SessionId??default,snapshot?.Tick??default,portInformation);
     }
-    private string SnapWarning() => _snapWarning == ConveyorSnapFailure.Ambiguous
-        ? "AMBIGUOUS SOCKET / SEPARATE OVERLAPPING CONNECTIONS"
-        : "PORT BLOCKED / CHOOSE A FREE IN OR OUT POSITION";
+    private string SnapWarning() => _snapWarning switch
+    {
+        ConveyorSnapFailure.Ambiguous => "AMBIGUOUS SOCKET / SEPARATE OVERLAPPING CONNECTIONS",
+        ConveyorSnapFailure.Blocked => "PORT BLOCKED / CHOOSE A FREE IN OR OUT POSITION",
+        _ => "INCOMPATIBLE SOCKET / CHECK FLOW DIRECTION AND TIER"
+    };
 
     private bool ChoosingDestination => Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_awaiting &&
         _anchor.HasValue && (_anchorPointer.HasValue ||
