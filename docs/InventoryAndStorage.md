@@ -106,6 +106,23 @@ The foundation includes aggregate reservation semantics:
 
 The current model reserves by resource quantity. Future requester-owned reservation tokens can extend this layer without changing callers that only depend on available/reserved totals.
 
+## Conveyor demolition recovery
+
+Deliberate loaded-conveyor removal is accounted by the shared InventoryStore.
+The current unreserved eligible buffer quantities are halved by resource.
+Exactly one half is transferred to a bounded owner-scoped salvage inventory
+(capacity 4,096); the other half is discarded with the removed buffer. Reservations
+are not reduced or transferred by demolition: any outstanding reservation blocks
+that module removal. An insufficiently large salvage destination also rejects
+removal before transfers begin.
+
+The conveyor Economy system attempts stable real inventory transfers from salvage
+to the owner's Command Core first, then owned storage depots. Full recipients
+leave the remaining material in the authoritative, persisted salvage inventory;
+no other player's stock or industrial production buffer can receive it directly.
+This is cargo recovery only, never a construction refund. Normal combat
+destruction and independent inventories are unaffected.
+
 ## Storage depots
 
 A storage depot is an ECS entity carrying:
