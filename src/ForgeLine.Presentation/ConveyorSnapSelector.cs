@@ -45,6 +45,20 @@ internal static class ConveyorSnapSelector
         return true;
     }
 
+    /// <summary>Give free placement a small deadband around the authored 4m grid.
+    /// Socket snaps bypass this function and never lose their exact coordinates.</summary>
+    internal static Vector3 SnapGrid(Vector3 pointer, Vector3? previous)
+    {
+        Vector3 snapped = ConveyorGeometry.Snap(pointer);
+        if (previous is not { } old || !float.IsFinite(old.X) || !float.IsFinite(old.Z))
+            return snapped;
+        float hold = ConstructionGrid.CellSizeMeters * .5f + .35f;
+        if (MathF.Abs(pointer.X - old.X) <= hold &&
+            MathF.Abs(pointer.Z - old.Z) <= hold)
+            return new Vector3(old.X, pointer.Y, old.Z);
+        return snapped;
+    }
+
     /// <summary>Find a canonical orientation and pivot that exactly mates a single
     /// authored socket, including ramp tier transitions. The construction service
     /// still validates terrain, support clearance, ownership and material payment.</summary>
