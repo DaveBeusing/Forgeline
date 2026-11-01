@@ -4,7 +4,7 @@ using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
-internal enum ConveyorSnapFailure : byte { None, Ambiguous, Blocked }
+internal enum ConveyorSnapFailure : byte { None, Ambiguous, Blocked, Incompatible }
 
 internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier,
     Vector3 Facing = default, bool Input = false, string Materials = "",
@@ -69,15 +69,20 @@ internal sealed class ConveyorEndpointPicker
         Matrix4x4 projection = camera.GetMatrices(width, height).ViewProjection;
         float radius = ConveyorSnapSelector.AcquirePixels *
             (float.IsFinite(scale) ? Math.Clamp(scale, .5f, 4f) : 1f);
-        bool blocked = false;
+        bool blocked = false, incompatible = false;
         foreach (var port in network.Ports)
         {
-            if (!includeBuildings || port.Building.IsValid == false || port.Owner != player ||
-                port.Input != input || !_visible.ContainsKey(port.Building) ||
+            if (!includeBuildings || !port.Building.IsValid || port.Owner != player ||
+                !_visible.ContainsKey(port.Building) ||
                 !TryScreenDistance(port.Position, projection, pointer, width, height, out float distance)) continue;
             if (port.Adaptable && port.Status != ConveyorPortState.Free)
             {
                 blocked |= distance <= radius * radius;
+                continue;
+            }
+            if (port.Input != input)
+            {
+                incompatible |= distance <= radius * radius;
                 continue;
             }
             if (!Usable(port, player, input)) continue;
@@ -93,8 +98,13 @@ internal sealed class ConveyorEndpointPicker
             foreach (var socket in row.Piece.Placement.Sockets)
             {
                 int ordinal = socketOrdinal++;
-                if (socket.Input != input || !Finite(socket.Position) || !Finite(socket.Facing) ||
+                if (!Finite(socket.Position) || !Finite(socket.Facing) ||
                     !TryScreenDistance(socket.Position, projection, pointer, width, height, out float distance)) continue;
+                if (socket.Input != input)
+                {
+                    incompatible |= distance <= radius * radius;
+                    continue;
+                }
                 int rise = row.Piece.Placement.RiseMeters != 0 ? 0 :
                     (int)MathF.Round((socket.Position.Y - row.Piece.Placement.Pivot.Y - CarrierHeight) / 2);
                 var candidate = new ConveyorEndpoint(socket.Position - Vector3.UnitY * CarrierHeight,
@@ -106,9 +116,10 @@ internal sealed class ConveyorEndpointPicker
         if (!ConveyorSnapSelector.TrySelect(_candidates, previous, scale, out endpoint,
                 out bool ambiguous))
         {
-            if (ambiguous || blocked)
+            if (ambiguous || blocked || incompatible)
             {
-                LastFailure = ambiguous ? ConveyorSnapFailure.Ambiguous : ConveyorSnapFailure.Blocked;
+                LastFailure = ambiguous ? ConveyorSnapFailure.Ambiguous :
+                    blocked ? ConveyorSnapFailure.Blocked : ConveyorSnapFailure.Incompatible;
                 return false;
             }
             if (!bodyFound) return false;
