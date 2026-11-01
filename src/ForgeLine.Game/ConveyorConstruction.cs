@@ -868,7 +868,10 @@ public sealed class ConveyorConstructionService
             if(carriers.Length==0)return false;
             ConveyorSocket socket=first?carriers[0].Sockets[0]:carriers[^1].Sockets[^1];
             return ports.Any(port=>port.Building==building && port.Input==input &&
-                (!port.Adaptable || port.Status==ConveyorPortState.Free) &&
+                (!port.Adaptable || port.Status==ConveyorPortState.Free ||
+                 request.Edit==ConveyorEdit.Replace && request.Target.IsValid &&
+                 old.Attachment==building &&
+                 port.Status==(input ? ConveyorPortState.ConnectedInput : ConveyorPortState.ConnectedOutput)) &&
                 Vector3.DistanceSquared(port.Position,socket.Position)<.0004f &&
                 Vector3.Dot(port.Facing,socket.Facing)<-.999f);
         }
