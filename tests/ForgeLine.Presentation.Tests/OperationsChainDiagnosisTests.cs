@@ -32,12 +32,42 @@ public sealed class OperationsChainDiagnosisTests
         Assert.Contains(ConveyorConstructionService.Capture(runtime.Simulation.Entities, Player),
             row => row.Flow is { } flow && flow.OutputA == depot);
         Assert.Contains(diagnosis.Rows, row => row.Entity == depot && row.Resource == ResourceIds.Fuel && row.Demand > 0);
+        Assert.DoesNotContain(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection &&
+            link.Resource == ResourceIds.Fuel && link.Destination == depot);
         Assert.DoesNotContain(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection && link.Resource == ResourceIds.Fuel);
         Assert.All(diagnosis.Links.Where(link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection),
             link => Assert.Equal(ResourceIds.Ammunition, link.Resource));
         var buffers = ConveyorConstructionService.Capture(runtime.Simulation.Entities, Player).Where(row => row.Flow.HasValue)
             .Select(row => row.Flow!.Value.Buffer).ToHashSet();
         Assert.DoesNotContain(diagnosis.Rows, row => row.SourceFreeQuantity.HasValue && row.Resource == ResourceIds.Fuel && buffers.Contains(row.Inventory));
+    }
+    [Fact]
+    public void FuelDemandDoesNotInventAConveyorOutputFromAnAmmunitionPlant()
+    {
+        using var runtime = CreateRuntime();
+        var interaction = new PresentationInteractionState();
+        var buffer = WorldHoverExtractionTests.Observe(runtime, interaction);
+        _ = Build(runtime, BuildingIds.PowerPlant, new(48, 0, 48));
+        EntityId ammunition = Build(runtime, BuildingIds.AmmunitionPlant, new(63, 0, 112));
+        // Primary sockets are x=72 and x=88 on the authored 4m route grid.
+        EntityId storage = Build(runtime, BuildingIds.StorageDepot, new(95, 0, 112));
+        Connect(runtime, ammunition, storage);
+        Submit(runtime, PlayerLogisticsActionCommand.SetStockPolicy(Player, storage, ResourceIds.Fuel,
+            10, 20, 30, LogisticsStockPriority.Normal, true, runtime.Simulation.CurrentTick));
+        Submit(runtime, PlayerLogisticsActionCommand.SetStockPolicy(Player, storage, ResourceIds.Ammunition,
+            10, 20, 30, LogisticsStockPriority.Normal, true, runtime.Simulation.CurrentTick));
+        interaction.SetSelection([storage]);
+        runtime.Simulation.AdvanceOneTick();
+        Assert.True(buffer.TryReadLatest(out var snapshot));
+        var diagnosis = Assert.IsType<OperationsDiagnosisSnapshot>(snapshot.Diagnosis);
+        Assert.Contains(diagnosis.Rows, row => row.Entity == storage && row.Resource == ResourceIds.Fuel && row.Demand > 0);
+        Assert.DoesNotContain(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection &&
+            link.Resource == ResourceIds.Fuel && link.Source == ammunition);
+        Assert.Contains(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection &&
+            link.Resource == ResourceIds.Ammunition && link.Source == ammunition);
+        Assert.Contains(diagnosis.Links, link => link.Kind == OperationsDiagnosisLinkKind.ConveyorConnection &&
+            link.Resource == ResourceIds.Fuel && link.Destination == storage &&
+            runtime.Simulation.Entities.HasComponent<ConveyorFlowState>(link.Source));
     }
     [Fact]
     public void UpstreamRequestWithNoObservedSourceRetainsItsRealFailureWithoutInventingALink()
