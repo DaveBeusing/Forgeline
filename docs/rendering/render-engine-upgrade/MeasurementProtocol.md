@@ -320,3 +320,55 @@ completion. Existing793/native0-versus-later/host pixel failures remain immutabl
 New clean source/build/payload/runtime, preflight, storage, selected journal-v1
 schedule, controls and manual readiness must be reviewed before any physical run.
 Numeric policies, baseline qualification and original wave2 readiness remain OPEN.
+
+### Native CPU-source provenance v1 (diagnostic only)
+
+`captureBoundInputProvenanceVersion: 1` selects an additive native-only CPU-source
+observation for the declared single Warm/Fixed/World/1920×1080 Full case. The shared
+parameterless request validator rejects this selector, so host and no-frame preflight
+paths cannot claim to exercise it. Stage, shadow-only and trace capture are disabled.
+The launcher marks every non-null selector diagnostic; admission independently rejects
+such requests even if an attempt incorrectly claims `diagnosticOnly: false`.
+
+The explicit creating-thread scope starts before device/resource construction. The
+selected native copy and both legacy/new hashes consume the same private frozen source
+bytes, including frozen/revalidated mip dimensions and pitches. Root constants freeze
+at most the existing64 words before their original command. The shared128MiB transient
+freeze refusal is structural diagnostic storage, not a managed-heap or allocation-policy
+budget. No additional native Map, copy, barrier, Signal or GPU wait is introduced.
+
+The latest-source map retains whole successful source hashes and slice offsets, not
+invented slice hashes or GPU-fetched bytes. Unknown buffer capacity remains explicitly
+unknown; it is not zero and does not imply that a shader fetched that capacity. The
+map refuses more than4096 resource identities,32768 total segments or64 segments per
+actual resource, with32MiB metadata accounting and no eviction. Shadow-frame and
+buffered constants share one actual implicit arena per resource epoch/slot. Its weak
+raw-wrapper witness detects replacement; it has no fabricated Lifetime or native address.
+Copy transfers retain queued, execute-returned and actual signaled-fence states separately.
+An observer refusal makes evidence unavailable. Only native Dispose cleanup quarantines
+observer propagation so required native Signal/idle/retirement can finish; normal work
+still fails closed and native failures remain authoritative.
+
+Each existing FinalColor-only readback exports separate compact journal and CPU-source
+sidecars with original `{file, sha256, bytes, schemaVersion}` references. The producer
+reference authenticates the companion, which authenticates the separate journal. Their
+actual UTF8 files are each bounded by32MiB, reserving31MiB body and1MiB context. Original
+source/runtime/recipe bytes, quality-profile bytes (a different domain from full ordinary
+composition), camera, process/device/session, captured slot, submission/fence and Present
+facts remain joined per process. Sidecar observations do not establish GPU residency,
+fetched contents, root cause or cross-process resource identity equality.
+
+Selected-v1 consumption requires all eight complete original references. Historical
+artifacts without the selector retain their original interpretation. Capture-prefix
+failures require the exact claimed invocation token or a known current capture and carry
+no successful tuple. Supplementary scope-only failure facts distinguish before-arm from
+arm-attempted phase without claiming that separately retained capture evidence is absent.
+The offline reducer replays destination writes and draw associations, reports later
+writes overlapping earlier draw bindings separately (whole-source hash plus destination
+and slice ranges, never an invented final digest), preserves nonoverlapping writes and
+unknown holes, and keeps process-local IDs/slots/write ordinals
+separate from source/description semantics. Byte-identical source intent or all-B pixels
+cannot establish a causal repair, physical stability, allocation policy or qualification.
+The offline overlap report refuses more than the existing131072-event structural cap
+of derived overlap records instead of producing an unbounded report. This is a tool
+capacity refusal, not a workload or allocation-policy limit.

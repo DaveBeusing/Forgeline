@@ -35,6 +35,8 @@ internal sealed record VisualReferenceCaptureRequest
     public bool ContinueAfterMismatch { get; init; }
     public bool CaptureShadowDiagnostics { get; init; }
     public bool CaptureStageDiagnostics { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CaptureBoundInputProvenanceVersion { get; init; }
     public ReferenceCollectorMode CollectorMode { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
@@ -57,7 +59,22 @@ internal sealed record VisualReferenceCaptureRequest
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
     public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
-    public void Validate()
+    public void Validate() => Validate(allowBoundInputProvenance: false);
+    internal void Validate(bool allowBoundInputProvenance)
+    {
+        if (CaptureBoundInputProvenanceVersion is not null)
+        {
+            if (!allowBoundInputProvenance || CaptureBoundInputProvenanceVersion != 1)
+                throw new NotSupportedException("CPU-source provenance is native-only version1; shared host/preflight modes reject selection.");
+            if (CaptureStageDiagnostics || CaptureShadowDiagnostics || OwnerTraceControlDirectory is not null ||
+                CollectorMode != ReferenceCollectorMode.Full || RunProfile != ReferenceRunProfile.Warm || CameraPath != ReferenceCameraPath.Fixed ||
+                Scenes is not { Length: 1 } || Profiles is not { Length: 1 } || Zooms is not { Length: 1 } || Displays is not { Length: 1 } ||
+                Displays[0] != new RtsReferenceDisplay(1920, 1080) || UiScenarios is not [UiReferenceScenario.World] || UiScales is not [1])
+                throw new NotSupportedException("CPU-source provenance requires one fixed1920World native Full case with the stage/shadow/trace bundle disabled.");
+        }
+        ValidateCommon();
+    }
+    private void ValidateCommon()
     {
         GraphicsSettings?.Validate();
         LocalHaze?.Validate();
@@ -106,6 +123,7 @@ internal static class VisualReferenceCapture
     internal static int Run(string requestPath)
     {
         VisualReferenceCaptureRequest? request = null;
+        GraphicsBoundInputProvenanceScope? provenanceScope = null;
         bool outputCreated = false;
         var captures = new List<object>();
         var captureInputs = new List<object>();
@@ -119,7 +137,7 @@ internal static class VisualReferenceCapture
         {
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
                 ?? throw new ArgumentException("Empty capture request.");
-            request.Validate();
+            request.Validate(allowBoundInputProvenance: true);
             if (request.OwnerTraceControlDirectory is not null) throw new NotSupportedException("Owner trace supervision requires the actual render-host producer.");
             if (request.CollectorMode != ReferenceCollectorMode.Full) throw new NotSupportedException("Collector controls are separate actual-host experiments, not native reference modes.");
             string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
@@ -133,6 +151,7 @@ internal static class VisualReferenceCapture
             var catalog = ReferenceRuntimeSeal.Load(request.RuntimeRoot, out object runtimeSeal);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog, mechanicalSeconds: request.MechanicalSeconds)).ToArray();
+            provenanceScope = request.CaptureBoundInputProvenanceVersion == 1 ? new GraphicsBoundInputProvenanceScope() : null;
             using var capturePower = new ReferenceCapturePowerLease();
             using var platform = new WindowsPlatform();
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
@@ -360,10 +379,11 @@ internal static class VisualReferenceCapture
                         ulong beforePresent = graphics.PresentedFrameCount;
                         var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                         byte[] pixels;
-                        if (request.CaptureStageDiagnostics)
+                        if (request.CaptureStageDiagnostics || request.CaptureBoundInputProvenanceVersion == 1)
                         {
                             using var attemptScope = worldAttempt = GraphicsWorldBindingJournal.BeginAttempt();
-                            stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record);
+                            stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record,
+                                request.CaptureBoundInputProvenanceVersion == 1 ? GraphicsCaptureStages.FinalColor : GraphicsCaptureStages.All);
                             pixels = stageCapture.FinalRgba;
                         }
                         else pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
@@ -374,7 +394,10 @@ internal static class VisualReferenceCapture
                         }
                         catch(Exception error)
                         {
-                            ReferenceStageDiagnostics.RetainWorldBindingFailure(error,request.OutputRoot,key,()=>new {runtimeFingerprint,recipeFingerprint=sharedFixture?.Fingerprint,recipeInputBytesBase64=sharedFixture?.InputBytesBase64,profile,captureState},stageCapture,worldAttempt);
+                            if (request.CaptureBoundInputProvenanceVersion == 1)
+                                ReferenceBoundInputProvenance.RetainCaptureFailure(error, request.OutputRoot, key,
+                                    () => new { runtimeFingerprint, recipeFingerprint = sharedFixture?.Fingerprint, captureState }, stageCapture, worldAttempt);
+                            else ReferenceStageDiagnostics.RetainWorldBindingFailure(error,request.OutputRoot,key,()=>new {runtimeFingerprint,recipeFingerprint=sharedFixture?.Fingerprint,recipeInputBytesBase64=sharedFixture?.InputBytesBase64,profile,captureState},stageCapture,worldAttempt);
                             throw;
                         }
                     }
@@ -388,6 +411,16 @@ internal static class VisualReferenceCapture
                             using var stream = new FileStream(Path.Combine(request.OutputRoot, file), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                             stream.Write(depth.Span);
                         }
+                        if (request.CaptureBoundInputProvenanceVersion == 1)
+                        {
+                            var bound = ReferenceBoundInputProvenance.Write(stageCapture ?? throw new InvalidDataException("Current FinalColor capture unavailable."),
+                                request.OutputRoot, key, repetition, runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Authored recipe unavailable."),
+                                sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint);
+                            return new { repetition, worldInputDiagnostics = (object?)null, frameIndex = recordFrameIndex,
+                                fingerprint = graphics.CaptureInputFingerprint, actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
+                                pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), shadowFingerprint = (string?)null, shadowFile = (string?)null,
+                                shadowLayout = (GraphicsTextureReadbackLayout?)null, stageDiagnostics = (object?)null, boundInputProvenance = bound };
+                        }
                         object? stages=stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
                             repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
                             sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint);
@@ -400,6 +433,8 @@ internal static class VisualReferenceCapture
                             stageDiagnostics = stages };
                     }
                     PrepareTerrain();
+                    if (request.CaptureBoundInputProvenanceVersion == 1)
+                        ReferenceBoundInputProvenance.Preflight(request.OutputRoot, key, display.Width, display.Height, request.RepeatCaptures);
                     if (request.CaptureStageDiagnostics)
                     {
                         if (sharedFixture is null) throw new NotSupportedException("Stage diagnostics require the shared authored World recipe.");
@@ -611,11 +646,14 @@ internal static class VisualReferenceCapture
         catch (Exception error)
         {
             Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
+            if (request is not null && outputCreated)
+                ReferenceBoundInputProvenance.RetainScopeFailure(error, provenanceScope, request.OutputRoot);
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
                 ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs, timedWindow = timedWindowState }, JsonOptions));
             return 1;
         }
+        finally { provenanceScope?.Dispose(); }
     }
 
     internal static object Distribution(double[] values)

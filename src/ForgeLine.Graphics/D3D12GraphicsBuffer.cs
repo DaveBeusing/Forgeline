@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using Vortice.Direct3D12;
 
 namespace ForgeLine.Graphics;
@@ -16,7 +17,15 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
         Owner = owner;
         Description = description;
         _resource = resource;
-        Lifetime = owner.RegisterResource(resource.Dispose, checked((long)description.SizeInBytes));
+        try { Lifetime = owner.RegisterResource(resource.Dispose, checked((long)description.SizeInBytes)); }
+        catch { resource.Dispose(); throw; }
+        try { owner.RegisterBoundBuffer(Lifetime, description); }
+        catch
+        {
+            try { owner.RetireResource(Lifetime); } catch { }
+            _resource = null;
+            throw;
+        }
     }
 
     public GraphicsBufferDescription Description { get; }
@@ -52,8 +61,19 @@ internal sealed class D3D12GraphicsBuffer : IGraphicsBuffer
             return;
         }
 
-        Resource.SetData(data, offsetInBytes);
-        Owner.RecordCaptureInput(MemoryMarshal.AsBytes(data));
+        if (Owner.BoundInputTracker is not null)
+        {
+            using var frozen = Owner.FreezeBoundSource(MemoryMarshal.AsBytes(data));
+            var consumed = MemoryMarshal.Cast<byte, T>(frozen.Bytes);
+            Resource.SetData(consumed, offsetInBytes);
+            Owner.RecordCaptureInput(frozen.Bytes);
+            Owner.RecordBoundWrite(Lifetime, offsetInBytes, frozen.Bytes, Unsafe.SizeOf<T>());
+        }
+        else
+        {
+            Resource.SetData(data, offsetInBytes);
+            Owner.RecordCaptureInput(MemoryMarshal.AsBytes(data));
+        }
     }
 
     public void Dispose()

@@ -9,6 +9,41 @@ namespace ForgeLine.Graphics.Tests.RenderTelemetry;
 public sealed class StageCaptureNativeTests
 {
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ProvenanceRefusalWithQueuedUploadStillExecutesSignalsAndDisposes(bool normalIdleFirst)
+    {
+        using var scope = new GraphicsBoundInputProvenanceScope();
+        var fixture = new Fixture(false, requestDebugLayer: true);
+        var operations = new List<SchedulingOperation>();
+        var device = fixture.Device;
+        Assert.True(device.Diagnostics.Device.IsSoftwareAdapter);
+        try
+        {
+            device.SchedulingFailureInjection = operation =>
+            {
+                operations.Add(operation);
+                if (operation == SchedulingOperation.MapUpload) device.BoundInputTracker!.Invalidate();
+            };
+            Assert.Throws<InvalidOperationException>(() => device.CreateInitializedStaticBuffer(
+                new(16, StaticGraphicsBufferUsage.Vertex), new byte[16]));
+            // A normal idle path must finish upload bookkeeping but refuse invalid evidence.
+            if (normalIdleFirst) Assert.Throws<InvalidOperationException>(device.WaitForIdle);
+            device.Dispose();
+            Assert.Equal(1, operations.Count(x => x == SchedulingOperation.ExecuteUpload));
+            Assert.Equal(1, operations.Count(x => x == SchedulingOperation.SignalUpload));
+        }
+        finally
+        {
+            // Keep only observation; native cleanup failures must still surface.
+            fixture.Dispose();
+        }
+        Assert.Equal(1, operations.Count(x => x == SchedulingOperation.ExecuteUpload));
+        Assert.Equal(1, operations.Count(x => x == SchedulingOperation.SignalUpload));
+        Assert.True(operations.IndexOf(SchedulingOperation.ExecuteUpload) < operations.IndexOf(SchedulingOperation.SignalUpload));
+    }
+
+    [Theory]
     [InlineData(1f)]
     [InlineData(.5f)]
     public void FirstCaptureSlotWrapAndOverlayDepthKeepEveryOriginalStage(float scale)

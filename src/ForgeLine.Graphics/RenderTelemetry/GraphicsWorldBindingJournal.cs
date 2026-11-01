@@ -297,6 +297,7 @@ internal sealed class GraphicsWorldBindingRecorder
     { Event(new(Next, "Viewport", Viewport: [x, y, width, height])); _viewport = true; }
     internal void Scissor(int left, int top, int right, int bottom)
     { Event(new(Next, "Scissor", Scissor: [left, top, right, bottom])); _scissor = true; }
+    internal int RecordedDrawCount => _drawCount;
     internal void Draw(bool indexed, int count, int instances, int start, int baseVertex, int startInstance)
     {
         Check();
@@ -361,6 +362,7 @@ internal sealed partial class D3D12GraphicsDevice
         if (_worldBindingRecorder is not { } r) return;
         try
         {
+            _boundInputTracker?.Pipeline(emitted, pipeline.Description.DirectionalShadowReceiver, pipeline.Description.VertexConstantsInBuffer);
             var description = GraphicsWorldBindingRecorder.Describe(pipeline.Description);
             r.Pipeline(r.Define(pipeline.Lifetime, "pipeline", pipeline: description), description, emitted);
             if (pipeline.Description.DirectionalShadowReceiver)
@@ -375,17 +377,23 @@ internal sealed partial class D3D12GraphicsDevice
     }
     internal void RecordWorldShadowFrame(GraphicsDirectionalShadowFrame frame)
     {
-        if (_worldBindingRecorder is not { } r) return;
+        if (_worldBindingRecorder is null && _boundInputTracker is null) return;
         Span<float> data = stackalloc float[24];
         var matrix = frame.ViewProjection; MemoryMarshal.Cast<float, System.Numerics.Matrix4x4>(data[..16])[0] = matrix;
         data[16] = frame.Center.X; data[17] = frame.Center.Y; data[18] = frame.Center.Z; data[19] = frame.Radius;
         data[20] = _directionalShadows.Resolution; data[21] = frame.DepthRange; data[22] = frame.ContactStrength; data[23] = 1;
-        r.ShadowFrame(data, new("directional-shadow-frame", checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, null, null, null, 0));
+        _boundInputTracker?.ImplicitWrite(_shadowConstants![_frameIndex], checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, 0, MemoryMarshal.AsBytes(data), shadow: true);
+        _worldBindingRecorder?.ShadowFrame(data, new("directional-shadow-frame", checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, null, null, null, 0));
     }
     internal void RecordWorldConstants(ReadOnlySpan<float> values, bool buffered)
     {
-        if (_worldBindingRecorder is not { } r) return;
-        r.Constants(values, buffered ? "buffered" : "root", buffered ? new("buffered-vertex-constants",
+        if (_boundInputTracker is { } tracker)
+        {
+            if (buffered) tracker.ImplicitWrite(_shadowConstants![_frameIndex], checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex,
+                checked((ulong)(_constantOffset - 256)), MemoryMarshal.AsBytes(values), shadow: false);
+            else tracker.RootConstants(Convert.ToHexString(SHA256.HashData(MemoryMarshal.AsBytes(values))));
+        }
+        _worldBindingRecorder?.Constants(values, buffered ? "buffered" : "root", buffered ? new("buffered-vertex-constants",
             checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, null, 0, null, _constantOffset - 256) : null);
     }
 }

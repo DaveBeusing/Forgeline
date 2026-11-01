@@ -46,7 +46,7 @@ def run_capture(client_executable,request_path,output,sensor_executable,dll_path
         payload_before=payload_inventory(Path(client).parent);write_new(output/'payload-inventory-before.json',payload_before)
         original=Path(request_path).read_bytes();request=parse_json_bytes(original)
         require(type(diagnostic_only) is bool and type(diagnostic_setup_hold) is bool,'Diagnostic mode flags must be actual booleans')
-        diagnostic_only=diagnostic_only or request.get('captureStageDiagnostics') is True or request.get('ownerTraceControlDirectory') is not None
+        diagnostic_only=diagnostic_only or request.get('captureStageDiagnostics') is True or request.get('ownerTraceControlDirectory') is not None or request.get('captureBoundInputProvenanceVersion') is not None
         require(not diagnostic_setup_hold or diagnostic_only,'External setup hold is diagnostic-only')
         require(diagnostic_before_release is None or diagnostic_only and callable(diagnostic_before_release),'Attach callback is diagnostic-only')
         runtime=runtime_fingerprint(request['runtimeRoot']);source=request['commit']

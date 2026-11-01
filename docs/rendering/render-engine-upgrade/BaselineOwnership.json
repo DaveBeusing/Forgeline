@@ -32,7 +32,20 @@
         "tests/ForgeLine.Graphics.Tests/RenderTelemetry/GraphicsWorldBindingJournalTests.cs",
         "tests/ForgeLine.Graphics.Tests/RenderTelemetry/StageCaptureNativeTests.cs",
         "build/rendering/render-engine-upgrade/world_binding_journal.py",
-        "build/rendering/render-engine-upgrade/test_world_binding_journal.py"
+        "build/rendering/render-engine-upgrade/test_world_binding_journal.py",
+        "src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs",
+        "src/ForgeLine.Graphics/D3D12GraphicsDevice.cs",
+        "src/ForgeLine.Graphics/ResourceScheduling/D3D12UploadArena.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/GraphicsBoundInputProvenance.cs",
+        "src/ForgeLine.Client/RenderTelemetry/ReferenceBoundInputProvenance.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/GraphicsBoundInputProvenanceTests.cs",
+        "tests/ForgeLine.Client.Tests/RenderQualification/ReferenceBoundInputProvenanceTests.cs",
+        "build/rendering/render-engine-upgrade/bound_input_provenance.py",
+        "build/rendering/render-engine-upgrade/test_bound_input_provenance.py",
+        "build/rendering/render-engine-upgrade/capture_runner.py",
+        "build/rendering/render-engine-upgrade/test_capture_runner.py",
+        "build/rendering/render-engine-upgrade/baseline_admission.py",
+        "build/rendering/render-engine-upgrade/test_baseline_admission.py"
       ]
     }
   ],

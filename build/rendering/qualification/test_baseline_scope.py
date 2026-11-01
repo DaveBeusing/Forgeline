@@ -124,4 +124,23 @@ class StabilityScopeTests(unittest.TestCase):
         result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs':'forbidden'}));self.assertNotEqual(result.returncode,0)
         record=copy.deepcopy(self.repo.record);record['packages'][0]['owns'].pop()
         with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+class ProvenanceScopeTests(StabilityScopeTests):
+    def setUp(self):
+        super().setUp()
+        self.repo.record['packages'][0]['owns']=list(scope.STABILITY_PROVENANCE_OWNS)
+    def test_provenance_exact_paths_and_old_journal_separation(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs':'new source probe','build/rendering/render-engine-upgrade/capture_runner.py':'diagnostic guard'}))
+        self.assertEqual(result.returncode,0,result.stderr)
+    def test_old_journal_cannot_borrow_provenance_paths(self):
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns']=list(scope.STABILITY_OWNS)
+        result,_=self.repo.check(self.repo.proposal(record,extra={'src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs':'foreign'}));self.assertNotEqual(result.returncode,0)
+    def test_provenance_rejects_partial_or_foreign_scope(self):
+        for mutate in (lambda r:r['packages'][0]['owns'].pop(),lambda r:r['packages'][0]['owns'].append('src/ForgeLine.Graphics/IGraphicsDevice.cs')):
+            record=copy.deepcopy(self.repo.record);mutate(record)
+            with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+    def test_journal_cannot_take_buffer_hook_or_partial_mixed_scope(self):
+        # Exercise the original22 route independently of the current35-row proposal.
+        self.repo.record['packages'][0]['owns']=list(scope.STABILITY_OWNS)
+        super().test_journal_cannot_take_buffer_hook_or_partial_mixed_scope()
+
 if __name__=='__main__':unittest.main()

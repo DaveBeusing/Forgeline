@@ -71,6 +71,7 @@ internal sealed partial class D3D12GraphicsDevice
         bool captureShadowDepth, GraphicsCaptureStages stages)
     {
         GraphicsWorldBindingAttempt? worldAttempt = null;
+        bool boundCaptureArmed = false;
         ArgumentNullException.ThrowIfNull(commands);
         ThrowIfDisposed();
         ThrowIfRecording();
@@ -128,6 +129,11 @@ internal sealed partial class D3D12GraphicsDevice
             {
                 ArmWorldBindingJournal();
                 worldAttempt = GraphicsWorldBindingAttempt.ClaimCurrent();
+                if (_boundInputTracker is not null)
+                {
+                    _boundInputTracker.Arm(checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, _presentedFrameCount);
+                    boundCaptureArmed = true;
+                }
             }
             RenderFrame(clearColor, commands);
             if (!_captureFrameRecorded) throw new InvalidOperationException("Native frame capture did not submit a backbuffer copy.");
@@ -173,9 +179,11 @@ internal sealed partial class D3D12GraphicsDevice
                     else observations.Add(new(stage, null, ReadOnlyMemory<byte>.Empty,
                         "Linear scene composition stage was unavailable or not recorded."));
                 }
+                var worldJournal = _worldBindingRecorder!.Finish(submission, completed, _captureRecordedFrameIndex, presentedBefore, _presentedFrameCount);
+                var provenance = _boundInputTracker?.Seal(worldJournal);
                 _lastStageCapture = new(output, submission, completed, _captureRecordedFrameIndex, presentedBefore,
                     _presentedFrameCount, DeviceIdentity ?? throw new InvalidOperationException("Actual device identity unavailable."), observations.ToArray()) { BufferCount = _configuration.BufferCount,
-                    WorldBindings=_worldBindingRecorder!.Finish(submission,completed,_captureRecordedFrameIndex,presentedBefore,_presentedFrameCount) };
+                    WorldBindings = worldJournal, BoundInputProvenance = provenance };
             }
             return output;
         }
@@ -184,10 +192,13 @@ internal sealed partial class D3D12GraphicsDevice
             if(_worldBindingRecorder is { } journal)
                 try { GraphicsWorldBindingJournal.AttachFailure(error,journal.Prefix(error),worldAttempt); }
                 catch { }
+            if (boundCaptureArmed && _boundInputTracker is { } tracker)
+                try { GraphicsBoundInputProvenance.AttachFailure(error, tracker.Prefix(error), worldAttempt); } catch { }
             throw;
         }
         finally
         {
+            if (boundCaptureArmed) _boundInputTracker?.EndCapture();
             _worldBindingRecorder=null;
             if (_captureStages is { } stageTargets)
                 foreach (var stage in stageTargets.Values) RetireResource(stage.Lifetime);

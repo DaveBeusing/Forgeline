@@ -20,6 +20,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _heapBound = false;
         _owner.InvalidateTextureBindings();
         _owner.WorldBindingRecorder?.InvalidateRoot();
+        _owner.BoundInputTracker?.InvalidateRoot();
     }
     private void ValidateRecording()
     {
@@ -174,7 +175,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _commandList.IASetVertexBuffers(
             checked((uint)inputSlot),
             view);
-        if(_owner.WorldBindingRecorder is { } journal) journal.Vertex(journal.Define(d3d12Buffer.Lifetime,"buffer",buffer:d3d12Buffer.Description),inputSlot,strideInBytes,offsetInBytes,remaining);
+        if (_owner.WorldBindingRecorder is { } journal)
+        {
+            ulong identity = journal.Define(d3d12Buffer.Lifetime, "buffer", buffer: d3d12Buffer.Description);
+            journal.Vertex(identity, inputSlot, strideInBytes, offsetInBytes, remaining);
+            _owner.BoundInputTracker?.BindBuffer(d3d12Buffer.Lifetime, identity, false, inputSlot, checked((ulong)offsetInBytes), remaining);
+        }
     }
 
     public void SetIndexBuffer(
@@ -196,7 +202,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             d3d12Buffer.Resource.GPUVirtualAddress + (ulong)offsetInBytes,
             checked((uint)remaining),
             nativeFormat);
-        if(_owner.WorldBindingRecorder is { } journal) journal.Index(journal.Define(d3d12Buffer.Lifetime,"buffer",buffer:d3d12Buffer.Description),format,offsetInBytes,remaining);
+        if (_owner.WorldBindingRecorder is { } journal)
+        {
+            ulong identity = journal.Define(d3d12Buffer.Lifetime, "buffer", buffer: d3d12Buffer.Description);
+            journal.Index(identity, format, offsetInBytes, remaining);
+            _owner.BoundInputTracker?.BindBuffer(d3d12Buffer.Lifetime, identity, true, 0, checked((ulong)offsetInBytes), remaining);
+        }
     }
 
     public void SetVertexConstants(ReadOnlySpan<float> values)
@@ -222,10 +233,22 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(values));
         }
 
+        if (_owner.BoundInputTracker is not null)
+        {
+            if (values.Length > 64) throw new InvalidOperationException("Bound constants exceed64words.");
+            Span<float> frozen = stackalloc float[64];
+            values.CopyTo(frozen);
+            SetVertexConstantsCore(frozen[..values.Length]);
+        }
+        else SetVertexConstantsCore(values);
+    }
+
+    private void SetVertexConstantsCore(ReadOnlySpan<float> values)
+    {
         _owner.RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(values));
-        if (_pipeline.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
+        if (_pipeline!.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
         else _commandList.SetGraphicsRoot32BitConstants(0, values);
-        _owner.RecordWorldConstants(values,_pipeline.Description.VertexConstantsInBuffer);
+        _owner.RecordWorldConstants(values, _pipeline.Description.VertexConstantsInBuffer);
     }
 
     public void SetPixelTexture(
@@ -271,7 +294,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
         _owner.UseResource(d3d12Texture.Lifetime);
         bool cached=_owner.TextureBindingMatches(slot,d3d12Texture);
-        if(_owner.WorldBindingRecorder is { } journal) journal.Texture(journal.Define(d3d12Texture.Lifetime,"texture",texture:d3d12Texture.Description,descriptor:d3d12Texture.DescriptorIndex),slot,!cached);
+        if (_owner.WorldBindingRecorder is { } journal)
+        {
+            ulong identity = journal.Define(d3d12Texture.Lifetime, "texture", texture: d3d12Texture.Description, descriptor: d3d12Texture.DescriptorIndex);
+            journal.Texture(identity, slot, !cached);
+            _owner.BoundInputTracker?.BindTexture(d3d12Texture.Lifetime, identity, slot);
+        }
         if (cached) return;
         if (!_heapBound)
         {
@@ -309,7 +337,11 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         }
 
         _owner.RecordDirectionalShadowDraw(1);
-        if(_owner.WorldBindingRecorder is { } journal && _owner.OpaqueWorldBindingPass) journal.Draw(false,vertexCount,1,startVertex,0,0);
+        if (_owner.WorldBindingRecorder is { } journal && _owner.OpaqueWorldBindingPass)
+        {
+            journal.Draw(false, vertexCount, 1, startVertex, 0, 0);
+            _owner.BoundInputTracker?.Draw(journal.RecordedDrawCount - 1);
+        }
         _commandList.DrawInstanced(
             checked((uint)vertexCount),
             1,
@@ -355,7 +387,11 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         ArgumentOutOfRangeException.ThrowIfNegative(startInstance);
 
         _owner.RecordDirectionalShadowDraw(instanceCount);
-        if(_owner.WorldBindingRecorder is { } journal && _owner.OpaqueWorldBindingPass) journal.Draw(true,indexCount,instanceCount,startIndex,baseVertex,startInstance);
+        if (_owner.WorldBindingRecorder is { } journal && _owner.OpaqueWorldBindingPass)
+        {
+            journal.Draw(true, indexCount, instanceCount, startIndex, baseVertex, startInstance);
+            _owner.BoundInputTracker?.Draw(journal.RecordedDrawCount - 1);
+        }
         _commandList.DrawIndexedInstanced(
             checked((uint)indexCount),
             checked((uint)instanceCount),
