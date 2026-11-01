@@ -195,7 +195,8 @@ public sealed class ConveyorEndpointRecoveryTests
 
                 bool output = module == ConveyorModule.OutputAdapter;
                 ConveyorBuildingPort port = ConveyorConstructionService.CapturePorts(entities, Owner)
-                    .Single(item => item.Building == storage && item.Input == output);
+                    .Single(item => item.Building == storage && item.Input == output &&
+                        item.Key == (output ? "west.primary" : "east.primary"));
                 Vector3 pivot = port.Position - Vector3.UnitY * 5.8f + port.Facing * 2;
                 var placement = new ConveyorPlacement(module, pivot,
                     ConveyorGeometry.Facing(output ? -port.Facing : port.Facing), 0);
