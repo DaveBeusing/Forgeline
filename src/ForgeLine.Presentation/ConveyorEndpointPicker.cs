@@ -96,6 +96,7 @@ internal sealed class ConveyorEndpointPicker
 
     private static bool Usable(in ConveyorBuildingPort port, PlayerId player, bool input) =>
         port.Building.IsValid && port.Owner == player && port.Input == input &&
+        (!port.Adaptable || port.Status == ConveyorPortState.Free) &&
         Finite(port.Position) && Finite(port.Facing) && port.Facing.LengthSquared() > .5f;
 
     private static bool Closer(float distance, EntityId entity, float nearest, EntityId chosen) =>
