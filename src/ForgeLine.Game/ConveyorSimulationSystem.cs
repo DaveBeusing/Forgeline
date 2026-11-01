@@ -105,6 +105,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         foreach (PlayerId owner in owners.OrderBy(o => o.Value))
             foreach (var port in ConveyorConstructionService.CapturePorts(entities, owner))
             {
+                if (port.Adaptable && port.Status == ConveyorPortState.Blocked) continue;
                 InventoryId inventory = ResolveInventory(entities, port.Building, port.Input);
                 if (!_stock.Contains(inventory)) continue;
                 int cursor = entities.TryGetComponent(port.Building, out ConveyorPortArbitration arbitration) ? arbitration.ResourceCursor : 0;
