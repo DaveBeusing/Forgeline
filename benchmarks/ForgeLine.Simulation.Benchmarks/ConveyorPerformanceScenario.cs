@@ -281,7 +281,11 @@ internal sealed class ConveyorPerformanceScenario : IDisposable
             next += 4;
             used++;
         }
-        Vector3 destinationPosition = new(next + 11, 0, origin.Z);
+        // Direction-adaptable four-position storage ports can legitimately
+        // accept the reversed adapter. The blocked workload therefore offsets
+        // the receiving building so no physical socket can mate.
+        Vector3 destinationPosition = new(next + 11, 0,
+            origin.Z + (State == ConveyorWorkloadState.Blocked ? 1.0f : 0.0f));
         InventoryId destinationInventory = Inventory(State == ConveyorWorkloadState.Congested ? 100 : 20_000);
         EntityId destination = Building(BuildingIds.StorageDepot, destinationPosition, destinationInventory,
             State == ConveyorWorkloadState.Blocked);
