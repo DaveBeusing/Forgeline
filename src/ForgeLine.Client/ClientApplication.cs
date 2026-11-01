@@ -31,15 +31,6 @@ internal readonly record struct ClientWindowQualificationSnapshot(
 
 internal sealed class ClientApplication
 {
-    internal static void UpdateMetricsOverlay(InputState input, bool modalFrame, ref bool enabled, ref bool held)
-    {
-        bool down = input.WasKeyPressedWithShift(PlatformKey.F1) ||
-            (input.IsKeyDown(PlatformKey.F1) &&
-             (input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)));
-        if (!modalFrame && down && !held) enabled = !enabled;
-        held = down;
-    }
-
     private const float MaximumCameraDeltaSeconds = 0.1f;
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
