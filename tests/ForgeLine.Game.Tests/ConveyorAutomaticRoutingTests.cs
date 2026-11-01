@@ -117,13 +117,15 @@ public sealed class ConveyorAutomaticRoutingTests
         AssertDirectedChain(fixture, source, destination);
         fixture.Give(source, ResourceIds.FerrousOre, 23.125);
         fixture.Give(source, ResourceIds.Fuel, 7);
-        fixture.RunUntil(() => fixture.Stock(destination, ResourceIds.FerrousOre) >= 23.125 - 1e-8,
+        fixture.RunUntil(() => fixture.Stock(destination, ResourceIds.FerrousOre) >= 23.125 - 1e-8 &&
+            fixture.Stock(destination, ResourceIds.Fuel) >= 7 - 1e-8,
             diagnostic: () => string.Join("; ", fixture.Carriers.Select(entity =>
                 $"{entity}: {fixture.Flow(entity).Status}/{fixture.Flow(entity).Cause}")));
         Assert.Equal(23.125, fixture.Total(ResourceIds.FerrousOre), 8);
         Assert.Equal(0, fixture.Stock(source, ResourceIds.FerrousOre), 8);
-        Assert.Equal(7, fixture.Stock(source, ResourceIds.Fuel));
-        Assert.Equal(0, fixture.Stock(destination, ResourceIds.Fuel));
+        Assert.Equal(7, fixture.Total(ResourceIds.Fuel), 8);
+        Assert.Equal(0, fixture.Stock(source, ResourceIds.Fuel), 8);
+        Assert.Equal(7, fixture.Stock(destination, ResourceIds.Fuel), 8);
     }
 
     [Theory]
