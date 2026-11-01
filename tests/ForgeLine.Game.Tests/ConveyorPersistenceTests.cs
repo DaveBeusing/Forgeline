@@ -60,13 +60,13 @@ public sealed class ConveyorPersistenceTests
     public void LoadedConveyorDemolitionReconstructsCargoSalvageThroughSaveAndReplay()
     {
         using MatchRuntime runtime = CreateRuntime(17);
+        var gateway = new PlayerCommandGateway(runtime.Simulation, runtime.Services.BuildingCommands,
+            runtime.BattlefieldRuntime.MatchStateEntity, demolition: runtime.Services.Demolition);
+        runtime.Simulation.RegisterTickObserver(gateway);
         BuildNetwork(runtime);
         RunUntil(runtime, HasCargo);
         ConveyorOwnedPiece target = Carriers(runtime).First(row => BufferQuantity(runtime, row.Entity) > 0);
         double held = BufferQuantity(runtime, target.Entity);
-        var gateway = new PlayerCommandGateway(runtime.Simulation, runtime.Services.BuildingCommands,
-            runtime.BattlefieldRuntime.MatchStateEntity, demolition: runtime.Services.Demolition);
-        runtime.Simulation.RegisterTickObserver(gateway);
 
         Assert.True(gateway.SubmitDemolition(Player, [target.Entity], runtime.Simulation.CurrentTick).Accepted);
         runtime.Simulation.AdvanceOneTick();
