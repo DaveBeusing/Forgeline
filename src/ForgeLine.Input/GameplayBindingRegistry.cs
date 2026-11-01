@@ -36,11 +36,11 @@ public sealed class GameplayBindingRegistry
         "SHIFT + LEFT EXTEND SELECTION / SHIFT + RIGHT APPEND",
         "RIGHT MOVE / TARGET / CTRL + RIGHT PATROL (SHIFT EXTENDS)", "CTRL + DIGIT ASSIGN / DIGIT RECALL / DOUBLE DIGIT FOCUS",
         "CTRL + SHIFT + DIGIT CLEAR", "SHIFT + CLICK REPEAT ACCEPTED BUILD",
-        "SHIFT + F12 GUIDE", "R RESTART TERMINAL MATCH",
+        "F1 STATISTICS SELECTOR", "SHIFT + F12 GUIDE", "R RESTART TERMINAL MATCH",
         "DELETE DEMOLISH SELECTED BUILDINGS (40% MATERIAL REFUND)"
     });
     private static readonly IReadOnlyList<string> DeveloperFixedBindings = Array.AsReadOnly(FixedBindings.Concat(new[]
-        { "F1 DEVELOPER CHECKBOX MENU / F2 WORLD DEBUG", "PAUSE / DEVELOPER TOOLS" }).ToArray());
+        { "F2 WORLD DEBUG", "ESC PAUSE / DEVELOPER TOOLS" }).ToArray());
     public static IReadOnlyList<string> FixedBindingsFor(bool developerCapability) => developerCapability ? DeveloperFixedBindings : FixedBindings;
     private static readonly GameplayBindingDefinition[] DefinitionsArray =
     [
