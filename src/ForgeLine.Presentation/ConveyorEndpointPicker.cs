@@ -17,6 +17,7 @@ internal sealed class ConveyorEndpointPicker
     private readonly Dictionary<EntityId, RenderInstance> _visible = new();
     private readonly List<ConveyorSnapSelector.Candidate> _candidates = new();
     internal ConveyorSnapFailure LastFailure { get; private set; }
+    internal void ResetFailure() => LastFailure = ConveyorSnapFailure.None;
 
     internal bool TryPick(PresentationSnapshot? snapshot, PlayerId player, RtsCamera camera,
         Vector2 pointer, int width, int height, float scale, bool input, out ConveyorEndpoint endpoint,
