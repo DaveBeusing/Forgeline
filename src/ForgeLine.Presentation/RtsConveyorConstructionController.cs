@@ -107,11 +107,12 @@ public sealed class RtsConveyorConstructionController
         if(input.WasKeyPressed(PlatformKey.V)){Edit=(ConveyorEdit)(((int)Edit+1)%4);_anchor=null;_anchorPointer=null;}
         if(!input.HasPointerPosition || !camera.TryScreenPointToWorldOnHorizontalPlane(input.PointerPosition,
             camera.Target.Y,width,height,out Vector3 pointer) || !terrain.TrySampleHeight(pointer.X,pointer.Z,out float ground))
-        {Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
+        {Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_lastFreeGrid=null;_snapWarning=ConveyorSnapFailure.None;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
         Vector3 target=ConveyorSnapSelector.SnapGrid(pointer with {Y=ground},_lastFreeGrid);
-        if (!terrain.TrySampleHeight(target.X,target.Z,out float snappedGround))
-        {Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_lastFreeGrid=null;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
-        target.Y=snappedGround;
+        // Grid sampling is advisory: an exact owned socket may still be valid
+        // if the nearest free grid cell crosses the terrain boundary.
+        if (terrain.TrySampleHeight(target.X,target.Z,out float snappedGround))
+            target.Y=snappedGround;
         float departurePixels=4*(float.IsFinite(scale)?Math.Clamp(scale,.5f,4):1);
         if(_anchorPointer is {} anchorPointer && Vector2.DistanceSquared(input.PointerPosition,anchorPointer)>departurePixels*departurePixels)
             _anchorPointer=null;
