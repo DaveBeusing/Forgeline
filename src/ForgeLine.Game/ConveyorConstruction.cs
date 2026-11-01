@@ -323,7 +323,10 @@ public sealed class ConveyorConstructionService
                 piece.Placement.Module is not (ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter))
                 continue;
             if (!adapters.TryGetValue(piece.Attachment, out List<ConveyorPiece>? attached))
-                adapters.Add(piece.Attachment, attached = new List<ConveyorPiece>());
+            {
+                attached = new List<ConveyorPiece>();
+                adapters.Add(piece.Attachment, attached);
+            }
             attached.Add(piece);
         }
         foreach (EntityId entity in entities.Query<CompletedBuilding, WorldTransform>(QueryIterationOrder.StableByEntityIndex))
@@ -355,7 +358,7 @@ public sealed class ConveyorConstructionService
 
                 int attachmentCount = 0;
                 ConveyorPortState state = ConveyorPortState.Free;
-                if (adapters.TryGetValue(entity, out List<ConveyorPiece>? connections))
+                if (adapters.TryGetValue(entity, out List<ConveyorPiece> connections))
                     foreach (ConveyorPiece adapter in connections)
                     {
                         bool intake = adapter.Placement.Module == ConveyorModule.OutputAdapter;
