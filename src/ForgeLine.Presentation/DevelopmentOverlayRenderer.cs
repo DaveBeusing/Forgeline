@@ -14,6 +14,18 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
     private const float GlyphPixelSize = 2.0f;
     private const float GlyphAdvance = 12.0f;
     private const float LineAdvance = 16.0f;
+    private static readonly DebugOverlayCategory[] PickerCategories =
+    [
+        DebugOverlayCategory.Rendering, DebugOverlayCategory.Navigation,
+        DebugOverlayCategory.World, DebugOverlayCategory.Logistics,
+        DebugOverlayCategory.Sensors, DebugOverlayCategory.Combat,
+        DebugOverlayCategory.Entities
+    ];
+    private static readonly string[] PickerLabels =
+    [
+        "PERFORMANCE", "RENDERING", "NAVIGATION", "WORLD",
+        "LOGISTICS", "SENSORS", "COMBAT", "ENTITIES"
+    ];
 
     private readonly IGraphicsDevice _graphics;
     private readonly IGraphicsPipeline _pipeline;
@@ -530,28 +542,16 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             EmitReadableText("STATISTICS / F1", rect.X + 12f * rect.Scale,
                 rect.Y + 9f * rect.Scale, new Vector4(.96f, .98f, 1f, 1f), width, height);
 
-            DebugOverlayCategory[] categories =
-            [
-                DebugOverlayCategory.Rendering, DebugOverlayCategory.Navigation,
-                DebugOverlayCategory.World, DebugOverlayCategory.Logistics,
-                DebugOverlayCategory.Sensors, DebugOverlayCategory.Combat,
-                DebugOverlayCategory.Entities
-            ];
-            string[] labels =
-            [
-                "PERFORMANCE", "RENDERING", "NAVIGATION", "WORLD",
-                "LOGISTICS", "SENSORS", "COMBAT", "ENTITIES"
-            ];
-            for (int index = 0; index < rect.RowCount; index++)
+             for (int index = 0; index < rect.RowCount; index++)
             {
                 float top = rect.Y + rect.HeaderHeight + index * rect.RowHeight;
                 if ((index & 1) == 0)
                     EmitRectangle(rect.X + 4f * rect.Scale, top, rect.Width - 8f * rect.Scale,
                         rect.RowHeight, new Vector4(.16f, .23f, .28f, .62f), width, height);
-                bool selected = index == 0 ? picker.Performance : picker.IsSelected(categories[index - 1]);
-                EmitReadableText(labels[index], rect.X + 12f * rect.Scale,
+                bool selected = index == 0 ? picker.Performance : picker.IsSelected(PickerCategories[index - 1]);
+                EmitReadableText(PickerLabels[index], rect.X + 12f * rect.Scale,
                     top + 4f * rect.Scale, new Vector4(.88f, .93f, .96f, 1f), width, height);
-                EmitReadableText(selected ? "[ON]" : "[OFF]",
+                EmitReadableText(selected ? "ON" : "OFF",
                     rect.X + rect.Width - 67f * rect.Scale, top + 4f * rect.Scale,
                     selected ? new Vector4(.5f, 1f, .67f, 1f) :
                         new Vector4(.7f, .75f, .78f, 1f), width, height);
@@ -816,7 +816,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                         8)
                 ],
                 CullMode = GraphicsCullMode.None,
-                DepthEnabled = false
+                DepthEnabled = false,
+                AlphaBlendEnabled = true
             });
     }
 
