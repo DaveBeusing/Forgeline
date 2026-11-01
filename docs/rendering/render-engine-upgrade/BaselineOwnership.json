@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "render-baseline-ownership",
-  "baselineSha": "b2cde90992f9207cb7adfd68faebf092059a499d",
+  "baselineSha": "6f2187612b0d3933170a438df3b80e8fc10455ee",
   "serializedVersionException": "Directory.Build.props",
   "packages": [
     {
@@ -66,7 +66,7 @@
   "ciScopeProposal": {
     "kind": "serial-baseline-contract-proposal",
     "package": "2_ResolveSceneLinearRepeatability",
-    "baseSha": "b2cde90992f9207cb7adfd68faebf092059a499d",
+    "baseSha": "6f2187612b0d3933170a438df3b80e8fc10455ee",
     "workflow": ".github/workflows/render-qualification.yml"
   }
 }
