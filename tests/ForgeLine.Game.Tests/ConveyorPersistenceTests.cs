@@ -56,6 +56,33 @@ public sealed class ConveyorPersistenceTests
         AssertRoundTripsAndContinues(runtime);
     }
 
+    [Fact]
+    public void LoadedConveyorDemolitionReconstructsCargoSalvageThroughSaveAndReplay()
+    {
+        using MatchRuntime runtime = CreateRuntime(17);
+        BuildNetwork(runtime);
+        RunUntil(runtime, HasCargo);
+        ConveyorOwnedPiece target = Carriers(runtime).First(row => BufferQuantity(runtime, row.Entity) > 0);
+        double held = BufferQuantity(runtime, target.Entity);
+        var gateway = new PlayerCommandGateway(runtime.Simulation, runtime.Services.BuildingCommands,
+            runtime.BattlefieldRuntime.MatchStateEntity, demolition: runtime.Services.Demolition);
+        runtime.Simulation.RegisterTickObserver(gateway);
+
+        Assert.True(gateway.SubmitDemolition(Player, [target.Entity], runtime.Simulation.CurrentTick).Accepted);
+        runtime.Simulation.AdvanceOneTick();
+
+        Assert.True(gateway.Results.TryRead(out var result));
+        BuildingDemolitionTargetResult accepted = Assert.Single(result.DemolitionTargets!);
+        Assert.True(accepted.Accepted);
+        ConveyorCargoRecovery recovered = Assert.Single(accepted.CargoRecovery!);
+        Assert.Equal(held, recovered.Held, 8);
+        Assert.Equal(held * 0.5, recovered.Recovered, 8);
+        Assert.Equal(held * 0.5, recovered.Lost, 8);
+        Assert.False(runtime.Simulation.Entities.IsAlive(target.Entity));
+        Assert.True(ConveyorSalvageStock.FindInventory(runtime.Simulation.Entities, Player).IsSpecified);
+        AssertRoundTripsAndContinues(runtime);
+    }
+
     [Theory]
     [InlineData(17UL)]
     [InlineData(831UL)]
