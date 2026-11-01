@@ -48,6 +48,7 @@ public sealed class RtsConveyorConstructionController
     private float _scale;
     private EntityId _sourcePort;
     private ConveyorEndpoint? _snappedEndpoint;
+    private Vector3? _smoothedSnapPosition;
     private SimulationTick _endpointTick;
     private Vector3? _pointerTarget;
     private double _availableSteel;
@@ -68,13 +69,13 @@ public sealed class RtsConveyorConstructionController
     public void Begin(ConveyorModule module)
     {
         Module=module; if(module==ConveyorModule.Overpass)Tier=0; IsActive=true; Edit=ConveyorEdit.Build; _anchor=null;_anchorPointer=null;_sourcePort=default;
-        _snappedEndpoint=null;_pointerTarget=null;
+        _snappedEndpoint=null;_smoothedSnapPosition=null;_pointerTarget=null;
         _requested=null;Preview=null;Current=false; Feedback=string.Empty;
     }
     public void Cancel(PresentationInteractionState interaction)
     {
         IsActive=false;_anchor=null;_anchorPointer=null;_pending=null;_requested=null;Preview=null;_sourcePort=default;
-        _snappedEndpoint=null;_pointerTarget=null;
+        _snappedEndpoint=null;_smoothedSnapPosition=null;_pointerTarget=null;
         Current=false;interaction.SetConveyorRequest(null);
         // An already submitted command remains authoritative; UI cancellation
         // cannot retract it. Its correlation is still consumed on completion.
@@ -95,7 +96,7 @@ public sealed class RtsConveyorConstructionController
         bool left=input.IsMouseButtonDown(PlatformMouseButton.Left);
         bool click=(left || input.TryGetMousePressPosition(PlatformMouseButton.Left,out _)) && !_leftDown;
         _leftDown=left;
-        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
+        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
         if(_awaiting)return;
         if(input.WasKeyPressed(PlatformKey.Q))Orientation=(BuildingOrientation)(((int)Orientation+3)%4);
         if(input.WasKeyPressed(PlatformKey.E))Orientation=(BuildingOrientation)(((int)Orientation+1)%4);
@@ -111,11 +112,13 @@ public sealed class RtsConveyorConstructionController
             _anchorPointer=null;
         if(_anchorPointer.HasValue && _anchor is {} anchor)target=anchor;
         EntityId destination=default;
+        ConveyorEndpoint? previousSnap = _snappedEndpoint;
         _snappedEndpoint=null;
         bool snapModule=false;
         if(!_anchor.HasValue)_sourcePort=default;
         if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_anchorPointer.HasValue &&
-            _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,_anchor.HasValue,out var endpoint))
+            _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,_anchor.HasValue,
+                out var endpoint,previous:previousSnap))
         {
             _snappedEndpoint=endpoint; _endpointTick=snapshot!.Tick;
             target=endpoint.Position;
@@ -125,29 +128,26 @@ public sealed class RtsConveyorConstructionController
         else if(Edit==ConveyorEdit.Build && Module is not (ConveyorModule.Route or ConveyorModule.Support or ConveyorModule.RaisedSupport) &&
             _endpoints.TryPick(snapshot,issuer,camera,input.PointerPosition,width,height,scale,
                 Module==ConveyorModule.OutputAdapter,out var mate,
-                includeBuildings:Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter))
+                includeBuildings:Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter,
+                previous:previousSnap) &&
+            ConveyorSnapSelector.TryAlign(Module,mate,out ConveyorPlacement aligned))
         {
-            foreach(var local in ConveyorGeometry.Sockets(Module))
-            {
-                if(local.Input==mate.Input)continue;
-                Orientation=ConveyorGeometry.Facing(local.Input?mate.Facing:-mate.Facing);
-                // Curves and branches have side-facing sockets; choose the exact opposing rotation.
-                for(int turn=0;turn<4;turn++)
-                {
-                    var rotation=BuildingFootprint.GetRotation(Orientation);
-                    if(Vector3.Dot(Vector3.Transform(local.Facing,rotation),mate.Facing)<-.999f)
-                    {
-                        target=mate.Position+Vector3.UnitY*5.8f-Vector3.Transform(local.Position,rotation);
-                        Tier=mate.Tier-(int)MathF.Round((local.Position.Y-5.8f)/2);
-                        _snappedEndpoint=mate;_endpointTick=snapshot!.Tick;snapModule=true;
-                        if(mate.Input)destination=mate.Building;else _sourcePort=mate.Building;
-                        break;
-                    }
-                    Orientation=(BuildingOrientation)(((int)Orientation+1)%4);
-                }
-                if(snapModule)break;
-            }
+            target=aligned.Pivot;
+            Orientation=aligned.Orientation;
+            Tier=aligned.Tier;
+            _snappedEndpoint=mate;_endpointTick=snapshot!.Tick;snapModule=true;
+            if(mate.Input)destination=mate.Building;else _sourcePort=mate.Building;
         }
+        // Only the marker eases; real preview parts, route requests, exact
+        // attachments and simulation snapshots always use the canonical target.
+        if (_snappedEndpoint is { } selected)
+        {
+            Vector3 exact = selected.Position + Vector3.UnitY * 5.8f;
+            _smoothedSnapPosition = _smoothedSnapPosition is { } old &&
+                Vector3.DistanceSquared(old, exact) <= 144
+                ? Vector3.Lerp(old, exact, .4f) : exact;
+        }
+        else _smoothedSnapPosition=null;
         _pointerTarget=_snappedEndpoint?.Position??target;
         EntityId entity=EntityId.Invalid;
         if(Edit!=ConveyorEdit.Build && snapshot?.Conveyors is {} read &&
@@ -180,7 +180,7 @@ public sealed class RtsConveyorConstructionController
         Preview=Current?result!.Preview:null;
         if(!click)return;
         if(Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && !_anchor.HasValue)
-        { _anchor=target;_anchorPointer=input.PointerPosition;_requested=null;return; }
+        { _anchor=target;_anchorPointer=input.PointerPosition;_requested=null;_smoothedSnapPosition=null;return; }
         if(ChoosingDestination)return;
         if(!Current || Preview is not {IsValid:true})
         {Feedback=!Current?"WAIT FOR PLACEMENT CHECK":FailureReason(snapshot);return;}
@@ -260,7 +260,13 @@ public sealed class RtsConveyorConstructionController
         {
             Vector3 socket=endpoint.Position+Vector3.UnitY*5.8f;
             draw.Circle(socket,1.6f,new(1,1,1,1),16);
-            draw.Label(socket+Vector3.UnitY*3,endpoint.Input?"INPUT SNAPPED":"OUTPUT SNAPPED",new(1,1,1,1));
+            if (_smoothedSnapPosition is { } smooth && Vector3.DistanceSquared(smooth,socket)>.01f)
+            {
+                draw.Circle(smooth,.85f,new(.7f,.85f,1,.55f),12);
+                draw.Line(smooth,socket,new(.7f,.85f,1,.45f));
+            }
+            draw.Label(socket+Vector3.UnitY*3,Current && Preview is { IsValid:false }
+                ? "SNAP BLOCKED" : endpoint.Input?"INPUT SNAPPED":"OUTPUT SNAPPED",new(1,1,1,1));
         }
         if(Preview is null || Edit==ConveyorEdit.Build && Module==ConveyorModule.Route && (!_anchor.HasValue || ChoosingDestination))return;
         Vector4 color=Current && Preview.IsValid?new(.15f,1,.35f,1):new(1,.2f,.15f,1);
