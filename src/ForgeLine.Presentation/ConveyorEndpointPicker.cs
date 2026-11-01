@@ -4,6 +4,8 @@ using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
+internal enum ConveyorSnapFailure : byte { None, Ambiguous, Blocked }
+
 internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier,
     Vector3 Facing = default, bool Input = false, string Materials = "",
     EntityId Source = default, string SocketKey = "", int SocketOrdinal = 0);
@@ -14,6 +16,7 @@ internal sealed class ConveyorEndpointPicker
     private const float CarrierHeight = 5.8f;
     private readonly Dictionary<EntityId, RenderInstance> _visible = new();
     private readonly List<ConveyorSnapSelector.Candidate> _candidates = new();
+    internal ConveyorSnapFailure LastFailure { get; private set; }
 
     internal bool TryPick(PresentationSnapshot? snapshot, PlayerId player, RtsCamera camera,
         Vector2 pointer, int width, int height, float scale, bool input, out ConveyorEndpoint endpoint,
@@ -22,6 +25,7 @@ internal sealed class ConveyorEndpointPicker
         endpoint = default;
         _visible.Clear();
         _candidates.Clear();
+        LastFailure = ConveyorSnapFailure.None;
         if (width <= 0 || height <= 0 || !float.IsFinite(pointer.X) || !float.IsFinite(pointer.Y) ||
             snapshot is not { SessionId.IsSpecified: true, PlayerExperience: { IsMatchComplete: false } experience,
                 Conveyors: { } network } || network.Tick != snapshot.Tick || experience.Tick != snapshot.Tick ||
@@ -62,10 +66,20 @@ internal sealed class ConveyorEndpointPicker
         chosen = default;
 
         Matrix4x4 projection = camera.GetMatrices(width, height).ViewProjection;
+        float radius = ConveyorSnapSelector.AcquirePixels *
+            (float.IsFinite(scale) ? Math.Clamp(scale, .5f, 4f) : 1f);
+        bool blocked = false;
         foreach (var port in network.Ports)
         {
-            if (!includeBuildings || !Usable(port, player, input) || !_visible.ContainsKey(port.Building) ||
+            if (!includeBuildings || port.Building.IsValid == false || port.Owner != player ||
+                port.Input != input || !_visible.ContainsKey(port.Building) ||
                 !TryScreenDistance(port.Position, projection, pointer, width, height, out float distance)) continue;
+            if (port.Adaptable && port.Status != ConveyorPortState.Free)
+            {
+                blocked |= distance <= radius * radius;
+                continue;
+            }
+            if (!Usable(port, player, input)) continue;
             var candidate = new ConveyorEndpoint(port.Position - Vector3.UnitY * CarrierHeight,
                 port.Building, 0, port.Facing, input, Source: port.Building, SocketKey: port.Key);
             _candidates.Add(new(candidate, port.Building, port.Key, 0, distance, false));
@@ -88,8 +102,14 @@ internal sealed class ConveyorEndpointPicker
                 _candidates.Add(new(candidate, row.Entity, "", ordinal, distance, true));
             }
         }
-        if (!ConveyorSnapSelector.TrySelect(_candidates, previous, scale, out endpoint))
+        if (!ConveyorSnapSelector.TrySelect(_candidates, previous, scale, out endpoint,
+                out bool ambiguous))
         {
+            if (ambiguous || blocked)
+            {
+                LastFailure = ambiguous ? ConveyorSnapFailure.Ambiguous : ConveyorSnapFailure.Blocked;
+                return false;
+            }
             if (!bodyFound) return false;
             endpoint = bodyEndpoint;
         }
