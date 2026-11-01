@@ -21,11 +21,9 @@ public sealed class ConveyorFlowTests
         EntityId[] line = fixture.Connect(source, destination);
         ResourceId[] resources = ConveyorSimulationSystem.EligibleResources.ToArray();
         foreach (ResourceId resource in resources) fixture.Give(source, resource, 100.125);
-        fixture.Give(source, ResourceIds.Fuel, 10);
-        fixture.Give(source, ResourceIds.Volatiles, 10);
         double[] totals = resources.Select(fixture.Total).ToArray();
 
-        // Five continuously available resources share 100/s, including at a fractional tick duration.
+        // All eligible resources, including interim fluids, share the same finite 100/s budget.
         for (int tick = 0; tick < 10; tick++)
         {
             double before = fixture.Inventories.GetTotalQuantity(fixture.Inventory(source));
@@ -40,10 +38,6 @@ public sealed class ConveyorFlowTests
         fixture.RunUntil(() => resources.All(resource => fixture.Stock(destination, resource) >= 100.125 - Tolerance));
         foreach (ResourceId resource in resources) Near(100.125, fixture.Stock(destination, resource));
         Assert.All(line, entity => Near(0, fixture.Inventories.GetTotalQuantity(fixture.Buffer(entity))));
-        Near(10, fixture.Stock(source, ResourceIds.Fuel));
-        Near(10, fixture.Stock(source, ResourceIds.Volatiles));
-        Near(0, fixture.Stock(destination, ResourceIds.Fuel));
-        Near(0, fixture.Stock(destination, ResourceIds.Volatiles));
         AssertTotals(fixture, resources, totals);
     }
 
