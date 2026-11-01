@@ -359,7 +359,7 @@ public sealed class ConveyorConstructionService
 
                 int attachmentCount = 0;
                 ConveyorPortState state = ConveyorPortState.Free;
-                if (adapters.TryGetValue(entity, out List<ConveyorPiece> connections))
+                if (adapters.TryGetValue(entity, out List<ConveyorPiece>? connections))
                     foreach (ConveyorPiece adapter in connections)
                     {
                         bool intake = adapter.Placement.Module == ConveyorModule.OutputAdapter;

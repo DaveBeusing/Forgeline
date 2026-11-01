@@ -7,6 +7,9 @@ namespace ForgeLine.Game.Tests;
 
 public sealed class BuildingConveyorPortTests
 {
+    private static readonly string[] PhysicalPortKeys =
+        ["west.primary", "east.primary", "west.secondary", "east.secondary"];
+
     [Theory]
     [InlineData(false, BuildingOrientation.North)]
     [InlineData(false, BuildingOrientation.East)]
@@ -26,8 +29,7 @@ public sealed class BuildingConveyorPortTests
         var groups = ports.GroupBy(p => p.Key).ToArray();
 
         Assert.Equal(4, groups.Length);
-        Assert.Equal(new[] { "west.primary", "east.primary", "west.secondary", "east.secondary" },
-            groups.Select(g => g.Key));
+        Assert.Equal(PhysicalPortKeys, groups.Select(g => g.Key));
         Assert.All(groups, group =>
         {
             Assert.Equal(2, group.Count());

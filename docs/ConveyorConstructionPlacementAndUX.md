@@ -79,10 +79,29 @@ connect only through their own directed sockets and never mix cargo at the cross
 ### Connection feedback and snapping
 
 The pointer catches compatible building and conveyor sockets within 28 physical
-pixels at UI scale 1 (scaled with the UI). A nearby socket takes priority over
-the fallback of clicking a building body. A white ring and **INPUT SNAPPED** or
-**OUTPUT SNAPPED** identify the actual selected connection before confirmation.
-Routes retain the exact socket position and departure/arrival direction.
+pixels at UI scale 1 (scaled with the UI). Socket candidates are ranked by projected
+distance, then stable full entity identity, physical port key and socket ordinal;
+they never depend on presentation iteration order. An already selected live socket
+is retained within a 6px larger hold radius until another valid candidate is at
+least 5px-equivalent closer. Missing, hidden, changed-generation, foreign or
+destroyed endpoints cannot be retained. An exact valid socket outranks the fallback
+of clicking a building body. Whole-building clicks prefer the original primary
+socket, falling back to another available authored socket when occupied.
+A white ring and **INPUT SNAPPED** or **OUTPUT SNAPPED** identify the actual
+connection. Overlapping physically ambiguous sockets, occupied building ports and
+incompatible role/tier candidates show explicit **AMBIGUOUS SOCKET**,
+**PORT BLOCKED** or **INCOMPATIBLE SOCKET** feedback, respectively; confirming
+them does not issue a build command.
+
+Free placement remains on the authored 4m grid. A 0.35m deadband around the
+2m half-cell threshold reduces cursor-boundary jitter; terrain height is sampled
+again at the snapped X/Z position. Single-module orientation and tier are resolved
+from exact opposite-facing authored sockets, including bends and ramp transitions.
+The visual snap indicator eases toward its latest valid position (bounded 40%
+interpolation and a visible exact-target reference), but authoritative preview
+cages, command coordinates, paid supports, connection directions and save/replay
+state are **never** interpolated. Routes retain the exact socket position and
+departure/arrival direction.
 
 Individual carriers, curves, branches, ramps and end caps also align to existing
 conveyor outputs. Output adapters align to inputs; input/output adapters can snap
