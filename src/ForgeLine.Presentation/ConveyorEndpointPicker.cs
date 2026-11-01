@@ -38,7 +38,11 @@ internal sealed class ConveyorEndpointPicker
         // Clicking any visible part of the building selects its appropriate input/output socket.
         foreach (var port in network.Ports)
         {
-            if (!includeBuildings || !Usable(port, player, input) || !_visible.TryGetValue(port.Building, out var instance) ||
+            // Body clicks retain the established west-in/east-out default; precise
+            // marker picking below may select any of the four physical positions.
+            if (!includeBuildings || !Usable(port, player, input) ||
+                port.Adaptable && port.Key != (input ? "west.primary" : "east.primary") ||
+                !_visible.TryGetValue(port.Building, out var instance) ||
                 (instance.Selectable.Category & ControllableEntityCategory.Building) == 0) continue;
             var bounds = PresentationBounds.ResolveAxisAlignedBounds(instance);
             if (!Finite(bounds.Minimum) || !Finite(bounds.Maximum) ||
