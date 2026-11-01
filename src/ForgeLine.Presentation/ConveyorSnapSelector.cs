@@ -17,9 +17,15 @@ internal static class ConveyorSnapSelector
         int SocketOrdinal, float DistanceSquared, bool Conveyor);
 
     internal static bool TrySelect(IReadOnlyList<Candidate> candidates,
-        ConveyorEndpoint? previous, float scale, out ConveyorEndpoint selected)
+        ConveyorEndpoint? previous, float scale, out ConveyorEndpoint selected) =>
+        TrySelect(candidates, previous, scale, out selected, out _);
+
+    internal static bool TrySelect(IReadOnlyList<Candidate> candidates,
+        ConveyorEndpoint? previous, float scale, out ConveyorEndpoint selected,
+        out bool ambiguous)
     {
         selected = default;
+        ambiguous = false;
         float factor = float.IsFinite(scale) ? Math.Clamp(scale, .5f, 4f) : 1f;
         float acquireSquared = MathF.Pow(AcquirePixels * factor, 2);
         float holdSquared = MathF.Pow((AcquirePixels + HoldExtraPixels) * factor, 2);
@@ -33,14 +39,22 @@ internal static class ConveyorSnapSelector
             if (previous is { } old && candidate.DistanceSquared <= holdSquared &&
                 SameSocket(candidate.Endpoint, old)) retained = candidate;
         }
-        if (retained is { } hold &&
+        Candidate? chosen = retained is { } hold &&
             (best is null || hold.DistanceSquared <= best.Value.DistanceSquared +
-             MathF.Pow(SwitchAdvantagePixels * factor, 2)))
-        {
-            selected = hold.Endpoint;
-            return true;
-        }
-        if (best is not { } winner) return false;
+             MathF.Pow(SwitchAdvantagePixels * factor, 2)) ? hold : best;
+        if (chosen is not { } winner) return false;
+
+        // Overlapping live endpoints are not two independent valid choices.
+        // The authoritative graph rejects ambiguous attachment; so must its picker.
+        foreach (Candidate candidate in candidates)
+            if (candidate.DistanceSquared <= holdSquared &&
+                candidate.Endpoint.Input == winner.Endpoint.Input &&
+                !SameSocket(candidate.Endpoint, winner.Endpoint) &&
+                Vector3.DistanceSquared(candidate.Endpoint.Position, winner.Endpoint.Position) < .0004f)
+            {
+                ambiguous = true;
+                return false;
+            }
         selected = winner.Endpoint;
         return true;
     }
