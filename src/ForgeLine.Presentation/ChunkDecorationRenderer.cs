@@ -46,6 +46,8 @@ internal sealed class ChunkDecorationRenderer(SimpleInstanceRenderer renderer) :
         renderer.RenderShadow(context, camera, _residency.World, 1, frame, casters, draws, seconds);
         Diagnostics = Diagnostics with { Shadow = renderer.LastShadowDiagnostics };
     }
+    internal GraphicsPostFrameBatch[] CapturePostFrameIntent(GraphicsPostFrameRoster roster, int capturedSlot)
+        => renderer.CapturePostFrameMainIntent(roster, capturedSlot);
     internal void Observe(GraphicsDiagnostics diagnostics) => renderer.ObserveFrameDiagnostics(diagnostics);
     internal void Submit() => renderer.Submit();
     internal void Retire() => renderer.Retire();

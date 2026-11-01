@@ -45,7 +45,21 @@
         "build/rendering/render-engine-upgrade/capture_runner.py",
         "build/rendering/render-engine-upgrade/test_capture_runner.py",
         "build/rendering/render-engine-upgrade/baseline_admission.py",
-        "build/rendering/render-engine-upgrade/test_baseline_admission.py"
+        "build/rendering/render-engine-upgrade/test_baseline_admission.py",
+        "src/ForgeLine.Graphics/D3D12GraphicsTexture.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/GraphicsPostFrameSnapshot.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/D3D12PostFrameSnapshot.cs",
+        "src/ForgeLine.Presentation/TerrainRenderer.cs",
+        "src/ForgeLine.Presentation/TerrainRenderer.PostFrameIntent.cs",
+        "src/ForgeLine.Presentation/SimpleInstanceRenderer.PostFrameIntent.cs",
+        "src/ForgeLine.Presentation/ChunkDecorationRenderer.cs",
+        "src/ForgeLine.Client/RenderTelemetry/ReferencePostFrameSnapshot.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameSnapshotTests.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameSnapshotNativeTests.cs",
+        "tests/ForgeLine.Presentation.Tests/PostFrameIntentTests.cs",
+        "tests/ForgeLine.Client.Tests/RenderQualification/ReferencePostFrameSnapshotTests.cs",
+        "build/rendering/render-engine-upgrade/post_frame_snapshot.py",
+        "build/rendering/render-engine-upgrade/test_post_frame_snapshot.py"
       ]
     }
   ],

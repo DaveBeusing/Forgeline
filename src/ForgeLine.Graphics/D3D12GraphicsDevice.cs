@@ -729,6 +729,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     {
         ThrowIfDisposed();
         ThrowIfRecording();
+        InvalidatePostFrameStamp();
         try
         {
             long started = !_telemetryActive ? 0 : System.Diagnostics.Stopwatch.GetTimestamp();
@@ -969,7 +970,9 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         CheckResult(_commandQueue.Signal(_frameFence, fenceValue), "fence-signal-failed");
 
         WaitForFence(fenceValue);
-        _resources.Collect(GetCompletedFence());
+        ulong completed = GetCompletedFence();
+        _resources.Collect(completed);
+        _postFrameIdleObserved = completed;
 
         CaptureCompletedGpuTimings();
         Array.Clear(_frameFenceValues);

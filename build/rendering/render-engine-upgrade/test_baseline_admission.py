@@ -124,4 +124,30 @@ class BaselineAdmissionContracts(unittest.TestCase):
                 return original_put(root,name,record,raw)
             with self.subTest(explicit_null=explicit_null),tempfile.TemporaryDirectory() as root,patch.object(integration,'put',side_effect=put):
                 self.assertTrue(integration.SyntheticProducerCohort(root).evaluate()['baselineControlsAccepted'])
+    def test_hash_bound_actual_request_post_frame_snapshot_is_independently_unadmittable(self):
+        import test_baseline_producer_integration as integration
+        from unittest.mock import patch
+        original_put=integration.put
+        for value in (1,2,0,False,'unsupported',{},[]):
+            def put(root,name,record,raw=False):
+                if name=='actual-request.json':record=dict(record,capturePostFrameResourceSnapshotVersion=value)
+                if name=='attempt.json':record=dict(record,diagnosticOnly=False)
+                return original_put(root,name,record,raw)
+            with self.subTest(value=value),tempfile.TemporaryDirectory() as root,patch.object(integration,'put',side_effect=put):
+                fixture=integration.SyntheticProducerCohort(root)
+                first=fixture.cohort['runs'][0];directory=Path(root)/first['directory']
+                attempt=json.loads((directory/first['attempt']['path']).read_bytes())
+                self.assertIs(attempt['diagnosticOnly'],False)
+                self.assertEqual(attempt['requestSha256'],sha256_bytes((directory/first['request']['path']).read_bytes()))
+                with self.assertRaisesRegex(ValueError,'post-frame snapshot'):fixture.evaluate()
+    def test_absent_and_null_post_frame_snapshot_keep_existing_positive_admission_controls(self):
+        import test_baseline_producer_integration as integration
+        from unittest.mock import patch
+        original_put=integration.put
+        for explicit_null in (False,True):
+            def put(root,name,record,raw=False):
+                if name=='actual-request.json' and explicit_null:record=dict(record,capturePostFrameResourceSnapshotVersion=None)
+                return original_put(root,name,record,raw)
+            with self.subTest(explicit_null=explicit_null),tempfile.TemporaryDirectory() as root,patch.object(integration,'put',side_effect=put):
+                self.assertTrue(integration.SyntheticProducerCohort(root).evaluate()['baselineControlsAccepted'])
 if __name__=='__main__':unittest.main()

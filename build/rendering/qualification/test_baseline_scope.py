@@ -143,4 +143,23 @@ class ProvenanceScopeTests(StabilityScopeTests):
         self.repo.record['packages'][0]['owns']=list(scope.STABILITY_OWNS)
         super().test_journal_cannot_take_buffer_hook_or_partial_mixed_scope()
 
+class PostFrameScopeTests(unittest.TestCase):
+    def setUp(self):
+        self.repo=Repository();self.addCleanup(self.repo.temp.cleanup)
+        self.repo.record.update(packages=[dict(id=scope.STABILITY,wave=2,dependsOn=[scope.WORKLOAD],owns=list(scope.STABILITY_POST_FRAME_OWNS))])
+        self.repo.record['ciScopeProposal']['package']=scope.STABILITY
+    def test_exact49_proposal_accepts_only_selected_new_paths(self):
+        self.assertEqual(len(scope.STABILITY_POST_FRAME_OWNS),49)
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12GraphicsTexture.cs':'typed source','src/ForgeLine.Presentation/TerrainRenderer.PostFrameIntent.cs':'late intent'}))
+        self.assertEqual(result.returncode,0,result.stderr)
+    def test_old35_cannot_borrow_late_snapshot_paths(self):
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns']=list(scope.STABILITY_PROVENANCE_OWNS)
+        result,_=self.repo.check(self.repo.proposal(record,extra={'src/ForgeLine.Graphics/RenderTelemetry/D3D12PostFrameSnapshot.cs':'foreign'}));self.assertNotEqual(result.returncode,0)
+    def test_partial_mixed_and_broad_shapes_fail_closed(self):
+        for mutate in (lambda r:r['packages'][0]['owns'].pop(),lambda r:r['packages'][0]['owns'].append('src/ForgeLine.Graphics/'),lambda r:r['packages'][0].update(dependsOn=[])):
+            record=copy.deepcopy(self.repo.record);mutate(record)
+            with self.assertRaises(scope.ValidationError):scope.validate_record(record)
+    def test_snapshot_cannot_take_unowned_shader(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Presentation/Shaders/unowned.hlsl':'foreign'}));self.assertNotEqual(result.returncode,0)
+
 if __name__=='__main__':unittest.main()

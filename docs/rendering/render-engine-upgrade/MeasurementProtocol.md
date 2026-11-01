@@ -372,3 +372,68 @@ cannot establish a causal repair, physical stability, allocation policy or quali
 The offline overlap report refuses more than the existing131072-event structural cap
 of derived overlap records instead of producing an unbounded report. This is a tool
 capacity refusal, not a workload or allocation-policy limit.
+
+### Native post-FinalColor resident-resource snapshot v1
+
+`capturePostFrameResourceSnapshotVersion:1` is a separate native-only, unqualified
+late diagnostic. It requires the declared single IndustrialBase/Medium/NormalGameplay
+1920x1080 DPI96 World case, Warm/Fixed64/512/8 Full with owner-observation v1.
+Stages, shadow capture, CPU-source provenance and trace handoffs remain off. Shared
+host/no-frame validation rejects the selector; a common no-frame preflight with null
+selection proves only static context. Every non-null selection is automatically
+classified diagnostic by the runner and independently rejected by baseline admission.
+
+Ordinary capture first returns CPU RGBA and closes the primary PNG. A newly known
+mismatch closes its original first-image duplicate and repetition PNG before any new
+receipt, enumeration or native-copy work. The selected route skips later duplicate
+PNG writers. An opaque one-use receipt binds the actual recorded slot, successful
+capture body AND successful cleanup, original device/session/owner/submission and
+presentation/resize facts. Rejected foreign-owner calls cannot consume the receipt.
+The next swapchain slot is never substituted for the captured slot. A managed witness
+also rejects replacement/creation/removal of the captured-slot constant arena.
+
+Late intent copies only resident terrain chunks, stored main-LOD history, index ranges,
+bounds, palette/material/resource references and the final retained main/decoration
+scratch. These accessors do not Prepare, Select, Harvest or Render. Culled LOD values
+may be old; scratch has no independent final-pass marker or entity/root association.
+The declared superset includes resident VB/shared IB/control/material textures, actual
+captured-slot instance prefixes and, if present, the actual implicit constant-arena
+allocation-cursor prefix. Padding has unknown shader relevance. Targets/depth/shadow,
+root constants, particles/HUD/skin caches, inactive private caches, earlier scratch and
+main entity/root associations are explicitly excluded. Unsupported declared resources
+refuse; they are never silently dropped or represented by fabricated identities.
+
+Pending initializer absence is proven with the existing tracker-independent upload
+bookkeeping; the late diagnostic does not flush initializers. Additional native COM
+references and one packed READBACK allocation are owned by an active composite lease
+before Execute. MAY_HAVE_EXECUTED is set before that native call. Uncertain unsignaled
+work retains the entire active lease through the existing device drain/removal path.
+Release is idempotent, attempts every part and never throws through ReleaseAll.
+The separate late-copy fence has its own domain; its numeric value is never compared
+with the original frame-fence value. Immutable textures restore their audited PSR
+state. Logical BC7 mip dimensions remain distinct from block-aligned native copy
+footprint dimensions; canonical raw encoded rows exclude padding and preserve color
+encoding. Upload/default buffer copy states follow the audited completed native path.
+
+Structural refusal guards are4096 total resources,32 mips/texture,131072 mip entries,
+4096 terrain/main/decoration entries each,32 index ranges/chunk,131072 total intent
+resource references and4096 UTF8 bytes/optional string. A running escaped UTF8 writer
+bounds metadata before oversized result allocation:31MiB body plus1MiB envelope,
+32MiB actual compact wire. Total padded staging and total canonical raw bytes are each
+bounded by128MiB per snapshot. These are implementation capacities, not approved
+allocation policies or a guaranteed workload fit. Every canonical mip has an exclusive
+ordinal file and original size/hash reference. Actual PNG publication, original/copy
+receipts, source/runtime/recipe bytes, quality-profile bytes, full observed composition
+(a different domain), camera, resource descriptions and intent remain joined. Failure
+prefixes retain available raw references and the original PNG without inventing a
+completed snapshot; cleanup/export failures do not replace the primary snapshot error.
+
+The strict offline reader requires all eight selected references and validates original
+PNG pixels, raw hashes/layouts, source/owner/device/slot/submission joins and chronology.
+Historical absence remains unavailable under its original interpretation. Comparisons
+separate semantic resident bytes/intent from process-local roster and captured-slot
+facts; rotating slots or local IDs are not automatically correctness failures.
+These are bytes observed AFTER image persistence, not evidence of what a shader fetched
+earlier. The copies can perturb later repetitions. Equal bytes or all-B pixels do not
+resolve the intermittent pixel cause, establish a repair, approve numeric policies,
+qualify a physical baseline or authorize the original optimization wave2.
