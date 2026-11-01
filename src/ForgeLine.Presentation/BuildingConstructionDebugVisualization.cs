@@ -18,8 +18,16 @@ public static class BuildingConstructionDebugVisualization
             : invalidColor;
 
         debugDraw.Box(preview.Bounds, color);
-        if (preview.ConveyorInput is { } input) ConveyorNetworkOverlay.DrawSocket(debugDraw, input.Position, input.Facing, true);
-        if (preview.ConveyorOutput is { } output) ConveyorNetworkOverlay.DrawSocket(debugDraw, output.Position, output.Facing, false);
+        if (preview.ConveyorPorts.Count > 0)
+        {
+            foreach (BuildingConveyorSocket physical in preview.ConveyorPorts)
+                ConveyorNetworkOverlay.DrawAdaptableSocket(debugDraw, physical.Socket.Position, !preview.IsValid);
+        }
+        else
+        {
+            if (preview.ConveyorInput is { } input) ConveyorNetworkOverlay.DrawSocket(debugDraw, input.Position, input.Facing, true);
+            if (preview.ConveyorOutput is { } output) ConveyorNetworkOverlay.DrawSocket(debugDraw, output.Position, output.Facing, false);
+        }
         if (preview.LoadingCorridor is ForgeLine.World.AxisAlignedBounds corridor)
         {
             var outline = new ForgeLine.World.AxisAlignedBounds(
