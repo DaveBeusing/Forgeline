@@ -48,7 +48,9 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
         FormationTemplate activeFormation = FormationTemplate.Compact,
         PreAlphaUxView preAlphaUx = default,
         float uiScale = 1.0f,
-        DebugDraw? gameplayOverlay = null)
+        DebugDraw? gameplayOverlay = null,
+        StatisticsOverlayPickerView statisticsPicker = default,
+        bool publicMetricsOnly = false)
     {
         ThrowIfDisposed();
         _bindings = preAlphaUx.Bindings ?? GameplayBindingRegistry.Default;
@@ -60,7 +62,19 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 ? Math.Clamp(uiScale, 0.75f, 4.0f)
                 : 1.0f;
 
-        if (showDevelopmentMetrics)
+        if (showDevelopmentMetrics && publicMetricsOnly)
+        {
+            Span<char> basic = stackalloc char[128];
+            var basicText = new OverlayTextBuilder(basic);
+            basicText.Append("FPS ");
+            basicText.Append(metrics.FramesPerSecond, "F1");
+            basicText.Append(" / FRAME ");
+            basicText.Append(metrics.FrameMilliseconds, "F2");
+            basicText.Append("MS");
+            EmitReadableText(basicText.Written, 12.0f, 64.0f * _uiScale,
+                new Vector4(.9f, .95f, 1f, 1f), context.Width, context.Height);
+        }
+        else if (showDevelopmentMetrics)
         {
         Span<char> buffer = stackalloc char[1_024];
         var builder = new OverlayTextBuilder(buffer);
@@ -146,6 +160,8 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
             preAlphaUx,
             context.Width,
             context.Height);
+        if (statisticsPicker.Visible)
+            EmitStatisticsPicker(statisticsPicker, context.Width, context.Height);
 
         if (camera is not null &&
             gameplayOverlay is not null &&
@@ -497,6 +513,72 @@ public sealed class DevelopmentOverlayRenderer : IDisposable
                 width,
                 height);
         }
+    }
+
+    private void EmitStatisticsPicker(StatisticsOverlayPickerView picker, int width, int height)
+    {
+        StatisticsOverlayPickerGeometry rect =
+            StatisticsOverlayPickerGeometry.Create(width, height, _uiScale, picker.DeveloperAuthorized);
+        float originalScale = _uiScale;
+        _uiScale = rect.Scale;
+        try
+        {
+            EmitRectangle(rect.X, rect.Y, rect.Width, rect.Height,
+                new Vector4(.055f, .085f, .12f, .78f), width, height);
+            EmitRectangle(rect.X, rect.Y, rect.Width, 2f * rect.Scale,
+                new Vector4(.29f, .7f, .87f, .98f), width, height);
+            EmitReadableText("STATISTICS / F1", rect.X + 12f * rect.Scale,
+                rect.Y + 9f * rect.Scale, new Vector4(.96f, .98f, 1f, 1f), width, height);
+
+            DebugOverlayCategory[] categories =
+            [
+                DebugOverlayCategory.Rendering, DebugOverlayCategory.Navigation,
+                DebugOverlayCategory.World, DebugOverlayCategory.Logistics,
+                DebugOverlayCategory.Sensors, DebugOverlayCategory.Combat,
+                DebugOverlayCategory.Entities
+            ];
+            string[] labels =
+            [
+                "PERFORMANCE", "RENDERING", "NAVIGATION", "WORLD",
+                "LOGISTICS", "SENSORS", "COMBAT", "ENTITIES"
+            ];
+            for (int index = 0; index < rect.RowCount; index++)
+            {
+                float top = rect.Y + rect.HeaderHeight + index * rect.RowHeight;
+                if ((index & 1) == 0)
+                    EmitRectangle(rect.X + 4f * rect.Scale, top, rect.Width - 8f * rect.Scale,
+                        rect.RowHeight, new Vector4(.16f, .23f, .28f, .62f), width, height);
+                bool selected = index == 0 ? picker.Performance : picker.IsSelected(categories[index - 1]);
+                EmitReadableText(labels[index], rect.X + 12f * rect.Scale,
+                    top + 4f * rect.Scale, new Vector4(.88f, .93f, .96f, 1f), width, height);
+                EmitReadableText(selected ? "[ON]" : "[OFF]",
+                    rect.X + rect.Width - 67f * rect.Scale, top + 4f * rect.Scale,
+                    selected ? new Vector4(.5f, 1f, .67f, 1f) :
+                        new Vector4(.7f, .75f, .78f, 1f), width, height);
+            }
+        }
+        finally
+        {
+            _uiScale = originalScale;
+        }
+    }
+
+    private void EmitRectangle(float x, float y, float w, float h,
+        Vector4 color, int width, int height)
+    {
+        if (w <= 0 || h <= 0 || width <= 0 || height <= 0 ||
+            _vertexCount > MaxVertices - 6) return;
+        Vector2 tl = new(x / width * 2f - 1f, 1f - y / height * 2f);
+        Vector2 br = new((x + w) / width * 2f - 1f,
+            1f - (y + h) / height * 2f);
+        Vector2 tr = new(br.X, tl.Y);
+        Vector2 bl = new(tl.X, br.Y);
+        _vertices[_vertexCount++] = new OverlayVertex(tl, color);
+        _vertices[_vertexCount++] = new OverlayVertex(br, color);
+        _vertices[_vertexCount++] = new OverlayVertex(tr, color);
+        _vertices[_vertexCount++] = new OverlayVertex(tl, color);
+        _vertices[_vertexCount++] = new OverlayVertex(bl, color);
+        _vertices[_vertexCount++] = new OverlayVertex(br, color);
     }
 
     private void EmitReadableText(
