@@ -97,7 +97,8 @@ The launcher builds the client, compiles and qualifies runtime assets, and stops
 | Logistics / supply / combat / technology | L / Y / K / H |
 | Strategic overlays | F10 |
 | Controls help | Escape → Controls |
-| Developer tools — Developer build only | F1 |
+| Statistics overlay selector (nonmodal) | F1 |
+| Full developer tools — Developer build only | Escape → Developer Tools |
 | Restart a finished match / exit session | R / Escape |
 
 Settings exposes rebindable gameplay actions with conflict checks. Owned selections use single/group action rings; Operations and the strategic map provide authorized diagnosis and focus actions. See [controls](docs/CameraAndInput.md), [HUD consolidation](docs/HudSurfaceConsolidation.md), [input accessibility](docs/GameplayInputAccessibilityAndQualification.md) and [operations](docs/ProductionAndLogisticsOperations.md).

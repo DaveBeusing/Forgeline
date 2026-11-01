@@ -31,15 +31,6 @@ internal readonly record struct ClientWindowQualificationSnapshot(
 
 internal sealed class ClientApplication
 {
-    internal static void UpdateMetricsOverlay(InputState input, bool modalFrame, ref bool enabled, ref bool held)
-    {
-        bool down = input.WasKeyPressedWithShift(PlatformKey.F1) ||
-            (input.IsKeyDown(PlatformKey.F1) &&
-             (input.IsKeyDown(PlatformKey.LeftShift) || input.IsKeyDown(PlatformKey.RightShift)));
-        if (!modalFrame && down && !held) enabled = !enabled;
-        held = down;
-    }
-
     private const float MaximumCameraDeltaSeconds = 0.1f;
     private const int MaximumDebugInstanceBoxes = 24;
     private const int MaximumDebugLabels = 4;
@@ -448,6 +439,7 @@ internal sealed class ClientApplication
             new RtsMinimapInteractionController();
         var debugOverlay =
             new DebugOverlayController();
+        var statisticsPicker = new StatisticsOverlayPicker();
         var navigationDiagnostics = new NavigationDiagnosticsController(DeveloperTools.Capability.IsCompiled && DeveloperSessionToolsEnabled);
         var gameplayDraw =
             new DebugDraw();
@@ -714,6 +706,10 @@ internal sealed class ClientApplication
                 developerSessionActive = nextDeveloperSessionActive;
                 navigationDiagnostics = new(developerSessionActive);
                 overlayEnabled = false;
+                if (!developerSessionActive)
+                    statisticsPicker.ClearDeveloperSelection(debugOverlay);
+                else
+                    statisticsPicker.Close();
                 debugOverlay.SetEnabled(false);
                 inputState.SuppressHeldInput();
             }
@@ -746,21 +742,26 @@ internal sealed class ClientApplication
                 if (inputState.WasKeyPressed(PlatformKey.Down) || inputState.WheelDelta < 0) controlsScroll++;
                 if (inputState.WasKeyPressed(PlatformKey.Up) || inputState.WheelDelta > 0) controlsScroll = Math.Max(0, controlsScroll - 1);
             }
-            bool developerMenuShortcut = false;
-#if FORGELINE_DEVELOPER_TOOLS
-            developerMenuShortcut = developerSessionActive && window.IsFocused && !window.IsMinimized &&
-                !pauseSettings.Visible && !pauseControlsVisible && !operationsController.View.Open &&
-                inputState.WasKeyPressed(PlatformKey.F1) &&
-                !inputState.IsKeyDown(PlatformKey.LeftShift) && !inputState.IsKeyDown(PlatformKey.RightShift) &&
-                !inputState.IsKeyDown(PlatformKey.LeftControl) && !inputState.IsKeyDown(PlatformKey.RightControl);
-#endif
-            bool modalFrame = wasShellBlocking || guidanceInteraction.ShortcutConsumedThisFrame || developerMenuShortcut;
+            bool statisticsInputOwned = statisticsPicker.Update(
+                inputState,
+                !wasShellBlocking && !pauseSettings.Visible &&
+                    !guidanceInteraction.ShortcutConsumedThisFrame &&
+                    !operationsController.View.Open && window.IsFocused && !window.IsMinimized,
+                developerSessionActive, window.ClientSize.Width, window.ClientSize.Height,
+                RtsUiLayout.ScaleForDpi(window.Dpi) * _settings.UiScale,
+                debugOverlay, ref overlayEnabled);
+            bool modalFrame = wasShellBlocking ||
+                guidanceInteraction.ShortcutConsumedThisFrame || statisticsInputOwned;
             if (!modalFrame)
             {
                 if (developerSessionActive &&
                     ConsumeKeyPress(inputState, PlatformKey.F2, ref debugMasterToggleHeld) &&
                     !inputState.IsKeyDown(PlatformKey.LeftShift) && !inputState.IsKeyDown(PlatformKey.RightShift))
+                {
+                    if (!debugOverlay.Enabled && debugOverlay.Categories == DebugOverlayCategory.None)
+                        debugOverlay.SetCategories(DebugOverlayCategory.All);
                     debugOverlay.ToggleMaster();
+                }
                 UpdateFormationSelection(
                     inputState,
                     ref formationToggleHeld,
@@ -790,12 +791,6 @@ internal sealed class ClientApplication
             developerMenu.Model.Refresh(DeveloperTools.Capability.BindSession(simulationHost.SessionId, DeveloperSessionToolsEnabled),
                 renderWorld.CurrentSnapshot, selectionController.Selection, scenario.RuntimeSettings.Participants,
                 simulationHost.IsPaused, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
-            if (developerMenuShortcut)
-            {
-                if (developerMenu.Visible) { developerMenu.Model.Close(); inputState.SuppressHeldInput(); }
-                else if (developerMenu.Open(inputState, DeveloperMenuSection.Visualization))
-                { pauseMenuActive = true; pauseControlsVisible = false; }
-            }
             developerMenu.Update(inputState, modalLayout, window.IsFocused && !window.IsMinimized && !window.ClientSize.IsEmpty);
             developerOwnedFrame |= developerMenu.Visible;
 #endif
@@ -846,7 +841,8 @@ internal sealed class ClientApplication
             hudInteraction.BeginFrame(
                 inputSnapshot?.SessionId ??
                 SimulationSessionId.None);
-            hudInteraction.CapturePointer(guidanceInteraction.BlocksGameplayThisFrame);
+            hudInteraction.CapturePointer(guidanceInteraction.BlocksGameplayThisFrame ||
+                statisticsPicker.PointerCaptured);
             PlayerExperienceSnapshot? inputExperience =
                 inputSnapshot?.PlayerExperience;
             bool inputMatchTerminal =
@@ -1983,7 +1979,8 @@ internal sealed class ClientApplication
                     HoverTooltip: tooltipView,
                     Operations: operationsController.View, FeedbackSettings: _settings.CreateUiFeedbackSettings(), WorldAudio: _settings.WorldAudio,
                     TacticalDisplay: _settings.TacticalDisplay,
-                    NotificationExpansion: alertController.Expansion, NavigationDiagnostics: navigationView),
+                    NotificationExpansion: alertController.Expansion, NavigationDiagnostics: navigationView,
+                    StatisticsPicker: statisticsPicker.Capture(developerSessionActive, overlayEnabled, debugOverlay.View)),
                     gameplayDraw, debugDraw, selectionController.Selection.Entities);
                 lastPublishedCamera = publicationCamera;
                 lastPublishedSnapshot = currentSnapshot;
