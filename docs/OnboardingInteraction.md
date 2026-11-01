@@ -18,7 +18,11 @@ recovery, scouting and continued play. The truck-roles and continued-play cards
 are explanations rather than achievable simulation goals. The existing eighteen keys
 remain stable. `belt-production` separately explains compatible base conveyors and
 committed processing output; `research` explains the existing paid research flow.
-Neither lesson adds a command, unlock or required reading order. The contact card
+Neither lesson adds a command, unlock or required reading order.
+The belt-production card explains temporary Volatiles conveyor delivery to
+Refineries and Fuel conveyor collection into compatible owned local storage,
+without suggesting pipelines are implemented. Regional Cargo and battlefield
+Supply Truck logistics retain their own roles. The contact card
 explains escorts, rerouting and transport reserves against observed raids without
 revealing hidden enemy state.
 
