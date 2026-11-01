@@ -349,6 +349,10 @@ internal static class VisualReferenceCapture
                     GraphicsStageCapture? stageCapture = null;
                     byte[] CaptureFrame()
                     {
+                        stageCapture=null;
+                        GraphicsWorldBindingAttempt? worldAttempt = null;
+                        try
+                        {
                         worldInputInspector?.BeforeSite(WorldInputSite.CaptureEnsurePrepared);
                         bool invokePreparation=!meshes.AssetsPrepared;
                         if (invokePreparation) PrepareTerrain();
@@ -358,6 +362,7 @@ internal static class VisualReferenceCapture
                         byte[] pixels;
                         if (request.CaptureStageDiagnostics)
                         {
+                            using var attemptScope = worldAttempt = GraphicsWorldBindingJournal.BeginAttempt();
                             stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record);
                             pixels = stageCapture.FinalRgba;
                         }
@@ -366,6 +371,12 @@ internal static class VisualReferenceCapture
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                         worldInputInspector?.AfterCapture(stageCapture);
                         return pixels;
+                        }
+                        catch(Exception error)
+                        {
+                            ReferenceStageDiagnostics.RetainWorldBindingFailure(error,request.OutputRoot,key,()=>new {runtimeFingerprint,recipeFingerprint=sharedFixture?.Fingerprint,recipeInputBytesBase64=sharedFixture?.InputBytesBase64,profile,captureState},stageCapture,worldAttempt);
+                            throw;
+                        }
                     }
                     object CaptureInputRecord(int repetition, byte[] pixels)
                     {

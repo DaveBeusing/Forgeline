@@ -18,7 +18,7 @@ public sealed record GraphicsStageReadback(GraphicsCaptureStages Stage, Graphics
 public sealed record GraphicsStageCapture(byte[] FinalRgba, GraphicsFrameSubmission Submission,
     ulong CompletedFence, int FrameIndex, ulong PresentedBefore, ulong PresentedAfter,
     GraphicsDeviceTelemetryIdentity DeviceIdentity, IReadOnlyList<GraphicsStageReadback> Stages)
-{ public int BufferCount { get; init; } }
+{ public int BufferCount { get; init; } public GraphicsWorldBindingJournal? WorldBindings { get; init; } }
 
 public static class GraphicsReadbackRows
 {

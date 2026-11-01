@@ -112,4 +112,16 @@ class StabilityScopeTests(unittest.TestCase):
     def test_stability_stale_base_never_falls_back(self):
         self.repo.record['ciScopeProposal']['baseSha']='a'*40
         result,report=self.repo.check(self.repo.proposal());self.assertNotEqual(result.returncode,0);self.assertEqual(report['mode'],'serial-baseline-contract-proposal')
+    def test_initial_inspector_literal_variant_remains_supported(self):
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns']=list(scope.STABILITY_INSPECTOR_OWNS)
+        result,_=self.repo.check(self.repo.proposal(record));self.assertEqual(result.returncode,0,result.stderr)
+    def test_journal_amendment_exact_new_paths_are_authorized(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs':'journal','src/ForgeLine.Graphics/RenderTelemetry/GraphicsWorldBindingJournal.cs':'bounded','src/ForgeLine.Client/RenderTelemetry/ReferenceStageDiagnostics.cs':'export'}));self.assertEqual(result.returncode,0,result.stderr)
+    def test_old_inspector_cannot_borrow_journal_paths(self):
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns']=list(scope.STABILITY_INSPECTOR_OWNS)
+        result,_=self.repo.check(self.repo.proposal(record,extra={'src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs':'foreign'}));self.assertNotEqual(result.returncode,0)
+    def test_journal_cannot_take_buffer_hook_or_partial_mixed_scope(self):
+        result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Graphics/D3D12GraphicsBuffer.cs':'forbidden'}));self.assertNotEqual(result.returncode,0)
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns'].pop()
+        with self.assertRaises(scope.ValidationError):scope.validate_record(record)
 if __name__=='__main__':unittest.main()

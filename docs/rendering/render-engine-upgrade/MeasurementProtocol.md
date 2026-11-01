@@ -230,3 +230,93 @@ A pixel-only continuation needs external finally-path after inventories for both
 commands before classification, preserving original run_capture failure/exit.
 Any causal production fix needs a reviewed exact ownership amendment. Numeric
 policies, qualification and original wave2 readiness remain open.
+
+
+### Opaque World binding journal v1 (diagnostic only)
+
+An explicit stage capture now also records a bounded ordered command/binding
+journal. Ordinary RenderFrame and legacy CaptureFrame with stages disabled do
+not construct or hash a journal. CaptureCore arms immediately before its existing
+RenderFrame, seals only against that capture's successful submission, recorded
+slot, completed fence and one Present, and clears the active recorder on every
+exit. No new Prepare, draw, native state change, wait, diagnostic query, upload
+hook or timed-loop callback is added. Legacy CaptureInputFingerprint semantics
+and bytes remain unchanged.
+
+The scope is opaque World draws. Directional-shadow and particle draws are
+excluded explicitly; IsWorldPass alone includes both subpasses. Armed setter
+observations include those subpasses so inherited IA vertex/index views remain
+known. Pipeline/root/constants/textures follow actual invalidation, including
+cache hits; IA views survive pipeline/pass changes. Shadow-end native viewport
+and scissor restoration is mirrored observationally. DrawIndexed delegates to
+one recorded DrawIndexedInstanced operation.
+
+The journal retains ordered pipeline description and shader-bytecode hashes,
+vertex layout, bound VB slots/identity/range/stride, IB identity/range/format,
+complete native draw arguments, exact IEEE constant bytes/hash and root/buffered
+mode, pixel slots/descriptors/cache-hit versus emitted state, and implicit shadow
+frame/CBV/t15 metadata. Ranges describe bound views; they do not prove fetched
+bytes. Shadow-frame constants are copied from the same CPU values written by
+the existing implementation, not read back from GPU memory. Implicit native
+shadow resources have no Lifetime identity: they use device/resource epoch,
+slot, descriptor and kind, never a fabricated resource ID.
+
+Explicit resources use weak existing Lifetime keys and monotonically assigned
+local IDs within one device epoch. The registry retains no native ownership.
+These IDs and descriptors are not asset identities or cross-process equality
+keys. Frame-indexed resources normally rotate across slots. Reports retain
+actual local bindings and same-slot comparisons (for example repetition0 versus
+3/6); changes are observations, not automatic correctness failures. Cross-lane
+semantic comparison uses compatible descriptions and shader/constant bytes while
+preserving the independent process/session/fence/epoch/slot identities. Equal
+descriptions do not prove equal assets, prearmed buffer/texture contents, actual
+GPU fetched contents, precision behavior or pixel cause.
+
+Structural refusal bounds are4096 draws,131072 events,4096 identity definitions
+and32MiB actual UTF8 per sidecar. The shared immutable compact camelCase,
+string-enum wire serializer is used for accounting and export.31MiB bounds the
+accepted journal with a conservative4KiB header reserve;1MiB is reserved for its
+envelope. The exporter and strict reader check actual original wire spans and
+total bytes. Nested strings/layouts/constants and collection lengths are bounded.
+These are diagnostic storage/refusal limits, not measured operation maxima,
+allocation budgets or approved capacity policies. The existing1.5x stage storage
+guard includes the32MiB journal cap for every declared repetition, separately
+from raw attachments, lossless images and the64MiB general-record allowance.
+
+Each stage JSON contains worldBindingJournalVersion=1 and a sibling
+worldBindingJournal={file,sha256,bytes,schemaVersion:1}. The sidecar filename is
+<key>-readback-<NN>-world-bindings.json. The producer's stage reference hashes
+the stage JSON, which hashes its journal: no circular stage/journal hash is used.
+The sidecar independently joins source/runtime/recipe, quality-profile bytes,
+camera, repetition, device/session, actual slot/submission/completion and Present.
+Its profileDomain is effective-quality-profile, distinct from the ordinary
+post-window full ClientRenderConfiguration domain.
+
+Journal refusals are sticky. An overflow, missing required state, foreign owner,
+metadata redefinition, serialization or capture failure cannot be corrected into
+a complete record. A current incomplete prefix retains all accepted events and
+definitions, no successful completion tuple, and the original error remains
+authoritative. Optional failure context that cannot serialize within its reserved
+envelope is explicitly unavailable while the journal prefix remains intact.
+CreateNew never overwrites a prior prefix or partial artifact; persistence/logging
+failures do not replace the original exception. Failure before arming or inability
+to persist a prefix stays unavailable, never borrowed from an earlier capture.
+Exception-only retention requires the exact opaque invocation token claimed at
+actual recorder arm; reusing an exception cannot reuse its earlier attachment. A
+known current completed capture takes precedence when exporting an incomplete
+post-capture failure prefix. Tokens are process-local and never hardware proof.
+
+world_binding_journal.validate_series(root,stage_refs,required_version=1) and the
+stage comparator's world_journal_version=1 require all eight original complete
+journal refs, exact types/bounds/hashes, ordered state reduction and own-lane joins.
+Missing/malformed selected-v1 data fails with no fallback. Historical missing data
+with no selected version remains unavailable; the historical stage-only API stays
+usable. compare_lanes reports semantic-description comparisons separately from
+local identity continuity; physical UUID/PCI/control and exact pixels remain
+separate checks. Failure prefixes and pixel mismatches cannot grant completion.
+
+This journal is another bounded discriminator, not a causal fix or package2
+completion. Existing793/native0-versus-later/host pixel failures remain immutable.
+New clean source/build/payload/runtime, preflight, storage, selected journal-v1
+schedule, controls and manual readiness must be reviewed before any physical run.
+Numeric policies, baseline qualification and original wave2 readiness remain OPEN.

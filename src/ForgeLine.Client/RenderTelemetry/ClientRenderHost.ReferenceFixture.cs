@@ -70,11 +70,26 @@ internal sealed partial class ClientRenderHost
             _fixtureWorldInputInspector?.AfterSite(WorldInputSite.HostReadbackPrepare,true);
             ulong beforePresent = graphics.PresentedFrameCount;
             var beforeSubmission = ((IGraphicsRenderTelemetry)graphics).LastSubmission;
-            GraphicsStageCapture? stageCapture = recipe.CaptureStageDiagnostics ? graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, commands) : null;
-            byte[] pixels = stageCapture?.FinalRgba ?? graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands, recipe.CaptureShadowDiagnostics);
+            GraphicsStageCapture? stageCapture=null;
+            GraphicsWorldBindingAttempt? worldAttempt = null;
+            byte[] pixels;
+            try
+            {
+            if (recipe.CaptureStageDiagnostics)
+            {
+                using var attemptScope = worldAttempt = GraphicsWorldBindingJournal.BeginAttempt();
+                stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, commands);
+            }
+            pixels = stageCapture?.FinalRgba ?? graphics.CaptureFrame(GraphicsColor.ForgeLineClear, commands, recipe.CaptureShadowDiagnostics);
             meshes.Submit(); meshes.Retire();
             ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, ((IGraphicsRenderTelemetry)graphics).LastSubmission);
             _fixtureWorldInputInspector?.AfterCapture(stageCapture);
+            }
+            catch(Exception error)
+            {
+                ReferenceStageDiagnostics.RetainWorldBindingFailure(error,recipe.OutputRoot,"host-fixed",()=>new {repeat,runtimeFingerprint=recipe.RuntimeFingerprint,recipeFingerprint=recipe.Fingerprint,recipeInputBytesBase64=recipe.InputBytesBase64,profile=_fixtureComposition?.Profile,actualCamera=actualCamera()},stageCapture,worldAttempt);
+                throw;
+            }
             object? stages=stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, recipe.OutputRoot, "host-fixed", repeat,
                 "actual-render-host", recipe.RuntimeFingerprint, recipe.Fingerprint, recipe.InputBytesBase64, actualCamera(),
                 _fixtureComposition?.Profile ?? throw new InvalidDataException("Actual effective host profile unavailable."), graphics.CaptureInputFingerprint);

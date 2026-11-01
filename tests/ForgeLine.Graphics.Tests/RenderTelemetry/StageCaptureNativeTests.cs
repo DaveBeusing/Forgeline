@@ -23,7 +23,7 @@ public sealed class StageCaptureNativeTests
         using var green = Pipeline(device, GraphicsFrameTargetFormat.Rgba8Unorm, "float4(0,1,0,1)");
         using var blue = Pipeline(device, GraphicsFrameTargetFormat.Rgba8Unorm, "float4(0,0,1,1)");
         int baseline = device.Diagnostics.Health.LiveResourceCount;
-        var slots = new HashSet<int>(); GraphicsStageCapture? first = null; ulong fence = 0;
+        var slots = new HashSet<int>(); GraphicsStageCapture? first = null; ulong fence = 0; string? firstFingerprint = null;
         int recordedSlot = -1, outputWidth = 0, outputHeight = 0;
         void Record(IGraphicsCommandContext context)
         {
@@ -41,6 +41,10 @@ public sealed class StageCaptureNativeTests
         {
             var actual = device.CaptureFrameDiagnostics(new(0,0,0,1), Record);
             Assert.Equal(recordedSlot, actual.FrameIndex); slots.Add(actual.FrameIndex);
+            Assert.NotNull(actual.WorldBindings); Assert.True(actual.WorldBindings.Complete);
+            Assert.Equal(1,actual.WorldBindings.DrawCount); Assert.Equal(actual.Submission,actual.WorldBindings.Submission);
+            Assert.Equal(actual.FrameIndex,actual.WorldBindings.FrameIndex); Assert.Equal(actual.CompletedFence,actual.WorldBindings.CompletedFence);
+            Assert.Null(device.WorldBindingRecorder); firstFingerprint ??= device.CaptureInputFingerprint;
             Assert.Equal((ulong)repetition + 1, actual.Submission.Submission);
             Assert.True(actual.Submission.SubmittedFence > fence); fence = actual.Submission.SubmittedFence;
             Assert.True(actual.CompletedFence >= fence); Assert.Equal(3, actual.BufferCount);
@@ -84,6 +88,7 @@ public sealed class StageCaptureNativeTests
         }
         Assert.Equal(3, slots.Count);
         Assert.Equal(first!.FinalRgba, device.CaptureFrame(new(0,0,0,1), Record));
+        Assert.Equal(firstFingerprint,device.CaptureInputFingerprint); Assert.Null(device.WorldBindingRecorder);
         Assert.Equal(0, device.Diagnostics.Debug.ErrorCount);
     }
     [Fact]
@@ -120,6 +125,7 @@ public sealed class StageCaptureNativeTests
             Assert.Throws<GraphicsDeviceException>(() => device.RenderFrame(GraphicsColor.ForgeLineClear));
             Assert.Throws<GraphicsDeviceException>(() => _ = device.IsRecording);
             Assert.Null(device.CaptureInputFingerprint); Assert.True(device.CaptureShadowDepth.IsEmpty);
+            Assert.Null(device.WorldBindingRecorder);
             Assert.True(device.Diagnostics.Health.SubmissionFaultCount >= 1);
             // Existing fault ownership may retain native resources until fixture Dispose establishes idle.
         }

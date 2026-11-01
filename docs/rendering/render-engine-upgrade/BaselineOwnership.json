@@ -23,7 +23,16 @@
         "build/rendering/qualification/baseline_scope.py",
         "build/rendering/qualification/test_baseline_scope.py",
         "docs/rendering/render-engine-upgrade/BaselineOwnership.json",
-        "docs/rendering/render-engine-upgrade/MeasurementProtocol.md"
+        "docs/rendering/render-engine-upgrade/MeasurementProtocol.md",
+        "src/ForgeLine.Graphics/D3D12GraphicsCommandContext.cs",
+        "src/ForgeLine.Graphics/D3D12FrameCapture.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/GraphicsStageCapture.cs",
+        "src/ForgeLine.Graphics/RenderTelemetry/GraphicsWorldBindingJournal.cs",
+        "src/ForgeLine.Client/RenderTelemetry/ReferenceStageDiagnostics.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/GraphicsWorldBindingJournalTests.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/StageCaptureNativeTests.cs",
+        "build/rendering/render-engine-upgrade/world_binding_journal.py",
+        "build/rendering/render-engine-upgrade/test_world_binding_journal.py"
       ]
     }
   ],
