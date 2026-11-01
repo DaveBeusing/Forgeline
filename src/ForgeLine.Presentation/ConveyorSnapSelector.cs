@@ -40,8 +40,8 @@ internal static class ConveyorSnapSelector
                 SameSocket(candidate.Endpoint, old)) retained = candidate;
         }
         Candidate? chosen = retained is { } hold &&
-            (best is null || hold.DistanceSquared <= best.Value.DistanceSquared +
-             MathF.Pow(SwitchAdvantagePixels * factor, 2)) ? hold : best;
+            (best is null || MathF.Sqrt(hold.DistanceSquared) <=
+             MathF.Sqrt(best.Value.DistanceSquared) + SwitchAdvantagePixels * factor) ? hold : best;
         if (chosen is not { } winner) return false;
 
         // Overlapping live endpoints are not two independent valid choices.
