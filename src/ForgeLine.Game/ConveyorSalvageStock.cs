@@ -1,3 +1,4 @@
+using ForgeLine.Combat;
 using ForgeLine.Core;
 using ForgeLine.Economy;
 using ForgeLine.Ecs;
@@ -97,7 +98,8 @@ public readonly record struct ConveyorSalvageStock(PlayerId Owner, InventoryId I
                         CompletedBuilding building = entities.GetComponent<CompletedBuilding>(candidate);
                         if (building.Owner != salvage.Owner ||
                             (priority == 0 ? building.BuildingId != BuildingIds.CommandCore :
-                                building.BuildingId != BuildingIds.StorageDepot))
+                                building.BuildingId != BuildingIds.StorageDepot) ||
+                            entities.TryGetComponent(candidate, out HealthState health) && health.IsDepleted)
                             continue;
                         InventoryId destination = entities.GetComponent<InventoryStorage>(candidate).InventoryId;
                         if (destination == salvage.Inventory || !inventories.Contains(destination))
