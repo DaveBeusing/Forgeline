@@ -92,8 +92,9 @@ public sealed class StatisticsOverlayPicker
             {
                 DebugOverlayCategory category = DeveloperCategories[row - 1];
                 bool selected = controller.View.IsEnabled(category);
-                DebugOverlayCategory next = selected
-                    ? controller.Categories & ~category
+                DebugOverlayCategory next = !controller.Enabled
+                    ? category
+                    : selected ? controller.Categories & ~category
                     : controller.Categories | category;
                 controller.SetCategories(next);
                 controller.SetEnabled(next != DebugOverlayCategory.None);
