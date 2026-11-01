@@ -25,7 +25,9 @@ public readonly record struct BuildingDemolitionTargetResult(
     EntityId Target,
     BuildingDemolitionFailure Failure,
     BuildingResourceCost[] Refunded,
-    ConveyorFailure ConveyorFailure = ConveyorFailure.None)
+    ConveyorFailure ConveyorFailure = ConveyorFailure.None,
+    ConveyorCargoRecovery[]? CargoRecovery = null,
+    bool WasConveyor = false)
 {
     public bool Accepted => Failure == BuildingDemolitionFailure.None;
 }
@@ -160,9 +162,9 @@ public sealed class BuildingDemolitionSystem : ISimulationSystem
             ConveyorPlacement placement = conveyor.Placement;
             var removal = new ConveyorBuildRequest(ConveyorEdit.Remove, placement.Module,
                 placement.Pivot, placement.Pivot, placement.Orientation, placement.Tier, true, entity);
-            ConveyorFailure failure = _conveyors.Apply(context, issuer, removal, payer);
+            ConveyorFailure failure = _conveyors.Apply(context, issuer, removal, payer, out var cargo);
             return new(entity, failure == ConveyorFailure.None ? BuildingDemolitionFailure.None :
-                BuildingDemolitionFailure.ConveyorRemovalRejected, [], failure);
+                BuildingDemolitionFailure.ConveyorRemovalRejected, [], failure, cargo, failure == ConveyorFailure.None);
         }
 
         if (controlled.Category != ControllableEntityCategory.Building)

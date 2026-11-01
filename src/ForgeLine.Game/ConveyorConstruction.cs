@@ -19,7 +19,7 @@ public enum ConveyorFailure : byte
 {
     None, InvalidRequest, RouteTooLong, Terrain, OutsideBuildArea, Obstructed,
     SupportOnRoad, InsufficientStock, InvalidSource, TargetUnavailable, NotOwned,
-    Occupied, UnsupportedTier, PortMismatch, MatchUnavailable, LimitReached
+    Occupied, UnsupportedTier, PortMismatch, MatchUnavailable, LimitReached, RecoveryFull
 }
 public enum ConveyorObstruction : byte { None, Building, Conveyor, VehicleOrObject, LoadingLane }
 public readonly record struct ConveyorBuildRequest(
@@ -91,6 +91,7 @@ public readonly record struct ConveyorPiece(PlayerId Owner, ConveyorPlacement Pl
 public sealed record ConveyorPlan(ConveyorFailure Failure, IReadOnlyList<ConveyorPlacement> Pieces, double Steel)
 {
     public bool IsValid => Failure == ConveyorFailure.None;
+    public ConveyorCargoRecovery[] CargoRecovery { get; init; } = [];
     public ConveyorObstruction Obstruction { get; init; }
     public Vector3? FailurePosition { get; init; }
 }
@@ -454,10 +455,36 @@ public sealed class ConveyorConstructionService
                     ConveyorFailure.InsufficientStock : ConveyorFailure.None,
                     Array.AsReadOnly(new[] { old.Placement }), cost);
             }
-            if ((request.Edit is ConveyorEdit.Remove or ConveyorEdit.Replace) &&
-                (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity!=0 ||
-                 entities.TryGetComponent(request.Target,out ConveyorFlowState held) &&
-                 _stock.Contains(held.Buffer) && _stock.GetResourceQuantities(held.Buffer).Any(r=>r.Quantity!=0 || r.ReservedQuantity!=0))) return Fail(ConveyorFailure.Occupied);
+            // Replacement is non-destructive with respect to cargo. Deliberate
+            // removal instead inspects authoritative available stock at this tick.
+            if (request.Edit == ConveyorEdit.Replace &&
+                (!double.IsFinite(old.BufferedQuantity) || old.BufferedQuantity != 0 ||
+                 entities.TryGetComponent(request.Target, out ConveyorFlowState replaced) &&
+                 _stock.Contains(replaced.Buffer) && _stock.GetResourceQuantities(replaced.Buffer)
+                     .Any(r => r.Quantity != 0 || r.ReservedQuantity != 0)))
+                return Fail(ConveyorFailure.Occupied);
+            ConveyorCargoRecovery[] cargo = [];
+            if (request.Edit == ConveyorEdit.Remove)
+            {
+                if (entities.TryGetComponent(request.Target, out ConveyorFlowState held) &&
+                    _stock.Contains(held.Buffer))
+                {
+                    InventoryResourceQuantity[] actual = _stock.GetResourceQuantities(held.Buffer);
+                    // Outstanding reservations belong to another transaction. Never
+                    // salvage, consume or discard those commitments implicitly.
+                    if (actual.Any(r => r.ReservedQuantity != 0 ||
+                        !ConveyorSimulationSystem.Eligible(r.ResourceId)))
+                        return Fail(ConveyorFailure.Occupied);
+                    cargo = actual.Where(r => r.Quantity > 0)
+                        .Select(r => new ConveyorCargoRecovery(r.ResourceId,
+                            r.Quantity, r.Quantity * 0.5, r.Quantity * 0.5)).ToArray();
+                    if (cargo.Length != 0 &&
+                        !ConveyorSalvageStock.CanAccept(entities, _stock, owner, cargo))
+                        return Fail(ConveyorFailure.RecoveryFull);
+                }
+                else if (!old.Placement.IsSupport && old.Placement.Module != ConveyorModule.Endcap)
+                    return Fail(ConveyorFailure.Occupied);
+            }
             if (request.Edit==ConveyorEdit.Repair &&
                 (!entities.TryGetComponent(request.Target,out ForgeLine.Combat.HealthState repairHealth) ||
                  repairHealth.Fraction>=1))return Fail(ConveyorFailure.InvalidRequest);
@@ -470,7 +497,8 @@ public sealed class ConveyorConstructionService
                 double cost=request.Edit==ConveyorEdit.Repair?
                     entities.TryGetComponent(request.Target,out ForgeLine.Combat.HealthState repairState) && repairState.IsDepleted?old.PaidSteel:4:0;
                 return new(_stock.GetAvailableQuantity(storage.InventoryId,ResourceIds.Steel)<cost?
-                    ConveyorFailure.InsufficientStock:ConveyorFailure.None,Array.AsReadOnly(new[]{old.Placement}),cost);
+                    ConveyorFailure.InsufficientStock:ConveyorFailure.None,Array.AsReadOnly(new[]{old.Placement}),cost)
+                { CargoRecovery = cargo };
             }
         }
         var existingPieces=Capture(entities,owner);
@@ -933,8 +961,13 @@ public sealed class ConveyorConstructionService
         }
         return false;
     }
-    internal ConveyorFailure Apply(SimulationContext context,PlayerId owner,ConveyorBuildRequest request,EntityId payer)
+    internal ConveyorFailure Apply(SimulationContext context,PlayerId owner,ConveyorBuildRequest request,EntityId payer) =>
+        Apply(context, owner, request, payer, out _);
+
+    internal ConveyorFailure Apply(SimulationContext context,PlayerId owner,ConveyorBuildRequest request,
+        EntityId payer, out ConveyorCargoRecovery[] recovered)
     {
+        recovered = [];
         bool running=false;
         foreach(EntityId e in context.Entities.Query<MatchState>())
             running |= context.Entities.GetComponent<MatchState>(e).Lifecycle==MatchLifecyclePhase.Running;
@@ -944,7 +977,17 @@ public sealed class ConveyorConstructionService
         InventoryId inventory=context.Entities.GetComponent<InventoryStorage>(payer).InventoryId;
         if (request.Edit==ConveyorEdit.Remove)
         {
-            // No refund: no resurrection of construction stock or occupied cargo.
+            // Transfer the recoverable half before deleting the authoritative
+            // buffer. The remaining half is deliberately lost; construction
+            // steel is never refunded by this operation.
+            if (plan.CargoRecovery.Length != 0)
+            {
+                if (!context.Entities.TryGetComponent(request.Target, out ConveyorFlowState flow) ||
+                    !ConveyorSalvageStock.Deposit(context.Entities, _stock, owner,
+                        flow.Buffer, plan.CargoRecovery))
+                    return ConveyorFailure.RecoveryFull;
+                recovered = plan.CargoRecovery;
+            }
             DestroyEmptyBuffer(request.Target);
             _spatial.Remove(request.Target);context.Entities.DestroyEntity(request.Target);
         }
@@ -1036,8 +1079,9 @@ public sealed class ConveyorConstructionCommand : ISimulationCommand
     public SimulationTick SubmittedAtTick { get; }
     public SimulationTick ExecutedAtTick { get; private set; }
     public ConveyorFailure Result { get; private set; }
+    public ConveyorCargoRecovery[] CargoRecovery { get; private set; } = [];
     public bool Accepted=>ExecutedAtTick!=SimulationTick.Zero && Result==ConveyorFailure.None;
     public void Execute(SimulationContext context)
-    { ExecutedAtTick=context.Tick; Result=_service.Apply(context,Issuer,Request,Payer); }
+    { ExecutedAtTick=context.Tick; Result=_service.Apply(context,Issuer,Request,Payer, out var cargo); CargoRecovery=cargo; }
 }
 

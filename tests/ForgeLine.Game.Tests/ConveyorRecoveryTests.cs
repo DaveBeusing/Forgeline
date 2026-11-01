@@ -143,10 +143,8 @@ public sealed class ConveyorRecoveryTests
         AssertQuantity(300, fixture.Total(ResourceIds.FerrousOre));
     }
 
-    [Theory]
-    [InlineData(ConveyorEdit.Remove)]
-    [InlineData(ConveyorEdit.Replace)]
-    public void OccupiedWreckRejectsEditsAndPaidRepairRetainsItsInventory(ConveyorEdit edit)
+    [Fact]
+    public void OccupiedWreckRejectsReplacementAndPaidRepairRetainsItsInventory()
     {
         var fixture = new ConveyorTestFixture();
         EntityId source = fixture.AddStorage(new(41, 0, 80));
@@ -161,7 +159,7 @@ public sealed class ConveyorRecoveryTests
         fixture.Entities.SetComponent(target, new HealthState(0, 200));
         fixture.SetPower(target, 0);
 
-        ConveyorConstructionCommand rejected = fixture.Edit(target, edit);
+        ConveyorConstructionCommand rejected = fixture.Edit(target, ConveyorEdit.Replace);
         Assert.Equal(ConveyorFailure.Occupied, rejected.Result);
         Assert.True(fixture.Entities.IsAlive(target));
         Assert.True(fixture.Inventories.Contains(buffer));

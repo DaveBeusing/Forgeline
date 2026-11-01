@@ -71,7 +71,8 @@ public readonly record struct PlayerCommandResultReadModel(
     ConveyorFailure ConveyorResult = ConveyorFailure.None,
     ConveyorRoutingFailure RoutingResult = ConveyorRoutingFailure.None,
     BridgeRepairFailure BridgeResult = BridgeRepairFailure.None,
-    EntityId CreatedSite = default);
+    EntityId CreatedSite = default,
+    ConveyorCargoRecovery[]? ConveyorRecovery = null);
 
 public sealed class PlayerCommandResultBuffer
 {
@@ -1466,7 +1467,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                     command.Accepted ? PlayerCommandFeedbackState.Accepted : PlayerCommandFeedbackState.Rejected,
                     command.Accepted ? 1 : 0, command.Accepted ? 0 : 1,
                     BuildCommandRejectionReason.None, BuildingPlacementFailureReason.None,
-                    command.ExecutedAtTick, ConveyorResult: command.Result);
+                    command.ExecutedAtTick, ConveyorResult: command.Result,
+                    ConveyorRecovery: command.CargoRecovery);
             }
             case PlayerCommandKind.OperationsRule:
             {

@@ -47,15 +47,39 @@ reconcile spatial occupancy and stale logistics graph references. Unit orders
 that point at removed structures are handled by their regular invalid-target
 paths. This action does not award combat kills or combat destruction effects.
 
+## Loaded conveyor demolition
+
+Selected owned conveyors and junctions use the same Delete command as buildings.
+Ordinary unreserved cargo is no longer a reason to reject removal. For each
+eligible material in the authoritative module buffer, exactly 50% is moved into
+bounded owned recovery storage and 50% is destroyed; fractional quantities retain
+the inventory's deterministic double precision. A full cargo reservation rejects
+demolition without modifying stock. Other attached/in-transit inventories are
+never counted as module cargo.
+
+Recovery is capped at 4,096 material units per owner. Each simulation economy
+tick drains it into the owner's Command Core and then owned storage depots
+using accepted InventoryStore transfers. Recovery remains available across
+checkpoint/save/replay while recipients have no room. If the half-cargo transfer
+cannot fit even in the bounded recovery inventory, the module stays in place
+and the player receives a capacity rejection. Repeated Delete on an already
+destroyed full EntityId cannot credit cargo twice.
+
+The UI identifies recovered and destroyed cargo per resource, separate from
+any building construction refund. **Conveyor construction Steel is never
+refunded.** Combat-caused conveyor wrecks retain their buffers and do not
+automatically salvage cargo; explicit owned demolition can remove them.
+
 ## Simulation and persistence
 
 Client input routes through the command gateway and an order-processing
 simulation system. Presentation does not alter inventories or ECS entities.
 The command stores stable target identities and is recorded in replay; it
 reconstructs the same cancellation or demolition decisions on playback.
-The authoritative snapshot schema is 4 and the save document schema is 5.
-Older authoritative snapshot schemas are explicitly rejected rather than
-silently recomputing paid construction materials from current catalog data.
+The current authoritative snapshot schema is 19 and the save document payload
+schema is 12. Earlier schemas are incompatible with the loaded-conveyor salvage
+simulation semantics; historical building demolition rules are not silently
+recomputed from changed catalog data.
 
 This feature does not change the separately configured stock-policy quantity
 steps or selected-unit destination indicators.

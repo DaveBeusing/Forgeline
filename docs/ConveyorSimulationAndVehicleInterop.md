@@ -144,9 +144,19 @@ inventory does not retain its input targets.
 
 A full/rejecting/downstream-offline sink stalls the immediate buffer, then bounded
 upstream buffers. Freeing stock or repairing/reconnecting the route resumes service
-without an offline catch-up burst. Remove and Replace recheck actual inventory stock
-and reservations and refuse occupied parts; empty buffer inventories are destroyed
-with their removed module. No cargo is refunded as construction Steel. Replacing the
+without an offline catch-up burst. Replace continues to refuse occupied parts.
+Authorized player Remove and selected Delete demolition may remove a loaded owned
+carrier or junction: the current InventoryStore quantities (not delayed visual
+buffer values) determine an exact per-resource 50% salvage and 50% destruction.
+Any outstanding cargo reservation or unsupported resource rejects that particular
+removal without mutation. There is no new construction Steel refund.
+The recoverable half first enters one bounded owner-scoped 4,096-unit inventory;
+the Economy phase transfers it through InventoryStore to a valid owned Command Core,
+then storage depots in stable entity order. When no recipient has room, the half
+remains in that persistent recovery inventory; when even the recovery inventory
+cannot accept the complete half, removal fails closed instead of discarding it.
+Existing replacement, placement, power and support rules remain unchanged.
+Empty buffer inventories are destroyed with their removed module. Replacing the
 same adapter without new endpoint arguments preserves its explicit full EntityId
 attachment in both preview and execution. An explicit new endpoint is validated
 normally; reusing an entity index does not make an old attachment valid.
@@ -154,9 +164,17 @@ normally; reusing an entity index does not make an old attachment valid.
 Combat retains a destroyed conveyor entity, health-zero wreck, buffer and footprint.
 A wreck stops transfer and its power consumer is disabled. Repair works with cargo
 present: nonfatal repairs cost 4 Steel; a wreck costs its original paid module Steel.
-It restores health and drive, retaining the same inventory and entity. Reconnect and
-drain before removing an occupied wreck. Destroyed support feet remain real ground
+It restores health and drive, retaining the same inventory and entity. Deliberate
+demolition of an owned occupied wreck uses the same half-cargo recovery rules;
+combat destruction itself never triggers salvage. Destroyed support feet remain real ground
 obstacles until repaired or safely removed, avoiding lost stock or invisible clearance.
+
+Demolition preview exposes the held/recovered/lost amounts by resource. Accepted
+Delete/Remove results report the authoritative recovered and lost amounts separately
+from construction refunds. Salvaged inventory can still be waiting for capacity.
+The owner's bounded recovery inventory is captured as ordinary ECS/inventory
+state; cargo transfers and repeated command rejection remain replayable under
+authoritative schema 19. Older authoritative checkpoints are not reinterpreted.
 
 ## Vehicle clearance and presentation
 

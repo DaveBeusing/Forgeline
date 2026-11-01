@@ -56,6 +56,33 @@ public sealed class ConveyorPersistenceTests
         AssertRoundTripsAndContinues(runtime);
     }
 
+    [Fact]
+    public void LoadedConveyorDemolitionReconstructsCargoSalvageThroughSaveAndReplay()
+    {
+        using MatchRuntime runtime = CreateRuntime(17);
+        var gateway = new PlayerCommandGateway(runtime.Simulation, runtime.Services.BuildingCommands,
+            runtime.BattlefieldRuntime.MatchStateEntity, demolition: runtime.Services.Demolition);
+        runtime.Simulation.RegisterTickObserver(gateway);
+        BuildNetwork(runtime);
+        RunUntil(runtime, HasCargo);
+        ConveyorOwnedPiece target = Carriers(runtime).First(row => BufferQuantity(runtime, row.Entity) > 0);
+        double held = BufferQuantity(runtime, target.Entity);
+
+        Assert.True(gateway.SubmitDemolition(Player, [target.Entity], runtime.Simulation.CurrentTick).Accepted);
+        runtime.Simulation.AdvanceOneTick();
+
+        Assert.True(gateway.Results.TryRead(out var result));
+        BuildingDemolitionTargetResult accepted = Assert.Single(result.DemolitionTargets!);
+        Assert.True(accepted.Accepted);
+        ConveyorCargoRecovery recovered = Assert.Single(accepted.CargoRecovery!);
+        Assert.Equal(held, recovered.Held, 8);
+        Assert.Equal(held * 0.5, recovered.Recovered, 8);
+        Assert.Equal(held * 0.5, recovered.Lost, 8);
+        Assert.False(runtime.Simulation.Entities.IsAlive(target.Entity));
+        Assert.True(ConveyorSalvageStock.FindInventory(runtime.Simulation.Entities, Player).IsSpecified);
+        AssertRoundTripsAndContinues(runtime);
+    }
+
     [Theory]
     [InlineData(17UL)]
     [InlineData(831UL)]
@@ -161,7 +188,7 @@ public sealed class ConveyorPersistenceTests
 
         ConveyorOwnedPiece wreck = Assert.Single(Carriers(runtime), row => row.Entity == target);
         var removeWreck = new ConveyorConstructionCommand(runtime.Services.Conveyors, Player,
-            EditRequest(wreck, ConveyorEdit.Remove), runtime.GetBase(Player).CommandCore, runtime.Simulation.CurrentTick);
+            EditRequest(wreck, ConveyorEdit.Replace), runtime.GetBase(Player).CommandCore, runtime.Simulation.CurrentTick);
         Submit(runtime, removeWreck);
         Assert.Equal(ConveyorFailure.Occupied, removeWreck.Result);
         Assert.True(runtime.Simulation.Entities.IsAlive(target));

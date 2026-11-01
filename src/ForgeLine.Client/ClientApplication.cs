@@ -3827,7 +3827,8 @@ internal sealed class ClientApplication
             placement.ObserveResult(result, interaction);
             if(result.Kind==PlayerCommandKind.ConveyorConstruction)
                 actionPanel.ShowDemolitionFeedback(result.State==PlayerCommandFeedbackState.Accepted?
-                    "CONVEYOR CHANGE ACCEPTED":RtsConveyorConstructionController.Explain(result.ConveyorResult));
+                    "CONVEYOR CHANGE ACCEPTED" + DescribeCargoRecovery(result.ConveyorRecovery, resources):
+                    RtsConveyorConstructionController.Explain(result.ConveyorResult));
             if (result.Kind == PlayerCommandKind.Demolition)
                 actionPanel.ShowDemolitionFeedback(DescribeDemolitionResult(result, resources));
             lastCommandResult = result;
@@ -3862,15 +3863,21 @@ internal sealed class ClientApplication
 
         var totals = new Dictionary<ResourceId, double>();
         bool anyRefund = false;
+        bool removedConveyor = false;
+        var cargo = new List<ConveyorCargoRecovery>();
         foreach (BuildingDemolitionTargetResult target in targets)
-            if (target.Accepted)
-                foreach (BuildingResourceCost refund in target.Refunded)
-                {
-                    anyRefund = true;
-                    totals[refund.ResourceId] = totals.GetValueOrDefault(refund.ResourceId) + refund.Quantity;
-                }
+        {
+            if (!target.Accepted) continue;
+            removedConveyor |= target.WasConveyor;
+            if (target.CargoRecovery is { } recovered) cargo.AddRange(recovered);
+            foreach (BuildingResourceCost refund in target.Refunded)
+            {
+                anyRefund = true;
+                totals[refund.ResourceId] = totals.GetValueOrDefault(refund.ResourceId) + refund.Quantity;
+            }
+        }
 
-        string prefix = anyRefund
+        string prefix = anyRefund || removedConveyor
             ? $"DEMOLISHED {result.AcceptedTargets}"
             : $"CANCELLED {result.AcceptedTargets} CONSTRUCTION SITE(S)";
         if (totals.Count > 0)
@@ -3879,9 +3886,29 @@ internal sealed class ClientApplication
                 .Select(item => $"{item.Value:0.##} {resources[item.Key].DisplayName}"));
             prefix += " - REFUNDED " + materials;
         }
+        prefix += DescribeCargoRecovery(cargo, resources);
         if (result.RejectedTargets > 0)
             prefix += $" - {result.RejectedTargets} REJECTED";
         return prefix;
+    }
+
+    private static string DescribeCargoRecovery(
+        IEnumerable<ConveyorCargoRecovery>? cargo, ResourceCatalog resources)
+    {
+        if (cargo is null) return string.Empty;
+        var totals = cargo.GroupBy(item => item.ResourceId).OrderBy(group => group.Key)
+            .Select(group => new
+            {
+                Resource = group.Key,
+                Recovered = group.Sum(item => item.Recovered),
+                Lost = group.Sum(item => item.Lost)
+            }).ToArray();
+        if (totals.Length == 0) return string.Empty;
+        string saved = string.Join(", ", totals.Select(item =>
+            $"{item.Recovered:0.##} {resources[item.Resource].DisplayName}"));
+        string lost = string.Join(", ", totals.Select(item =>
+            $"{item.Lost:0.##} {resources[item.Resource].DisplayName}"));
+        return $" - CARGO SAVED (IN STOCK OR RECOVERY): {saved} / LOST: {lost}";
     }
 
 }

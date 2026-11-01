@@ -1,4 +1,5 @@
 using ForgeLine.Core;
+using ForgeLine.Economy;
 using ForgeLine.Game;
 using ForgeLine.Simulation;
 using Xunit;
@@ -29,26 +30,92 @@ public sealed class ConveyorDemolitionTests
         Assert.Equal(1, refreshes);
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void DeleteCommandPreservesActualCargoAndReservations(bool reserved)
+    [Fact]
+    public void DeleteCommandRecoversExactlyHalfOfUnreservedCargo()
     {
         var fixture = CreateFixture(out var demolition);
         EntityId target = fixture.Build(ConveyorModule.Standard, new(160, 0, 80));
         fixture.Give(target, ResourceIds.FerrousOre, 20);
-        var buffer = fixture.Buffer(target);
-        if (reserved)
-            Assert.True(fixture.Inventories.Reserve(buffer, ResourceIds.FerrousOre, 20).Succeeded);
+        InventoryId buffer = fixture.Buffer(target);
+        double original = fixture.Stock(fixture.Payer, ResourceIds.FerrousOre);
 
         var result = Demolish(fixture, demolition, fixture.Player, target);
 
-        var rejected = Assert.Single(result.Targets);
+        var accepted = Assert.Single(result.Targets);
+        Assert.True(accepted.Accepted);
+        Assert.Empty(accepted.Refunded);
+        ConveyorCargoRecovery recovery = Assert.Single(Assert.IsType<ConveyorCargoRecovery[]>(accepted.CargoRecovery));
+        Assert.Equal(ResourceIds.FerrousOre, recovery.ResourceId);
+        Assert.Equal(20, recovery.Held);
+        Assert.Equal(10, recovery.Recovered);
+        Assert.Equal(10, recovery.Lost);
+        Assert.False(fixture.Entities.IsAlive(target));
+        Assert.False(fixture.Inventories.Contains(buffer));
+        Assert.Equal(original + 10, fixture.Stock(fixture.Payer, ResourceIds.FerrousOre));
+        Assert.Equal(0, fixture.Inventories.GetTotalQuantity(
+            ConveyorSalvageStock.FindInventory(fixture.Entities, fixture.Player)));
+    }
+
+    [Fact]
+    public void ReservedCargoRejectsDemolitionWithoutMutation()
+    {
+        var fixture = CreateFixture(out var demolition);
+        EntityId target = fixture.Build(ConveyorModule.Standard, new(160, 0, 80));
+        fixture.Give(target, ResourceIds.FerrousOre, 20);
+        InventoryId buffer = fixture.Buffer(target);
+        Assert.True(fixture.Inventories.Reserve(buffer, ResourceIds.FerrousOre, 20).Succeeded);
+
+        var rejected = Assert.Single(Demolish(fixture, demolition, fixture.Player, target).Targets);
         Assert.Equal(BuildingDemolitionFailure.ConveyorRemovalRejected, rejected.Failure);
         Assert.Equal(ConveyorFailure.Occupied, rejected.ConveyorFailure);
         Assert.True(fixture.Entities.IsAlive(target));
         Assert.Equal(20, fixture.Stock(target, ResourceIds.FerrousOre));
-        Assert.Equal(reserved ? 20 : 0, fixture.Inventories.GetReservedQuantity(buffer, ResourceIds.FerrousOre));
+        Assert.Equal(20, fixture.Inventories.GetReservedQuantity(buffer, ResourceIds.FerrousOre));
+        Assert.False(ConveyorSalvageStock.FindInventory(fixture.Entities, fixture.Player).IsSpecified);
+    }
+
+    [Fact]
+    public void FullStorageRetainsRecoveryAndDrainsWhenSpaceIsFreed()
+    {
+        var fixture = CreateFixture(out var demolition);
+        EntityId target = fixture.Build(ConveyorModule.Standard, new(160, 0, 80));
+        fixture.Give(target, ResourceIds.FerrousOre, 20);
+        double room = fixture.Inventories.GetRemainingCapacity(fixture.PayerInventory);
+        fixture.Give(fixture.Payer, ResourceIds.Steel, room);
+
+        var accepted = Assert.Single(Demolish(fixture, demolition, fixture.Player, target).Targets);
+        Assert.True(accepted.Accepted);
+        InventoryId salvage = ConveyorSalvageStock.FindInventory(fixture.Entities, fixture.Player);
+        Assert.True(salvage.IsSpecified);
+        Assert.Equal(10, fixture.Inventories.GetQuantity(salvage, ResourceIds.FerrousOre));
+        Assert.Equal(0, fixture.Stock(fixture.Payer, ResourceIds.FerrousOre));
+
+        Assert.True(fixture.Inventories.Remove(fixture.PayerInventory, ResourceIds.Steel, 10).Succeeded);
+        fixture.Step();
+        Assert.Equal(10, fixture.Stock(fixture.Payer, ResourceIds.FerrousOre));
+        Assert.Equal(0, fixture.Inventories.GetQuantity(salvage, ResourceIds.FerrousOre));
+    }
+
+    [Fact]
+    public void FractionalMixedCargoIsAccountedPerResourceAndRepeatedDeleteCannotDuplicate()
+    {
+        var fixture = CreateFixture(out var demolition);
+        EntityId target = fixture.Build(ConveyorModule.Merger, new(160, 0, 80));
+        fixture.Give(target, ResourceIds.FerrousOre, 2.5);
+        fixture.Give(target, ResourceIds.Electronics, 3.25);
+        double steel = fixture.Stock(fixture.Payer, ResourceIds.Steel);
+
+        var first = Assert.Single(Demolish(fixture, demolition, fixture.Player, target).Targets);
+        Assert.True(first.Accepted);
+        var cargo = Assert.IsType<ConveyorCargoRecovery[]>(first.CargoRecovery);
+        Assert.Equal(2, cargo.Length);
+        Assert.Equal(1.25, cargo.Single(item => item.ResourceId == ResourceIds.FerrousOre).Recovered);
+        Assert.Equal(1.625, cargo.Single(item => item.ResourceId == ResourceIds.Electronics).Recovered);
+        Assert.Equal(steel, fixture.Stock(fixture.Payer, ResourceIds.Steel));
+        var repeated = Assert.Single(Demolish(fixture, demolition, fixture.Player, target).Targets);
+        Assert.Equal(BuildingDemolitionFailure.InvalidTarget, repeated.Failure);
+        Assert.Equal(1.25, fixture.Stock(fixture.Payer, ResourceIds.FerrousOre));
+        Assert.Equal(1.625, fixture.Stock(fixture.Payer, ResourceIds.Electronics));
     }
 
     [Fact]
