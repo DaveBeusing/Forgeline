@@ -315,12 +315,16 @@ public sealed class ConveyorConstructionService
     {
         var ports = new List<ConveyorBuildingPort>();
         // Resolve full-generation adapter attachments once for this completed-tick capture.
-        var adapters = new List<ConveyorPiece>();
+        var adapters = new Dictionary<EntityId, List<ConveyorPiece>>();
         foreach (EntityId id in entities.Query<ConveyorPiece>(QueryIterationOrder.StableByEntityIndex))
         {
             ConveyorPiece piece = entities.GetComponent<ConveyorPiece>(id);
-            if (piece.Owner == owner && piece.Placement.Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter)
-                adapters.Add(piece);
+            if (piece.Owner != owner || !piece.Attachment.IsValid ||
+                piece.Placement.Module is not (ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter))
+                continue;
+            if (!adapters.TryGetValue(piece.Attachment, out List<ConveyorPiece>? attached))
+                adapters.Add(piece.Attachment, attached = new List<ConveyorPiece>());
+            attached.Add(piece);
         }
         foreach (EntityId entity in entities.Query<CompletedBuilding, WorldTransform>(QueryIterationOrder.StableByEntityIndex))
         {
@@ -351,9 +355,9 @@ public sealed class ConveyorConstructionService
 
                 int attached = 0;
                 ConveyorPortState state = ConveyorPortState.Free;
-                foreach (ConveyorPiece adapter in adapters)
-                {
-                    if (adapter.Attachment != entity) continue;
+                if (adapters.TryGetValue(entity, out List<ConveyorPiece>? attached))
+                    foreach (ConveyorPiece adapter in attached)
+                    {
                     bool intake = adapter.Placement.Module == ConveyorModule.OutputAdapter;
                     ConveyorSocket terminal = intake ? adapter.Placement.Sockets[^1] : adapter.Placement.Sockets[0];
                     if (Vector3.DistanceSquared(terminal.Position, socket.Position) >= .0004f) continue;
