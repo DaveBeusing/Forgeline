@@ -987,8 +987,9 @@ public sealed class ConveyorConstructionCommand : ISimulationCommand
     public SimulationTick SubmittedAtTick { get; }
     public SimulationTick ExecutedAtTick { get; private set; }
     public ConveyorFailure Result { get; private set; }
+    public ConveyorCargoRecovery[] CargoRecovery { get; private set; } = [];
     public bool Accepted=>ExecutedAtTick!=SimulationTick.Zero && Result==ConveyorFailure.None;
     public void Execute(SimulationContext context)
-    { ExecutedAtTick=context.Tick; Result=_service.Apply(context,Issuer,Request,Payer); }
+    { ExecutedAtTick=context.Tick; Result=_service.Apply(context,Issuer,Request,Payer, out var cargo); CargoRecovery=cargo; }
 }
 
