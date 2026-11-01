@@ -26,7 +26,8 @@ public readonly record struct BuildingDemolitionTargetResult(
     BuildingDemolitionFailure Failure,
     BuildingResourceCost[] Refunded,
     ConveyorFailure ConveyorFailure = ConveyorFailure.None,
-    ConveyorCargoRecovery[]? CargoRecovery = null)
+    ConveyorCargoRecovery[]? CargoRecovery = null,
+    bool WasConveyor = false)
 {
     public bool Accepted => Failure == BuildingDemolitionFailure.None;
 }
@@ -163,7 +164,7 @@ public sealed class BuildingDemolitionSystem : ISimulationSystem
                 placement.Pivot, placement.Pivot, placement.Orientation, placement.Tier, true, entity);
             ConveyorFailure failure = _conveyors.Apply(context, issuer, removal, payer, out var cargo);
             return new(entity, failure == ConveyorFailure.None ? BuildingDemolitionFailure.None :
-                BuildingDemolitionFailure.ConveyorRemovalRejected, [], failure, cargo);
+                BuildingDemolitionFailure.ConveyorRemovalRejected, [], failure, cargo, failure == ConveyorFailure.None);
         }
 
         if (controlled.Category != ControllableEntityCategory.Building)
