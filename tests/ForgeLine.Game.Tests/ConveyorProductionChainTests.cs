@@ -253,8 +253,10 @@ public sealed class ConveyorProductionChainTests
         void Connect(EntityId source, EntityId destination)
         {
             IReadOnlyList<ConveyorBuildingPort> ports = ConveyorConstructionService.CapturePorts(runtime.Simulation.Entities, player);
-            var start = Assert.Single(ports, port => port.Building == source && !port.Input);
-            var end = Assert.Single(ports, port => port.Building == destination && port.Input);
+            var start = Assert.Single(ports, port => port.Building == source && !port.Input &&
+                (!port.Adaptable || port.Key == "east.primary"));
+            var end = Assert.Single(ports, port => port.Building == destination && port.Input &&
+                (!port.Adaptable || port.Key == "west.primary"));
             var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
                 start.Position - Vector3.UnitY * 5.8f, end.Position - Vector3.UnitY * 5.8f,
                 BuildingOrientation.North, 0, true, SourcePortBuilding: source, DestinationPortBuilding: destination);
