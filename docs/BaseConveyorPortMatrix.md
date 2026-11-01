@@ -11,8 +11,12 @@ The current Refinery processes only Volatiles/Fuel and has no conveyor port; Pow
 and Radar also remain excluded. Rows below describe roles including future eligible
 content, not permission to invent sockets for an unsupported definition or scale.
 
-In Draw route, clicking an eligible source and destination selects these existing
-directed ports and places their adapters automatically. During construction,
+In Draw route, clicking an eligible source and destination selects compatible
+available ports and places their adapters automatically. Command Core and
+Storage Depot each expose four physical adaptable positions (not eight sockets):
+west/east primary at local Z 0, plus west/east secondary at local Z -6m
+(Command Core) or -4m (Storage Depot). One validated adapter determines
+whether a free position is an input or output, and occupies it exclusively. During construction,
 IN/OUT arrows identify the real sockets; selected or hovered buildings retain
 these markers outside construction. See [construction and routing](ConveyorConstructionPlacementAndUX.md)
 for length adjustment, visibility and placement limits.
