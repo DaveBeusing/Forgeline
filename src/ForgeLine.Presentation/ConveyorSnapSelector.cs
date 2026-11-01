@@ -97,10 +97,16 @@ internal static class ConveyorSnapSelector
                 Vector3 pivot = mate.Position + Vector3.UnitY * 5.8f -
                     Vector3.Transform(local.Position, rotation);
                 var candidate = new ConveyorPlacement(module, pivot, orientation, tier);
-                if (!candidate.Sockets.Any(socket => socket.Input != mate.Input &&
-                    Vector3.DistanceSquared(socket.Position, mate.Position + Vector3.UnitY * 5.8f) < .0004f &&
-                    Vector3.Dot(socket.Facing, mate.Facing) < -.999f))
-                    continue;
+                bool compatible = false;
+                foreach (ConveyorSocket socket in candidate.Sockets)
+                    if (socket.Input != mate.Input &&
+                        Vector3.DistanceSquared(socket.Position, mate.Position + Vector3.UnitY * 5.8f) < .0004f &&
+                        Vector3.Dot(socket.Facing, mate.Facing) < -.999f)
+                    {
+                        compatible = true;
+                        break;
+                    }
+                if (!compatible) continue;
                 placement = candidate;
                 return true;
             }
