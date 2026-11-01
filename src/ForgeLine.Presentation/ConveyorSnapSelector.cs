@@ -1,4 +1,6 @@
+using System.Numerics;
 using ForgeLine.Core;
+using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
@@ -41,6 +43,41 @@ internal static class ConveyorSnapSelector
         if (best is not { } winner) return false;
         selected = winner.Endpoint;
         return true;
+    }
+
+    /// <summary>Find a canonical orientation and pivot that exactly mates a single
+    /// authored socket, including ramp tier transitions. The construction service
+    /// still validates terrain, support clearance, ownership and material payment.</summary>
+    internal static bool TryAlign(ConveyorModule module, in ConveyorEndpoint mate,
+        out ConveyorPlacement placement)
+    {
+        placement = default;
+        ConveyorSocket[] sockets = ConveyorGeometry.Sockets(module);
+        for (int slot = 0; slot < sockets.Length; slot++)
+        {
+            ConveyorSocket local = sockets[slot];
+            if (local.Input == mate.Input) continue;
+            for (int facing = 0; facing < 4; facing++)
+            {
+                var orientation = (BuildingOrientation)facing;
+                Quaternion rotation = BuildingFootprint.GetRotation(orientation);
+                if (Vector3.Dot(Vector3.Transform(local.Facing, rotation), mate.Facing) >= -.999f)
+                    continue;
+                int rise = (int)MathF.Round((local.Position.Y - 5.8f) / 2);
+                int tier = mate.Tier - rise;
+                if (tier is < 0 or > 1) continue;
+                Vector3 pivot = mate.Position + Vector3.UnitY * 5.8f -
+                    Vector3.Transform(local.Position, rotation);
+                var candidate = new ConveyorPlacement(module, pivot, orientation, tier);
+                if (!candidate.Sockets.Any(socket => socket.Input != mate.Input &&
+                    Vector3.DistanceSquared(socket.Position, mate.Position + Vector3.UnitY * 5.8f) < .0004f &&
+                    Vector3.Dot(socket.Facing, mate.Facing) < -.999f))
+                    continue;
+                placement = candidate;
+                return true;
+            }
+        }
+        return false;
     }
 
     // Stable source identities, authored port keys, and physical socket ordinals
