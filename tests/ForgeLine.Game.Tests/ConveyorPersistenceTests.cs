@@ -83,6 +83,33 @@ public sealed class ConveyorPersistenceTests
         AssertRoundTripsAndContinues(runtime);
     }
 
+    [Fact]
+    public void InterimFuelAndVolatilesBeltTransportReconstructsFromCommands()
+    {
+        using MatchRuntime runtime = CreateRuntime(17);
+        BuildNetwork(runtime);
+        EntityId commandCore = runtime.GetBase(Player).CommandCore;
+
+        // The starting Command Core has physical, authoritative Fluid stock.
+        // Reuse its paid conveyor route, with no fixture-created material.
+        foreach (EntityId entity in runtime.Simulation.Entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex).ToArray())
+        {
+            LogisticsStockPolicy policy = runtime.Simulation.Entities.GetComponent<LogisticsStockPolicy>(entity);
+            if (policy.TargetEntity != commandCore ||
+                policy.ResourceId != ResourceIds.Fuel && policy.ResourceId != ResourceIds.Volatiles)
+                continue;
+            var remove = PlayerLogisticsActionCommand.RemoveStockPolicy(Player, entity, runtime.Simulation.CurrentTick);
+            Submit(runtime, remove);
+            Assert.True(remove.Accepted);
+        }
+        Assert.True(runtime.RunUntil(match => Carriers(match).Any(row =>
+            match.Inventories.GetQuantity(row.Flow!.Value.Buffer, ResourceIds.Fuel) > 0 ||
+            match.Inventories.GetQuantity(row.Flow!.Value.Buffer, ResourceIds.Volatiles) > 0),
+            maximumTicks: 500, cancellationToken: TestContext.Current.CancellationToken));
+        AssertRoundTripsAndContinues(runtime);
+    }
+
     [Theory]
     [InlineData(17UL)]
     [InlineData(831UL)]
