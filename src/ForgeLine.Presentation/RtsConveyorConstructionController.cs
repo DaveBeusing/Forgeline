@@ -228,8 +228,11 @@ public sealed class RtsConveyorConstructionController
             return new(PlacementContextState.Pending,"CONVEYOR","CHOOSE INPUT / CLICK BUILDING OR BELT INPUT",controls,
                 SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default,PortInformation:portInformation);
         string reason=_awaiting?"REQUEST PENDING":!Current?"CHECKING PLACEMENT":Preview is {} p?
-            p.IsValid?$"READY / {p.Steel:0} STEEL / "+(_snappedEndpoint.HasValue?"SNAPPED / CLICK TO BUILD":"CLICK TO BUILD"):FailureReason(snapshot):"CHOOSE START AND END";
-        IReadOnlyList<PlayerActionResourceAmount>? costs=Preview is {} plan?
+            p.IsValid?(Edit == ConveyorEdit.Remove
+                ? CargoPreview(p) + " / CLICK TO REMOVE"
+                : $"READY / {p.Steel:0} STEEL / "+(_snappedEndpoint.HasValue?"SNAPPED / CLICK TO BUILD":"CLICK TO BUILD")):
+                FailureReason(snapshot):"CHOOSE START AND END";
+        IReadOnlyList<PlayerActionResourceAmount>? costs=Preview is {} plan && Edit != ConveyorEdit.Remove?
             new[]{new PlayerActionResourceAmount(ResourceIds.Steel,"Steel",plan.Steel,snapshot?.Conveyors?.AvailableSteel??0)}:null;
         return new(_awaiting || !Current?PlacementContextState.Pending:Preview?.IsValid==true?
             PlacementContextState.Valid:Preview?.Failure==ConveyorFailure.InsufficientStock?
@@ -267,7 +270,8 @@ public sealed class RtsConveyorConstructionController
         if(Current && !Preview.IsValid && Preview.FailurePosition is {} failure)
             draw.Circle(failure,2.5f,color,16);
         if(label is {} position)draw.Label(position,
-            !Current?"CHECKING PLACEMENT":Preview.IsValid?$"READY / {Preview.Steel:0} STEEL":
+            !Current?"CHECKING PLACEMENT":Preview.IsValid?(Edit == ConveyorEdit.Remove
+                ? CargoPreview(Preview) : $"READY / {Preview.Steel:0} STEEL") :
             Preview.Failure==ConveyorFailure.InsufficientStock?$"NEED {Preview.Steel:0} STEEL / AVAILABLE {_availableSteel:0}":ExplainPlan(Preview),color);
         foreach(var part in Preview.Pieces)
         {
@@ -276,6 +280,21 @@ public sealed class RtsConveyorConstructionController
                 ConveyorNetworkOverlay.DrawSocket(draw,socket.Position,socket.Facing,socket.Input);
         }
     }
+    private static string CargoPreview(ConveyorPlan plan)
+    {
+        if (plan.CargoRecovery.Length == 0) return "EMPTY BELT / NO CARGO REFUND";
+        string recovered = string.Join(", ", plan.CargoRecovery.Select(item =>
+            $"{item.Recovered:0.##} {CargoName(item.ResourceId)}"));
+        return $"50% CARGO SAVED: {recovered} / 50% LOST / NO STEEL REFUND";
+    }
+
+    private static string CargoName(ResourceId resource) =>
+        resource == ResourceIds.FerrousOre ? "ORE" :
+        resource == ResourceIds.Silicates ? "SILICATES" :
+        resource == ResourceIds.Steel ? "STEEL" :
+        resource == ResourceIds.Electronics ? "ELECTRONICS" :
+        resource == ResourceIds.Ammunition ? "AMMO" : "RESOURCE";
+
     public static string Explain(ConveyorFailure failure)=>failure switch
     {
         ConveyorFailure.None=>"READY",ConveyorFailure.LimitReached=>"INFRASTRUCTURE LIMIT: REMOVE UNUSED PARTS",ConveyorFailure.Terrain=>"TERRAIN EXCEEDS SUPPORT OR SLOPE LIMITS / CHANGE ROUTE",
@@ -283,7 +302,9 @@ public sealed class RtsConveyorConstructionController
         ConveyorFailure.OutsideBuildArea=>"OUTSIDE OWN BUILD AREA / MOVE CLOSER TO BASE",ConveyorFailure.Obstructed=>"BLOCKED BY BUILDING, VEHICLE OR BELT / MOVE ROUTE",
         ConveyorFailure.InsufficientStock=>"NOT ENOUGH STEEL IN COMMAND CORE",
         ConveyorFailure.PortMismatch=>"PORTS DO NOT ALIGN / MATCH TIER AND IN-OUT DIRECTION",
-        ConveyorFailure.Occupied=>"DRAIN CARGO BEFORE EDITING",ConveyorFailure.NotOwned=>"OWN INFRASTRUCTURE ONLY",
+        ConveyorFailure.Occupied=>"RESERVED CARGO MUST BE RELEASED / LOADED REPLACEMENTS NEED AN EMPTY BUFFER",
+        ConveyorFailure.RecoveryFull=>"RECOVERY STORAGE FULL / FREE OWN STORAGE CAPACITY",
+        ConveyorFailure.NotOwned=>"OWN INFRASTRUCTURE ONLY",
         ConveyorFailure.UnsupportedTier=>"ONLY TIERS 0 AND 1 / RAMPS AND OVERPASS FROM TIER 0",
         ConveyorFailure.RouteTooLong=>"ROUTE MUST BE 4 TO 256 METRES",
         ConveyorFailure.InvalidSource=>"OWN COMPLETED COMMAND CORE WITH STOCK REQUIRED",
