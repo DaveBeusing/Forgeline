@@ -12,11 +12,13 @@ class CaptureRunnerTests(unittest.TestCase):
         return exe,sensor,request
     def test_exit_zero_without_manifest_is_retained_failure(self):self.run_mock(False)
     def test_real_launcher_path_retains_precommand_and_postcommand_sensors(self):self.run_mock(True)
-    def run_mock(self,produce_manifest,hang_after_handshake=False,change_assembly=False,setup_hold=False,trace_control=False):
+    def run_mock(self,produce_manifest,hang_after_handshake=False,change_assembly=False,setup_hold=False,trace_control=False,include_provenance=False,provenance_selector=None,selector_key="captureBoundInputProvenanceVersion"):
         with tempfile.TemporaryDirectory() as root:
             exe,sensor,request=self.fixture(root);output=Path(root)/'run';state={}
             if trace_control:
                 value=json.loads(request.read_bytes());value['ownerTraceControlDirectory']=str(Path(root)/'external-trace');request.write_text(json.dumps(value))
+            if include_provenance:
+                value=json.loads(request.read_bytes());value[selector_key]=provenance_selector;request.write_text(json.dumps(value))
             class Child:
                 pid=42;returncode=None
                 def __init__(self,argv,**kwargs):
@@ -45,7 +47,7 @@ class CaptureRunnerTests(unittest.TestCase):
                 return dict(status='failed' if setup_hold and pid and not state.get('focused') else 'controlled' if pid else 'unavailable',ownerPid=pid,hwnd=hwnd)
             with patch('capture_runner.run_record',return_value=(b'provider version',{})),patch('capture_runner.subprocess.run',return_value=subprocess.CompletedProcess([],0,RAW,b'')),patch('capture_runner.subprocess.Popen',Child),patch('capture_runner.power_status',return_value=dict(powerSource='ac')),patch('capture_runner.window_facts',side_effect=facts),patch('capture_runner.complete_checkpoint',side_effect=handshake),patch('diagnostic_control.hold_for_operator',side_effect=hold):
                 if produce_manifest and not change_assembly:
-                    result=c.run_capture(exe,request,output,sensor,'unused',diagnostic_only=setup_hold,diagnostic_setup_hold=setup_hold);self.assertEqual(result['status'],'structural-pass');self.assertFalse(result['qualified']);self.assertEqual(result['diagnosticOnly'],setup_hold or trace_control)
+                    result=c.run_capture(exe,request,output,sensor,'unused',diagnostic_only=setup_hold,diagnostic_setup_hold=setup_hold);self.assertEqual(result['status'],'structural-pass');self.assertFalse(result['qualified']);self.assertEqual(result['diagnosticOnly'],setup_hold or trace_control or include_provenance and provenance_selector is not None)
                 else:
                     with self.assertRaises(ContractError):c.run_capture(exe,request,output,sensor,'unused')
                     record=json.loads((output/'attempt.json').read_bytes());self.assertEqual(record['status'],'failed')
@@ -93,4 +95,14 @@ class CaptureRunnerTests(unittest.TestCase):
     def test_runtime_seal_detects_changed_bytes(self):
         with tempfile.TemporaryDirectory() as root:
             path=Path(root)/'data';path.write_bytes(b'first');before=c.runtime_fingerprint(root);path.write_bytes(b'changed');self.assertNotEqual(c.runtime_fingerprint(root),before)
+    def test_every_nonnull_provenance_selector_auto_labels_actual_runner_attempt(self):
+        for value in (1,2,0,False,'unsupported',{},[]):
+            with self.subTest(value=value):self.run_mock(True,include_provenance=True,provenance_selector=value)
+    def test_null_provenance_selector_keeps_actual_runner_nondiagnostic(self):
+        self.run_mock(True,include_provenance=True,provenance_selector=None)
+    def test_every_nonnull_post_frame_selector_auto_labels_actual_runner(self):
+        for value in (1,0,False,2,'unsupported',{},[]):
+            with self.subTest(value=value):self.run_mock(True,include_provenance=True,provenance_selector=value,selector_key='capturePostFrameResourceSnapshotVersion')
+    def test_null_post_frame_selector_keeps_legacy_runner_mode(self):
+        self.run_mock(True,include_provenance=True,provenance_selector=None,selector_key='capturePostFrameResourceSnapshotVersion')
 if __name__=='__main__':unittest.main()

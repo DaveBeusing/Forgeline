@@ -70,9 +70,15 @@ internal sealed partial class D3D12GraphicsDevice
     private byte[] CaptureCore(GraphicsColor clearColor, Action<IGraphicsCommandContext> commands,
         bool captureShadowDepth, GraphicsCaptureStages stages)
     {
+        GraphicsWorldBindingAttempt? worldAttempt = null;
+        bool boundCaptureArmed = false;
+        bool captureBodySucceeded = false;
+        Exception? capturePrimary = null;
+        byte[]? captureOutput = null;
         ArgumentNullException.ThrowIfNull(commands);
         ThrowIfDisposed();
         ThrowIfRecording();
+        InvalidatePostFrameStamp();
         if (_surfaceLifecycle.IsSuspended || _surfaceLifecycle.HasPendingResize || _surfaceLifecycle.IsOccluded)
             throw new InvalidOperationException("Frame capture requires an active, settled surface.");
         PlacedSubresourceFootPrint[] footprints = new PlacedSubresourceFootPrint[1];
@@ -123,6 +129,16 @@ internal sealed partial class D3D12GraphicsDevice
                     AddStageTarget(stages, GraphicsCaptureStages.ComposedColor, _renderTargets[_frameIndex]);
                 }
             }
+            if (stages != 0)
+            {
+                ArmWorldBindingJournal();
+                worldAttempt = GraphicsWorldBindingAttempt.ClaimCurrent();
+                if (_boundInputTracker is not null)
+                {
+                    _boundInputTracker.Arm(checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, _presentedFrameCount);
+                    boundCaptureArmed = true;
+                }
+            }
             RenderFrame(clearColor, commands);
             if (!_captureFrameRecorded) throw new InvalidOperationException("Native frame capture did not submit a backbuffer copy.");
             CaptureInputFingerprint = Convert.ToHexString(_captureInputHash.GetHashAndReset());
@@ -167,25 +183,54 @@ internal sealed partial class D3D12GraphicsDevice
                     else observations.Add(new(stage, null, ReadOnlyMemory<byte>.Empty,
                         "Linear scene composition stage was unavailable or not recorded."));
                 }
+                var worldJournal = _worldBindingRecorder!.Finish(submission, completed, _captureRecordedFrameIndex, presentedBefore, _presentedFrameCount);
+                var provenance = _boundInputTracker?.Seal(worldJournal);
                 _lastStageCapture = new(output, submission, completed, _captureRecordedFrameIndex, presentedBefore,
-                    _presentedFrameCount, DeviceIdentity ?? throw new InvalidOperationException("Actual device identity unavailable."), observations.ToArray()) { BufferCount = _configuration.BufferCount };
+                    _presentedFrameCount, DeviceIdentity ?? throw new InvalidOperationException("Actual device identity unavailable."), observations.ToArray()) { BufferCount = _configuration.BufferCount,
+                    WorldBindings = worldJournal, BoundInputProvenance = provenance };
             }
-            return output;
+            captureBodySucceeded = true;
+            captureOutput = output;
+        }
+        catch(Exception error)
+        {
+            capturePrimary = error;
+            if(_worldBindingRecorder is { } journal)
+                try { GraphicsWorldBindingJournal.AttachFailure(error,journal.Prefix(error),worldAttempt); }
+                catch { }
+            if (boundCaptureArmed && _boundInputTracker is { } tracker)
+                try { GraphicsBoundInputProvenance.AttachFailure(error, tracker.Prefix(error), worldAttempt); } catch { }
         }
         finally
         {
-            if (_captureStages is { } stageTargets)
-                foreach (var stage in stageTargets.Values) RetireResource(stage.Lifetime);
-            _captureStages = null;
-            _captureTarget = null;
-            _captureLifetime = null;
-            _captureInputHash?.Dispose();
-            _captureInputHash = null;
-            _captureShadowTarget = null;
-            if (_captureShadowLifetime is { } shadowLifetime) RetireResource(shadowLifetime);
-            _captureShadowLifetime = null;
-            RetireResource(lifetime);
+            bool cleanupSucceeded = false;
+            try
+            {
+                if (boundCaptureArmed) _boundInputTracker?.EndCapture();
+                _worldBindingRecorder=null;
+                if (_captureStages is { } stageTargets)
+                    foreach (var stage in stageTargets.Values) RetireResource(stage.Lifetime);
+                _captureStages = null;
+                _captureTarget = null;
+                _captureLifetime = null;
+                _captureInputHash?.Dispose();
+                _captureInputHash = null;
+                _captureShadowTarget = null;
+                if (_captureShadowLifetime is { } shadowLifetime) RetireResource(shadowLifetime);
+                _captureShadowLifetime = null;
+                RetireResource(lifetime);
+                cleanupSucceeded = true;
+            }
+            catch (Exception cleanup)
+            {
+                if (capturePrimary is null) capturePrimary = cleanup;
+                else GraphicsPostFrameFailure.TrySecondary(capturePrimary, cleanup);
+            }
+            if (captureBodySucceeded && cleanupSucceeded)
+                PublishPostFrameStamp(stages == 0 && !captureShadowDepth && _boundInputTracker is null, presentedBefore);
         }
+        if (capturePrimary is not null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(capturePrimary).Throw();
+        return captureOutput!;
     }
 
     private static GraphicsTextureReadbackLayout Layout(ResourceDescription description, PlacedSubresourceFootPrint footprint) =>

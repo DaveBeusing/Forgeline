@@ -35,6 +35,10 @@ internal sealed record VisualReferenceCaptureRequest
     public bool ContinueAfterMismatch { get; init; }
     public bool CaptureShadowDiagnostics { get; init; }
     public bool CaptureStageDiagnostics { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CaptureBoundInputProvenanceVersion { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CapturePostFrameResourceSnapshotVersion { get; init; }
     public ReferenceCollectorMode CollectorMode { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
@@ -57,7 +61,32 @@ internal sealed record VisualReferenceCaptureRequest
     public RenderQuality[] Profiles { get; init; } = Enum.GetValues<RenderQuality>();
     public RtsReferenceDisplay[] Displays { get; init; } = RtsVisualReference.Displays.ToArray();
     public RtsReferenceZoom[] Zooms { get; init; } = Enum.GetValues<RtsReferenceZoom>();
-    public void Validate()
+    public void Validate() => Validate(allowBoundInputProvenance: false, allowPostFrameSnapshot: false);
+    internal void Validate(bool allowBoundInputProvenance, bool allowPostFrameSnapshot = false)
+    {
+        if (CaptureBoundInputProvenanceVersion is not null)
+        {
+            if (!allowBoundInputProvenance || CaptureBoundInputProvenanceVersion != 1)
+                throw new NotSupportedException("CPU-source provenance is native-only version1; shared host/preflight modes reject selection.");
+            if (CaptureStageDiagnostics || CaptureShadowDiagnostics || OwnerTraceControlDirectory is not null ||
+                CollectorMode != ReferenceCollectorMode.Full || RunProfile != ReferenceRunProfile.Warm || CameraPath != ReferenceCameraPath.Fixed ||
+                Scenes is not { Length: 1 } || Profiles is not { Length: 1 } || Zooms is not { Length: 1 } || Displays is not { Length: 1 } ||
+                Displays[0] != new RtsReferenceDisplay(1920, 1080) || UiScenarios is not [UiReferenceScenario.World] || UiScales is not [1])
+                throw new NotSupportedException("CPU-source provenance requires one fixed1920World native Full case with the stage/shadow/trace bundle disabled.");
+        }
+        if (CapturePostFrameResourceSnapshotVersion is not null)
+        {
+            if (!allowPostFrameSnapshot || CapturePostFrameResourceSnapshotVersion != 1 || CaptureBoundInputProvenanceVersion is not null ||
+                CaptureStageDiagnostics || CaptureShadowDiagnostics || OwnerTraceControlDirectory is not null || CollectorMode != ReferenceCollectorMode.Full ||
+                RunProfile != ReferenceRunProfile.Warm || CameraPath != ReferenceCameraPath.Fixed || Warmups != 64 || Samples != 512 || RepeatCaptures != 8 ||
+                OwnerObservationVersion != 1 || OwnerCycleCapacity != 8192 || RasterDpi != 96 || !ContinueAfterMismatch ||
+                Scenes is not [VisualReferenceSceneKind.IndustrialBase] || Profiles is not [RenderQuality.Medium] || Zooms is not [RtsReferenceZoom.NormalGameplay] ||
+                Displays is not { Length: 1 } || Displays[0] != new RtsReferenceDisplay(1920, 1080) || UiScenarios is not [UiReferenceScenario.World] || UiScales is not [1])
+                throw new NotSupportedException("Post-frame snapshot v1 is native-only fixed IndustrialBase/Medium1920World64/512/8 with pre-draw diagnostics disabled.");
+        }
+        ValidateCommon();
+    }
+    private void ValidateCommon()
     {
         GraphicsSettings?.Validate();
         LocalHaze?.Validate();
@@ -106,7 +135,14 @@ internal static class VisualReferenceCapture
     internal static int Run(string requestPath)
     {
         VisualReferenceCaptureRequest? request = null;
+        GraphicsBoundInputProvenanceScope? provenanceScope = null;
         bool outputCreated = false;
+        Exception? selectedSnapshotPrimary = null;
+        void RememberSelectedFailure(Exception error)
+        {
+            if (request?.CapturePostFrameResourceSnapshotVersion == 1)
+                selectedSnapshotPrimary = ReferencePostFrameSnapshot.Remember(selectedSnapshotPrimary, error);
+        }
         var captures = new List<object>();
         var captureInputs = new List<object>();
         var failedCaptures = new List<string>();
@@ -119,7 +155,7 @@ internal static class VisualReferenceCapture
         {
             request = JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(File.ReadAllText(requestPath), JsonOptions)
                 ?? throw new ArgumentException("Empty capture request.");
-            request.Validate();
+            request.Validate(allowBoundInputProvenance: true, allowPostFrameSnapshot: true);
             if (request.OwnerTraceControlDirectory is not null) throw new NotSupportedException("Owner trace supervision requires the actual render-host producer.");
             if (request.CollectorMode != ReferenceCollectorMode.Full) throw new NotSupportedException("Collector controls are separate actual-host experiments, not native reference modes.");
             string identity = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
@@ -133,13 +169,24 @@ internal static class VisualReferenceCapture
             var catalog = ReferenceRuntimeSeal.Load(request.RuntimeRoot, out object runtimeSeal);
             var terrain = CentralDivideTerrainFactory.Create(CentralDivideBattlefield.Create());
             var fixtures = request.Scenes.Select(x => VisualReferenceScene.Create(x, terrain, runtimeAssets: catalog, mechanicalSeconds: request.MechanicalSeconds)).ToArray();
+            provenanceScope = request.CaptureBoundInputProvenanceVersion == 1 ? new GraphicsBoundInputProvenanceScope() : null;
             using var capturePower = new ReferenceCapturePowerLease();
+            try
+            {
             using var platform = new WindowsPlatform();
+            try
+            {
             using IWindow window = platform.CreateWindow(new("FORGELINE Reference Capture", 1280, 720));
+            try
+            {
             using var assetPreparation = new AssetPreparationScope(() => !platform.PumpEvents());
+            try
+            {
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
             { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = request.Software,
                 AllowSoftwareAdapterFallback = request.Software });
+            try
+            {
             if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
                 throw new InvalidOperationException("Capture adapter does not match the requested lane.");
             var adapterCheckpoint = ReferenceAdapterCheckpoint.PublishAndWait(request.AdapterBindingDirectory, graphics, runtimeFingerprint, window.NativeHandle.Value.ToInt64(), () => platform.PumpEvents());
@@ -179,13 +226,23 @@ internal static class VisualReferenceCapture
                     using var ground = new TerrainRenderer(graphics, terrain, runtimeAssets: catalog, lighting: lighting,
                         surfaceDetail: profile.TerrainDetail, textureDetail: profile.Textures, residency: profile.TerrainResidency,
                         environment: profile.Environment, presentationProfile: terrainProfile) { DebugChunksEnabled = false };
+                    try
+                    {
                     using var meshes = new SimpleInstanceRenderer(graphics, catalog, lighting: lighting,
                         lodDiameterScale: profile.LodDiameterScale, textureDetail: profile.Textures, vegetationMotion: profile.VegetationMotion,
                         environment: profile.Environment, vegetation: profile.Vegetation);
+                    try
+                    {
                     if (sharedFixture is not null) meshes.EnableContentEvidence();
                     using var particles = new ParticleVfxRenderer(graphics, catalog, profile.Particles, lighting);
+                    try
+                    {
                     using var hud = new GameplayHudRenderer(graphics, catalog);
+                    try
+                    {
                     using var frontend = UiReferenceStates.IsFrontend(uiScenario) ? new FrontendOverlayRenderer(graphics) : null;
+                    try
+                    {
                     if (frontend is not null)
                     {
                         frontend.PrepareSkin(catalog);
@@ -199,7 +256,11 @@ internal static class VisualReferenceCapture
                         if (frontend.BackgroundDiagnostics.State != "Ready") throw new InvalidDataException("Requested cinematic background is unavailable.");
                     }
                     using var selection = new DebugDrawRenderer(graphics, depthEnabled: false, lineWidthPixels: 3);
+                    try
+                    {
                     using var materialReference = fixture.Kind == VisualReferenceSceneKind.MaterialFoundation ? new MaterialReferenceRenderer(graphics, lighting) : null;
+                    try
+                    {
                     if (!platform.PumpEvents()) throw new OperationCanceledException("Reference window was closed.");
                     string key = $"{fixture.Kind}-{display.Width}x{display.Height}-{quality}-{zoom}";
                     if (request.RasterDpi != 0) key += $"-Dpi{request.RasterDpi}";
@@ -343,22 +404,104 @@ internal static class VisualReferenceCapture
                         meshes.Submit(); meshes.Retire();
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
                     }
+                    ReferenceWorldInputDiagnostics? worldInputInspector=request.CaptureStageDiagnostics && sharedFixture is not null
+                        ? ReferenceWorldInputDiagnostics.Create(request.OutputRoot,key,"native-reference",runtimeFingerprint,sharedFixture.Fingerprint,
+                            sharedFixture.InputBytesBase64,profile,request.RepeatCaptures,ground,meshes,particles,graphics,camera) : null;
                     GraphicsStageCapture? stageCapture = null;
-                    byte[] CaptureFrame()
+                    object? postFrameReference = null;
+                    byte[]? snapshotFirstPixels = null;
+                    bool snapshotFirstDuplicateWritten = false;
+                    byte[] CaptureFrame(int repetition = -1)
                     {
-                        if (!meshes.AssetsPrepared) PrepareTerrain();
+                        stageCapture=null;
+                        postFrameReference = null;
+                        GraphicsPostFrameReceipt? postReceipt = null;
+                        ReferencePostFrameSnapshot.Metadata? postMetadata = null;
+                        bool assetsCleaned = false;
+                        string postPhase = "capture-setup";
+                        string? postImage = null;
+                        GraphicsPostFrameSnapshotResult? postSnapshot = null;
+                        GraphicsWorldBindingAttempt? worldAttempt = null;
+                        try
+                        {
+                        worldInputInspector?.BeforeSite(WorldInputSite.CaptureEnsurePrepared);
+                        bool invokePreparation=!meshes.AssetsPrepared;
+                        if (invokePreparation) PrepareTerrain();
+                        worldInputInspector?.AfterSite(WorldInputSite.CaptureEnsurePrepared,invokePreparation);
                         ulong beforePresent = graphics.PresentedFrameCount;
                         var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                         byte[] pixels;
-                        if (request.CaptureStageDiagnostics)
+                        if (request.CaptureStageDiagnostics || request.CaptureBoundInputProvenanceVersion == 1)
                         {
-                            stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record);
+                            using var attemptScope = worldAttempt = GraphicsWorldBindingJournal.BeginAttempt();
+                            stageCapture = graphics.CaptureFrameDiagnostics(GraphicsColor.ForgeLineClear, record,
+                                request.CaptureBoundInputProvenanceVersion == 1 ? GraphicsCaptureStages.FinalColor : GraphicsCaptureStages.All);
                             pixels = stageCapture.FinalRgba;
                         }
                         else pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
-                        meshes.Submit(); meshes.Retire();
+                        if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                        {
+                            if (repetition is < 0 or > 7) throw new InvalidDataException("Selected late capture repetition unavailable.");
+                            postPhase = "png-publication";
+                            string imageFile = key + ".png";
+                            postImage = imageFile;
+                            if (repetition == 0)
+                            {
+                                ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, imageFile), display.Width, display.Height, pixels);
+                                snapshotFirstPixels = pixels;
+                            }
+                            else if (!(snapshotFirstPixels ?? throw new InvalidDataException("First selected image unavailable.")).AsSpan().SequenceEqual(pixels))
+                            {
+                                if (!snapshotFirstDuplicateWritten)
+                                {
+                                    ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, snapshotFirstPixels);
+                                    snapshotFirstDuplicateWritten = true;
+                                }
+                                imageFile = $"failed-{key}-repeat-{repetition:D2}.png";
+                                postImage = imageFile;
+                                ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, imageFile), display.Width, display.Height, pixels);
+                            }
+                            // All new enumeration/native-copy work follows closed PNG publication.
+                            postPhase = "receipt-issue";
+                            postReceipt = GraphicsPostFrameSnapshots.IssueReceipt(graphics, recordFrameIndex);
+                            postPhase = "late-intent";
+                            var roster = new GraphicsPostFrameRoster();
+                            var intent = new GraphicsPostFrameIntent(ground.CapturePostFrameIntent(roster),
+                                meshes.CapturePostFrameMainIntent(roster, recordFrameIndex), meshes.CapturePostFrameDecorationIntent(roster, recordFrameIndex));
+                            postMetadata = ReferencePostFrameSnapshot.Context(runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Authored recipe unavailable."),
+                                sharedFixture.InputBytesBase64, repetition, camera.CaptureState(), profile, new ClientRenderConfiguration(profile, lighting, graphics.Atmosphere),
+                                pixels, graphics.CaptureInputFingerprint, request.OutputRoot, imageFile);
+                            postPhase = "native-copy";
+                            postSnapshot = GraphicsPostFrameSnapshots.Capture(graphics, postReceipt, roster, intent);
+                            postPhase = "asset-cleanup";
+                            assetsCleaned = true;
+                            ReferencePostFrameSnapshot.CleanupAssets(meshes.Submit, meshes.Retire);
+                            postPhase = "export";
+                            postFrameReference = ReferencePostFrameSnapshot.Write(postSnapshot, postMetadata, request.OutputRoot, key, repetition);
+                        }
+                        else { meshes.Submit(); meshes.Retire(); assetsCleaned = true; }
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
+                        worldInputInspector?.AfterCapture(stageCapture);
                         return pixels;
+                        }
+                        catch(Exception error)
+                        {
+                            if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                            {
+                                RememberSelectedFailure(error);
+                                if (!assetsCleaned)
+                                {
+                                    try { meshes.Submit(); } catch (Exception cleanup) { try { error.Data["postFrameSubmitCleanup"] = cleanup.ToString(); } catch { } }
+                                    try { meshes.Retire(); } catch (Exception cleanup) { try { error.Data["postFrameRetireCleanup"] = cleanup.ToString(); } catch { } }
+                                }
+                                ReferencePostFrameSnapshot.RetainFailure(error, request.OutputRoot, key + "-readback-" + repetition.ToString("D2", System.Globalization.CultureInfo.InvariantCulture), postReceipt, postMetadata, postPhase, postImage, postSnapshot);
+                            }
+                            else if (request.CaptureBoundInputProvenanceVersion == 1)
+                                ReferenceBoundInputProvenance.RetainCaptureFailure(error, request.OutputRoot, key,
+                                    () => new { runtimeFingerprint, recipeFingerprint = sharedFixture?.Fingerprint, captureState }, stageCapture, worldAttempt);
+                            else ReferenceStageDiagnostics.RetainWorldBindingFailure(error,request.OutputRoot,key,()=>new {runtimeFingerprint,recipeFingerprint=sharedFixture?.Fingerprint,recipeInputBytesBase64=sharedFixture?.InputBytesBase64,profile,captureState},stageCapture,worldAttempt);
+                            throw;
+                        }
                     }
                     object CaptureInputRecord(int repetition, byte[] pixels)
                     {
@@ -370,16 +513,36 @@ internal static class VisualReferenceCapture
                             using var stream = new FileStream(Path.Combine(request.OutputRoot, file), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                             stream.Write(depth.Span);
                         }
-                        return new { repetition, frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
+                        if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                            return new { repetition, worldInputDiagnostics = (object?)null, frameIndex = recordFrameIndex,
+                                fingerprint = graphics.CaptureInputFingerprint, actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
+                                pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), shadowFingerprint = (string?)null, shadowFile = (string?)null,
+                                shadowLayout = (GraphicsTextureReadbackLayout?)null, stageDiagnostics = (object?)null,
+                                postFrameResourceSnapshot = postFrameReference ?? throw new InvalidDataException("Current late snapshot reference unavailable.") };
+                        if (request.CaptureBoundInputProvenanceVersion == 1)
+                        {
+                            var bound = ReferenceBoundInputProvenance.Write(stageCapture ?? throw new InvalidDataException("Current FinalColor capture unavailable."),
+                                request.OutputRoot, key, repetition, runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Authored recipe unavailable."),
+                                sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint);
+                            return new { repetition, worldInputDiagnostics = (object?)null, frameIndex = recordFrameIndex,
+                                fingerprint = graphics.CaptureInputFingerprint, actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
+                                pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), shadowFingerprint = (string?)null, shadowFile = (string?)null,
+                                shadowLayout = (GraphicsTextureReadbackLayout?)null, stageDiagnostics = (object?)null, boundInputProvenance = bound };
+                        }
+                        object? stages=stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
+                            repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
+                            sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint);
+                        object? worldInputs=worldInputInspector?.Persist(stages);
+                        return new { repetition, worldInputDiagnostics=worldInputs, frameIndex = recordFrameIndex, fingerprint = graphics.CaptureInputFingerprint,
                             actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
                             pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)),
                             shadowFingerprint = depth.IsEmpty ? null : Convert.ToHexString(SHA256.HashData(depth.Span)),
                             shadowFile = file, shadowLayout = (graphics as IGraphicsRenderTelemetry)?.CaptureShadowLayout,
-                            stageDiagnostics = stageCapture is null ? null : ReferenceStageDiagnostics.Write(stageCapture, request.OutputRoot, key,
-                                repetition, "native-reference", runtimeFingerprint, sharedFixture?.Fingerprint ?? throw new InvalidDataException("Stage diagnostics require an authored World recipe."),
-                                sharedFixture.InputBytesBase64, camera.CaptureState(), profile, graphics.CaptureInputFingerprint) };
+                            stageDiagnostics = stages };
                     }
                     PrepareTerrain();
+                    if (request.CaptureBoundInputProvenanceVersion == 1)
+                        ReferenceBoundInputProvenance.Preflight(request.OutputRoot, key, display.Width, display.Height, request.RepeatCaptures);
                     if (request.CaptureStageDiagnostics)
                     {
                         if (sharedFixture is null) throw new NotSupportedException("Stage diagnostics require the shared authored World recipe.");
@@ -438,9 +601,15 @@ internal static class VisualReferenceCapture
                     timedWindowState = new { sourceSha = ClientBuildIdentity.SourceRevision, runtimeFingerprint, key,
                         recipeFingerprint = sharedFixture?.Fingerprint, recipeInputs = sharedFixture?.IdentityInputs,
                         recipeInputBytesBase64 = sharedFixture?.InputBytesBase64, camera = initialCamera, profile, lighting,
+                        observedComposition = new ClientRenderConfiguration(profile,lighting,graphics.Atmosphere),
                         performance = performance.Report(measured) };
+                    byte[] rgba;bool repeatPixelsEqual;List<object> repeatFailures;ReadOnlyMemory<byte> shadowDepth;
+                    using(worldInputInspector?.Arm(0))
+                    {
                     camera.ApplyState(initialCamera);
+                    worldInputInspector?.BeforeSite(WorldInputSite.NativeFixedPoseRestore);
                     PrepareTerrain();
+                    worldInputInspector?.AfterSite(WorldInputSite.NativeFixedPoseRestore,true);
                     // Restore fixed pose and settle history only after the timed window.
                     if (request.CameraPath != ReferenceCameraPath.Fixed)
                         for (int i = 0; i < 3; i++) RecordFrame();
@@ -456,22 +625,28 @@ internal static class VisualReferenceCapture
                         (measured.Debug.Enabled && measured.Debug.ErrorCount != 0))
                         throw new InvalidOperationException("Capture contains failed bindings, missing resource visuals or fallback meshes.");
                     captureState = new { key, stage = "first-readback", surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                    byte[] rgba = CaptureFrame();
-                    bool repeatPixelsEqual = true;
-                    var repeatFailures = new List<object>();
-                    ReadOnlyMemory<byte> shadowDepth = graphics.CaptureShadowDepth;
+                    rgba = CaptureFrame(0);
+                    repeatPixelsEqual = true;
+                    repeatFailures = new List<object>();
+                    shadowDepth = graphics.CaptureShadowDepth;
                     captureInputs.Add(CaptureInputRecord(0, rgba));
+                    }
                     for (int repetition = 1; repetition < request.RepeatCaptures; repetition++)
                     {
+                        byte[] repeated;
+                        using(worldInputInspector?.Arm(repetition))
+                        {
                         captureState = new { key, stage = "repeat-readback", repetition, surface = graphics.Diagnostics.Surface, hostWindowDpi = window.Dpi };
-                        byte[] repeated = CaptureFrame();
+                        repeated = CaptureFrame(repetition);
                         captureInputs.Add(CaptureInputRecord(repetition, repeated));
+                        }
                         if (!rgba.AsSpan().SequenceEqual(repeated))
                         {
-                            if (repeatPixelsEqual)
+                            if (repeatPixelsEqual && request.CapturePostFrameResourceSnapshotVersion is null)
                                 ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, $"failed-{key}-first.png"), display.Width, display.Height, rgba);
                             string failedImage = $"failed-{key}-repeat-{repetition:D2}.png";
-                            ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, failedImage), display.Width, display.Height, repeated);
+                            if (request.CapturePostFrameResourceSnapshotVersion is null)
+                                ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, failedImage), display.Width, display.Height, repeated);
                             if (!shadowDepth.IsEmpty)
                             {
                                 File.WriteAllBytes(Path.Combine(request.OutputRoot, $"failed-{key}-first.depth"), shadowDepth.Span);
@@ -490,7 +665,8 @@ internal static class VisualReferenceCapture
                     }
                     if (!repeatPixelsEqual) failedCaptures.Add(key);
                     string image = key + ".png";
-                    ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
+                    if (request.CapturePostFrameResourceSnapshotVersion is null)
+                        ReferenceCaptureImage.WritePng(Path.Combine(request.OutputRoot, image), display.Width, display.Height, rgba);
                     if (uiScenario != UiReferenceScenario.World)
                         UiReferenceStates.ConfirmDistinct(uiPixelHashes, FormattableString.Invariant($"{display.Width}x{display.Height}-{quality}-{rasterDpi}-{uiScale:0.00}-"), uiScenario, rgba);
                     var motionImages = new List<object>();
@@ -543,9 +719,23 @@ internal static class VisualReferenceCapture
                         resourceBatches = meshes.GetResourceBatchDiagnostics(),
                         materialReference = materialReference is null ? null : MaterialReferenceRenderer.Materials,
                         hudVertices = hud.LastRenderedVertexCount, graphics = measured, repeatPixelsEqual, request.RepeatCaptures, repeatFailures,
-                        captureInputs = captureInputs.ToArray(),
+                        worldInputInspectorVersion=request.CaptureStageDiagnostics ? 1 : (int?)null,captureInputs = captureInputs.ToArray(),
                         motionImages, motionMethod = "Eight adjacent camera poses, no timing claim; readback stalls prevent judder acceptance.", visualReview = "pending" });
                     WriteManifest("in-progress", null);
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
+                    }
+                    catch (Exception error) { RememberSelectedFailure(error); throw; }
                 }
                 graphics.WaitForIdle();
             }
@@ -576,15 +766,52 @@ internal static class VisualReferenceCapture
                     postWindowControl=postWindowControl?.Evidence(),ownerCycles=new {schemaVersion=1,available=false,reason="Native reference has no ClientRenderHost owner cycle or exact process-allocation collector"},
                     platformWorkload=request.OwnerObservationVersion==1 ? (object)platform.CaptureWorkloadTelemetry() : null,
                     failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
+            }
+            catch (Exception error) { RememberSelectedFailure(error); throw; }
+            }
+            catch (Exception error) { RememberSelectedFailure(error); throw; }
+            }
+            catch (Exception error) { RememberSelectedFailure(error); throw; }
+            }
+            catch (Exception error) { RememberSelectedFailure(error); throw; }
+            }
+            catch (Exception error) { RememberSelectedFailure(error); throw; }
         }
-        catch (Exception error)
+        catch (Exception caught)
         {
-            Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
+            Exception error = ReferencePostFrameSnapshot.SelectPrimary(caught, selectedSnapshotPrimary);
+            if (request?.CapturePostFrameResourceSnapshotVersion == 1)
+            {
+                try { Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}"); }
+                catch (Exception reporting) { RememberSelectedFailure(reporting); }
+            }
+            else Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}");
+            if (request is not null && outputCreated)
+                ReferenceBoundInputProvenance.RetainScopeFailure(error, provenanceScope, request.OutputRoot);
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
-                ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs, timedWindow = timedWindowState }, JsonOptions));
+            {
+                if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                {
+                    try
+                    {
+                        ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
+                        {
+                            status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs,
+                            timedWindow = timedWindowState, postFrameFailure = ReferencePostFrameSnapshot.FailureFacts(error, "outer-report", null, [])
+                        }, JsonOptions));
+                    }
+                    catch (Exception reporting)
+                    {
+                        RememberSelectedFailure(reporting);
+                        ReferencePostFrameSnapshot.RetainReportingFailure(error, request.OutputRoot);
+                    }
+                }
+                else ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new { status = "structural-failure", error = error.ToString(), completedCaptures = captures.Count, captureState, captureInputs, timedWindow = timedWindowState }, JsonOptions));
+            }
             return 1;
         }
+        finally { provenanceScope?.Dispose(); }
     }
 
     internal static object Distribution(double[] values)

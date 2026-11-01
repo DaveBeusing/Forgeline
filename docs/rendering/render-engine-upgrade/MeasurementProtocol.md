@@ -146,3 +146,294 @@ continuous visibility, hardware stability, repeatable pixels or baseline/wave2
 admission. The detailed PR449 report remains local by the current session publication choice.
 No new physical capture or
 trace is implied by CPU regression results.
+
+
+## Fixed-readback world-input inspector v1
+
+Stage diagnostics opt into this additive inspector on a reviewed new producer.
+Construct one inspector on the render owner during setup, then explicitly arm
+only each declared fixed readback. Stage-enabled but unarmed motion/helper calls
+produce no inspector reads or records. There are no hooks in the existing shared
+PrepareTerrain/RecordFrame definitions or the warm/sample loops.
+
+Native repetition0 brackets the existing post-window fixed-pose PrepareTerrain
+site and the existing CaptureFrame conditional preparation site; later native
+repetitions bracket only that conditional site. Host repetitions bracket their
+existing readback prepare call. The call counts and order are unchanged.
+BeforeSite records PreparationInvoked as null (not yet evaluated); AfterSite
+records the actual boolean, with false meaning prepared state was reused. Phases
+are BeforeSite, AfterSite and AfterCaptureAndClientRetire. Checked fixed storage
+is5*RepeatCaptures, at most640 rows for128 repeats; unrelated motion never consumes
+that capacity. Rejected armed phases, ownership, chronology or capture tuples are
+sticky invalid evidence, not correctable into a passing subset.
+
+Each <key>-readback-<NN>-world-inputs.json is written CreateNew before pixel
+comparison. Its sibling reference is worldInputDiagnostics={file,sha256,
+schemaVersion:1}. The file binds source/runtime/recipe bytes, actual camera,
+quality-profile bytes, render-owner IDs and its own original stage metadata
+file/hash. profileDomain=effective-quality-profile means RenderQualityProfile;
+it is NOT the ordinary post-window ready profileFingerprint domain, which hashes
+the full ClientRenderConfiguration. Native failure timedWindow.observedComposition
+and host owner.observedComposition preserve that separate full-composition proof.
+
+The final pre-capture AfterSite surface supplies the captured-slot join. The
+post-capture surface FrameIndex is the next slot and is never substituted for
+GraphicsStageCapture.FrameIndex. CompletedFence is supplied only by that actual
+completed stage capture, not a pre/after-Prepare diagnostic or lagging CPU/GPU
+metric. Each lane binds its own successful submission/fence/generations and
+presentation progression; independent processes need not share those numbers.
+Incomplete preparation/capture scopes retain an incomplete prefix even if the
+final manifest is absent. Persistence and logging errors must not replace the
+original producer failure; an unavailable prefix is not a complete record.
+
+Facts are copied from the existing public typed terrain, instance (including
+main/shadow/preparation/reuse/asset/skin/material), particle and graphics
+properties. One Graphics.Diagnostics read per phase can harvest completed timing
+or debug state and allocate; this is a sequential observation bracket, not an
+atomic hardware/input read. DXGI memory is cached250ms. Preserve null/lagged facts.
+No extra wait, drain, Prepare, Enable or ObserveFrameDiagnostics call is added.
+*Milliseconds leaves are separated as timingFacts. Other values are labelled
+stateAndActivityFacts: expected cumulative/per-draw activity is not an invariant.
+SkinUploadBytes is resident skin-slot accounting and UploadBytes logical submitted
+bytes. Public logical staging/pending bytes are separate from physical memory.
+Internal upload-arena state and actual full GPU bindings/contents remain unobserved.
+
+The offline consumer embeds a reviewed static schema derived passively from the
+public record metadata, including exact fields, CLR integer widths, booleans,
+enums and nullable properties. No target constructor/getter/static method is run
+for discovery, and no runtime reflection is required for validation. Nullable
+values remain explicit nulls; present record timing paths cannot be omitted.
+Every available phase device and surface/raster is joined to its own stage.
+Prior submitted state is monotonic; the last pre-capture snapshot names the
+immediate predecessor, not the captured/completed frame. Native0 may legitimately
+advance during its existing non-Fixed settle frames. Raw optional CPU interval
+records remain labelled potentially lagged observations, never equal-cost or
+state-invariance proof.
+
+The offline API world_input_diagnostics.validate_series(root,stage_refs,
+inspector_refs,required_version=1) requires all eight complete inspector records
+and their original stages, hashes, phase sequence, owner, camera and tuple joins.
+The stage comparator accepts inspector_references and inspector_version=1 for
+that selected mode. Missing selected-v1 records fail; old absent records retain
+historical/unavailable status and the old stage-only route stays usable.
+compare_inspector_lanes validates each lane independently, compares common
+source/runtime/recipe/quality-profile/pose and reports state/activity changes;
+physical UUID/PCI and exact pixels remain the separate strict stage comparator's
+responsibility. Timing differences are labelled separately. Neither changed nor
+equal aggregate facts establish a shader/driver/lifetime cause or identical GPU
+contents. A pixel mismatch remains a failure with no tolerance or winning rerun.
+
+This initial inspector does not resolve repeatability or complete package2.
+Before any physical diagnostic, separately freeze clean source/build/payload/runtime,
+no-frame preflight, storage, literal schedule, controls and original deadlines.
+A pixel-only continuation needs external finally-path after inventories for both
+commands before classification, preserving original run_capture failure/exit.
+Any causal production fix needs a reviewed exact ownership amendment. Numeric
+policies, qualification and original wave2 readiness remain open.
+
+
+### Opaque World binding journal v1 (diagnostic only)
+
+An explicit stage capture now also records a bounded ordered command/binding
+journal. Ordinary RenderFrame and legacy CaptureFrame with stages disabled do
+not construct or hash a journal. CaptureCore arms immediately before its existing
+RenderFrame, seals only against that capture's successful submission, recorded
+slot, completed fence and one Present, and clears the active recorder on every
+exit. No new Prepare, draw, native state change, wait, diagnostic query, upload
+hook or timed-loop callback is added. Legacy CaptureInputFingerprint semantics
+and bytes remain unchanged.
+
+The scope is opaque World draws. Directional-shadow and particle draws are
+excluded explicitly; IsWorldPass alone includes both subpasses. Armed setter
+observations include those subpasses so inherited IA vertex/index views remain
+known. Pipeline/root/constants/textures follow actual invalidation, including
+cache hits; IA views survive pipeline/pass changes. Shadow-end native viewport
+and scissor restoration is mirrored observationally. DrawIndexed delegates to
+one recorded DrawIndexedInstanced operation.
+
+The journal retains ordered pipeline description and shader-bytecode hashes,
+vertex layout, bound VB slots/identity/range/stride, IB identity/range/format,
+complete native draw arguments, exact IEEE constant bytes/hash and root/buffered
+mode, pixel slots/descriptors/cache-hit versus emitted state, and implicit shadow
+frame/CBV/t15 metadata. Ranges describe bound views; they do not prove fetched
+bytes. Shadow-frame constants are copied from the same CPU values written by
+the existing implementation, not read back from GPU memory. Implicit native
+shadow resources have no Lifetime identity: they use device/resource epoch,
+slot, descriptor and kind, never a fabricated resource ID.
+
+Explicit resources use weak existing Lifetime keys and monotonically assigned
+local IDs within one device epoch. The registry retains no native ownership.
+These IDs and descriptors are not asset identities or cross-process equality
+keys. Frame-indexed resources normally rotate across slots. Reports retain
+actual local bindings and same-slot comparisons (for example repetition0 versus
+3/6); changes are observations, not automatic correctness failures. Cross-lane
+semantic comparison uses compatible descriptions and shader/constant bytes while
+preserving the independent process/session/fence/epoch/slot identities. Equal
+descriptions do not prove equal assets, prearmed buffer/texture contents, actual
+GPU fetched contents, precision behavior or pixel cause.
+
+Structural refusal bounds are4096 draws,131072 events,4096 identity definitions
+and32MiB actual UTF8 per sidecar. The shared immutable compact camelCase,
+string-enum wire serializer is used for accounting and export.31MiB bounds the
+accepted journal with a conservative4KiB header reserve;1MiB is reserved for its
+envelope. The exporter and strict reader check actual original wire spans and
+total bytes. Nested strings/layouts/constants and collection lengths are bounded.
+These are diagnostic storage/refusal limits, not measured operation maxima,
+allocation budgets or approved capacity policies. The existing1.5x stage storage
+guard includes the32MiB journal cap for every declared repetition, separately
+from raw attachments, lossless images and the64MiB general-record allowance.
+
+Each stage JSON contains worldBindingJournalVersion=1 and a sibling
+worldBindingJournal={file,sha256,bytes,schemaVersion:1}. The sidecar filename is
+<key>-readback-<NN>-world-bindings.json. The producer's stage reference hashes
+the stage JSON, which hashes its journal: no circular stage/journal hash is used.
+The sidecar independently joins source/runtime/recipe, quality-profile bytes,
+camera, repetition, device/session, actual slot/submission/completion and Present.
+Its profileDomain is effective-quality-profile, distinct from the ordinary
+post-window full ClientRenderConfiguration domain.
+
+Journal refusals are sticky. An overflow, missing required state, foreign owner,
+metadata redefinition, serialization or capture failure cannot be corrected into
+a complete record. A current incomplete prefix retains all accepted events and
+definitions, no successful completion tuple, and the original error remains
+authoritative. Optional failure context that cannot serialize within its reserved
+envelope is explicitly unavailable while the journal prefix remains intact.
+CreateNew never overwrites a prior prefix or partial artifact; persistence/logging
+failures do not replace the original exception. Failure before arming or inability
+to persist a prefix stays unavailable, never borrowed from an earlier capture.
+Exception-only retention requires the exact opaque invocation token claimed at
+actual recorder arm; reusing an exception cannot reuse its earlier attachment. A
+known current completed capture takes precedence when exporting an incomplete
+post-capture failure prefix. Tokens are process-local and never hardware proof.
+
+world_binding_journal.validate_series(root,stage_refs,required_version=1) and the
+stage comparator's world_journal_version=1 require all eight original complete
+journal refs, exact types/bounds/hashes, ordered state reduction and own-lane joins.
+Missing/malformed selected-v1 data fails with no fallback. Historical missing data
+with no selected version remains unavailable; the historical stage-only API stays
+usable. compare_lanes reports semantic-description comparisons separately from
+local identity continuity; physical UUID/PCI/control and exact pixels remain
+separate checks. Failure prefixes and pixel mismatches cannot grant completion.
+
+This journal is another bounded discriminator, not a causal fix or package2
+completion. Existing793/native0-versus-later/host pixel failures remain immutable.
+New clean source/build/payload/runtime, preflight, storage, selected journal-v1
+schedule, controls and manual readiness must be reviewed before any physical run.
+Numeric policies, baseline qualification and original wave2 readiness remain OPEN.
+
+### Native CPU-source provenance v1 (diagnostic only)
+
+`captureBoundInputProvenanceVersion: 1` selects an additive native-only CPU-source
+observation for the declared single Warm/Fixed/World/1920×1080 Full case. The shared
+parameterless request validator rejects this selector, so host and no-frame preflight
+paths cannot claim to exercise it. Stage, shadow-only and trace capture are disabled.
+The launcher marks every non-null selector diagnostic; admission independently rejects
+such requests even if an attempt incorrectly claims `diagnosticOnly: false`.
+
+The explicit creating-thread scope starts before device/resource construction. The
+selected native copy and both legacy/new hashes consume the same private frozen source
+bytes, including frozen/revalidated mip dimensions and pitches. Root constants freeze
+at most the existing64 words before their original command. The shared128MiB transient
+freeze refusal is structural diagnostic storage, not a managed-heap or allocation-policy
+budget. No additional native Map, copy, barrier, Signal or GPU wait is introduced.
+
+The latest-source map retains whole successful source hashes and slice offsets, not
+invented slice hashes or GPU-fetched bytes. Unknown buffer capacity remains explicitly
+unknown; it is not zero and does not imply that a shader fetched that capacity. The
+map refuses more than4096 resource identities,32768 total segments or64 segments per
+actual resource, with32MiB metadata accounting and no eviction. Shadow-frame and
+buffered constants share one actual implicit arena per resource epoch/slot. Its weak
+raw-wrapper witness detects replacement; it has no fabricated Lifetime or native address.
+Copy transfers retain queued, execute-returned and actual signaled-fence states separately.
+An observer refusal makes evidence unavailable. Only native Dispose cleanup quarantines
+observer propagation so required native Signal/idle/retirement can finish; normal work
+still fails closed and native failures remain authoritative.
+
+Each existing FinalColor-only readback exports separate compact journal and CPU-source
+sidecars with original `{file, sha256, bytes, schemaVersion}` references. The producer
+reference authenticates the companion, which authenticates the separate journal. Their
+actual UTF8 files are each bounded by32MiB, reserving31MiB body and1MiB context. Original
+source/runtime/recipe bytes, quality-profile bytes (a different domain from full ordinary
+composition), camera, process/device/session, captured slot, submission/fence and Present
+facts remain joined per process. Sidecar observations do not establish GPU residency,
+fetched contents, root cause or cross-process resource identity equality.
+
+Selected-v1 consumption requires all eight complete original references. Historical
+artifacts without the selector retain their original interpretation. Capture-prefix
+failures require the exact claimed invocation token or a known current capture and carry
+no successful tuple. Supplementary scope-only failure facts distinguish before-arm from
+arm-attempted phase without claiming that separately retained capture evidence is absent.
+The offline reducer replays destination writes and draw associations, reports later
+writes overlapping earlier draw bindings separately (whole-source hash plus destination
+and slice ranges, never an invented final digest), preserves nonoverlapping writes and
+unknown holes, and keeps process-local IDs/slots/write ordinals
+separate from source/description semantics. Byte-identical source intent or all-B pixels
+cannot establish a causal repair, physical stability, allocation policy or qualification.
+The offline overlap report refuses more than the existing131072-event structural cap
+of derived overlap records instead of producing an unbounded report. This is a tool
+capacity refusal, not a workload or allocation-policy limit.
+
+### Native post-FinalColor resident-resource snapshot v1
+
+`capturePostFrameResourceSnapshotVersion:1` is a separate native-only, unqualified
+late diagnostic. It requires the declared single IndustrialBase/Medium/NormalGameplay
+1920x1080 DPI96 World case, Warm/Fixed64/512/8 Full with owner-observation v1.
+Stages, shadow capture, CPU-source provenance and trace handoffs remain off. Shared
+host/no-frame validation rejects the selector; a common no-frame preflight with null
+selection proves only static context. Every non-null selection is automatically
+classified diagnostic by the runner and independently rejected by baseline admission.
+
+Ordinary capture first returns CPU RGBA and closes the primary PNG. A newly known
+mismatch closes its original first-image duplicate and repetition PNG before any new
+receipt, enumeration or native-copy work. The selected route skips later duplicate
+PNG writers. An opaque one-use receipt binds the actual recorded slot, successful
+capture body AND successful cleanup, original device/session/owner/submission and
+presentation/resize facts. Rejected foreign-owner calls cannot consume the receipt.
+The next swapchain slot is never substituted for the captured slot. A managed witness
+also rejects replacement/creation/removal of the captured-slot constant arena.
+
+Late intent copies only resident terrain chunks, stored main-LOD history, index ranges,
+bounds, palette/material/resource references and the final retained main/decoration
+scratch. These accessors do not Prepare, Select, Harvest or Render. Culled LOD values
+may be old; scratch has no independent final-pass marker or entity/root association.
+The declared superset includes resident VB/shared IB/control/material textures, actual
+captured-slot instance prefixes and, if present, the actual implicit constant-arena
+allocation-cursor prefix. Padding has unknown shader relevance. Targets/depth/shadow,
+root constants, particles/HUD/skin caches, inactive private caches, earlier scratch and
+main entity/root associations are explicitly excluded. Unsupported declared resources
+refuse; they are never silently dropped or represented by fabricated identities.
+
+Pending initializer absence is proven with the existing tracker-independent upload
+bookkeeping; the late diagnostic does not flush initializers. Additional native COM
+references and one packed READBACK allocation are owned by an active composite lease
+before Execute. MAY_HAVE_EXECUTED is set before that native call. Uncertain unsignaled
+work retains the entire active lease through the existing device drain/removal path.
+Release is idempotent, attempts every part and never throws through ReleaseAll.
+The separate late-copy fence has its own domain; its numeric value is never compared
+with the original frame-fence value. Immutable textures restore their audited PSR
+state. Logical BC7 mip dimensions remain distinct from block-aligned native copy
+footprint dimensions; canonical raw encoded rows exclude padding and preserve color
+encoding. Upload/default buffer copy states follow the audited completed native path.
+
+Structural refusal guards are4096 total resources,32 mips/texture,131072 mip entries,
+4096 terrain/main/decoration entries each,32 index ranges/chunk,131072 total intent
+resource references and4096 UTF8 bytes/optional string. A running escaped UTF8 writer
+bounds metadata before oversized result allocation:31MiB body plus1MiB envelope,
+32MiB actual compact wire. Total padded staging and total canonical raw bytes are each
+bounded by128MiB per snapshot. These are implementation capacities, not approved
+allocation policies or a guaranteed workload fit. Every canonical mip has an exclusive
+ordinal file and original size/hash reference. Actual PNG publication, original/copy
+receipts, source/runtime/recipe bytes, quality-profile bytes, full observed composition
+(a different domain), camera, resource descriptions and intent remain joined. Failure
+prefixes retain available raw references and the original PNG without inventing a
+completed snapshot; cleanup/export failures do not replace the primary snapshot error.
+
+The strict offline reader requires all eight selected references and validates original
+PNG pixels, raw hashes/layouts, source/owner/device/slot/submission joins and chronology.
+Historical absence remains unavailable under its original interpretation. Comparisons
+separate semantic resident bytes/intent from process-local roster and captured-slot
+facts; rotating slots or local IDs are not automatically correctness failures.
+These are bytes observed AFTER image persistence, not evidence of what a shader fetched
+earlier. The copies can perturb later repetitions. Equal bytes or all-B pixels do not
+resolve the intermittent pixel cause, establish a repair, approve numeric policies,
+qualify a physical baseline or authorize the original optimization wave2.

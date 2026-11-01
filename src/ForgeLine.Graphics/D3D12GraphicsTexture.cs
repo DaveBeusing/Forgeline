@@ -4,7 +4,9 @@ namespace ForgeLine.Graphics;
 
 internal sealed class D3D12GraphicsTexture : IGraphicsTexture
 {
+    private readonly ID3D12Resource _resource;
     internal GraphicsResourceRetirement.Resource Lifetime { get; }
+    internal ID3D12Resource Resource { get { Lifetime.ThrowIfDisposed(); return _resource; } }
 
     internal D3D12GraphicsTexture(
         D3D12GraphicsDevice owner,
@@ -15,6 +17,7 @@ internal sealed class D3D12GraphicsTexture : IGraphicsTexture
         long residentByteCount,
         GraphicsResourceRetirement.Resource lifetime)
     {
+        _resource = resource;
         Owner = owner;
         Description = description;
         DescriptorIndex = descriptorIndex;

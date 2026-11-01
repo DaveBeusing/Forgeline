@@ -416,7 +416,7 @@ def evaluate(cohort,root,repo,trusted_master):
         require(payload_before==payload_after==protocol['payloadInventory'],'Complete binary/runtime payload inventory changed or differs from freeze')
         require(r['payloadInventoryBefore']['sha256']==attempt['payloadInventoryBeforeSha256'] and r['payloadInventoryAfter']['sha256']==attempt['payloadInventoryAfterSha256'],'Actual launcher payload references differ')
         request=load(directory,r['request']);require(sha256_bytes((directory/r['request']['path']).read_bytes())==attempt['requestSha256'],'Actual request differs from launched bytes')
-        require(request.get('captureStageDiagnostics',False) is False and request.get('ownerTraceControlDirectory') is None,'Intrusive stage/owner-trace requests are separate diagnostics, never baseline timing')
+        require(request.get('captureStageDiagnostics',False) is False and request.get('ownerTraceControlDirectory') is None and request.get('captureBoundInputProvenanceVersion') is None and request.get('capturePostFrameResourceSnapshotVersion') is None,'Intrusive stage/owner-trace/CPU-source provenance/post-frame snapshot requests are separate diagnostics, never baseline timing')
         observation_version=request.get('ownerObservationVersion',0)
         require(type(observation_version) is int and observation_version in (0,1),'Unknown actual owner-observation version')
         require(type(protocol.get('ownerObservationVersion',0)) is int and observation_version==protocol.get('ownerObservationVersion',0),'Actual owner-observation interval differs from frozen protocol')
