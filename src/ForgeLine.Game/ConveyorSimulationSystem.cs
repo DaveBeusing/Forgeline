@@ -53,7 +53,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     { _stock = stock; _distribution = distribution; _recipes = recipes; _units = units; }
     public SimulationPhase Phase => SimulationPhase.Economy;
     public static IReadOnlyList<ResourceId> EligibleResources { get; } = Array.AsReadOnly(new[]
-    { ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Steel, ResourceIds.Electronics, ResourceIds.Ammunition });
+    { ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Steel, ResourceIds.Electronics, ResourceIds.Ammunition,
+      ResourceIds.Volatiles, ResourceIds.Fuel });
     public static bool Eligible(ResourceId resource) => EligibleResources.Contains(resource);
     public static double Capacity(ConveyorModule module) => module is ConveyorModule.ShortSegment or
         ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter or ConveyorModule.Merger or ConveyorModule.Splitter ? 100 : 200;
@@ -421,7 +422,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         if (id == BuildingIds.Extractor)
             return !port.Input && entities.TryGetComponent(port.Building, out ResourceExtractor extractor) && extractor.Enabled &&
                 extractor.Owner == new FactionId(checked((uint)port.Owner.Value)) ? ResourceMask(extractor.ResourceId) : 0;
-        if (id == BuildingIds.Smelter || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
+        if (id == BuildingIds.Smelter || id == BuildingIds.Refinery || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
         {
             int mask = 0;
             if (entities.TryGetComponent(port.Building, out ProductionFacility facility))
@@ -463,7 +464,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         if (building.Id == BuildingIds.StorageDepot || building.Id == BuildingIds.LogisticsHub || building.Id == BuildingIds.CommandCore)
             return (1 << EligibleResources.Count) - 1;
         int mask = 0;
-        if (building.Id == BuildingIds.Smelter || building.Id == BuildingIds.ElectronicsPlant || building.Id == BuildingIds.AmmunitionPlant)
+        if (building.Id == BuildingIds.Smelter || building.Id == BuildingIds.Refinery || building.Id == BuildingIds.ElectronicsPlant || building.Id == BuildingIds.AmmunitionPlant)
             foreach (var recipe in _recipes.Definitions)
                 if ((building.ProductionCapabilities & recipe.RequiredCapability) == recipe.RequiredCapability)
                     foreach (var ingredient in input ? recipe.Inputs : recipe.Outputs)
