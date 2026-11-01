@@ -241,7 +241,7 @@ public sealed class BuildingCombatDestructionTests
         EntityRegistry entities = runtime.Simulation.Entities;
         WorldTransform oldTransform = entities.GetComponent<WorldTransform>(storage);
         ConveyorBuildingPort port = ConveyorConstructionService.CapturePorts(entities, Owner)
-            .Single(item => item.Building == storage && item.Input);
+            .Single(item => item.Building == storage && item.Input && item.Key == "west.primary");
         Vector3 pivot = port.Position - Vector3.UnitY * 5.8f + port.Facing * 2;
         var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.OutputAdapter,
             pivot, pivot, ConveyorGeometry.Facing(-port.Facing), 0, true,
