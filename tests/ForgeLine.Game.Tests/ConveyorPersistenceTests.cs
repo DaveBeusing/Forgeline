@@ -92,8 +92,11 @@ public sealed class ConveyorPersistenceTests
 
         // The starting Command Core has physical, authoritative Fluid stock.
         // Reuse its paid conveyor route, with no fixture-created material.
+        var policies = new List<EntityId>();
         foreach (EntityId entity in runtime.Simulation.Entities.Query<LogisticsStockPolicy>(
-                     QueryIterationOrder.StableByEntityIndex).ToArray())
+                     QueryIterationOrder.StableByEntityIndex))
+            policies.Add(entity);
+        foreach (EntityId entity in policies)
         {
             LogisticsStockPolicy policy = runtime.Simulation.Entities.GetComponent<LogisticsStockPolicy>(entity);
             if (policy.TargetEntity != commandCore ||
