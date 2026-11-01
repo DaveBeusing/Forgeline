@@ -39,7 +39,7 @@ Extract → Process → Manufacture → Supply → Fight → Expand → Automate
 | System | Implemented development slice |
 | :--- | :--- |
 | **Directorate** | 13 constructible structures and 7 producible units. |
-| **Industry and logistics** | Production queues, power, capacity-based routing, physical cargo, automated distribution and resupply. |
+| **Industry and logistics** | Production queues, power, capacity-based routing, physical cargo, automated distribution and resupply. Refineries temporarily accept Volatiles and export processed Fuel through compatible elevated local conveyors; regional trucks remain supported and pipelines are not yet implemented. |
 | **Combat and intelligence** | Infantry, vehicles, directional armor, suppression, repairs, artillery, fog of war and faction-scoped sensors. |
 | **Skirmish and recovery** | A computer opponent using the normal economy/supply/combat rules; setup, pause, victory, surrender, save/load/replay and restart. |
 | **Presentation** | Native Direct3D 12, compiled assets and physical LODs, terrain, contextual HUD, minimap, overlays, effects and bounded spatial audio. |

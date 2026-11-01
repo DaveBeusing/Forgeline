@@ -106,7 +106,8 @@ public static class ConveyorGeometry
     public const uint MenuCount = (uint)ConveyorModule.Overpass + 1;
     public static Vector3 BuildingPortDimensions(BuildingId id) =>
         id==BuildingIds.CommandCore?new(20,12,20):id==BuildingIds.Extractor?new(12,8,12):
-        id==BuildingIds.StorageDepot?new(14,8,14):id==BuildingIds.Smelter?new(18,10,16):
+        id==BuildingIds.StorageDepot?new(14,8,14):
+        id==BuildingIds.Smelter || id==BuildingIds.Refinery?new(18,10,16):
         id==BuildingIds.ElectronicsPlant || id==BuildingIds.AmmunitionPlant?new(18,10,18):
         id==BuildingIds.LogisticsHub?new(18,9,18):id==BuildingIds.SupplyDepot?new(16,8,16):
         id==BuildingIds.Barracks?new(18,8,16):id==BuildingIds.VehicleFactory?new(26,12,24):default;

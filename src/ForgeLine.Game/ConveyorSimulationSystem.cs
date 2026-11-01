@@ -53,7 +53,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     { _stock = stock; _distribution = distribution; _recipes = recipes; _units = units; }
     public SimulationPhase Phase => SimulationPhase.Economy;
     public static IReadOnlyList<ResourceId> EligibleResources { get; } = Array.AsReadOnly(new[]
-    { ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Steel, ResourceIds.Electronics, ResourceIds.Ammunition });
+    { ResourceIds.FerrousOre, ResourceIds.Silicates, ResourceIds.Steel, ResourceIds.Electronics, ResourceIds.Ammunition,
+      ResourceIds.Volatiles, ResourceIds.Fuel });
     public static bool Eligible(ResourceId resource) => EligibleResources.Contains(resource);
     public static double Capacity(ConveyorModule module) => module is ConveyorModule.ShortSegment or
         ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter or ConveyorModule.Merger or ConveyorModule.Splitter ? 100 : 200;
@@ -162,12 +163,17 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 ? (Math.Min(target.Minimum, policy.DesiredTarget), Math.Max(target.Maximum, policy.DesiredTarget))
                 : (policy.DesiredTarget, policy.DesiredTarget);
         }
+        // A storage inventory may expose several physical output ports. Reserve
+        // its desired stock once per resource, never once for every port.
+        var retainedInventoryResources = new HashSet<(InventoryId Inventory, ResourceId Resource)>();
         foreach (var node in nodes)
         {
             if (node.Port is not { Input: false } || ResolveInventory(entities, node.Entity, true) != node.Inventory) continue;
             for (int r = 0; r < EligibleResources.Count; r++)
             {
-                double retain = targets.TryGetValue((node.Entity, EligibleResources[r]), out var target) ? target.Maximum : 0;
+                ResourceId resource = EligibleResources[r];
+                if (!retainedInventoryResources.Add((node.Inventory, resource))) continue;
+                double retain = targets.TryGetValue((node.Entity, resource), out var target) ? target.Maximum : 0;
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
         }
@@ -421,7 +427,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         if (id == BuildingIds.Extractor)
             return !port.Input && entities.TryGetComponent(port.Building, out ResourceExtractor extractor) && extractor.Enabled &&
                 extractor.Owner == new FactionId(checked((uint)port.Owner.Value)) ? ResourceMask(extractor.ResourceId) : 0;
-        if (id == BuildingIds.Smelter || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
+        if (id == BuildingIds.Smelter || id == BuildingIds.Refinery || id == BuildingIds.ElectronicsPlant || id == BuildingIds.AmmunitionPlant)
         {
             int mask = 0;
             if (entities.TryGetComponent(port.Building, out ProductionFacility facility))
@@ -463,7 +469,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         if (building.Id == BuildingIds.StorageDepot || building.Id == BuildingIds.LogisticsHub || building.Id == BuildingIds.CommandCore)
             return (1 << EligibleResources.Count) - 1;
         int mask = 0;
-        if (building.Id == BuildingIds.Smelter || building.Id == BuildingIds.ElectronicsPlant || building.Id == BuildingIds.AmmunitionPlant)
+        if (building.Id == BuildingIds.Smelter || building.Id == BuildingIds.Refinery || building.Id == BuildingIds.ElectronicsPlant || building.Id == BuildingIds.AmmunitionPlant)
             foreach (var recipe in _recipes.Definitions)
                 if ((building.ProductionCapabilities & recipe.RequiredCapability) == recipe.RequiredCapability)
                     foreach (var ingredient in input ? recipe.Inputs : recipe.Outputs)

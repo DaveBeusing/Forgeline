@@ -36,9 +36,10 @@ are recorded separately; an unreached required gate is not a pass.
 `ConveyorSimulationSystem` runs in Economy after extraction, with no presentation,
 Windows or rendering dependency. Constructed modules retain their entity ID,
 generation, owner, geometry, health and explicit building attachment. Each active
-module owns an InventoryStore inventory, restricted to the five stable resource IDs
-Ferrous Ore, Silicates, Steel, Electronics and Ammunition. Fuel, Volatiles, units and
-unknown resources are excluded. Supports and caps have no inventory or drive.
+module owns an InventoryStore inventory, restricted to seven stable resource IDs:
+Ferrous Ore, Silicates, Steel, Electronics, Ammunition, Volatiles and Fuel.
+Volatiles and Fuel are an interim conveyor exception for the existing Refinery
+until pipelines are implemented. Units and unknown resources remain excluded. Supports and caps have no inventory or drive.
 
 | Module | Total buffer | Maximum ingress and egress |
 | --- | ---: | ---: |
@@ -69,7 +70,7 @@ quanta; a transfer uses the smaller endpoint quantum. This avoids a recurring
 alternate; splitter outputs alternate; blocked/rejecting/offline branches are
 skipped and the remaining branch can use the shared 100/s budget. A deterministic
 bounded number of rounds covers the tick budget, two-port contention and fractional
-tails of the five eligible resources. Cursors
+tails of the seven eligible resources. Cursors
 advance only for actual transfers, surviving idle periods and replay.
 
 Connections require the same owner, complementary direction, opposite facing and
@@ -104,6 +105,7 @@ with exact authored dimensions expose these ports; unsupported variants do not.
 | Extractor | 12,8,12 | None | Its actual eligible extracted resource |
 | Storage Depot | 14,8,14 | Eligible solids/packages | Same |
 | Smelter | 18,10,16 | Actual supported recipe ingredients: Ferrous Ore | Actual completed recipe outputs: Steel |
+| Refinery | 18,10,16 | Volatiles, real production input inventory | Fuel, real production output inventory |
 | Electronics Fabricator | 18,10,18 | Actual recipe: Silicates | Actual recipe: Electronics |
 | Ammunition Plant | 18,10,18 | Actual recipe: Steel, Electronics | Actual recipe: Ammunition |
 | Logistics Hub | 18,9,18 | Eligible solids/packages | Same |
@@ -116,16 +118,22 @@ unit facilities bind their real input inventory. Extractors bind their actual ou
 InventoryStorage and require the matching extractor owner/resource. Storage, hub and
 supply ports use the existing authoritative shared inventories. No proxy stock,
 recipe completion shortcut, invisible external shipment or synthetic unit cargo exists.
-The current Refinery only uses Volatiles/Fuel, so has no belt ports. Power Plant and
-Radar also have none. New port geometry requires an explicit content update.
+The Refinery exposes exactly one fixed west INPUT and one fixed east OUTPUT at
+5.8m above local ground, rotated with its authored footprint. Its actual
+powered recipe consumes 10 Volatiles and produces 10 Fuel over 30 ticks at
+full power. These are authoritative inventory transfers, not conversion by
+conveyor. The +Z truck dock remains open. Power Plant and Radar have no ports.
 
 ## Trucks, stock policy and recovery
 
 The explicit hybrid handoff is the existing Storage Depot, Logistics Hub or Supply
 Depot inventory. Cargo Trucks bring regional goods through normal docks; local
 conveyors consume available unreserved stock. Ammunition delivered by belt can be
-loaded into Supply Trucks through the normal depot system. Fuel and regional/front
-routes continue through existing vehicles, loading queues, reservations and road rules.
+loaded into Supply Trucks through the normal depot system. Volatiles and
+Fuel may travel between compatible owned storage and the Refinery via powered
+local belts, but no Fuel enters the ammunition-only Supply Depot conveyor port.
+Regional/front routes and existing Fuel/Volatiles Cargo Trucks continue through
+their existing vehicle queues, reservations, fuel consumption and road rules.
 
 Enabled stock policies retain their DesiredTarget in shared source inventories.
 At a destination with a policy, conveyor receipt is limited to DesiredTarget minus

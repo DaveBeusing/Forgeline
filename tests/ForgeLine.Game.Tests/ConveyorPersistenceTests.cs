@@ -74,12 +74,43 @@ public sealed class ConveyorPersistenceTests
         Assert.True(gateway.Results.TryRead(out var result));
         BuildingDemolitionTargetResult accepted = Assert.Single(result.DemolitionTargets!);
         Assert.True(accepted.Accepted);
-        ConveyorCargoRecovery recovered = Assert.Single(accepted.CargoRecovery!);
-        Assert.Equal(held, recovered.Held, 8);
-        Assert.Equal(held * 0.5, recovered.Recovered, 8);
-        Assert.Equal(held * 0.5, recovered.Lost, 8);
+        ConveyorCargoRecovery[] recovered = Assert.IsType<ConveyorCargoRecovery[]>(accepted.CargoRecovery);
+        Assert.NotEmpty(recovered);
+        Assert.Equal(held, recovered.Sum(item => item.Held), 8);
+        Assert.Equal(held * 0.5, recovered.Sum(item => item.Recovered), 8);
+        Assert.Equal(held * 0.5, recovered.Sum(item => item.Lost), 8);
         Assert.False(runtime.Simulation.Entities.IsAlive(target.Entity));
         Assert.True(ConveyorSalvageStock.FindInventory(runtime.Simulation.Entities, Player).IsSpecified);
+        AssertRoundTripsAndContinues(runtime);
+    }
+
+    [Fact]
+    public void InterimFuelAndVolatilesBeltTransportReconstructsFromCommands()
+    {
+        using MatchRuntime runtime = CreateRuntime(17);
+        BuildNetwork(runtime);
+        EntityId commandCore = runtime.GetBase(Player).CommandCore;
+
+        // The starting Command Core has physical, authoritative Fluid stock.
+        // Reuse its paid conveyor route, with no fixture-created material.
+        var policies = new List<EntityId>();
+        foreach (EntityId entity in runtime.Simulation.Entities.Query<LogisticsStockPolicy>(
+                     QueryIterationOrder.StableByEntityIndex))
+            policies.Add(entity);
+        foreach (EntityId entity in policies)
+        {
+            LogisticsStockPolicy policy = runtime.Simulation.Entities.GetComponent<LogisticsStockPolicy>(entity);
+            if (policy.TargetEntity != commandCore ||
+                policy.ResourceId != ResourceIds.Fuel && policy.ResourceId != ResourceIds.Volatiles)
+                continue;
+            var remove = PlayerLogisticsActionCommand.RemoveStockPolicy(Player, entity, runtime.Simulation.CurrentTick);
+            Submit(runtime, remove);
+            Assert.True(remove.Accepted);
+        }
+        Assert.True(runtime.RunUntil(match => Carriers(match).Any(row =>
+            match.Inventories.GetQuantity(row.Flow!.Value.Buffer, ResourceIds.Fuel) > 0 ||
+            match.Inventories.GetQuantity(row.Flow!.Value.Buffer, ResourceIds.Volatiles) > 0),
+            maximumTicks: 500, cancellationToken: TestContext.Current.CancellationToken));
         AssertRoundTripsAndContinues(runtime);
     }
 

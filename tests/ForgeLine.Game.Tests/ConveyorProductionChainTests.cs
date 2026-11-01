@@ -302,7 +302,10 @@ public sealed class ConveyorProductionChainTests
         Near(20, runtime.CargoTransport.Metrics.DeliveredQuantity);
         Assert.True(construction[ResourceIds.Steel] > 0);
         ProductionRecipeDefinition recipe = runtime.Services.ProductionRecipes[RecipeIds.Steel];
-        foreach (ResourceId resource in ConveyorSimulationSystem.EligibleResources)
+        // This Ore-to-Steel scenario measures solids; regional vehicle propulsion
+        // consumes Fuel independently of the recipe and construction ledgers.
+        foreach (ResourceId resource in Resources.Where(resource =>
+                     resource != ResourceIds.Fuel && resource != ResourceIds.Volatiles))
         {
             double consumed = recipe.Inputs.Where(input => input.ResourceId == resource).Sum(input => input.Quantity) * 2;
             double produced = recipe.Outputs.Where(output => output.ResourceId == resource).Sum(output => output.Quantity) * 2;
