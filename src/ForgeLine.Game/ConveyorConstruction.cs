@@ -353,20 +353,20 @@ public sealed class ConveyorConstructionService
                     continue;
                 }
 
-                int attached = 0;
+                int attachmentCount = 0;
                 ConveyorPortState state = ConveyorPortState.Free;
-                if (adapters.TryGetValue(entity, out List<ConveyorPiece>? attached))
-                    foreach (ConveyorPiece adapter in attached)
+                if (adapters.TryGetValue(entity, out List<ConveyorPiece>? connections))
+                    foreach (ConveyorPiece adapter in connections)
                     {
-                    bool intake = adapter.Placement.Module == ConveyorModule.OutputAdapter;
-                    ConveyorSocket terminal = intake ? adapter.Placement.Sockets[^1] : adapter.Placement.Sockets[0];
-                    if (Vector3.DistanceSquared(terminal.Position, socket.Position) >= .0004f) continue;
-                    attached++;
-                    state = Vector3.Dot(terminal.Facing, socket.Facing) < -.999f
-                        ? intake ? ConveyorPortState.ConnectedInput : ConveyorPortState.ConnectedOutput
-                        : ConveyorPortState.Blocked;
-                }
-                if (attached > 1) state = ConveyorPortState.Blocked;
+                        bool intake = adapter.Placement.Module == ConveyorModule.OutputAdapter;
+                        ConveyorSocket terminal = intake ? adapter.Placement.Sockets[^1] : adapter.Placement.Sockets[0];
+                        if (Vector3.DistanceSquared(terminal.Position, socket.Position) >= .0004f) continue;
+                        attachmentCount++;
+                        state = Vector3.Dot(terminal.Facing, socket.Facing) < -.999f
+                            ? intake ? ConveyorPortState.ConnectedInput : ConveyorPortState.ConnectedOutput
+                            : ConveyorPortState.Blocked;
+                    }
+                if (attachmentCount > 1) state = ConveyorPortState.Blocked;
                 if (state == ConveyorPortState.Free)
                 {
                     ports.Add(new(entity, owner, socket.Position, socket.Facing, true, physical.Key, true, state));
