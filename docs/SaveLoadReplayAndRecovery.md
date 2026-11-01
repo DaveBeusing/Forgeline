@@ -44,7 +44,7 @@ The current format is intentionally versioned for the current product stage. Uns
 
 ## Guided practice compatibility
 
-Current captures use envelope 1, payload 12 and authoritative schema 19. Payload 12 adds optional PracticeProgress for the three registered guided practice compositions. Practice saves require matching lesson/version/player/tick and bounded completion timestamps; ordinary skirmish saves reject practice metadata. Practice replay requires payload 12. The existing authoritative compatibility rules for ordinary historical saves remain in force.
+Current captures use envelope 1, payload 12 and authoritative schema 20. Payload 12 adds optional PracticeProgress for the three registered guided practice compositions. Practice saves require matching lesson/version/player/tick and bounded completion timestamps; ordinary skirmish saves reject practice metadata. Practice replay requires payload 12. The existing authoritative compatibility rules for ordinary historical saves remain in force.
 
 The loader reconstructs the normal commands and deterministic paid setup, then verifies derived objective status, failure and timestamps before returning the candidate. Practice snapshots are observations rather than a second authoritative checkpoint; their session identity is regenerated. Hints and reading state are local UI state and cannot certify saved completion. See [guided practice](GuidedStrategyPractice.md) and [the bounded observer contract](adr/BoundedGuidedPractice.md).
 
@@ -54,6 +54,13 @@ marker participate in regular inventory/entity snapshots and deterministic
 command replay. Earlier schema-18 saves or replays are incompatible because a
 previously rejected loaded-removal command now changes cargo ownership and the
 world. Combat wreck creation still does not grant salvage.
+
+The Refinery conveyor extension advances authoritative simulation schema to 20,
+retaining payload 12 and envelope 1. The resource compatibility and reachable
+routing rules now transport real Volatiles and Fuel through finite owned
+inventories; old checkpoints are explicitly incompatible rather than silently
+replaying newly eligible deliveries. Existing truck contracts and reservations
+remain unchanged. No pipeline state or fluid network is introduced.
 
 ## Recovery Model
 
