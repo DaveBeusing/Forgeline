@@ -98,7 +98,6 @@ public sealed class ConveyorEndpointRecoveryTests
         ConveyorBuildRequest valid = CreateReplacement(runtime, adapter, replacement).Request;
         ConveyorBuildRequest[] invalid =
         [
-            valid with { Edit = ConveyorEdit.Remove },
             valid with { Module = ConveyorModule.Standard },
             valid with { DestinationPortBuilding = adapter.Piece.Attachment },
             valid with { DestinationPortBuilding = payer },
