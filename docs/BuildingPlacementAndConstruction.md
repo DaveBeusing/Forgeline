@@ -89,9 +89,11 @@ Interactive building placement snaps to the same 4m grid as conveyors. A bounded
 terrain-following grid is visible around the preview. Foundation and clearance
 validation use that snapped site. Rotation keeps the same grid origin.
 
-The building ghost shows cyan **IN** and amber **OUT** direction arrows at its
-actual prospective belt sockets, using the same geometry as the completed
-building, including its orientation and foundation height. Mines expose only an
+The building ghost shows cyan **IN** and amber **OUT** arrows at prospective
+fixed-purpose belt sockets. Command Core and Storage Depot instead show four
+neutral **IN / OUT** positions at their actual prospective footprint, orientation,
+foundation height and raised conveyor tier. An invalid placement marks these
+positions as blocked rather than implying a valid connection. Mines expose only an
 eligible solid-resource output; Barracks and Vehicle Factory expose only input.
 Buildings without belt ports do not show belt sockets. The truck loading corridor
 also identifies **CARGO IN / CARGO OUT** access, including for liquid-processing
