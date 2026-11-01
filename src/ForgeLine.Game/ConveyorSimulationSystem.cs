@@ -62,6 +62,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
     {
         _observations.Clear();
         ObservationTick = context.Tick;
+        // Reclaim bounded, owner-scoped demolition salvage through real inventory transfers.
+        ConveyorSalvageStock.Drain(context.Entities, _stock);
 #if FORGELINE_DEVELOPER_TOOLS
         if (_developerTuning is { } tuning)
         {
