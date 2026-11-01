@@ -119,9 +119,14 @@ elevated. Built instances use the existing authored meshes and PBR atlas, with
 LOD0/1/2 at the existing 140/420m handoff distances.
 
 During conveyor construction, visible owned buildings show **IN** and **OUT**
-markers at their real sockets. The input arrow points toward the building and the
-output arrow points away. Labels and direction distinguish the two roles in
-addition to cyan/amber coloring. Outside construction the selected or hovered
+markers at their real fixed-purpose sockets. The input arrow points toward the
+building and the output arrow points away. Command Core and Storage Depot
+instead expose four physical **IN / OUT** positions each. An unused position
+has one neutral marker; once attached, its marker resolves to **CONNECTED IN**
+or **CONNECTED OUT**. Malformed double or misaligned attachments show **PORT
+BLOCKED** and cannot be snapped to. This status comes from live, full-generation
+adapter attachments, not decorative geometry. Labels and direction distinguish
+roles without relying on color. Outside construction the selected or hovered
 building retains its port markers. At most 64 building ports are drawn; focused
 buildings have priority. Offscreen ports do not consume that budget. Unsupported
 buildings do not acquire decorative ports.

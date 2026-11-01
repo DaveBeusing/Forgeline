@@ -34,18 +34,25 @@ internal sealed class ConveyorEndpointPicker
         CameraRay ray = camera.ScreenPointToWorldRay(pointer, width, height);
         float nearest = float.PositiveInfinity;
         EntityId chosen = default;
+        int bestRank = int.MaxValue;
         ConveyorEndpoint bodyEndpoint = default;
-        // Clicking any visible part of the building selects its appropriate input/output socket.
+        // Whole-building clicks prefer legacy west-in/east-out, then available
+        // secondary positions. Explicit socket picking below permits any free port.
         foreach (var port in network.Ports)
         {
-            if (!includeBuildings || !Usable(port, player, input) || !_visible.TryGetValue(port.Building, out var instance) ||
+            if (!includeBuildings || !Usable(port, player, input) ||
+                !_visible.TryGetValue(port.Building, out var instance) ||
                 (instance.Selectable.Category & ControllableEntityCategory.Building) == 0) continue;
             var bounds = PresentationBounds.ResolveAxisAlignedBounds(instance);
             if (!Finite(bounds.Minimum) || !Finite(bounds.Maximum) ||
-                !SelectionPicking.TryIntersectBounds(ray, bounds.Minimum, bounds.Maximum, out float distance) ||
-                !Closer(distance, port.Building, nearest, chosen)) continue;
+                !SelectionPicking.TryIntersectBounds(ray, bounds.Minimum, bounds.Maximum, out float distance))
+                continue;
+            int rank = BodyRank(port, input);
+            if (!Closer(distance, port.Building, nearest, chosen) &&
+                !(distance == nearest && port.Building == chosen && rank < bestRank)) continue;
             nearest = distance;
             chosen = port.Building;
+            bestRank = rank;
             bodyEndpoint = new(port.Position - Vector3.UnitY * CarrierHeight, port.Building, 0, port.Facing, input);
         }
         bool bodyFound = chosen.IsValid;
@@ -94,8 +101,18 @@ internal sealed class ConveyorEndpointPicker
         return true;
     }
 
+    private static int BodyRank(in ConveyorBuildingPort port, bool input)
+    {
+        if (!port.Adaptable) return 0;
+        if (port.Key == (input ? "west.primary" : "east.primary")) return 0;
+        if (port.Key == (input ? "west.secondary" : "east.secondary")) return 1;
+        if (port.Key == (input ? "east.primary" : "west.primary")) return 2;
+        return 3;
+    }
+
     private static bool Usable(in ConveyorBuildingPort port, PlayerId player, bool input) =>
         port.Building.IsValid && port.Owner == player && port.Input == input &&
+        (!port.Adaptable || port.Status == ConveyorPortState.Free) &&
         Finite(port.Position) && Finite(port.Facing) && port.Facing.LengthSquared() > .5f;
 
     private static bool Closer(float distance, EntityId entity, float nearest, EntityId chosen) =>

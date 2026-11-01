@@ -57,6 +57,7 @@ public readonly record struct BuildingPlacementPreview(
     EntityId ResourceDeposit)
 {
     public AxisAlignedBounds? LoadingCorridor { get; init; }
+    public IReadOnlyList<BuildingConveyorSocket> ConveyorPorts { get; init; } = Array.Empty<BuildingConveyorSocket>();
     public ConveyorSocket? ConveyorInput { get; init; }
     public ConveyorSocket? ConveyorOutput { get; init; }
     public string ConveyorInputMaterials { get; init; } = string.Empty;
@@ -161,6 +162,10 @@ public sealed class BuildingPlacementService
             result.ResourceDeposit)
         {
             LoadingCorridor = result.LoadingCorridor,
+            ConveyorPorts = buildingId == BuildingIds.CommandCore || buildingId == BuildingIds.StorageDepot
+                ? ConveyorGeometry.BuildingSockets(buildingId, result.GroundPosition,
+                    BuildingFootprint.GetRotation(result.Orientation))
+                : Array.Empty<BuildingConveyorSocket>(),
             ConveyorInput = PreviewPort(entities, result, true),
             ConveyorOutput = PreviewPort(entities, result, false)
         };

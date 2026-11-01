@@ -84,11 +84,19 @@ the minimum full entity identity in each connected component; there are no road 
 
 ## Activated building ports
 
-Authored sockets are relative to the building's ground origin, rotated by its actual
-pose: INPUT at `(-width/2, 5.8, 0)`, facing west; OUTPUT at `(width/2, 5.8, 0)`,
-facing east. They are tier 0 and leave +Z loading bays available. The completed,
-living owned building must match the exact dimensions below; unsupported content
-and scale variants do not acquire automatic ports.
+Authored tier-0 sockets are relative to the building's ground origin and rotate
+with its actual pose. Fixed-role buildings retain INPUT at `(-width/2, 5.8, 0)`
+facing west and OUTPUT at `(width/2, 5.8, 0)` facing east where supported.
+**Command Core and Storage Depot have four keyed physical positions each:**
+`west.primary` at `(-width/2, 5.8, 0)`, `east.primary` at
+`(width/2, 5.8, 0)`, plus `west.secondary` and `east.secondary`
+at the same X coordinates with local Z -6m for Command Core or -4m for
+Storage Depot. The primary positions preserve the former exact attachment
+coordinates. Each position accepts **either** a building-input adapter or a
+building-output adapter, never two simultaneously. The connected adapter
+resolves and locks the direction until it is validly removed/reconnected.
+The +Z loading lanes remain reserved. Only completed, living, owned buildings
+with exact authored dimensions expose these ports; unsupported variants do not.
 
 | Building | Expected width,height,depth | Input | Output |
 | --- | --- | --- | --- |

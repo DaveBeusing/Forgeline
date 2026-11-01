@@ -197,7 +197,8 @@ internal sealed class ConveyorTestFixture
     {
         PlayerId owner = Entities.GetComponent<CompletedBuilding>(building).Owner;
         return Assert.Single(ConveyorConstructionService.CapturePorts(Entities, owner),
-            port => port.Building == building && port.Input == input);
+            port => port.Building == building && port.Input == input &&
+                (!port.Adaptable || port.Key == (input ? "west.primary" : "east.primary")));
     }
 
     public ConveyorFlowState Flow(EntityId entity) => Entities.GetComponent<ConveyorFlowState>(entity);

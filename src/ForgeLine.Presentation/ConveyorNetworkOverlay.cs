@@ -89,10 +89,12 @@ public static class ConveyorNetworkOverlay
         Matrix4x4? viewProjection)
     {
         int drawn = 0;
+        var seen = new HashSet<(EntityId Building, string Key)>();
         // Focused buildings retain their markers when a large construction network reaches the budget.
         foreach (var entity in focus)
             foreach (var port in network.Ports)
-                if (port.Building == entity && CanDraw(port))
+                if (port.Building == entity && CanDraw(port) &&
+                    (!port.Adaptable || seen.Add((port.Building, port.Key))))
                 {
                     DrawPort(draw, port);
                     if (++drawn == MaximumBuildingPorts) return;
@@ -100,7 +102,8 @@ public static class ConveyorNetworkOverlay
         if (!showAll) return;
         foreach (var port in network.Ports)
         {
-            if (focus.Contains(port.Building) || !CanDraw(port)) continue;
+            if (focus.Contains(port.Building) || !CanDraw(port) ||
+                port.Adaptable && !seen.Add((port.Building, port.Key))) continue;
             DrawPort(draw, port);
             if (++drawn == MaximumBuildingPorts) return;
         }
@@ -120,8 +123,29 @@ public static class ConveyorNetworkOverlay
             clip.Y >= -clip.W && clip.Y <= clip.W && clip.Z >= 0 && clip.Z <= clip.W;
     }
 
-    private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port) =>
-        DrawSocket(draw, port.Position, port.Facing, port.Input);
+    private static void DrawPort(DebugDraw draw, in ConveyorBuildingPort port)
+    {
+        if (!port.Adaptable)
+        {
+            DrawSocket(draw, port.Position, port.Facing, port.Input);
+            return;
+        }
+        if (port.Status is ConveyorPortState.Free or ConveyorPortState.Blocked)
+        {
+            DrawAdaptableSocket(draw, port.Position, port.Status == ConveyorPortState.Blocked);
+            return;
+        }
+        DrawSocket(draw, port.Position, port.Facing, port.Input,
+            port.Status == ConveyorPortState.ConnectedInput ? "CONNECTED IN" : "CONNECTED OUT");
+    }
+
+    internal static void DrawAdaptableSocket(DebugDraw draw, Vector3 position, bool blocked = false)
+    {
+        Vector4 color = blocked ? new(1, .25f, .2f, 1) : new(.8f, .86f, .95f, 1);
+        draw.Circle(position, .9f, color, 12);
+        draw.Label(position + Vector3.UnitY * 1.3f,
+            blocked ? "PORT BLOCKED" : "IN / OUT", color);
+    }
 
     internal static void DrawSocket(DebugDraw draw, Vector3 position, Vector3 facing, bool input, string? label = null)
     {
