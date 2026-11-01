@@ -133,7 +133,8 @@ internal readonly record struct ClientRenderFrame(
     HoverTooltipView HoverTooltip = default,
     OperationsView Operations = default, UiFeedbackSettings FeedbackSettings = default, WorldAudioSettings WorldAudio = default,
     NotificationExpansion NotificationExpansion = default, NavigationDiagnosticsView NavigationDiagnostics = default,
-    TacticalDisplaySettings TacticalDisplay = default);
+    TacticalDisplaySettings TacticalDisplay = default,
+    StatisticsOverlayPickerView StatisticsPicker = default);
 
 internal sealed partial class ClientRenderHost : IDisposable
 {
@@ -934,7 +935,9 @@ internal sealed partial class ClientRenderHost : IDisposable
                             showDevelopmentMetrics:
                                 current.OverlayEnabled,
                             uiScale:
-                                RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale);
+                                RtsUiLayout.ScaleForDpi(current.Dpi) * current.UiScale,
+                            statisticsPicker: current.StatisticsPicker,
+                            publicMetricsOnly: !current.StatisticsPicker.DeveloperAuthorized);
                         if (animatedFrontend is FrontendSurfaceView frontend)
                         {
                             frontendRenderer.Render(
