@@ -126,7 +126,7 @@ Camera bindings are represented by `RtsCameraBindings`. Selection conventions us
 
 The pre-alpha client persists the existing `RtsCameraBindings` contract in `%LOCALAPPDATA%\\FORGELINE\\settings.json`. Camera pan, rotation, pitch, and drag-pan bindings can therefore be changed without adding a second input model. Settings validation rejects unknown/no-button values and duplicate primary camera actions. Settings also exposes twenty-five gameplay actions, including dock navigation and activation. Schema 1 migrates without rewriting camera values; invalid gameplay overrides alone recover while valid camera/display settings survive. See [editing and overlap rules](GameplayInputAccessibilityAndQualification.md).
 
-Escape opens Pause and its Controls page. In an activated Developer build, unmodified F1 opens the existing developer menu at Visualization; F1/Escape returns to Pause. There are no legacy F1/F12 help bindings. Shift+F12 only toggles the optional match guide; metrics and diagnostic switches use the F1 checkboxes. Space retains explicit player pause. All modal entry and exit use the existing simulation-owner control boundary.
+Escape opens Pause and its Controls page. Unmodified F1 toggles a compact, nonmodal, semi-transparent statistics selector. Public builds expose only bounded FPS and frame-time metrics; Developer builds with an active authorized session also expose independent Rendering, Navigation, World, Logistics, Sensors, Combat and Entities overlays. Switching a category changes only the existing DebugOverlayController selection; it never writes simulation state. Closing the selector with F1, Escape or a click outside preserves selected overlays, and a panel click cannot pass through to orders or selection. The full developer console remains accessible only through Escape → DEVELOPER TOOLS in an activated Developer build. F1 does not open it. F10 continues to control strategic layers. Shift+F12 toggles the optional match guide; retired Shift+F combinations remain absent. Space retains explicit player pause.
 
 ## Raw Input
 
@@ -287,10 +287,13 @@ See [named regions and migration](FrontendLayout.md) and [qualification](Fronten
 
 ## Gameplay usability
 
-F1 opens Visualization only with compiled and active developer tools. Public F1
-and unmodified F12 have no help action. Escape opens Pause/Controls/Settings.
-Performance metrics use the developer menu checkbox; the live loop no longer
-handles Shift+F1. F3-F9 and their old placement/debug combinations are retired.
+F1 opens or closes the small statistics selector in active gameplay, including
+Public builds (FPS/frame-time only). Authorized Developer builds add Rendering,
+Navigation, World, Logistics, Sensors, Combat and Entities switches. Escape closes
+the selector first; the full developer menu remains under Pause → DEVELOPER TOOLS.
+F1 does not activate developer permissions or the developer console. Unmodified
+F12 has no help action; the live loop does not handle Shift+F1. F3-F9 and their
+old placement/debug combinations remain retired.
 Gameplay overrides using them are dropped during settings load; affected camera
 slots receive available ordinary default keys without resetting other settings.
 F10/F11 remain player overlay/minimap keys. Windows modifier decoding and
