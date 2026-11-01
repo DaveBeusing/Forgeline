@@ -11,7 +11,7 @@ public sealed class ConveyorSnapSelectorTests
     public void EqualDistanceUsesFullIdentityRegardlessOfCandidateOrder()
     {
         var first = Endpoint(new EntityId(4, 2), "output", 0);
-        var second = Endpoint(new EntityId(4, 3), "output", 0);
+        var second = Endpoint(new EntityId(4, 3), "output", 0) with { Position = new Vector3(8, 0, 0) };
         var a = Candidate(second, 25);
         var b = Candidate(first, 25);
         Assert.True(ConveyorSnapSelector.TrySelect([a, b], null, 1, out var initial));
@@ -24,7 +24,7 @@ public sealed class ConveyorSnapSelectorTests
     public void SocketOrdinalBreaksTiesWithoutSnapshotOrdering()
     {
         EntityId source = new(9, 1);
-        var later = Endpoint(source, "", 2);
+        var later = Endpoint(source, "", 2) with { Position = new Vector3(8, 0, 0) };
         var earlier = Endpoint(source, "", 1);
         Assert.True(ConveyorSnapSelector.TrySelect(
             [Candidate(later, 0), Candidate(earlier, 0)], null, 1, out var selected));
@@ -35,7 +35,7 @@ public sealed class ConveyorSnapSelectorTests
     public void HysteresisRetainsOnlyLiveSocketAndSwitchesWhenClearlyCloser()
     {
         var previous = Endpoint(new EntityId(10, 1), "east.primary", 0);
-        var other = Endpoint(new EntityId(11, 1), "west.primary", 0);
+        var other = Endpoint(new EntityId(11, 1), "west.primary", 0) with { Position = new Vector3(8, 0, 0) };
         Assert.True(ConveyorSnapSelector.TrySelect(
             [Candidate(other, 16), Candidate(previous, 25)], previous, 1, out var held));
         Assert.Equal(previous, held);
@@ -48,10 +48,21 @@ public sealed class ConveyorSnapSelectorTests
     }
 
     [Fact]
+    public void OverlappingPhysicalEndpointsAreAmbiguousAndFailClosed()
+    {
+        var a = Endpoint(new EntityId(7, 1), "", 0);
+        var b = Endpoint(new EntityId(8, 1), "", 0);
+        Assert.False(ConveyorSnapSelector.TrySelect(
+            [Candidate(a, 0), Candidate(b, 0)], null, 1,
+            out _, out bool ambiguous));
+        Assert.True(ambiguous);
+    }
+
+    [Fact]
     public void StaleOrOutOfRangeSocketCannotRemainSelected()
     {
         var earlier = Endpoint(new EntityId(12, 1), "a", 0);
-        var reused = Endpoint(new EntityId(12, 2), "a", 0);
+        var reused = Endpoint(new EntityId(12, 2), "a", 0) with { Position = new Vector3(8, 0, 0) };
         Assert.False(ConveyorSnapSelector.TrySelect(
             [Candidate(earlier, 35 * 35)], earlier, 1, out _));
         Assert.True(ConveyorSnapSelector.TrySelect(
