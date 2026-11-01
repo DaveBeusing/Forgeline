@@ -13,7 +13,7 @@ public sealed class CompiledScenarioTests
         using var runtime = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         Assert.Equal(ScenarioRegistry.CentralDivideDescriptor.Identity, runtime.RuntimeSettings.Composition.Identity);
         BattlefieldMapArtifact.Capture(CentralDivideBattlefield.Create()).ValidateMatches(runtime.Battlefield);
-        Assert.Equal(18, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        Assert.Equal(20, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
         using var independent = MatchRuntime.Create(CentralDivideScenario.CreateHeadless(MatchScenarioProfile.Validation, 2026, enableDebugCapture: true), TestContext.Current.CancellationToken);
         string initial = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         Assert.Equal(initial, MatchAuthoritativeSnapshot.Capture(independent).ComputeSha256());
@@ -21,8 +21,11 @@ public sealed class CompiledScenarioTests
         independent.Simulation.RunTicks(20, TestContext.Current.CancellationToken);
         string afterTwenty = MatchAuthoritativeSnapshot.Capture(runtime).ComputeSha256();
         Assert.Equal(afterTwenty, MatchAuthoritativeSnapshot.Capture(independent).ComputeSha256());
-        Assert.Equal("E8A27383CE21EFE848672254CAA4D2E1F7ECD9912E59F174C6762E9884E0324C", initial);
-        Assert.Equal("14D58A81A68CC2437CA714001BB323859E04A9F4D759D77BBF16F614A2606E99", afterTwenty);
+        Assert.NotEqual("E8A27383CE21EFE848672254CAA4D2E1F7ECD9912E59F174C6762E9884E0324C", initial);
+        Assert.NotEqual("14D58A81A68CC2437CA714001BB323859E04A9F4D759D77BBF16F614A2606E99", afterTwenty);
+        // Schema 20: independently captured with the same Validation recipe and no presentation observer.
+        Assert.Equal("A5215C615B70EF19EE0D64DCF994C2EF4526E4CF8296AE6FCF26401D276CFAC5", initial);
+        Assert.Equal("822EA719E5A002667DE4B98E014D329FFA8C7E0912E60DAF41E6F3D0FE3A2CB3", afterTwenty);
         var report = BattlefieldOperationalGeographyValidator.Validate(runtime.Battlefield, runtime.Terrain,
             new NavigationGridSettings { CellSizeMeters = 16, StaticObstacleClearanceMeters = 0.5f },
             new NavigationSectorSettings { SectorSizeCells = 8 });

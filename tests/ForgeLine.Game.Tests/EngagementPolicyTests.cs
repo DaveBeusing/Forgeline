@@ -94,7 +94,7 @@ public sealed class EngagementPolicyTests
         Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(restored).ComputeSha256());
         Assert.Equal(save.StateSha256, MatchAuthoritativeSnapshot.Capture(replayed).ComputeSha256());
         Assert.Equal(FirePolicy.ReturnFire, restored.Simulation.Entities.GetComponent<FirePolicyState>(first).Policy);
-        Assert.Equal(18, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
+        Assert.Equal(20, MatchAuthoritativeSnapshot.CurrentSchemaVersion);
         Assert.Equal(12, copy.SchemaVersion);
     }
 

@@ -266,8 +266,10 @@ public sealed class OperationsChainDiagnosisTests
     private static void Connect(MatchRuntime runtime, EntityId source, EntityId destination)
     {
         var ports = ConveyorConstructionService.CapturePorts(runtime.Simulation.Entities, Player);
-        var output = Assert.Single(ports, port => port.Building == source && !port.Input);
-        var input = Assert.Single(ports, port => port.Building == destination && port.Input);
+        var output = Assert.Single(ports, port => port.Building == source && !port.Input &&
+            (!port.Adaptable || port.Key == "east.primary"));
+        var input = Assert.Single(ports, port => port.Building == destination && port.Input &&
+            (!port.Adaptable || port.Key == "west.primary"));
         var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route, output.Position - Vector3.UnitY * 5.8f,
                 input.Position - Vector3.UnitY * 5.8f, BuildingOrientation.North, 0, true,
                 SourcePortBuilding: source, DestinationPortBuilding: destination);
