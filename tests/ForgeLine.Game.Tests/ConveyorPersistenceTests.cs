@@ -85,8 +85,10 @@ public sealed class ConveyorPersistenceTests
         EntityId source = runtime.GetBase(Player).CommandCore;
         IReadOnlyList<ConveyorBuildingPort> ports = ConveyorConstructionService.CapturePorts(
             runtime.Simulation.Entities, Player);
-        ConveyorBuildingPort output = Assert.Single(ports, port => port.Building == source && !port.Input);
-        ConveyorBuildingPort input = Assert.Single(ports, port => port.Building == destination && port.Input);
+        ConveyorBuildingPort output = Assert.Single(ports, port => port.Building == source && !port.Input &&
+            (!port.Adaptable || port.Key == "east.primary"));
+        ConveyorBuildingPort input = Assert.Single(ports, port => port.Building == destination && port.Input &&
+            (!port.Adaptable || port.Key == "west.primary"));
         var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
             output.Position - Vector3.UnitY * 5.8f, input.Position - Vector3.UnitY * 5.8f,
             BuildingOrientation.North, 0, true, SourcePortBuilding: source,
@@ -248,8 +250,10 @@ public sealed class ConveyorPersistenceTests
         EntityId destination = Build(runtime, BuildingIds.StorageDepot, new(145, 0, 96));
         EntityId source = runtime.GetBase(Player).CommandCore;
         IReadOnlyList<ConveyorBuildingPort> ports = ConveyorConstructionService.CapturePorts(runtime.Simulation.Entities, Player);
-        ConveyorBuildingPort output = Assert.Single(ports, port => port.Building == source && !port.Input);
-        ConveyorBuildingPort input = Assert.Single(ports, port => port.Building == destination && port.Input);
+        ConveyorBuildingPort output = Assert.Single(ports, port => port.Building == source && !port.Input &&
+            (!port.Adaptable || port.Key == "east.primary"));
+        ConveyorBuildingPort input = Assert.Single(ports, port => port.Building == destination && port.Input &&
+            (!port.Adaptable || port.Key == "west.primary"));
         var request = new ConveyorBuildRequest(ConveyorEdit.Build, ConveyorModule.Route,
             output.Position - Vector3.UnitY * 5.8f, input.Position - Vector3.UnitY * 5.8f,
             BuildingOrientation.North, 0, true, SourcePortBuilding: source, DestinationPortBuilding: destination);
