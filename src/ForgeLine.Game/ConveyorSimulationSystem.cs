@@ -163,12 +163,17 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 ? (Math.Min(target.Minimum, policy.DesiredTarget), Math.Max(target.Maximum, policy.DesiredTarget))
                 : (policy.DesiredTarget, policy.DesiredTarget);
         }
+        // A storage inventory may expose several physical output ports. Reserve
+        // its desired stock once per resource, never once for every port.
+        var retainedInventoryResources = new HashSet<(InventoryId Inventory, ResourceId Resource)>();
         foreach (var node in nodes)
         {
             if (node.Port is not { Input: false } || ResolveInventory(entities, node.Entity, true) != node.Inventory) continue;
             for (int r = 0; r < EligibleResources.Count; r++)
             {
-                double retain = targets.TryGetValue((node.Entity, EligibleResources[r]), out var target) ? target.Maximum : 0;
+                ResourceId resource = EligibleResources[r];
+                if (!retainedInventoryResources.Add((node.Inventory, resource))) continue;
+                double retain = targets.TryGetValue((node.Entity, resource), out var target) ? target.Maximum : 0;
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
         }
