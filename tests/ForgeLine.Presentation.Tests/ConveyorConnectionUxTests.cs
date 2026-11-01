@@ -412,6 +412,43 @@ public sealed class ConveyorConnectionUxTests
         Assert.All(draw.Labels, label => Assert.True(label.Position.X > 0));
     }
 
+    [Fact]
+    public void AmbiguousLiveBeltEndpointsRejectRegardlessOfSnapshotOrder()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var placement = new ConveyorPlacement(ConveyorModule.Standard, Vector3.Zero,
+            BuildingOrientation.East, 0);
+        var first = new ConveyorOwnedPiece(new(19, 1), new(Player, placement, 16));
+        var second = new ConveyorOwnedPiece(new(20, 1), new(Player, placement, 16));
+        var socket = placement.Sockets.Single(s => !s.Input);
+        Vector2 pointer = camera.WorldToScreen(socket.Position, Width, Height).Position;
+        var picker = new ConveyorEndpointPicker();
+        Assert.False(picker.TryPick(Snapshot([Piece(first), Piece(second)], [],
+            [first, second]), Player, camera, pointer, Width, Height, 1, false, out _));
+        Assert.Equal(ConveyorSnapFailure.Ambiguous, picker.LastFailure);
+        Assert.False(picker.TryPick(Snapshot([Piece(second), Piece(first)], [],
+            [second, first]), Player, camera, pointer, Width, Height, 1, false, out _));
+        Assert.Equal(ConveyorSnapFailure.Ambiguous, picker.LastFailure);
+    }
+
+    [Fact]
+    public void OccupiedAdaptableBuildingPortReportsBlockedInsteadOfBodyFallback()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var building = Building(1, Vector3.Zero);
+        var port = Ports(building).Single(p => p.Input) with
+        {
+            Adaptable = true,
+            Key = "west.primary",
+            Status = ConveyorPortState.ConnectedInput
+        };
+        Vector2 pointer = camera.WorldToScreen(port.Position, Width, Height).Position;
+        var picker = new ConveyorEndpointPicker();
+        Assert.False(picker.TryPick(Snapshot([building], [port]), Player, camera,
+            pointer, Width, Height, 1, true, out _));
+        Assert.Equal(ConveyorSnapFailure.Blocked, picker.LastFailure);
+    }
+
     private static RenderInstance Building(uint id, Vector3 ground, BuildingOrientation orientation = BuildingOrientation.North) =>
         new(new(id, 1), new(ground + Vector3.UnitY * 6, BuildingFootprint.GetRotation(orientation), new(20, 12, 20)),
             new(1), RenderMaterialHandle.Default, RenderVisibilityMask.World,
