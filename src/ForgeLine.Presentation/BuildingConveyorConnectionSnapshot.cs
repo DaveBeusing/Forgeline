@@ -64,6 +64,12 @@ internal static class BuildingConveyorConnectionCapture
         ArgumentNullException.ThrowIfNull(materials);
         if (unavailable) return new(building, true, []);
 
+        var adapters = new List<ConveyorOwnedPiece>();
+        foreach (ConveyorOwnedPiece piece in pieces)
+            if (piece.Piece.Owner == owner && piece.Piece.Attachment == building &&
+                piece.Piece.Placement.Module is ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter)
+                adapters.Add(piece);
+
         var views = new List<BuildingConveyorPortView>();
         var seenAdaptable = new HashSet<(string Key, Vector3 Position)>();
         foreach (ConveyorBuildingPort port in ports)
@@ -78,11 +84,8 @@ internal static class BuildingConveyorConnectionCapture
             int matches = 0;
             bool complementary = false;
             ConveyorLinkStatus? transport = null;
-            foreach (ConveyorOwnedPiece piece in pieces)
+            foreach (ConveyorOwnedPiece piece in adapters)
             {
-                if (piece.Piece.Owner != owner || piece.Piece.Attachment != building ||
-                    piece.Piece.Placement.Module is not
-                        (ConveyorModule.InputAdapter or ConveyorModule.OutputAdapter)) continue;
                 bool intake = piece.Piece.Placement.Module == ConveyorModule.OutputAdapter;
                 ConveyorSocket terminal = intake
                     ? piece.Piece.Placement.Sockets[^1] : piece.Piece.Placement.Sockets[0];
