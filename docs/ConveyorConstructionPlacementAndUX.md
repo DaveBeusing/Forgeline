@@ -84,7 +84,10 @@ connect only through their own directed sockets and never mix cargo at the cross
 
 ### Connection feedback and snapping
 
-Draw route initially displays **SELECT INPUT OR OUTPUT**. The first clicked
+Draw route initially displays **SELECT INPUT OR OUTPUT**. When an adaptable
+physical position supports both roles at exactly the same location, an ordinary
+click selects OUTPUT for compatibility; **Shift + click** selects INPUT without
+creating an additional position or changing the installed adapter. The first clicked
 physical port is retained with its exact building/piece generation identity,
 authored port key or socket ordinal, height tier, role, and simulation observation
 tick. After selecting an OUTPUT the second prompt is **SELECT COMPATIBLE INPUT**;

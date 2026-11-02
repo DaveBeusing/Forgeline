@@ -344,6 +344,29 @@ public sealed class ConveyorConnectionUxTests
     }
 
     [Fact]
+    public void AdaptablePhysicalPortUsesShiftToSelectInputRoleOnAnExactTie()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var building = Building(1, Vector3.Zero);
+        Vector3 point = building.Transform.Position - Vector3.UnitY * 0.2f +
+            Vector3.UnitX * 10;
+        var output = new ConveyorBuildingPort(building.Entity, Player, point,
+            Vector3.UnitX, false, "east.primary", true);
+        var input = output with { Input = true };
+        var snapshot = Snapshot([building], [output, input]);
+        Vector2 pointer = camera.WorldToScreen(point, Width, Height).Position;
+        var picker = new ConveyorEndpointPicker();
+        Assert.True(picker.TryPickEither(snapshot, Player, camera, pointer, Width, Height,
+            1, out var normal));
+        Assert.False(normal.Input);
+        Assert.True(picker.TryPickEither(snapshot, Player, camera, pointer, Width, Height,
+            1, out var modified, preferInputOnTie: true));
+        Assert.True(modified.Input);
+        Assert.Equal(normal.Position, modified.Position);
+        Assert.Equal(normal.SocketKey, modified.SocketKey);
+    }
+
+    [Fact]
     public void IncompatibleResourceMasksRejectTheSecondClickWithoutSubmission()
     {
         var camera = SameTypeSelectionTests.Camera();
