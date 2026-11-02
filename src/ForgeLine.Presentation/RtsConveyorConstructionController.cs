@@ -16,6 +16,7 @@ public sealed record ConveyorConstructionReadModel(ulong RequestId, SimulationTi
 {
     public string BeltMaterials { get; init; } = string.Empty;
     public IReadOnlyList<ConveyorPortInformation> PortInformation { get; init; } = Array.Empty<ConveyorPortInformation>();
+    public BuildingConveyorConnectionSnapshot? SelectedBuildingConnections { get; init; }
 }
 public readonly record struct ConveyorFeaturePresentationMetadata(ConveyorPlacement Placement, string State)
 {

@@ -19,7 +19,8 @@ internal readonly record struct HoverTooltipContent(
     PlayerActionSnapshot? OwnedActions = null,
     string ActionTitle = "", string ActionStatus = "",
     ProductionInputInformation? ProductionInput = null,
-    ProductionOutputStock? ProductionOutput = null);
+    ProductionOutputStock? ProductionOutput = null,
+    BuildingConveyorConnectionSnapshot? BuildingConveyors = null);
 
 internal static class HoverTooltipResolver
 {
@@ -44,6 +45,7 @@ internal static class HoverTooltipResolver
                 WrapDetails: true, Selection: experience.Selection,
                 Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
                 Formation: formation, Feedback: experience.Feedback,
+                BuildingConveyors: SelectionInspectorHudModel.ResolveConveyors(snapshot, experience.Selection),
                 OwnedActions: experience.Selection.Count == 1 &&
                     snapshot.PlayerActions is { } actions &&
                     actions.SessionId == snapshot.SessionId && actions.Tick == snapshot.Tick &&

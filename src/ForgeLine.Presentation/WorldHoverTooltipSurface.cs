@@ -162,6 +162,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         if (resolved.Selection is { } selection)
         {
             EmitSelectionStatus(selection, resolved.Group, resolved.Formation);
+            if (selection.Count == 1 && resolved.BuildingConveyors is { } connections)
+                EmitConveyorConnections(connections);
             if (selection.Count == 1 && resolved.OwnedActions is { } actions)
                 EmitOperationalDetails(actions, selection.PrimaryEntity);
         }
@@ -257,6 +259,87 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
         {
             text = new(buffer); text.Append("LOCAL INVENTORY "); text.Number(selection.InventoryQuantity, "N0"); Line(text.Written);
         }
+    }
+
+    private void EmitConveyorConnections(BuildingConveyorConnectionSnapshot connections)
+    {
+        if (connections.Unavailable)
+        {
+            Line("CONVEYORS: CONNECTION UNAVAILABLE");
+            return;
+        }
+        if (connections.Ports.Count == 0)
+        {
+            Line("NO CONVEYOR PORTS");
+            return;
+        }
+
+        Span<char> buffer = stackalloc char[256];
+        var summary = new TooltipTextBuilder(buffer);
+        summary.Append("CONVEYORS: INPUTS ");
+        summary.Number(connections.ConnectedInputs, "0");
+        summary.Append("/");
+        summary.Number(connections.TotalInputs, "0");
+        summary.Append(" / OUTPUTS ");
+        summary.Number(connections.ConnectedOutputs, "0");
+        summary.Append("/");
+        summary.Number(connections.TotalOutputs, "0");
+        Line(summary.Written);
+        if (connections.AvailablePorts > 0)
+        {
+            summary = new(buffer);
+            summary.Append("UNASSIGNED IN/OUT PORTS ");
+            summary.Number(connections.AvailablePorts, "0");
+            Line(summary.Written);
+        }
+
+        const int maximumRows = 6;
+        for (int i = 0; i < Math.Min(maximumRows, connections.Ports.Count); i++)
+        {
+            BuildingConveyorPortView port = connections.Ports[i];
+            var detail = new TooltipTextBuilder(buffer);
+            detail.Append(port.Role switch
+            {
+                BuildingConveyorPortRole.Input => "IN ",
+                BuildingConveyorPortRole.Output => "OUT ",
+                _ => "IN/OUT "
+            });
+            detail.Append(port.Key);
+            detail.Append(" ");
+            detail.Append(port.Facing);
+            detail.Append(" / ");
+            detail.Append(port.Attachment switch
+            {
+                BuildingConveyorAttachmentState.Attached => "CONNECTED",
+                BuildingConveyorAttachmentState.Blocked => "BLOCKED",
+                BuildingConveyorAttachmentState.Invalid => "INVALID",
+                _ => port.Role == BuildingConveyorPortRole.Available ? "AVAILABLE" : "DISCONNECTED"
+            });
+            if (port.Transport is { } transport)
+            {
+                detail.Append(" / ");
+                detail.Append(transport switch
+                {
+                    ConveyorLinkStatus.Flowing => "FLOWING",
+                    ConveyorLinkStatus.Offline => "OFFLINE",
+                    ConveyorLinkStatus.Congested => "CONGESTED",
+                    ConveyorLinkStatus.Damaged => "DAMAGED",
+                    ConveyorLinkStatus.Critical => "CRITICAL DAMAGE",
+                    ConveyorLinkStatus.Destroyed => "DESTROYED",
+                    ConveyorLinkStatus.Blocked => "FLOW BLOCKED",
+                    ConveyorLinkStatus.Disconnected => "FLOW DISCONNECTED",
+                    _ => "IDLE"
+                });
+            }
+            if (port.Role != BuildingConveyorPortRole.Available)
+            {
+                detail.Append(" / ");
+                detail.Append(port.Materials);
+            }
+            Line(detail.Written);
+        }
+        if (connections.Ports.Count > maximumRows)
+            Line("ADDITIONAL PORTS NOT SHOWN");
     }
 
     private void EmitOperationalDetails(PlayerActionSnapshot actions, ForgeLine.Core.EntityId selected)
