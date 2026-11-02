@@ -103,10 +103,11 @@ public sealed class RtsConveyorConstructionController
         bool left=input.IsMouseButtonDown(PlatformMouseButton.Left);
         bool click=(left || input.TryGetMousePressPosition(PlatformMouseButton.Left,out _)) && !_leftDown;
         _leftDown=left;
-        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_lastFreeGrid=null;_snapWarning=ConveyorSnapFailure.None;_pointerTarget=null;interaction.SetConveyorRequest(null);return;}
+        if(captured){Preview=null;Current=false;_requested=null;_snappedEndpoint=null;_smoothedSnapPosition=null;_lastFreeGrid=null;_snapWarning=ConveyorSnapFailure.None;_pointerTarget=null;_anchor=null;_anchorPointer=null;_firstEndpoint=null;_firstEndpointTick=default;interaction.SetConveyorRequest(null);return;}
         if(_awaiting)return;
         if (_anchor.HasValue && _firstEndpoint is { } first &&
-            !AnchorIsCurrent(snapshot, issuer, first))
+            (snapshot is null || snapshot.Tick.Value < _firstEndpointTick.Value ||
+             !AnchorIsCurrent(snapshot, issuer, first)))
         {
             _anchor = null; _anchorPointer = null; _firstEndpoint = null; _firstEndpointTick = default;
             _requested = null; Preview = null; Current = false;
