@@ -994,7 +994,7 @@ public sealed class AutomatedDistributionSystem
             if (!policy.Enabled ||
                 !_network.TryGetNodeForEntity(policy.TargetEntity, out var targetNode) ||
                 !_network.TryGetNode(targetNode, out var node) ||
-                !TryResolveDestinationInventory(entities, node, out var inventory) ||
+                !TryResolveSourceInventory(entities, node, out var inventory) ||
                 !sourceInventories.Contains(inventory)) continue;
             for (var priority = policy.Priority; priority <= LogisticsStockPriority.Low; priority++)
             {
