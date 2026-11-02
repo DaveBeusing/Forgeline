@@ -142,10 +142,11 @@ readability does not depend on color alone.
 The Windows session-loading owner maps reported replay ticks to determinate
 progress and all other preparation phases to indeterminate progress. Cancellation
 retains the session worker/graphics lifetime safeguards and removes the Escape
-invitation while outstanding work is shutting down. The startup controller
-publishes its specific failure message to the view; terminal errors never
-inherit a stale determinate bar. Session-load failures still return safely to
-the existing menu with an error banner and a new-request retry path. No new
+invitation while outstanding work is shutting down. The frontend adapter preserves the startup controller's specific failure
+message when that state is rendered; the existing application startup failure
+path still owns termination. Terminal error views cannot inherit a stale
+determinate bar. Session-load failures still return safely to the existing
+menu with an error banner and a new-request retry path. No new
 session command, persistent menu or fabricated progress was introduced.
 
 Skin and emergency fallback both display the same heading, status and
