@@ -344,8 +344,8 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                         if (_stock.GetAvailableQuantity(source.Inventory, resource) <= 0)
                             Add(new(ConveyorBlockReason.ReservedStock, source.Entity, resource));
                         else if (source.Port is { Input: false } &&
-                            targets.TryGetValue((source.Entity, resource), out var retained) &&
-                            _stock.GetAvailableQuantity(source.Inventory, resource) <= retained.Maximum)
+                            retained.TryGetValue((source.Inventory, resource), out double minimum) &&
+                            _stock.GetAvailableQuantity(source.Inventory, resource) <= minimum)
                             Add(new(ConveyorBlockReason.RetainedStock, source.Entity, resource));
                     }
                     if (!hasStock && source.Sent <= 0)
