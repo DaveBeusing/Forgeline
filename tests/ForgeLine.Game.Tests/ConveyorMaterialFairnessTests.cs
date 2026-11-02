@@ -106,8 +106,8 @@ public sealed class ConveyorMaterialFairnessTests
         Assert.InRange(delivered, 200 - Tolerance, 200 + Tolerance);
         Assert.Equal(0, fixture.Stock(destination, first));
 
-        LogisticsStockPolicy policy = fixture.Entities.GetComponent<LogisticsStockPolicy>(cap);
-        fixture.Entities.SetComponent(cap, policy with { Enabled = false });
+        fixture.Entities.SetComponent(cap,
+            new LogisticsStockPolicy(destination, first, 0, 0, 0, enabled: false));
         double firstBefore = fixture.Stock(destination, first);
         double secondBefore = fixture.Stock(destination, second);
         fixture.Step(40);
