@@ -337,6 +337,10 @@ public sealed class AutomatedDistributionSystem
             }
             double currentQuantity =
                 _inventories.GetQuantity(destinationInventory, policy.ResourceId);
+            double effectiveTarget = Math.Min(policy.DesiredTarget,
+                BuildingStockLimits.GetEffectiveMaximum(
+                    context.Entities, _inventories, destinationInventory, policy.ResourceId));
+            double effectiveMinimum = Math.Min(policy.DesiredMinimum, effectiveTarget);
 
             if (existing is not null && existing.State is
                 LogisticsTransportRequestState.Pending or LogisticsTransportRequestState.RetryPending)
@@ -344,7 +348,7 @@ public sealed class AutomatedDistributionSystem
                 // Pending/retrying quantity is a desired target, not committed
                 // inbound stock. Reconcile it against the live policy without
                 // resetting RequestId, CreatedAtTick, or WaitingSinceTick.
-                double required = Math.Max(0.0, policy.DesiredTarget - currentQuantity);
+                double required = Math.Max(0.0, effectiveTarget - currentQuantity);
                 if (required <= QuantityEpsilon)
                     RetireUnneededRequest(existing, context.Tick);
                 else
@@ -362,14 +366,14 @@ public sealed class AutomatedDistributionSystem
                 currentQuantity + outstandingQuantity;
 
             if (projectedQuantity + QuantityEpsilon >=
-                policy.DesiredMinimum)
+                effectiveMinimum)
             {
                 continue;
             }
 
             double requestedQuantity = Math.Max(
                 0.0,
-                policy.DesiredTarget - projectedQuantity);
+                effectiveTarget - projectedQuantity);
 
             if (requestedQuantity <= QuantityEpsilon)
             {
@@ -496,11 +500,9 @@ public sealed class AutomatedDistributionSystem
         }
 
         double destinationCapacity =
-            phase.Incoming.GetAddable(
-                _inventories,
-                destinationInventory,
-                request.ResourceId,
-                request.RequestedQuantity);
+            BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory,
+                request.ResourceId, request.RequestedQuantity, phase.Incoming);
 
         if (destinationCapacity <= QuantityEpsilon)
         {
@@ -992,12 +994,12 @@ public sealed class AutomatedDistributionSystem
             if (!policy.Enabled ||
                 !_network.TryGetNodeForEntity(policy.TargetEntity, out var targetNode) ||
                 !_network.TryGetNode(targetNode, out var node) ||
-                !TryResolveDestinationInventory(entities, node, out var inventory) ||
+                !TryResolveSourceInventory(entities, node, out var inventory) ||
                 !sourceInventories.Contains(inventory)) continue;
             for (var priority = policy.Priority; priority <= LogisticsStockPriority.Low; priority++)
             {
                 var key = (inventory, policy.ResourceId, priority);
-                targets[key] = Math.Max(targets.GetValueOrDefault(key), policy.DesiredTarget);
+                targets[key] = Math.Max(targets.GetValueOrDefault(key), policy.DesiredMinimum);
             }
         }
         return targets;
@@ -1671,6 +1673,13 @@ public sealed class AutomatedDistributionSystem
             return true;
         }
 
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot sourceDepot) &&
+            _inventories.Contains(sourceDepot.InventoryId))
+        {
+            inventoryId = sourceDepot.InventoryId;
+            return true;
+        }
+
         inventoryId = InventoryId.None;
         return false;
     }
@@ -1719,6 +1728,13 @@ public sealed class AutomatedDistributionSystem
             _inventories.Contains(hub.InventoryId))
         {
             inventoryId = hub.InventoryId;
+            return true;
+        }
+
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot destinationDepot) &&
+            _inventories.Contains(destinationDepot.InventoryId))
+        {
+            inventoryId = destinationDepot.InventoryId;
             return true;
         }
 

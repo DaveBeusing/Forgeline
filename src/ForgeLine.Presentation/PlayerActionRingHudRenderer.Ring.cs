@@ -179,7 +179,10 @@ internal sealed partial class PlayerActionRingHudRenderer
                 if (stockRows.IsCommandCore)
                 {
                     value.Append("HAVE "); value.Append(stockPolicy.CurrentQuantity, "F0");
-                    if (!stockPolicy.HasPolicy) value.Append(" / SET MIN MAX");
+                    value.Append("/"); value.Append(stockPolicy.EffectiveMaximum, "F0");
+                    if (stockPolicy.InboundStatus == "ABOVE CONFIGURED MAXIMUM") value.Append(" / OVER MAX");
+                    else if (stockPolicy.InboundStatus == "MAXIMUM STOCK REACHED") value.Append(" / FULL");
+                    else if (!stockPolicy.HasPolicy) value.Append(" / SET MIN MAX");
                     else if (!stockPolicy.Enabled) value.Append(" / OFF");
                     else if (stockPolicy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
                     { value.Append(" / "); value.Append(PlayerActionDockHudModel.ResolveTransportFailureLabel(stockPolicy.FailureReason)); }
@@ -195,7 +198,9 @@ internal sealed partial class PlayerActionRingHudRenderer
                     value.Append(">");
                     value.Append(PlayerActionDockHudModel.ResolveLogisticsPriorityLabel(stockPolicy.DispatchPriority));
                 }
-                if (!stockPolicy.Enabled) value.Append(" / OFF");
+                if (stockPolicy.InboundStatus == "ABOVE CONFIGURED MAXIMUM") value.Append(" / OVER MAX");
+                else if (stockPolicy.InboundStatus == "MAXIMUM STOCK REACHED") value.Append(" / FULL");
+                else if (!stockPolicy.Enabled) value.Append(" / OFF");
                 else if (stockPolicy.FailureReason != ForgeLine.Game.LogisticsTransportRequestFailureReason.None)
                 {
                     value.Append(" / ");

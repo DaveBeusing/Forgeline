@@ -17,6 +17,9 @@ internal sealed class CargoInboundCapacity
         _resources[key] = _resources.GetValueOrDefault(key) + quantity;
     }
 
+    internal double GetCommittedResource(InventoryId inventory, ResourceId resource) =>
+        _resources.GetValueOrDefault((inventory, resource));
+
     internal double GetAddable(InventoryStore stock, InventoryId inventory, ResourceId resource, double requested)
     {
         double physical = stock.GetAddableQuantity(inventory, resource, requested);

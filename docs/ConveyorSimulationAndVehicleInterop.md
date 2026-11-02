@@ -135,20 +135,23 @@ local belts, but no Fuel enters the ammunition-only Supply Depot conveyor port.
 Regional/front routes and existing Fuel/Volatiles Cargo Trucks continue through
 their existing vehicle queues, reservations, fuel consumption and road rules.
 
-Enabled stock policies retain their DesiredTarget in shared source inventories.
-At a destination with a policy, conveyor receipt is limited to DesiredTarget minus
-current stock minus already committed Assigned/InTransit truck quantities. Pending
-truck demand is reconciled against subsequent actual receipts by the existing
-scheduler. The belt creates no second logistics request. In-flight belt stock is a
-finite upstream buffer, not a promise of destination delivery; a truck may cover a
-shortage while the belt waits. A request for 80 may result in an accepted 40-unit
-truckload: only those 40 reserve destination demand. Once 20 have actually unloaded,
-only the remaining 20 are committed; the first 20 are already destination inventory.
-The accepted CargoTransportOrder destination remains authoritative if its stock policy
-is retargeted. Full physical loading transitions Assigned to InTransit even when the
-reservation observer has already reduced the source-reservation quantity to zero.
-Without a stock policy, actual capacity is the limit. Production's separate output
-inventory does not retain its input targets.
+Enabled stock policies retain **DesiredMinimum** in shared source inventories
+during voluntary outbound service. Production recipes and previously reserved material
+retain their normal authority. Input acceptance obeys **DesiredMaximum** as a hard
+ceiling, never DesiredTarget. A disabled or removed policy falls back to actual finite
+per-resource and shared physical capacities; the effective limit is the smaller
+physical or configured maximum. Target remains the goal for automatic replenishment.
+
+Conveyor input ports sharing one real `InventoryId` use one material ceiling, one
+shared physical capacity and the smallest active maximum, even when different
+buildings alias the inventory. The already committed cargo of live truck orders
+is deducted once from remaining inbound space; pending requests do not consume
+physical capacity. Partial unloading moves accepted cargo to inventory while the
+remaining load stays in transit. A policy lowered below the quantity already
+stored retains that stock but blocks new ingress until consumption/export opens
+headroom. Full destinations retain their upstream buffered cargo. This admission
+change does not alter the finite one-hop conveyor buffers, nominal 100 units/s
+rate, cursors, routing fairness, or transport queue ordering.
 
 A full/rejecting/downstream-offline sink stalls the immediate buffer, then bounded
 upstream buffers. Freeing stock or repairing/reconnecting the route resumes service

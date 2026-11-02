@@ -570,6 +570,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 : _inventories.GetAvailableQuantity(
                     sourceInventory,
                     order.ResourceId);
+        if (!hasAutomatedReservation)
+            available = Math.Max(0, available - BuildingStockLimits.GetOutboundMinimum(
+                context.Entities, origin.Entity, order.ResourceId));
         double addable =
             _inventories.GetAddableQuantity(
                 transport.CargoInventory,
@@ -994,10 +997,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
         }
 
         double unloadQuantity =
-            _inventories.GetAddableQuantity(
-                destinationInventory,
-                order.ResourceId,
-                cargoQuantity);
+            BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory, order.ResourceId, cargoQuantity);
 
         if (unloadQuantity <= QuantityEpsilon)
         {
@@ -1059,7 +1060,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (remaining > QuantityEpsilon)
         {
-            if (_inventories.GetAddableQuantity(destinationInventory, order.ResourceId, 1) <= QuantityEpsilon)
+            if (BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory, order.ResourceId, 1) <= QuantityEpsilon)
                 Wait(context.Entities, entity, unloadedState, CargoTransportWaitReason.DestinationCapacity, context.Tick);
             else SetState(context.Entities, entity, unloadedState);
             return;
@@ -1227,10 +1229,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
                             transport.CargoInventory,
                             order.ResourceId);
                     double addable =
-                        _inventories.GetAddableQuantity(
-                            destinationInventory,
-                            order.ResourceId,
-                            cargoQuantity);
+                        BuildingStockLimits.GetAddable(
+                            context.Entities, _inventories, destinationInventory, order.ResourceId, cargoQuantity);
 
                     if (cargoQuantity <= QuantityEpsilon ||
                         addable > QuantityEpsilon)
@@ -1911,6 +1911,19 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return true;
         }
 
+        if (entities.TryGetComponent(node.Entity, out LogisticsHub sourceHub) &&
+            _inventories.Contains(sourceHub.InventoryId))
+        {
+            inventoryId = sourceHub.InventoryId;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot sourceDepot) &&
+            _inventories.Contains(sourceDepot.InventoryId))
+        {
+            inventoryId = sourceDepot.InventoryId;
+            return true;
+        }
+
         inventoryId = InventoryId.None;
         return false;
     }
@@ -1944,6 +1957,25 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 storage.InventoryId))
         {
             inventoryId = storage.InventoryId;
+            return true;
+        }
+
+        if (entities.TryGetComponent(node.Entity, out UnitProductionFacility unitProduction) &&
+            _inventories.Contains(unitProduction.InputInventory))
+        {
+            inventoryId = unitProduction.InputInventory;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out LogisticsHub destinationHub) &&
+            _inventories.Contains(destinationHub.InventoryId))
+        {
+            inventoryId = destinationHub.InventoryId;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot destinationDepot) &&
+            _inventories.Contains(destinationDepot.InventoryId))
+        {
+            inventoryId = destinationDepot.InventoryId;
             return true;
         }
 

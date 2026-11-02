@@ -151,43 +151,44 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                     quantities[r] = _stock.GetAvailableQuantity(node.Inventory, EligibleResources[r]);
                 available[node.Inventory] = quantities;
             }
-        // This index is rebuilt from authoritative policies every tick, including full entity generations.
-        // Duplicate policies retain the former minimum input target and maximum retained output stock.
-        var targets = new Dictionary<(EntityId, ResourceId), (double Minimum, double Maximum)>();
+        // Rebuild enabled limits per tick. Input caps are shared by all ports of one physical inventory.
+        // The largest minimum reserves voluntary output; the smallest maximum bounds inbound.
+        var retained = new Dictionary<(InventoryId, ResourceId), double>();
+        var inboundMaximums = new Dictionary<(InventoryId, ResourceId), double>();
         foreach (EntityId e in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
             var policy = entities.GetComponent<LogisticsStockPolicy>(e);
             if (!policy.Enabled) continue;
-            var key = (policy.TargetEntity, policy.ResourceId);
-            targets[key] = targets.TryGetValue(key, out var target)
-                ? (Math.Min(target.Minimum, policy.DesiredTarget), Math.Max(target.Maximum, policy.DesiredTarget))
-                : (policy.DesiredTarget, policy.DesiredTarget);
+
+            InventoryId output = ResolveInventory(entities, policy.TargetEntity, input: false);
+            if (_stock.Contains(output))
+            {
+                var retainKey = (output, policy.ResourceId);
+                retained[retainKey] = Math.Max(retained.GetValueOrDefault(retainKey), policy.DesiredMinimum);
+            }
+
+            InventoryId input = ResolveInventory(entities, policy.TargetEntity, input: true);
+            if (!_stock.Contains(input)) continue;
+            var inboundKey = (input, policy.ResourceId);
+            inboundMaximums[inboundKey] = Math.Min(
+                inboundMaximums.GetValueOrDefault(inboundKey, _stock.GetResourceCapacity(input, policy.ResourceId)),
+                policy.DesiredMaximum);
         }
         // A storage inventory may expose several physical output ports. Reserve
         // its desired stock once per resource, never once for every port.
         var retainedInventoryResources = new HashSet<(InventoryId Inventory, ResourceId Resource)>();
         foreach (var node in nodes)
         {
-            if (node.Port is not { Input: false } || ResolveInventory(entities, node.Entity, true) != node.Inventory) continue;
+            if (node.Port is not { Input: false }) continue;
             for (int r = 0; r < EligibleResources.Count; r++)
             {
                 ResourceId resource = EligibleResources[r];
                 if (!retainedInventoryResources.Add((node.Inventory, resource))) continue;
-                double retain = targets.TryGetValue((node.Entity, resource), out var target) ? target.Maximum : 0;
+                double retain = retained.GetValueOrDefault((node.Inventory, resource));
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
         }
         var incomingCapacity = _distribution.CaptureInboundCapacity(entities);
-        var limits=new Dictionary<(EntityId,ResourceId),double>();
-        foreach(var node in nodes)
-        {
-            if (node.Port is not { Input: true }) continue;
-            foreach(var resource in EligibleResources)
-            {
-                double target = targets.TryGetValue((node.Entity, resource), out var policy) ? policy.Minimum : double.PositiveInfinity;
-                limits[(node.Entity,resource)]=target-_distribution.GetCommittedInbound(entities,node.Entity,resource);
-            }
-        }
         // Match one incoming offer per receiver and one output per sender each round.
         // Successful transfers alone advance cursors. Blocked branches are skipped; spare capacity is reused.
         // Two-port contention and each input resource's fractional tail need bounded extra rounds.
@@ -321,7 +322,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                         else if (_stock.GetAddableQuantity(target.Inventory, resource, 1) <= 0)
                             Add(new(ConveyorBlockReason.DestinationFull, target.Entity, resource));
                         else if (Room(target, resource) <= 0)
-                            Add(new(ConveyorBlockReason.DestinationTargetCovered, target.Entity, resource));
+                            Add(new(ConveyorBlockReason.DestinationFull, target.Entity, resource));
                     }
                 }
             if (!moving && buffered <= 0)
@@ -389,8 +390,11 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         double Room(Node node, ResourceId resource)
         {
             if (node.Port is not { Input: true }) return double.PositiveInfinity;
-            double policyRoom = Math.Max(0, limits[(node.Entity,resource)] - _stock.GetQuantity(node.Inventory, resource));
-            return incomingCapacity.GetAddable(_stock, node.Inventory, resource, Math.Min(policyRoom, node.InRemaining));
+            double maximum = inboundMaximums.GetValueOrDefault(
+                (node.Inventory, resource), _stock.GetResourceCapacity(node.Inventory, resource));
+            double room = Math.Max(0, maximum - _stock.GetQuantity(node.Inventory, resource) -
+                incomingCapacity.GetCommittedResource(node.Inventory, resource));
+            return incomingCapacity.GetAddable(_stock, node.Inventory, resource, Math.Min(room, node.InRemaining));
         }
     }
 
