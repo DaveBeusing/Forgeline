@@ -72,9 +72,12 @@ policy edits are reevaluated by the existing scheduler.
 No source stock, free truck, drive Fuel, valid graph route or physical bay means
 waiting/retry with the recorded reason. Supply Trucks are separate. Policy
 acceptance, requested quantities and assigned incoming loads do not prove arrival.
-MAX is the refill goal for this editor, not a hard cap on conveyors or already
-committed cargo. Shared capacity still limits actual unloading. REMOVE RULE stops
-future unassigned demand; existing cargo keeps its transport lifecycle.
+MAX is both the refill goal for this editor and a hard ceiling for new
+conveyor, Cargo Truck and automated inbound material. Physical shared/resource
+capacity may be stricter. Already stored goods are never discarded if MAX is
+lowered; an existing truck retains its cargo and waits for receiving headroom.
+REMOVE RULE stops future unassigned demand and removes the configured ceiling;
+existing cargo keeps its transport lifecycle.
 
 New drafts retain the normal 50 / 150 MIN/MAX defaults (or capacity-fitted
 equivalents). Existing policy values are loaded without rewriting their stored
@@ -111,10 +114,10 @@ multiples of 50. No editor change itself guarantees a delivery.
 
 ## Policy meanings
 
-- MIN triggers replenishment when stock plus outstanding requests falls below it.
-- TARGET is the refill goal.
-- MAX is validated and saved policy metadata. The current dispatcher does not enforce it as a hard inventory ceiling. The Command Core editor deliberately submits TARGET equal to MAX to make MAX its refill goal.
-- Shared inventory capacity is a separate physical storage contract. It still limits unloading.
+- MIN triggers replenishment when stock plus outstanding requests falls below it and reserves stock against voluntary outbound logistics.
+- TARGET is the automated refill goal, not a conveyor acceptance limit.
+- MAX is the hard material ingress ceiling for live building storage. The Command Core editor deliberately submits TARGET equal to MAX so that the requested refill goal and ingress ceiling agree.
+- Effective maximum is the lower of the enabled policy MAX and the accepted material's finite physical capacity. Shared inventory capacity and other committed inbound shipments also limit new admission. Disabled or removed policies restore the physical default; they never create unlimited storage.
 
 INPUTS cards prepare drafts only. A draft target includes materials for the selected additional steps and the inputs still reserved by active work. The current stored rule and its command outcome remain separate from the editor. Closing, losing the selection or changing the session discards the draft. Opening another building cannot inherit its values.
 
@@ -179,8 +182,8 @@ Manually disabled stock policies remain untouched. Active matching Operations
 rules, duplicate policies, unsupported resources, destroyed/foreign facilities and
 capacity violations are shown as reasons to use individual controls. Combined
 policy targets are checked against actual configured storage, while unloading,
-reservations, distribution and physical cargo remain authoritative. MAX is still
-saved policy metadata, not a hard unloading ceiling.
+reservations, distribution and physical cargo remain authoritative. MAX is
+also enforced at authoritative delivery and dispatch; it is not merely metadata.
 
 Focus loss, modal/resize interruption, closing or changing selection stops unsent
 work. Already submitted commands retain their ordinary result. There is no
