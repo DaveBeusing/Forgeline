@@ -128,3 +128,34 @@ TotalDetailRows/DetailRowOffset publish the existing settings/save list window f
 scrollbar rendering. PauseContext extends the opaque menu backing to paused
 settings/controls while preserving visible battlefield space beside it. Bootstrap,
 studio and explicit failure paths remain independent and visibly diagnosable.
+
+## Unified loading and recovery presentation
+
+The existing frontend renderer and compiled Directorate skin share one
+`FrontendLoadingVisualState` contract. Pending and running states distinguish
+waiting from active initialization; only running views with a finite, owner-reported
+progress fraction draw a progress bar and percentage. Cancelling displays an
+explicit cancellation heading without a completion percentage. Completed,
+recoverable-error and fatal-error states have distinct text headings; error
+readability does not depend on color alone.
+
+The Windows session-loading owner maps reported replay ticks to determinate
+progress and all other preparation phases to indeterminate progress. Cancellation
+retains the session worker/graphics lifetime safeguards and removes the Escape
+invitation while outstanding work is shutting down. The startup controller
+publishes its specific failure message to the view; terminal errors never
+inherit a stale determinate bar. Session-load failures still return safely to
+the existing menu with an error banner and a new-request retry path. No new
+session command, persistent menu or fabricated progress was introduced.
+
+Skin and emergency fallback both display the same heading, status and
+progress conditions. The emergency renderer retains the original interactive
+regions and a visible repair instruction when mandatory skin/font data is
+unavailable. The studio-video compositor remains independent.
+
+Native visual acceptance remains a separate review, not a claim made by
+headless tests. Check main/new/load/settings/controls/credits/pause and
+startup/session loading at 1280×720 and 1920×1080, UI scales .75/1/2,
+high contrast and reduced motion. Include replay progress, cancellation,
+failure and fallback, and confirm labels, action hitboxes, focus, backdrop
+coverage and return-to-menu flow on a Windows D3D12 host.
