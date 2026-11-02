@@ -87,6 +87,23 @@ public sealed class CargoInboundCapacityTests
         Assert.Equal(100, state.Capture().GetAddable(state.Stock, state.Inventory, ResourceIds.Steel, 100));
     }
 
+    [Fact]
+    public void PolicyMaximumSubtractsCommittedTruckCargoBeforeNewAdmission()
+    {
+        var state = new Fixture();
+        state.Order(state.Node, ResourceIds.FerrousOre, 60);
+        var policyEntity = state.Entities.CreateEntity();
+        state.Entities.AddComponent(policyEntity,
+            new LogisticsStockPolicy(state.Target, ResourceIds.FerrousOre, 0, 20, 70));
+
+        CargoInboundCapacity incoming = state.Capture();
+        Assert.Equal(60, incoming.GetCommittedResource(state.Inventory, ResourceIds.FerrousOre));
+        Assert.Equal(10, BuildingStockLimits.GetAddable(
+            state.Entities, state.Stock, state.Inventory, ResourceIds.FerrousOre, 100, incoming));
+        Assert.Equal(40, BuildingStockLimits.GetAddable(
+            state.Entities, state.Stock, state.Inventory, ResourceIds.Steel, 100, incoming));
+    }
+
     private sealed class Fixture
     {
         internal EntityRegistry Entities { get; } = new();
