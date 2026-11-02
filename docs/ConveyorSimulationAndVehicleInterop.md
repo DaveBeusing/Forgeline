@@ -73,6 +73,31 @@ bounded number of rounds covers the tick budget, two-port contention and fractio
 tails of the seven eligible resources. Cursors
 advance only for actual transfers, surviving idle periods and replay.
 
+### Equal-share material service
+
+All eligible materials on a physical carrier compete for **one shared aggregate**
+100-unit/s nominal transport budget. Under sustained availability, compatible
+receiver demand, and equal service priority, two materials receive about
+50 units/s each; three receive about 33.33 units/s each. With seven
+simultaneously active materials, each gets approximately one seventh. The
+actual allocation is quantized by the fixed-tick budget; a single completed
+tick need not divide perfectly. Compare delivered totals across successive
+ticks, allowing at most one ordinary transfer quantum of imbalance for
+equally eligible streams.
+
+Service is work-conserving: an exhausted source, rejected material, depleted
+receiver allowance, reserved stock or configured destination maximum does
+not reserve unused transfer budget. Other currently eligible materials may
+consume that remainder, up to the same carrier-level limit. On reopening a
+previously blocked material, round-robin service resumes from retained
+cursors without saving up offline capacity or moving cargo beyond the
+physical next link in one tick. A damaged or brownout carrier scales the
+whole budget; it never multiplies transport by the number of material types.
+Explicit splitter OutputA/OutputB weighting still governs branch selection
+before resource arbitration. Reservations, minimum stock retention,
+maximum inbound stock, shared buffer room and per-resource acceptance
+remain authoritative on each transfer.
+
 Connections require the same owner, complementary direction, opposite facing and
 position/height within 0.02m. A building connection additionally requires the correct
 adapter's exact building entity/generation attachment. Ambiguous coincident sockets
