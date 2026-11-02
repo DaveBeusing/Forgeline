@@ -189,6 +189,32 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             }
         }
         var incomingCapacity = _distribution.CaptureInboundCapacity(entities);
+        // Reachability expresses material compatibility; admission additionally requires
+        // an accepting powered sink with actual room this tick. Existing in-flight cargo
+        // remains in physical buffers and may resume when downstream capacity returns.
+        // Only completed building output ports use this mask to admit fresh stock.
+        for (int r = 0; r < EligibleResources.Count; r++)
+        {
+            ResourceId resource = EligibleResources[r];
+            int bit = 1 << r;
+            var queue = new Queue<Node>();
+            foreach (var sink in nodes)
+                if (sink.Port is { Input: true } && sink.Budget > Epsilon &&
+                    (sink.AllowedResources & bit) != 0 &&
+                    Room(sink, resource) > Epsilon &&
+                    _stock.GetAddableQuantity(sink.Inventory, resource, 1) > Epsilon)
+                {
+                    sink.DemandableDownstream |= bit;
+                    queue.Enqueue(sink);
+                }
+            while (queue.TryDequeue(out var downstream))
+                foreach (var link in downstream.Inputs)
+                    if ((link.Source.DemandableDownstream & bit) == 0)
+                    {
+                        link.Source.DemandableDownstream |= bit;
+                        queue.Enqueue(link.Source);
+                    }
+        }
         // Match one incoming offer per receiver and one output per sender each round.
         // Successful transfers alone advance cursors. Blocked branches are skipped; spare capacity is reused.
         // Two-port contention and each input resource's fractional tail need bounded extra rounds.
@@ -381,7 +407,9 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             {
                 int r = (source.ResourceCursor + i) % EligibleResources.Count;
                 ResourceId id = EligibleResources[r];
-                if ((destination.AcceptedDownstream & (1 << r)) == 0) continue;
+                if ((destination.AcceptedDownstream & (1 << r)) == 0 ||
+                    source.Port is { Input: false } && (source.DemandableDownstream & (1 << r)) == 0)
+                    continue;
                 if (available[source.Inventory][r] <= Epsilon || ((source.AllowedResources & destination.AllowedResources) & (1 << r)) == 0) continue;
                 if (Room(destination, id) > Epsilon && _stock.GetAddableQuantity(destination.Inventory, id, 1) > Epsilon) return r;
             }
@@ -562,7 +590,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         public double Budget { get; }
         public double Quantum { get; }
         public double InRemaining, OutRemaining, Sent, Received;
-        public int InputCursor, OutputCursor, ResourceCursor, AcceptedDownstream;
+        public int InputCursor, OutputCursor, ResourceCursor, AcceptedDownstream, DemandableDownstream;
         public int AllowedResources=(1 << EligibleResources.Count)-1;
         public List<Link> Inputs { get; } = [];
         public List<Link> Outputs { get; } = [];
