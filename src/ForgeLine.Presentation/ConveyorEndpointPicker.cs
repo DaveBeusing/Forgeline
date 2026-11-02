@@ -137,6 +137,54 @@ internal sealed class ConveyorEndpointPicker
         return true;
     }
 
+    // The first click has no direction yet. Probe both authentic roles and
+    // select the closest physical socket, without synthesizing an opposite port.
+    internal bool TryPickEither(PresentationSnapshot? snapshot, PlayerId player, RtsCamera camera,
+        Vector2 pointer, int width, int height, float scale, out ConveyorEndpoint endpoint,
+        ConveyorEndpoint? previous = null)
+    {
+        bool outputFound = TryPick(snapshot, player, camera, pointer, width, height, scale,
+            false, out ConveyorEndpoint output, previous: previous);
+        ConveyorSnapFailure outputFailure = LastFailure;
+        bool inputFound = TryPick(snapshot, player, camera, pointer, width, height, scale,
+            true, out ConveyorEndpoint input, previous: previous);
+        ConveyorSnapFailure inputFailure = LastFailure;
+
+        // An ambiguous or occupied physical position must not silently switch role.
+        if (outputFailure is ConveyorSnapFailure.Ambiguous or ConveyorSnapFailure.Blocked ||
+            inputFailure is ConveyorSnapFailure.Ambiguous or ConveyorSnapFailure.Blocked)
+        {
+            LastFailure = outputFailure == ConveyorSnapFailure.Ambiguous ||
+                inputFailure == ConveyorSnapFailure.Ambiguous
+                ? ConveyorSnapFailure.Ambiguous : ConveyorSnapFailure.Blocked;
+            endpoint = default;
+            return false;
+        }
+
+        if (outputFound && inputFound)
+        {
+            float outputDistance = Vector2.DistanceSquared(pointer,
+                camera.WorldToScreen(output.Position + Vector3.UnitY * CarrierHeight, width, height).Position);
+            float inputDistance = Vector2.DistanceSquared(pointer,
+                camera.WorldToScreen(input.Position + Vector3.UnitY * CarrierHeight, width, height).Position);
+            // Both roles at one adaptable position remain one exclusive physical
+            // socket. Output is the backward-compatible default for that tie.
+            endpoint = inputDistance < outputDistance ? input : output;
+        }
+        else if (outputFound) endpoint = output;
+        else if (inputFound) endpoint = input;
+        else
+        {
+            endpoint = default;
+            LastFailure = outputFailure == ConveyorSnapFailure.Incompatible ||
+                inputFailure == ConveyorSnapFailure.Incompatible
+                ? ConveyorSnapFailure.Incompatible : ConveyorSnapFailure.None;
+            return false;
+        }
+        LastFailure = ConveyorSnapFailure.None;
+        return true;
+    }
+
     private static int BodyRank(in ConveyorBuildingPort port, bool input)
     {
         if (!port.Adaptable) return 0;
