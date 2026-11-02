@@ -67,3 +67,27 @@ Earlier loading-test counts above describe their historical implementation check
 ## Generated skirmish preparation
 
 New Game validates generated maps on a separate instance of the existing construction coordinator before requesting a gameplay session. The frontend remains interactive and exposes cooperative Cancel, copied indeterminate stage state and actionable failures. A qualified result requires a separate Start action. Session reconstruction resolves the exact manifest identity from the host-owned package cache, checks current asset identity and builds CPU terrain/decoration presentation data before match allocation. Existing New/Load/Restart, scheduler, presentation and cancellation ownership remains in force. See [seeded skirmish selection](SeededSkirmishSelection.md) for input, cache, qualification and visual-acceptance limits.
+
+## Session loading presentation states
+
+`ClientSessionLoadingLoop.Surface` publishes a presentation-only loading
+state without changing authoritative work or cancellation. Configuration,
+scenario construction, verification, binding and renderer readiness are
+indeterminate. Replay is determinate only when a real total tick count is
+reported, and the fraction derives from completed and total replay ticks.
+The shared frontend render contract rejects nonfinite progress values.
+
+An Escape request enters the explicit `Cancelling` presentation state,
+removes any replay percentage and replaces the return prompt with a message
+that active work is stopping. The existing owner loop continues pumping until
+it can finish and dispose safely. Errors still propagate through
+`ClientSessionLoadingException`; the application returns to the existing
+menu with its categorized failure feedback so another request can be made.
+This presentation change does not add automated retries, change ownership
+or create an intermediate gameplay HUD frame.
+
+The shared loading contract also models pending, completed, recoverable
+and fatal errors for use by their owning flows. These are distinct visual
+states, not claims that all session phases expose dedicated interactive
+error pages. Native D3D12 cancellation/recovery and failure readability
+require separate manual acceptance.
