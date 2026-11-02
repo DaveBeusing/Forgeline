@@ -63,6 +63,18 @@ internal static class OperationsSnapshotFactory
                 if (OperationsWorldOverlay.IsOwnedVisible(instance, extraction.Player)) visible.Add(instance.Entity);
         var scenario = extraction.Scenario;
         var inventories = new HashSet<InventoryId>();
+        // One captured set of effective material ceilings, shared across storage aliases and ports.
+        var policyMaximums = new Dictionary<(InventoryId, ResourceId), double>();
+        foreach (var candidate in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
+        {
+            var policy = entities.GetComponent<LogisticsStockPolicy>(candidate);
+            if (!policy.Enabled) continue;
+            var input = ConveyorSimulationSystem.ResolveInventory(entities, policy.TargetEntity, input: true);
+            if (!scenario.Inventories.Contains(input)) continue;
+            var key = (input, policy.ResourceId);
+            double maximum = scenario.Inventories.GetResourceCapacity(input, policy.ResourceId);
+            policyMaximums[key] = Math.Min(policyMaximums.GetValueOrDefault(key, maximum), policy.DesiredMaximum);
+        }
         var queues = new Dictionary<EntityId, int>();
         foreach (var request in entities.Query<ProductionRequest>())
             Count(entities.GetComponent<ProductionRequest>(request).Facility);
@@ -151,6 +163,16 @@ internal static class OperationsSnapshotFactory
                 units && factory.BlockReason != UnitProductionBlockReason.None ? factory.BlockReason.ToString() :
                 consumer && power.State != PowerOperationalState.Powered ? power.State.ToString() : string.Empty;
             if (distribution.TryGetValue(entity, out string? transportCause)) cause = cause.Length > 0 ? cause + "/" + transportCause : transportCause;
+            foreach (var (key, maximum) in policyMaximums)
+            {
+                if (!held.Contains(key.Item1)) continue;
+                double actual = scenario.Inventories.GetQuantity(key.Item1, key.Item2);
+                string limitCause = actual > maximum + 1e-9 ? "AboveConfiguredMaximum" :
+                    actual + 1e-9 >= maximum ? "MaximumStockReached" : string.Empty;
+                if (limitCause.Length == 0) continue;
+                cause = cause.Length == 0 ? limitCause : cause + "/" + limitCause;
+                break;
+            }
             string name = category.ToString();
             if (entities.TryGetComponent(entity, out CompletedBuilding identity) && scenario.Services.BuildingDefinitions.TryGet(identity.BuildingId, out var definition))
                 name = definition.DisplayName;
@@ -239,6 +261,8 @@ internal static class OperationsSnapshotFactory
         "OutputFull" => "OUTPUT STORAGE FULL - CHECK COLLECTION",
         "Paused" => "REQUEST PAUSED BY POLICY",
         "DesiredStockReached" => "TARGET STOCK REACHED",
+        "AboveConfiguredMaximum" => "ABOVE CONFIGURED MAXIMUM / NEW INBOUND BLOCKED",
+        "MaximumStockReached" => "MAXIMUM STOCK REACHED / NEW INBOUND BLOCKED",
         "InvalidInventory" => "INVENTORY UNAVAILABLE",
         "NoRoute" => "REPORTED ROUTE UNAVAILABLE - CHECK CONNECTIONS",
         "CapacitySaturated" => "REPORTED LINK OR HUB CAPACITY SATURATED",
