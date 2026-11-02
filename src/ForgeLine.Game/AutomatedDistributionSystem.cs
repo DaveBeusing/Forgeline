@@ -337,6 +337,10 @@ public sealed class AutomatedDistributionSystem
             }
             double currentQuantity =
                 _inventories.GetQuantity(destinationInventory, policy.ResourceId);
+            double effectiveTarget = Math.Min(policy.DesiredTarget,
+                BuildingStockLimits.GetEffectiveMaximum(
+                    context.Entities, _inventories, destinationInventory, policy.ResourceId));
+            double effectiveMinimum = Math.Min(policy.DesiredMinimum, effectiveTarget);
 
             if (existing is not null && existing.State is
                 LogisticsTransportRequestState.Pending or LogisticsTransportRequestState.RetryPending)
@@ -344,7 +348,7 @@ public sealed class AutomatedDistributionSystem
                 // Pending/retrying quantity is a desired target, not committed
                 // inbound stock. Reconcile it against the live policy without
                 // resetting RequestId, CreatedAtTick, or WaitingSinceTick.
-                double required = Math.Max(0.0, policy.DesiredTarget - currentQuantity);
+                double required = Math.Max(0.0, effectiveTarget - currentQuantity);
                 if (required <= QuantityEpsilon)
                     RetireUnneededRequest(existing, context.Tick);
                 else
@@ -362,14 +366,14 @@ public sealed class AutomatedDistributionSystem
                 currentQuantity + outstandingQuantity;
 
             if (projectedQuantity + QuantityEpsilon >=
-                policy.DesiredMinimum)
+                effectiveMinimum)
             {
                 continue;
             }
 
             double requestedQuantity = Math.Max(
                 0.0,
-                policy.DesiredTarget - projectedQuantity);
+                effectiveTarget - projectedQuantity);
 
             if (requestedQuantity <= QuantityEpsilon)
             {
@@ -496,11 +500,9 @@ public sealed class AutomatedDistributionSystem
         }
 
         double destinationCapacity =
-            phase.Incoming.GetAddable(
-                _inventories,
-                destinationInventory,
-                request.ResourceId,
-                request.RequestedQuantity);
+            BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory,
+                request.ResourceId, request.RequestedQuantity, phase.Incoming);
 
         if (destinationCapacity <= QuantityEpsilon)
         {
@@ -997,7 +999,7 @@ public sealed class AutomatedDistributionSystem
             for (var priority = policy.Priority; priority <= LogisticsStockPriority.Low; priority++)
             {
                 var key = (inventory, policy.ResourceId, priority);
-                targets[key] = Math.Max(targets.GetValueOrDefault(key), policy.DesiredTarget);
+                targets[key] = Math.Max(targets.GetValueOrDefault(key), policy.DesiredMinimum);
             }
         }
         return targets;
