@@ -1673,6 +1673,13 @@ public sealed class AutomatedDistributionSystem
             return true;
         }
 
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot sourceDepot) &&
+            _inventories.Contains(sourceDepot.InventoryId))
+        {
+            inventoryId = sourceDepot.InventoryId;
+            return true;
+        }
+
         inventoryId = InventoryId.None;
         return false;
     }
@@ -1721,6 +1728,13 @@ public sealed class AutomatedDistributionSystem
             _inventories.Contains(hub.InventoryId))
         {
             inventoryId = hub.InventoryId;
+            return true;
+        }
+
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot destinationDepot) &&
+            _inventories.Contains(destinationDepot.InventoryId))
+        {
+            inventoryId = destinationDepot.InventoryId;
             return true;
         }
 
