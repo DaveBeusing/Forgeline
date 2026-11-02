@@ -88,8 +88,8 @@ public readonly record struct LogisticsStockPolicy
             !double.IsFinite(desiredTarget) ||
             !double.IsFinite(desiredMaximum) ||
             desiredMinimum < 0.0 ||
-            desiredTarget <= 0.0 ||
-            desiredMaximum <= 0.0 ||
+            desiredTarget < 0.0 ||
+            desiredMaximum < 0.0 ||
             desiredMinimum > desiredTarget ||
             desiredTarget > desiredMaximum)
         {
