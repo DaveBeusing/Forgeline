@@ -403,6 +403,18 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         {
             var source = link.Source; var destination = link.Destination;
             if (source.OutRemaining <= Epsilon || destination.InRemaining <= Epsilon || source.Inventory == destination.Inventory) return -1;
+            // Preserve finite backpressure when every available material is blocked.
+            // When a genuinely demandable stream coexists, prioritize its use of
+            // the shared budget instead of admitting cargo that cannot be delivered.
+            bool hasDemandable = false;
+            if (source.Port is { Input: false })
+                for (int r = 0; r < EligibleResources.Count; r++)
+                    if ((source.AllowedResources & source.DemandableDownstream & (1 << r)) != 0 &&
+                        available[source.Inventory][r] > Epsilon)
+                    {
+                        hasDemandable = true;
+                        break;
+                    }
             for (int i = 0; i < EligibleResources.Count; i++)
             {
                 int r = (source.ResourceCursor + i) % EligibleResources.Count;
