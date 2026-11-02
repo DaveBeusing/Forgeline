@@ -5,6 +5,26 @@ namespace ForgeLine.Graphics.Tests.RenderTelemetry;
 public sealed class PostFrameSnapshotTests
 {
     [Theory]
+    [InlineData(1, 1, 1)]
+    [InlineData(67, 41, 7)]
+    [InlineData(176, 41, 8)]
+    [InlineData(1920, 1080, 11)]
+    public void AttachmentMipZeroIsSeparateFromFullDepthBacking(int width, int height, int levels)
+    {
+        Assert.Equal(levels, GraphicsPostFrameLimits.FullMipLevels(width, height));
+        Assert.True(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, levels, 0, 1, 0));
+        Assert.True(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-scene-linear", width, height, 1, 0, 1, 0));
+        Assert.True(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-shadow-depth", width, height, 1, 0, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, 0, 0, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, levels + 1, 0, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, levels, 1, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, levels, 0, 2, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", width, height, levels, 0, 1, 1));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-shadow-depth", width, height, 2, 0, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("unknown", width, height, 1, 0, 1, 0));
+        Assert.False(GraphicsPostFrameLimits.SupportedAttachmentMips("retained-final-depth", 0, height, levels, 0, 1, 0));
+    }
+    [Theory]
     [InlineData(GraphicsTextureColorSpace.Linear)]
     [InlineData(GraphicsTextureColorSpace.Srgb)]
     public void Bc7SmallMipsKeepLogicalDimensionsSeparateFromNativeBlockFootprints(GraphicsTextureColorSpace color)

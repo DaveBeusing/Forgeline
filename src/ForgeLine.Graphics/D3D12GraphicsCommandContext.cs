@@ -21,6 +21,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _owner.InvalidateTextureBindings();
         _owner.WorldBindingRecorder?.InvalidateRoot();
         _owner.BoundInputTracker?.InvalidateRoot();
+        if (_owner.ActivePostFrameTape is { } tape) tape.InvalidateRoot(_owner.ActivePostFrameTapeInvocation);
     }
     private void ValidateRecording()
     {
@@ -41,6 +42,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _outputWidth = width;
         _outputHeight = height;
         FrameIndex = frameIndex;
+        _owner.TapeOwnerTargets(PostFrameTapeOwnerPostcondition.InitialTargets);
     }
 
     public int Width => _owner.IsWorldPass ? _owner.WorldWidth : _outputWidth;
@@ -49,8 +51,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
     public int FrameIndex { get; }
 
-    public void BeginParticlePass() { ValidateRecording(); _owner.BeginParticlePass(); InvalidatePipelineBindings(); }
-    public void EndParticlePass() { ValidateRecording(); _owner.EndParticlePass(); InvalidatePipelineBindings(); }
+    public void BeginParticlePass() { ValidateRecording(); _owner.BeginParticlePass(); _owner.TapeOwnerTargets(PostFrameTapeOwnerPostcondition.ParticleTargets); InvalidatePipelineBindings(); }
+    public void EndParticlePass() { ValidateRecording(); _owner.EndParticlePass(); _owner.TapeOwnerTargets(PostFrameTapeOwnerPostcondition.ParticleReturnTargets); InvalidatePipelineBindings(); }
 
     public void SetAtmosphereView(GraphicsAtmosphereView view)
     {
@@ -62,6 +64,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         ValidateRecording();
         _owner.BeginDirectionalShadowPass(frame);
+        _owner.TapeOwnerTargets(PostFrameTapeOwnerPostcondition.ShadowTargets);
         _owner.RecordWorldShadowFrame(frame);
         InvalidatePipelineBindings();
     }
@@ -70,6 +73,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         ValidateRecording();
         _owner.EndDirectionalShadowPass();
+        _owner.TapeOwnerTargets(PostFrameTapeOwnerPostcondition.ShadowReturnTargets);
         _owner.WorldBindingRecorder?.Viewport(0,0,_owner.WorldWidth,_owner.WorldHeight);
         _owner.WorldBindingRecorder?.Scissor(0,0,_owner.WorldWidth,_owner.WorldHeight);
         InvalidatePipelineBindings();
@@ -79,7 +83,14 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     {
         ValidateRecording();
         if (_owner.BeginPass(pass))
+        {
+            if (_owner.ActivePostFrameTape is { } tape)
+            {
+                tape.Pass(_owner.ActivePostFrameTapeInvocation, PostFrameTapePass.Composition, false);
+                tape.Pass(_owner.ActivePostFrameTapeInvocation, PostFrameTapePass.Overlay, true);
+            }
             InvalidatePipelineBindings();
+        }
     }
 
     public void SetViewport(float x, float y, float width, float height)
@@ -92,7 +103,14 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 "Viewport dimensions must be positive.");
         }
 
-        _commandList.RSSetViewport(new Viewport(x, y, width, height));
+        var tape = _owner.ActivePostFrameTape;
+        tape?.ViewportRequest(_owner.ActivePostFrameTapeInvocation, BitConverter.SingleToUInt32Bits(x), BitConverter.SingleToUInt32Bits(y),
+            BitConverter.SingleToUInt32Bits(width), BitConverter.SingleToUInt32Bits(height), 0, BitConverter.SingleToUInt32Bits(1));
+        try { _commandList.RSSetViewport(new Viewport(x, y, width, height)); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Viewport, 0); throw; }
+        if (tape is not null)
+            tape.Viewport(_owner.ActivePostFrameTapeInvocation, BitConverter.SingleToUInt32Bits(x), BitConverter.SingleToUInt32Bits(y),
+                BitConverter.SingleToUInt32Bits(width), BitConverter.SingleToUInt32Bits(height), 0, BitConverter.SingleToUInt32Bits(1));
         _owner.WorldBindingRecorder?.Viewport(x,y,width,height);
     }
 
@@ -107,7 +125,14 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         }
 
         RectI rectangle = RectI.FromLTRB(left, top, right, bottom);
-        _commandList.RSSetScissorRect(rectangle);
+        var tape = _owner.ActivePostFrameTape;
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Scissor, 0, 0,
+            unchecked((uint)left), unchecked((uint)top), unchecked((uint)right), unchecked((uint)bottom));
+        try { _commandList.RSSetScissorRect(rectangle); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Scissor, 0); throw; }
+        if (tape is not null)
+            tape.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Scissor, 0, 0,
+                unchecked((uint)left), unchecked((uint)top), unchecked((uint)right), unchecked((uint)bottom));
         _owner.WorldBindingRecorder?.Scissor(left,top,right,bottom);
     }
 
@@ -127,8 +152,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         }
 
         _owner.UseResource(d3d12Pipeline.Lifetime);
+        var tape = _owner.ActivePostFrameTape;
+        uint pipelineIdentity = tape is null ? 0 : _owner.TapePipelineIdentity(d3d12Pipeline);
+        if (tape is not null) tape.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Pipeline, 0, pipelineIdentity);
         if (ReferenceEquals(_pipeline, d3d12Pipeline))
         {
+            tape?.CacheHit(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Pipeline, 0);
             _owner.ValidateParticlePipeline(d3d12Pipeline);
             _owner.RecordWorldPipeline(d3d12Pipeline,false);
             return;
@@ -136,13 +165,23 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
         _heapBound = false;
         _owner.InvalidateTextureBindings();
         _pipeline = d3d12Pipeline;
-        _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature);
-        _commandList.SetPipelineState(d3d12Pipeline.PipelineState);
+        uint rootIdentity = tape is null ? 0 : _owner.TapePipelineIdentity(d3d12Pipeline, root: true);
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.RootSignature, 0, rootIdentity);
+        try { _commandList.SetGraphicsRootSignature(d3d12Pipeline.RootSignature); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.RootSignature, 0); throw; }
+        if (tape is not null)
+        {
+            tape.InvalidateRoot(_owner.ActivePostFrameTapeInvocation);
+            tape.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.RootSignature, 0, rootIdentity);
+        }
+        try { _commandList.SetPipelineState(d3d12Pipeline.PipelineState); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Pipeline, 0); throw; }
+        tape?.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Pipeline, 0, pipelineIdentity);
         if (pipeline.Description.DirectionalShadowReceiver) _owner.BindDirectionalShadowReceiver(d3d12Pipeline);
+        if (pipeline.Description.DirectionalShadowReceiver) _owner.TapeShadowReceiver(d3d12Pipeline);
         _owner.ValidateParticlePipeline(d3d12Pipeline);
         _owner.RecordWorldPipeline(d3d12Pipeline,true);
-        _commandList.IASetPrimitiveTopology(
-            d3d12Pipeline.Description.PrimitiveTopology switch
+        PrimitiveTopology topology = d3d12Pipeline.Description.PrimitiveTopology switch
             {
                 GraphicsPrimitiveTopology.TriangleList =>
                     PrimitiveTopology.TriangleList,
@@ -152,7 +191,12 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                     nameof(pipeline),
                     d3d12Pipeline.Description.PrimitiveTopology,
                     "Unsupported graphics primitive topology.")
-            });
+            };
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Topology, 0, (ulong)topology);
+        try { _commandList.IASetPrimitiveTopology(topology); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Topology, 0); throw; }
+        if (tape is not null)
+            tape.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.Topology, 0, (ulong)topology);
     }
 
     public void SetVertexBuffer(
@@ -172,9 +216,15 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             checked((uint)remaining),
             checked((uint)strideInBytes));
 
-        _commandList.IASetVertexBuffers(
-            checked((uint)inputSlot),
-            view);
+        var tape = _owner.ActivePostFrameTape;
+        uint tapeIdentity = tape is null ? 0 : _owner.TapeBufferIdentity(d3d12Buffer);
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.VertexBuffer, (uint)inputSlot,
+            tapeIdentity, (uint)offsetInBytes, remaining, (uint)strideInBytes);
+        try { _commandList.IASetVertexBuffers(checked((uint)inputSlot), view); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.VertexBuffer, (uint)inputSlot); throw; }
+        if (tape is not null)
+            tape.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.VertexBuffer, (uint)inputSlot,
+                tapeIdentity, (uint)offsetInBytes, remaining, (uint)strideInBytes);
         if (_owner.WorldBindingRecorder is { } journal)
         {
             ulong identity = journal.Define(d3d12Buffer.Lifetime, "buffer", buffer: d3d12Buffer.Description);
@@ -198,10 +248,15 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             _ => throw new ArgumentOutOfRangeException(nameof(format))
         };
 
-        _commandList.IASetIndexBuffer(
-            d3d12Buffer.Resource.GPUVirtualAddress + (ulong)offsetInBytes,
-            checked((uint)remaining),
-            nativeFormat);
+        var tape = _owner.ActivePostFrameTape;
+        uint tapeIdentity = tape is null ? 0 : _owner.TapeBufferIdentity(d3d12Buffer);
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.IndexBuffer, 0,
+            tapeIdentity, (uint)offsetInBytes, remaining, format == GraphicsIndexFormat.SixteenBit ? 2UL : 4UL);
+        try { _commandList.IASetIndexBuffer(d3d12Buffer.Resource.GPUVirtualAddress + (ulong)offsetInBytes, checked((uint)remaining), nativeFormat); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.IndexBuffer, 0); throw; }
+        if (tape is not null)
+            tape.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.IndexBuffer, 0,
+                tapeIdentity, (uint)offsetInBytes, remaining, format == GraphicsIndexFormat.SixteenBit ? 2UL : 4UL);
         if (_owner.WorldBindingRecorder is { } journal)
         {
             ulong identity = journal.Define(d3d12Buffer.Lifetime, "buffer", buffer: d3d12Buffer.Description);
@@ -233,7 +288,7 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
                 nameof(values));
         }
 
-        if (_owner.BoundInputTracker is not null)
+        if (_owner.BoundInputTracker is not null || _owner.ActivePostFrameTape is not null)
         {
             if (values.Length > 64) throw new InvalidOperationException("Bound constants exceed64words.");
             Span<float> frozen = stackalloc float[64];
@@ -246,9 +301,19 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
     private void SetVertexConstantsCore(ReadOnlySpan<float> values)
     {
         _owner.RecordCaptureInput(System.Runtime.InteropServices.MemoryMarshal.AsBytes(values));
-        if (_pipeline!.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
-        else _commandList.SetGraphicsRoot32BitConstants(0, values);
+        _owner.TapeVertexConstantsRequest(values.Length, _pipeline!.Description.VertexConstantsInBuffer);
+        try
+        {
+            if (_pipeline.Description.VertexConstantsInBuffer) _owner.SetBufferedVertexConstants(values);
+            else _commandList.SetGraphicsRoot32BitConstants(0, values);
+        }
+        catch when (_owner.ActivePostFrameTape is { })
+        {
+            _owner.ActivePostFrameTape!.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.RootParameter, 0);
+            throw;
+        }
         _owner.RecordWorldConstants(values, _pipeline.Description.VertexConstantsInBuffer);
+        _owner.TapeVertexConstants(values, _pipeline.Description.VertexConstantsInBuffer);
     }
 
     public void SetPixelTexture(
@@ -294,16 +359,27 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
 
         _owner.UseResource(d3d12Texture.Lifetime);
         bool cached=_owner.TextureBindingMatches(slot,d3d12Texture);
+        var tape = _owner.ActivePostFrameTape;
+        uint textureIdentity = tape is null ? 0 : _owner.TapeTextureIdentity(d3d12Texture);
+        tape?.Request(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.TextureTable, (uint)slot, textureIdentity,
+            (ulong)d3d12Texture.DescriptorIndex, (uint)((_pipeline.Description.VertexRootConstantCount > 0 ? 1 : 0) + slot),
+            tape is null ? 0 : _owner.TapeShaderHeapIdentity(), (uint)d3d12Texture.Description.Format | ((ulong)(uint)d3d12Texture.Description.ColorSpace << 8));
         if (_owner.WorldBindingRecorder is { } journal)
         {
             ulong identity = journal.Define(d3d12Texture.Lifetime, "texture", texture: d3d12Texture.Description, descriptor: d3d12Texture.DescriptorIndex);
             journal.Texture(identity, slot, !cached);
             _owner.BoundInputTracker?.BindTexture(d3d12Texture.Lifetime, identity, slot);
         }
-        if (cached) return;
+        if (cached)
+        {
+            tape?.CacheHit(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.TextureTable, (uint)slot);
+            return;
+        }
         if (!_heapBound)
         {
-            _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap);
+            try { _commandList.SetDescriptorHeaps(_owner.ShaderResourceHeap); }
+            catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.DescriptorHeap, 0); throw; }
+            _owner.TapeDescriptorHeapReturned();
             _heapBound = true;
         }
 
@@ -311,9 +387,11 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             (_pipeline.Description.VertexRootConstantCount > 0 ? 1 : 0) +
             slot;
 
-        _commandList.SetGraphicsRootDescriptorTable(
-            checked((uint)rootParameterIndex),
-            d3d12Texture.GpuDescriptorHandle);
+        try { _commandList.SetGraphicsRootDescriptorTable(checked((uint)rootParameterIndex), d3d12Texture.GpuDescriptorHandle); }
+        catch when (tape is not null) { tape.NativeFailed(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.TextureTable, (uint)slot); throw; }
+        tape?.NativeReturned(_owner.ActivePostFrameTapeInvocation, PostFrameTapeBinding.TextureTable, (uint)slot, textureIdentity,
+            (ulong)d3d12Texture.DescriptorIndex, (uint)rootParameterIndex, tape is null ? 0 : _owner.TapeShaderHeapIdentity(),
+            (uint)d3d12Texture.Description.Format | ((ulong)(uint)d3d12Texture.Description.ColorSpace << 8));
         _owner.RememberTextureBinding(slot, d3d12Texture);
     }
 
@@ -347,6 +425,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             1,
             checked((uint)startVertex),
             0);
+        if (_owner.ActivePostFrameTape is { } tape)
+            tape.Draw(_owner.ActivePostFrameTapeInvocation, false, vertexCount, 1, startVertex, 0, 0);
     }
 
     public void DrawIndexed(
@@ -398,6 +478,8 @@ internal sealed class D3D12GraphicsCommandContext : IGraphicsCommandContext
             checked((uint)startIndex),
             baseVertex,
             checked((uint)startInstance));
+        if (_owner.ActivePostFrameTape is { } tape)
+            tape.Draw(_owner.ActivePostFrameTapeInvocation, true, indexCount, instanceCount, startIndex, baseVertex, startInstance);
     }
 
     private D3D12GraphicsBuffer ValidateBuffer(IGraphicsBuffer buffer)

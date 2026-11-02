@@ -24,6 +24,7 @@ CONTRACT_OWNS=('src/ForgeLine.Client/Program.cs', 'src/ForgeLine.Client/ClientRe
 MEASUREMENT_OWNS=('build/rendering/render-engine-upgrade/', 'docs/rendering/render-engine-upgrade/Baseline.md', 'docs/rendering/render-engine-upgrade/MeasurementProtocol.md', 'docs/rendering/render-engine-upgrade/evidence/baseline/')
 
 STABILITY_POST_FRAME_OWNS=STABILITY_PROVENANCE_OWNS+('src/ForgeLine.Graphics/D3D12GraphicsTexture.cs', 'src/ForgeLine.Graphics/RenderTelemetry/GraphicsPostFrameSnapshot.cs', 'src/ForgeLine.Graphics/RenderTelemetry/D3D12PostFrameSnapshot.cs', 'src/ForgeLine.Presentation/TerrainRenderer.cs', 'src/ForgeLine.Presentation/TerrainRenderer.PostFrameIntent.cs', 'src/ForgeLine.Presentation/SimpleInstanceRenderer.PostFrameIntent.cs', 'src/ForgeLine.Presentation/ChunkDecorationRenderer.cs', 'src/ForgeLine.Client/RenderTelemetry/ReferencePostFrameSnapshot.cs', 'tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameSnapshotTests.cs', 'tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameSnapshotNativeTests.cs', 'tests/ForgeLine.Presentation.Tests/PostFrameIntentTests.cs', 'tests/ForgeLine.Client.Tests/RenderQualification/ReferencePostFrameSnapshotTests.cs', 'build/rendering/render-engine-upgrade/post_frame_snapshot.py', 'build/rendering/render-engine-upgrade/test_post_frame_snapshot.py')
+STABILITY_CAUSAL_WITNESS_OWNS=STABILITY_POST_FRAME_OWNS+('src/ForgeLine.Graphics/RenderTelemetry/GraphicsPostFrameCommandTape.cs','tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameCommandTapeTests.cs','tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameCommandTapeNativeTests.cs')
 
 def owned(path,owns):return any(path==entry or entry.endswith('/') and path.startswith(entry) for entry in owns)
 def blob(repo,sha,path):return legacy.git(repo,"show",sha+":"+path)
@@ -39,7 +40,7 @@ def validate_record(record):
     diagnostics=packages[0].get("id")==DIAGNOSTICS if type(packages[0]) is dict else False
     # Both exact reviewed footprints remain literal; malformed/mixed proposals cannot widen either.
     supplied=packages[0].get("owns") if stability else None
-    stability_paths=next((paths for paths in (STABILITY_INSPECTOR_OWNS,STABILITY_OWNS,STABILITY_PROVENANCE_OWNS,STABILITY_POST_FRAME_OWNS)
+    stability_paths=next((paths for paths in (STABILITY_INSPECTOR_OWNS,STABILITY_OWNS,STABILITY_PROVENANCE_OWNS,STABILITY_POST_FRAME_OWNS,STABILITY_CAUSAL_WITNESS_OWNS)
         if type(supplied) is list and len(supplied)==len(paths) and set(supplied)==set(paths)), STABILITY_PROVENANCE_OWNS)
     expected=[(STABILITY,2,[WORKLOAD],stability_paths)] if stability else [(WORKLOAD,1,[DIAGNOSTICS],WORKLOAD_OWNS)] if workload else [(DIAGNOSTICS,0,[],DIAGNOSTICS_OWNS),(MEASUREMENT,1,[DIAGNOSTICS],MEASUREMENT_OWNS)] if diagnostics else [(CONTRACT,0,[],CONTRACT_OWNS),(MEASUREMENT,1,[CONTRACT],MEASUREMENT_OWNS)]
     for package,(name,wave,deps,paths) in zip(packages,expected):

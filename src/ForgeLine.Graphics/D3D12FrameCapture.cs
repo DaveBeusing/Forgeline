@@ -78,6 +78,9 @@ internal sealed partial class D3D12GraphicsDevice
         ArgumentNullException.ThrowIfNull(commands);
         ThrowIfDisposed();
         ThrowIfRecording();
+        if (_postFrameCoverageMode is not null && (stages != 0 || captureShadowDepth))
+            throw new NotSupportedException("Snapshot v2 capture excludes pre-draw stage/shadow diagnostics.");
+        ClaimPostFrameCapture();
         InvalidatePostFrameStamp();
         if (_surfaceLifecycle.IsSuspended || _surfaceLifecycle.HasPendingResize || _surfaceLifecycle.IsOccluded)
             throw new InvalidOperationException("Frame capture requires an active, settled surface.");
@@ -139,6 +142,7 @@ internal sealed partial class D3D12GraphicsDevice
                     boundCaptureArmed = true;
                 }
             }
+            ArmPostFrameOpaqueTape();
             RenderFrame(clearColor, commands);
             if (!_captureFrameRecorded) throw new InvalidOperationException("Native frame capture did not submit a backbuffer copy.");
             CaptureInputFingerprint = Convert.ToHexString(_captureInputHash.GetHashAndReset());
@@ -228,8 +232,13 @@ internal sealed partial class D3D12GraphicsDevice
             }
             if (captureBodySucceeded && cleanupSucceeded)
                 PublishPostFrameStamp(stages == 0 && !captureShadowDepth && _boundInputTracker is null, presentedBefore);
+            SealPostFrameOpaqueTape(captureBodySucceeded, cleanupSucceeded);
         }
-        if (capturePrimary is not null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(capturePrimary).Throw();
+        if (capturePrimary is not null)
+        {
+            if (_postFrameTapeClaimed) _postFrameTape?.AttachFailure(capturePrimary, _postFrameTapeInvocation);
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(capturePrimary).Throw();
+        }
         return captureOutput!;
     }
 

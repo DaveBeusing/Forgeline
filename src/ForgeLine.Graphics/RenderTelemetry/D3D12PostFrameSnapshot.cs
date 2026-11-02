@@ -9,7 +9,184 @@ internal sealed partial class D3D12GraphicsDevice
     private GraphicsPostFrameCompletionStamp _postFrameStamp;
     private bool _postFrameReceiptIssued;
     private ulong _postFrameIdleObserved;
+    private string? _postFrameCoverageMode;
+    private bool _postFrameAttachmentClosed, _postFrameCapturePending, _postFrameInvocationOpen, _postFrameSessionEnded;
+    private ulong _postFrameInvocation;
+    private int _postFrameRepetition = -1;
+    private GraphicsPostFrameCaptureContext _postFrameContext;
+    private GraphicsPostFrameCommandTape? _postFrameTape;
+    private Guid _postFrameTapeSession;
+    private PostFrameTapeInvocation _postFrameTapeInvocation;
+    private PostFrameTapeCompletion _postFrameTapeCompletion;
+    private bool _postFrameTapeClaimed;
+    private PostFrameTapeWire? _postFrameMaterializedWitness;
+    private GraphicsPostFrameSnapshotResult? _postFrameCompletedCopy;
+    internal GraphicsPostFrameCommandTape? ActivePostFrameTape => _postFrameTape is { Armed: true } ? _postFrameTape : null;
+    internal PostFrameTapeInvocation ActivePostFrameTapeInvocation => _postFrameTapeInvocation;
     internal Action<GraphicsPostFrameOperation>? PostFrameFailureInjection { get; set; }
+
+    internal void ConfigurePostFrameSnapshots(string mode)
+    {
+        ThrowIfDisposed(); ThrowIfRecording();
+        if (_postFrameSessionEnded || !GraphicsPostFrameSnapshotModes.IsSupported(mode) || _postFrameAttachmentClosed || _postFrameCoverageMode is not null)
+            throw new InvalidOperationException("Snapshot v2 selection requires one exact mode before any pipeline/frame.");
+        if (mode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments)
+        {
+            _postFrameTapeSession = Guid.ParseExact(_telemetryIdentitySession, "N");
+            _postFrameTape = new(this, _postFrameTapeSession, _ownerThreadId);
+        }
+        // Attachment-only stores this selection value and allocates no catalog/tape/observer arrays.
+        _postFrameCoverageMode = mode;
+    }
+
+    internal GraphicsPostFrameCaptureContext BeginPostFrameCapture(string mode, int repetition)
+    {
+        ThrowIfDisposed(); ThrowIfRecording();
+        if (_postFrameSessionEnded || !GraphicsPostFrameSnapshotModes.IsSupported(mode) || !string.Equals(mode, _postFrameCoverageMode, StringComparison.Ordinal) ||
+            _postFrameCapturePending || _postFrameInvocationOpen || repetition != _postFrameRepetition + 1 || repetition is < 0 or > 7 ||
+            _postFrameInvocation == ulong.MaxValue)
+            throw new InvalidOperationException("Snapshot v2 invocation is foreign, unfinished or out of order.");
+        _postFrameContext = new(this, _postFrameInvocation + 1, repetition, mode);
+        _postFrameCapturePending = true;
+        return _postFrameContext;
+    }
+
+    private void ClaimPostFrameCapture()
+    {
+        if (_postFrameCoverageMode is null) return;
+        if (_postFrameSessionEnded) throw new InvalidOperationException("Selected post-frame session has terminated.");
+        if (!_postFrameCapturePending || !_postFrameContext.Matches(this, _postFrameInvocation + 1, _postFrameCoverageMode))
+            throw new InvalidOperationException("Selected capture lacks its current declared invocation.");
+        _postFrameInvocation = _postFrameContext.Invocation;
+        _postFrameRepetition = _postFrameContext.Repetition;
+        _postFrameCapturePending = false;
+        _postFrameInvocationOpen = true;
+        _postFrameTapeClaimed = false;
+        _postFrameTapeInvocation = default;
+        _postFrameTapeCompletion = default;
+        _postFrameMaterializedWitness = null;
+        _postFrameCompletedCopy = null;
+    }
+
+    private void ArmPostFrameOpaqueTape()
+    {
+        if (_postFrameTape is null) return;
+        _postFrameTapeInvocation = _postFrameTape.Arm(this, _postFrameTapeSession, _ownerThreadId, _postFrameRepetition);
+        _postFrameTapeClaimed = _postFrameTapeInvocation.BelongsTo(_postFrameTape, _postFrameInvocation);
+    }
+
+    private void SealPostFrameOpaqueTape(bool bodySucceeded, bool cleanupSucceeded)
+    {
+        if (_postFrameTape is null || !_postFrameTapeClaimed) return;
+        GraphicsPostFrameCompletionStamp stamp = _postFrameStamp;
+        PostFrameTapeFrame frame = stamp.Valid ? new((uint)stamp.FrameIndex, stamp.Submission.Submission,
+            stamp.Submission.SubmittedFence, stamp.CompletedFence, stamp.Submission.Generation,
+            stamp.Submission.ResourceGeneration, stamp.PresentedBefore, stamp.PresentedAfter) : default;
+        _postFrameTapeCompletion = _postFrameTape.ObserveOriginalCompletion(_postFrameTapeInvocation,
+            frame, bodySucceeded, cleanupSucceeded && stamp.Valid);
+        _postFrameTape.Seal(_postFrameTapeInvocation, this, _postFrameTapeSession, _ownerThreadId, _postFrameTapeCompletion);
+        _postFrameTape.ClearSourceScratch();
+    }
+
+    internal uint TapeBufferIdentity(D3D12GraphicsBuffer buffer) => ActivePostFrameTape is { } tape ?
+        tape.ObserveIdentity(_postFrameTapeInvocation, buffer, buffer.Lifetime, PostFrameTapeIdentityKind.Buffer,
+            _telemetryGeneration, 0, (ulong)buffer.Description.Memory, 0, buffer.Description.SizeInBytes, 0) : 0;
+
+    internal uint TapeTextureIdentity(D3D12GraphicsTexture texture) => ActivePostFrameTape is { } tape ?
+        tape.ObserveIdentity(_postFrameTapeInvocation, texture, texture.Lifetime, PostFrameTapeIdentityKind.Texture,
+            _telemetryGeneration, 0, (ulong)texture.DescriptorIndex,
+            (uint)texture.Description.Width | ((ulong)(uint)texture.Description.Height << 32), 0,
+            (uint)texture.Description.MipCount | ((ulong)(uint)texture.Description.Format << 8) | ((ulong)(uint)texture.Description.ColorSpace << 16)) : 0;
+
+    internal uint TapePipelineIdentity(D3D12GraphicsPipeline pipeline, bool root = false) => ActivePostFrameTape is { } tape ?
+        tape.ObserveIdentity(_postFrameTapeInvocation, root ? pipeline.RootSignature : pipeline, pipeline.Lifetime,
+            root ? PostFrameTapeIdentityKind.RootSignature : PostFrameTapeIdentityKind.Pipeline, 0, 0, 0, 0, 0, 0) : 0;
+
+    private uint TapeRawIdentity(ID3D12Resource resource, ulong slot, ulong descriptor = 0)
+    {
+        if (ActivePostFrameTape is not { } tape) return 0;
+        if (_surfaceLifecycle.AppliedResizeGeneration == ulong.MaxValue) { tape.Refuse(PostFrameTapeRefusal.InvalidTransition); return 0; }
+        return tape.ObserveIdentity(_postFrameTapeInvocation, resource, null, PostFrameTapeIdentityKind.RetainedTarget,
+            _surfaceLifecycle.AppliedResizeGeneration + 1, slot, descriptor, 0, 0, 0);
+    }
+
+    private uint TapeHeapIdentity() => ActivePostFrameTape!.ObserveIdentity(_postFrameTapeInvocation, _shaderResourceHeap, null,
+        PostFrameTapeIdentityKind.DescriptorHeap, _telemetryGeneration, 0, 0, 0, 0, 0);
+    internal uint TapeShaderHeapIdentity() => ActivePostFrameTape is null ? 0 : TapeHeapIdentity();
+
+    internal void TapeOwnerTargets(PostFrameTapeOwnerPostcondition source)
+    {
+        if (ActivePostFrameTape is not { } tape) return;
+        bool shadow = source == PostFrameTapeOwnerPostcondition.ShadowTargets;
+        bool particle = source == PostFrameTapeOwnerPostcondition.ParticleTargets;
+        bool overlay = _passState.Current == GraphicsFramePass.Overlay;
+        tape.Pass(_postFrameTapeInvocation, shadow ? PostFrameTapePass.Shadow : particle ? PostFrameTapePass.Particle :
+            overlay ? PostFrameTapePass.Overlay : PostFrameTapePass.OpaqueWorld, true);
+        uint color = shadow ? 0 : TapeRawIdentity(overlay || !_sceneOutput.Enabled ? _renderTargets[_frameIndex] : _sceneTargets![_frameIndex], (ulong)_frameIndex);
+        uint depth = particle ? 0 : shadow ? TapeRawIdentity(_shadowTargets![_frameIndex], (ulong)_frameIndex, (ulong)_shadowDescriptors![_frameIndex]) :
+            TapeRawIdentity(overlay && _overlayDepthTarget is not null ? _overlayDepthTarget : _depthTarget!, ulong.MaxValue);
+        tape.OwnerPostcondition(_postFrameTapeInvocation, source, PostFrameTapeBinding.RenderTarget, 0, color);
+        tape.OwnerPostcondition(_postFrameTapeInvocation, source, PostFrameTapeBinding.DepthTarget, 0, depth);
+        if (source is PostFrameTapeOwnerPostcondition.ShadowTargets or PostFrameTapeOwnerPostcondition.ShadowReturnTargets)
+        {
+            int width = shadow ? _directionalShadows.Resolution : WorldWidth, height = shadow ? _directionalShadows.Resolution : WorldHeight;
+            tape.Viewport(_postFrameTapeInvocation, 0, 0, BitConverter.SingleToUInt32Bits(width), BitConverter.SingleToUInt32Bits(height),
+                0, BitConverter.SingleToUInt32Bits(1), source);
+            tape.OwnerPostcondition(_postFrameTapeInvocation, source, PostFrameTapeBinding.Scissor, 0, 0, 0, 0, (uint)width, (uint)height);
+        }
+    }
+
+    internal void TapeShadowReceiver(D3D12GraphicsPipeline pipeline)
+    {
+        if (ActivePostFrameTape is not { } tape) return;
+        if (_surfaceLifecycle.AppliedResizeGeneration == ulong.MaxValue) { tape.Refuse(PostFrameTapeRefusal.InvalidTransition); return; }
+        ulong epoch = _surfaceLifecycle.AppliedResizeGeneration + 1;
+        uint arena = tape.ObserveIdentity(_postFrameTapeInvocation, _shadowConstants![_frameIndex], null,
+            PostFrameTapeIdentityKind.ImplicitArena, epoch, (ulong)_frameIndex, 0, 0, GraphicsDirectionalShadowSettings.ConstantArenaBytesPerFrame, 4);
+        uint root = (uint)(1 + pipeline.Description.PixelTextureCount);
+        tape.OwnerPostcondition(_postFrameTapeInvocation, PostFrameTapeOwnerPostcondition.ShadowReceiverImplicit,
+            PostFrameTapeBinding.RootParameter, root, arena, 0, 256, epoch, (ulong)_frameIndex);
+        tape.RootWords(_postFrameTapeInvocation, root, tape.ShadowFrameWords, true, (uint)_frameIndex, epoch, 0, arena,
+            PostFrameTapeOwnerPostcondition.ShadowReceiverImplicit);
+        uint shadow = TapeRawIdentity(_shadowTargets![_frameIndex], (ulong)_frameIndex, (ulong)_shadowDescriptors![_frameIndex]);
+        tape.OwnerPostcondition(_postFrameTapeInvocation, PostFrameTapeOwnerPostcondition.ShadowReceiverImplicit,
+            PostFrameTapeBinding.DescriptorHeap, 0, TapeHeapIdentity());
+        tape.OwnerPostcondition(_postFrameTapeInvocation, PostFrameTapeOwnerPostcondition.ShadowReceiverImplicit,
+            PostFrameTapeBinding.TextureTable, 15, shadow, (ulong)_shadowDescriptors![_frameIndex], root + 1, TapeHeapIdentity(), 1);
+    }
+
+    internal void TapeVertexConstants(ReadOnlySpan<float> values, bool buffered)
+    {
+        if (ActivePostFrameTape is not { } tape) return;
+        var words = System.Runtime.InteropServices.MemoryMarshal.Cast<float, uint>(values);
+        if (!buffered) { tape.RootWords(_postFrameTapeInvocation, 0, words, false); return; }
+        if (_surfaceLifecycle.AppliedResizeGeneration == ulong.MaxValue || _constantOffset < 256)
+        { tape.Refuse(PostFrameTapeRefusal.InvalidTransition); return; }
+        ulong epoch = _surfaceLifecycle.AppliedResizeGeneration + 1, offset = (ulong)(_constantOffset - 256);
+        uint arena = tape.ObserveIdentity(_postFrameTapeInvocation, _shadowConstants![_frameIndex], null,
+            PostFrameTapeIdentityKind.ImplicitArena, epoch, (ulong)_frameIndex, 0, 0, GraphicsDirectionalShadowSettings.ConstantArenaBytesPerFrame, 4);
+        tape.OwnerPostcondition(_postFrameTapeInvocation, PostFrameTapeOwnerPostcondition.BufferedVertexConstant,
+            PostFrameTapeBinding.RootParameter, 0, arena, offset, 256, epoch, (ulong)_frameIndex);
+        tape.RootWords(_postFrameTapeInvocation, 0, words, true, (uint)_frameIndex, epoch, offset, arena);
+    }
+
+    internal void TapeVertexConstantsRequest(int words, bool buffered)
+    {
+        if (ActivePostFrameTape is not { } tape) return;
+        if (!buffered) { tape.Request(_postFrameTapeInvocation, PostFrameTapeBinding.RootParameter, 0, 0, 0, (uint)words); return; }
+        if (_shadowConstants is null || _surfaceLifecycle.AppliedResizeGeneration == ulong.MaxValue || _constantOffset < 256)
+        { tape.Refuse(PostFrameTapeRefusal.InvalidTransition); return; }
+        ulong epoch = _surfaceLifecycle.AppliedResizeGeneration + 1;
+        uint arena = tape.ObserveIdentity(_postFrameTapeInvocation, _shadowConstants[_frameIndex], null,
+            PostFrameTapeIdentityKind.ImplicitArena, epoch, (ulong)_frameIndex, 0, 0, GraphicsDirectionalShadowSettings.ConstantArenaBytesPerFrame, 4);
+        tape.Request(_postFrameTapeInvocation, PostFrameTapeBinding.RootParameter, 0, arena, (uint)_constantOffset, 256, epoch, (ulong)_frameIndex);
+    }
+
+    internal void TapeDescriptorHeapReturned()
+    {
+        if (ActivePostFrameTape is { } tape)
+            tape.NativeReturned(_postFrameTapeInvocation, PostFrameTapeBinding.DescriptorHeap, 0, TapeHeapIdentity());
+    }
 
     private void InvalidatePostFrameStamp()
     {
@@ -31,11 +208,24 @@ internal sealed partial class D3D12GraphicsDevice
             new(_submittedFrameCount, _lastSubmittedFrameFence, _telemetryGeneration, _surfaceLifecycle.AppliedResizeGeneration + 1),
             _postFrameIdleObserved, _captureRecordedFrameIndex, before, _presentedFrameCount,
             _surfaceLifecycle.Width, _surfaceLifecycle.Height, _surfaceLifecycle.ResizeGeneration,
-            _surfaceLifecycle.AppliedResizeGeneration, _constantOffset, _shadowConstants?[_captureRecordedFrameIndex]);
+            _surfaceLifecycle.AppliedResizeGeneration, _constantOffset, _shadowConstants?[_captureRecordedFrameIndex])
+        {
+            CoverageMode = _postFrameCoverageMode,
+            Invocation = _postFrameCoverageMode is null ? 0 : _postFrameInvocation,
+            SceneWitness = _postFrameCoverageMode is null ? null : _sceneTargets?[_captureRecordedFrameIndex],
+            ShadowWitness = _postFrameCoverageMode is null ? null : _shadowTargets?[_captureRecordedFrameIndex],
+            FinalDepthWitness = _postFrameCoverageMode is null ? null : _overlayDepthTarget ?? _depthTarget,
+            WorldDepthWitness = _postFrameCoverageMode is null ? null : _depthTarget,
+            WorldWidth = _postFrameCoverageMode is null ? 0 : WorldWidth,
+            WorldHeight = _postFrameCoverageMode is null ? 0 : WorldHeight,
+            ShadowResolution = _postFrameCoverageMode is null ? 0 : _directionalShadows.Resolution,
+            ShadowRecorded = _postFrameCoverageMode is not null && _shadowRecorded
+        };
     }
     private void ValidatePostFrameStamp(GraphicsPostFrameCompletionStamp stamp)
     {
         ThrowIfDisposed(); ThrowIfRecording();
+        if (_postFrameSessionEnded) throw new InvalidOperationException("Selected post-frame session has terminated.");
         object? currentArena = _shadowConstants is not null && stamp.FrameIndex >= 0 && stamp.FrameIndex < _shadowConstants.Length ? _shadowConstants[stamp.FrameIndex] : null;
         if (!stamp.Valid || !_postFrameStamp.Valid || stamp != _postFrameStamp || !ReferenceEquals(currentArena, stamp.ConstantArenaWitness) ||
             stamp.Submission.Generation != _telemetryGeneration || stamp.Submission.Submission != _submittedFrameCount ||
@@ -44,20 +234,100 @@ internal sealed partial class D3D12GraphicsDevice
             stamp.Width != _surfaceLifecycle.Width || stamp.Height != _surfaceLifecycle.Height ||
             _surfaceLifecycle.IsSuspended || _surfaceLifecycle.HasPendingResize || _surfaceLifecycle.IsOccluded)
             throw new InvalidOperationException("Post-frame receipt has no current successfully cleaned capture.");
+        if (stamp.CoverageMode is not null && (!GraphicsPostFrameSnapshotModes.IsSupported(stamp.CoverageMode) ||
+            !_postFrameInvocationOpen || !string.Equals(stamp.CoverageMode, _postFrameCoverageMode, StringComparison.Ordinal) ||
+            stamp.Invocation != _postFrameInvocation || !stamp.ShadowRecorded || stamp.SceneWitness is null || stamp.ShadowWitness is null || stamp.FinalDepthWitness is null ||
+            _sceneTargets is null || _shadowTargets is null || stamp.FrameIndex >= _sceneTargets.Length || stamp.FrameIndex >= _shadowTargets.Length ||
+            !ReferenceEquals(stamp.SceneWitness, _sceneTargets[stamp.FrameIndex]) || !ReferenceEquals(stamp.ShadowWitness, _shadowTargets[stamp.FrameIndex]) ||
+            !ReferenceEquals(stamp.FinalDepthWitness, _overlayDepthTarget ?? _depthTarget) || !ReferenceEquals(stamp.WorldDepthWitness, _depthTarget)))
+            throw new InvalidOperationException("Snapshot v2 required retained attachment witnesses are missing or stale.");
+        if (stamp.CoverageMode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments &&
+            !ReferenceEquals(stamp.WorldDepthWitness, stamp.FinalDepthWitness))
+            throw new NotSupportedException("Opaque World depth is not covered by the declared retained-final-depth attachment; no substitute copy is permitted.");
     }
-    internal GraphicsPostFrameReceipt IssuePostFrameReceipt(int recordedSlot)
+    internal GraphicsPostFrameReceipt IssuePostFrameReceipt(int recordedSlot, GraphicsPostFrameCaptureContext? context = null)
     {
         var stamp = _postFrameStamp;
         ValidatePostFrameStamp(stamp);
         if (_postFrameReceiptIssued || recordedSlot != stamp.FrameIndex)
             throw new InvalidOperationException("Post-frame receipt already issued or actual callback slot differs.");
+        if (stamp.CoverageMode is null ? context is not null : context is not { } selected ||
+            !selected.Matches(this, stamp.Invocation, stamp.CoverageMode) || selected.Repetition != _postFrameRepetition)
+            throw new InvalidOperationException("Snapshot mode/invocation context differs from the successful capture.");
+        if (stamp.CoverageMode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments)
+        {
+            if (!_postFrameTapeClaimed || _postFrameTape is null || !_postFrameTape.PngClosed(_postFrameTapeInvocation))
+                throw new InvalidOperationException("Opaque capture lacks its actual current claimed invocation and closed primary PNG source edge.");
+            _postFrameMaterializedWitness = _postFrameTape.Materialize(_postFrameTapeInvocation);
+            if (_postFrameTape.Refusal != PostFrameTapeRefusal.None)
+                throw new InvalidDataException("Opaque observer refused the original capture: " + _postFrameTape.Refusal);
+            _ = GraphicsPostFrameJson.Measure(_postFrameMaterializedWitness, GraphicsPostFrameLimits.BodyBytes);
+        }
         var identity = DeviceIdentity ?? throw new InvalidDataException("Actual post-frame device identity unavailable.");
-        var original = new GraphicsPostFrameOriginalReceipt(1, "original-device-frame-fence", identity, _ownerThreadId,
+        var original = new GraphicsPostFrameOriginalReceipt(stamp.CoverageMode is null ? 1 : 2, "original-device-frame-fence", identity, _ownerThreadId,
             stamp.FrameIndex, stamp.Submission, stamp.CompletedFence, stamp.PresentedBefore, stamp.PresentedAfter,
-            stamp.Width, stamp.Height, stamp.ResizeGeneration, stamp.AppliedResizeGeneration);
-        var receipt = new GraphicsPostFrameReceipt(this, stamp.Serial, original);
+            stamp.Width, stamp.Height, stamp.ResizeGeneration, stamp.AppliedResizeGeneration)
+        { CoverageMode = stamp.CoverageMode, Invocation = stamp.CoverageMode is null ? null : stamp.Invocation,
+            WorldDepthAliasesRetainedFinalDepth = stamp.CoverageMode is null ? null : ReferenceEquals(stamp.WorldDepthWitness, stamp.FinalDepthWitness) };
+        var receipt = new GraphicsPostFrameReceipt(this, stamp.Serial, original, context);
         _postFrameReceiptIssued = true;
         return receipt;
+    }
+
+    internal object? CurrentPostFrameFailureFacts(GraphicsPostFrameCaptureContext context)
+    {
+        VerifyOwner();
+        if (_postFrameSessionEnded || !context.Matches(this, _postFrameInvocation, _postFrameCoverageMode) || context.Repetition != _postFrameRepetition) return null;
+        return new { kind = "current-post-frame-v2-incomplete-context", mode = context.Mode, invocation = context.Invocation,
+            repetition = context.Repetition, opaqueTapeCaptureClaimed = _postFrameTapeClaimed,
+            originalReceiptIssued = _postFrameReceiptIssued, originalStampValid = _postFrameStamp.Valid,
+            observerRefusal = _postFrameTape?.Refusal, opaqueWitness = _postFrameMaterializedWitness,
+            copyCompletionAvailable = _postFrameCompletedCopy is not null, invocationOpen = _postFrameInvocationOpen,
+            complete = false, qualified = false };
+    }
+
+    internal void CompletePostFrameExport(GraphicsPostFrameReceipt receipt, GraphicsPostFrameSnapshotResult result)
+    {
+        ThrowIfDisposed(); ThrowIfRecording(); ValidatePostFrameStamp(_postFrameStamp);
+        if (!_postFrameInvocationOpen || !receipt.Consumed || !ReferenceEquals(receipt.Owner, this) ||
+            !ReferenceEquals(result, _postFrameCompletedCopy) || !ReferenceEquals(result.CompletionOwner, this) ||
+            !ReferenceEquals(result.OriginalFrameReceipt, receipt.Original) || receipt.CaptureContext is not { } context ||
+            !context.Matches(this, _postFrameInvocation, _postFrameCoverageMode) ||
+            !result.CopyReceipt.CompletionProved || !result.CopyReceipt.MayHaveExecuted || result.CopyReceipt.CompletedFence == ulong.MaxValue ||
+            result.CopyReceipt.SubmittedFence == 0 || result.CopyReceipt.CompletedFence < result.CopyReceipt.SubmittedFence)
+            throw new InvalidOperationException("Snapshot publication lacks its current actual native copy/export source proof.");
+        if (_postFrameCoverageMode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments)
+        {
+            if (_postFrameTape is null || result.OpaqueWitness is not PostFrameTapeWire witness ||
+                !_postFrameTape.ConfirmEvidenceExported(_postFrameTapeInvocation) ||
+                !_postFrameTape.FinalizeNativeExport(_postFrameTapeInvocation, _postFrameTapeCompletion, receipt, result, witness))
+                throw new InvalidOperationException("Opaque native publication was not finalized by its current owner.");
+        }
+        else if (result.OpaqueWitness is not null) throw new InvalidOperationException("Attachment-only cannot publish an opaque witness.");
+        _postFrameInvocationOpen = false;
+    }
+
+    internal void EndPostFrameSnapshotSession()
+    {
+        // Terminal managed cleanup remains available on a failed/disposed owner, but must not
+        // destroy an observer while the original command recording is still in progress.
+        VerifyOwner(); ThrowIfRecording();
+        if (_postFrameSessionEnded || _postFrameCoverageMode is null) return;
+        _postFrameSessionEnded = true;
+        _postFrameAttachmentClosed = true;
+        _postFrameCapturePending = _postFrameInvocationOpen = _postFrameTapeClaimed = false;
+        _postFrameContext = default;
+        _postFrameTapeInvocation = default;
+        _postFrameTapeCompletion = default;
+        _postFrameTapeSession = default;
+        _postFrameIdleObserved = 0;
+        InvalidatePostFrameStamp();
+        _postFrameTape?.Dispose();
+        _postFrameTape = null;
+        _postFrameMaterializedWitness = null;
+        _postFrameCompletedCopy = null;
+        // Keep the selected mode and the native resource-retirement registry. This is not
+        // a new selection window, nor proof that uncertain native copy work has completed.
     }
     private void VerifyPostFrameInitializerAbsence(GraphicsPostFrameCompletionStamp stamp)
     {
@@ -76,7 +346,8 @@ internal sealed partial class D3D12GraphicsDevice
     }
 
     private sealed record PostFrameNativeSource(ID3D12Resource Resource, GraphicsPostFrameResourceDescription Description,
-        PlacedSubresourceFootPrint[] Footprints, bool Texture);
+        PlacedSubresourceFootPrint[] Footprints, bool Texture, ResourceStates RestoreState = ResourceStates.PixelShaderResource,
+        uint TransitionSubresource = uint.MaxValue);
 
     internal GraphicsPostFrameSnapshotResult CapturePostFrameSnapshot(GraphicsPostFrameReceipt receipt,
         GraphicsPostFrameRoster roster, GraphicsPostFrameIntent intent)
@@ -84,7 +355,9 @@ internal sealed partial class D3D12GraphicsDevice
         ArgumentNullException.ThrowIfNull(receipt); ArgumentNullException.ThrowIfNull(roster);
         var stamp = _postFrameStamp;
         ValidatePostFrameStamp(stamp);
-        if (receipt.Serial != stamp.Serial || receipt.Original.Submission != stamp.Submission || receipt.Original.FrameIndex != stamp.FrameIndex)
+        if (receipt.Serial != stamp.Serial || receipt.Original.Submission != stamp.Submission || receipt.Original.FrameIndex != stamp.FrameIndex ||
+            !string.Equals(receipt.Original.CoverageMode, stamp.CoverageMode, StringComparison.Ordinal) ||
+            (stamp.CoverageMode is not null && (receipt.CaptureContext is not { } selected || !selected.Matches(this, stamp.Invocation, stamp.CoverageMode))))
             throw new InvalidOperationException("Post-frame receipt belongs to a stale capture.");
         receipt.Consume(this);
         VerifyPostFrameInitializerAbsence(stamp);
@@ -109,16 +382,21 @@ internal sealed partial class D3D12GraphicsDevice
                 ID3D12Resource source;
                 GraphicsBufferDescription? buffer = null;
                 GraphicsTextureDescription? texture = null;
+                uint? causalIdentity = null;
                 bool isTexture;
                 if (request.Resource is D3D12GraphicsBuffer b && ReferenceEquals(b.Owner, this))
                 {
                     ValidatePostFrameLifetime(b.Lifetime, stamp);
                     source = Own(b.Resource.QueryInterface<ID3D12Resource>()); buffer = b.Description; isTexture = false;
+                    uint found = _postFrameTape?.FindIdentity(b, b.Lifetime, PostFrameTapeIdentityKind.Buffer) ?? 0;
+                    if (found != 0) causalIdentity = found;
                 }
                 else if (request.Resource is D3D12GraphicsTexture t && ReferenceEquals(t.Owner, this))
                 {
                     ValidatePostFrameLifetime(t.Lifetime, stamp);
                     source = Own(t.Resource.QueryInterface<ID3D12Resource>()); texture = t.Description; isTexture = true;
+                    uint found = _postFrameTape?.FindIdentity(t, t.Lifetime, PostFrameTapeIdentityKind.Texture) ?? 0;
+                    if (found != 0) causalIdentity = found;
                 }
                 else throw new NotSupportedException("A declared post-frame resource is unsupported or belongs to another device.");
                 var native = source.Description;
@@ -171,7 +449,8 @@ internal sealed partial class D3D12GraphicsDevice
                 if (mipEntries > GraphicsPostFrameLimits.MipEntries) throw new InvalidDataException("Snapshot mip-entry capacity exceeded.");
                 GraphicsPostFrameLimits.Totals(cursor, canonical);
                 var description = new GraphicsPostFrameResourceDescription(request.Id, request.Name, isTexture ? "texture" : "buffer", true,
-                    buffer, texture, null, request.Offset, observed, "Declared resident subset; not a prior shader-fetch or bound-range assertion.", mips.ToArray());
+                    buffer, texture, null, request.Offset, observed, "Declared resident subset; not a prior shader-fetch or bound-range assertion.", mips.ToArray())
+                { CausalIdentityId = causalIdentity };
                 plans.Add(new(source, description, footprints, isTexture));
             }
             // Include only the actual captured-slot implicit arena prefix, never the next swapchain slot.
@@ -187,12 +466,67 @@ internal sealed partial class D3D12GraphicsDevice
                 var description = new GraphicsPostFrameResourceDescription(plans.Count + 1, "captured-slot-constant-prefix", "implicit-buffer", false,
                     new(source.Description.Width, GraphicsBufferMemory.Upload), null, implicitIdentity, 0, bytes,
                     "Existing allocation cursor prefix including reserved/padding bytes; shader relevance is unknown.", [mip]);
+                uint arenaId = _postFrameTape?.FindIdentity(_shadowConstants[stamp.FrameIndex], null, PostFrameTapeIdentityKind.ImplicitArena) ?? 0;
+                if (arenaId != 0) description = description with { CausalIdentityId = arenaId };
                 plans.Add(new(source, description, [], false)); cursor = checked(cursor + bytes); canonical = checked(canonical + bytes);
+            }
+            if (stamp.CoverageMode is not null)
+            {
+                AddAttachment("retained-scene-linear", (ID3D12Resource)stamp.SceneWitness!, Format.R16G16B16A16_Float,
+                    stamp.WorldWidth, stamp.WorldHeight, ResourceStates.PixelShaderResource);
+                AddAttachment("retained-shadow-depth", (ID3D12Resource)stamp.ShadowWitness!, Format.R32_Typeless,
+                    stamp.ShadowResolution, stamp.ShadowResolution, ShadowReadState);
+                var finalDepth = (ID3D12Resource)stamp.FinalDepthWitness!;
+                AddAttachment("retained-final-depth", finalDepth, finalDepth.Description.Format,
+                    _overlayDepthTarget is null ? stamp.WorldWidth : stamp.Width,
+                    _overlayDepthTarget is null ? stamp.WorldHeight : stamp.Height, ResourceStates.DepthWrite);
+            }
+            void AddAttachment(string role, ID3D12Resource actual, Format expectedFormat, int width, int height, ResourceStates state)
+            {
+                if (plans.Count >= GraphicsPostFrameLimits.Resources || mipEntries >= GraphicsPostFrameLimits.MipEntries)
+                    throw new InvalidDataException("Required attachment exceeds existing aggregate structural capacity.");
+                ID3D12Resource retainedSource = Own(actual.QueryInterface<ID3D12Resource>());
+                ResourceDescription native = retainedSource.Description;
+                bool scene = role == "retained-scene-linear";
+                if (width <= 0 || height <= 0 || native.Dimension != ResourceDimension.Texture2D || native.Width != (ulong)width ||
+                    native.Height != height || native.DepthOrArraySize != 1 || native.SampleDescription.Count != 1 ||
+                    !GraphicsPostFrameLimits.SupportedAttachmentMips(role, width, height, native.MipLevels, 0, 1, 0) ||
+                    native.Format != expectedFormat || (scene ? expectedFormat != Format.R16G16B16A16_Float : expectedFormat is not (Format.R32_Typeless or Format.D32_Float)))
+                    throw new NotSupportedException($"Required retained attachment lacks its exact supported native format/view/layout: role={role}; dimension={native.Dimension}; width={native.Width}; height={native.Height}; array={native.DepthOrArraySize}; mipLevels={native.MipLevels}; sampleCount={native.SampleDescription.Count}; sampleQuality={native.SampleDescription.Quality}; format={native.Format}.");
+                phase = "attachment-footprints"; PostFrameFailureInjection?.Invoke(GraphicsPostFrameOperation.Footprints);
+                cursor = GraphicsPostFrameLimits.Align(cursor, 512);
+                var footprints = new PlacedSubresourceFootPrint[1]; var rows = new uint[1]; var rowBytes = new ulong[1];
+                _device.GetCopyableFootprints(native, 0, 1, cursor, footprints, rows, rowBytes, out ulong queried);
+                var footprint = footprints[0]; ulong logicalRow = checked((ulong)width * (scene ? 8UL : 4UL));
+                if (queried is 0 or ulong.MaxValue || footprint.Offset % 512 != 0 || footprint.Footprint.Width != width ||
+                    footprint.Footprint.Height != height || footprint.Footprint.Depth != 1 || footprint.Footprint.Format != expectedFormat ||
+                    rows[0] != height || rowBytes[0] != logicalRow || footprint.Footprint.RowPitch < logicalRow || footprint.Footprint.RowPitch % 256 != 0)
+                    throw new InvalidDataException("Required retained attachment native footprint differs.");
+                ulong padded = checked((ulong)footprint.Footprint.RowPitch * (ulong)height), raw = checked(logicalRow * (ulong)height);
+                cursor = checked(footprint.Offset + padded); canonical = checked(canonical + raw); mipEntries++;
+                GraphicsPostFrameLimits.Totals(cursor, canonical);
+                var mip = new GraphicsPostFrameMip(0, width, height, height, logicalRow, footprint.Footprint.RowPitch,
+                    footprint.Offset, padded, raw, expectedFormat.ToString());
+                var description = new GraphicsPostFrameResourceDescription(plans.Count + 1, role, "retained-attachment", false,
+                    null, null, null, 0, raw, "Actual captured-slot retained target after PNG; not earlier shader fetches or pre-overlay depth.", [mip])
+                {
+                    Attachment = new(role, expectedFormat.ToString(), scene ? "R16G16B16A16_Float" : "R32_Float",
+                        scene ? null : "D32_Float", role == "retained-shadow-depth" ? "R32_Float" : scene ? "R16G16B16A16_Float" : null,
+                        state.ToString(), width, height, stamp.FrameIndex, stamp.Submission.ResourceGeneration,
+                        "Same DIRECT queue, mip0 array0 plane0 only after original capture and PNG; other backing mip contents unobserved; final depth can include overlay writes.")
+                    { NativeMipLevels = native.MipLevels, ObservedMipSlice = 0, ObservedMipLevels = 1, ObservedSubresource = 0 }
+                };
+                uint targetId = _postFrameTape?.FindIdentity(actual, null, PostFrameTapeIdentityKind.RetainedTarget) ?? 0;
+                if (targetId != 0) description = description with { CausalIdentityId = targetId };
+                plans.Add(new(retainedSource, description, footprints, true, state, 0));
             }
             GraphicsPostFrameLimits.Totals(cursor, canonical);
             GraphicsPostFrameLimits.ValidateIntent(intent, plans.Count);
-            GraphicsPostFrameLimits.MetadataBody(new { resources = plans.Select(x => x.Description).ToArray(), intent },
-                plans.Sum(x => x.Description.Mips.Length));
+            if (stamp.CoverageMode is null)
+                GraphicsPostFrameLimits.MetadataBody(new { resources = plans.Select(x => x.Description).ToArray(), intent },
+                    plans.Sum(x => x.Description.Mips.Length));
+            else GraphicsPostFrameLimits.MetadataBody(new { resources = plans.Select(x => x.Description).ToArray(), intent,
+                    opaqueWitness = _postFrameMaterializedWitness }, plans.Sum(x => x.Description.Mips.Length));
             phase = "allocate"; PostFrameFailureInjection?.Invoke(GraphicsPostFrameOperation.AllocateReadback);
             ID3D12Resource readback = Own(_device.CreateCommittedResource(HeapType.Readback, ResourceDescription.Buffer(cursor), ResourceStates.CopyDest));
             phase = "copy-objects"; PostFrameFailureInjection?.Invoke(GraphicsPostFrameOperation.CreateCopyObjects);
@@ -206,10 +540,10 @@ internal sealed partial class D3D12GraphicsDevice
             {
                 if (plan.Texture)
                 {
-                    commands.ResourceBarrierTransition(plan.Resource, ResourceStates.PixelShaderResource, ResourceStates.CopySource);
+                    commands.ResourceBarrierTransition(plan.Resource, plan.RestoreState, ResourceStates.CopySource, plan.TransitionSubresource);
                     for (int mip = 0; mip < plan.Footprints.Length; mip++)
                         commands.CopyTextureRegion(new TextureCopyLocation(readback, plan.Footprints[mip]), 0, 0, 0, new TextureCopyLocation(plan.Resource, checked((uint)mip)));
-                    commands.ResourceBarrierTransition(plan.Resource, ResourceStates.CopySource, ResourceStates.PixelShaderResource);
+                    commands.ResourceBarrierTransition(plan.Resource, ResourceStates.CopySource, plan.RestoreState, plan.TransitionSubresource);
                 }
                 else commands.CopyBufferRegion(readback, plan.Description.Mips[0].PackedOffset, plan.Resource, plan.Description.SourceOffset, plan.Description.ObservedBytes);
             }
@@ -251,7 +585,13 @@ internal sealed partial class D3D12GraphicsDevice
             }
             phase = "retire"; RetireResource(leaseLifetime);
             if (lease.ErrorCount != 0) throw new InvalidOperationException("Late native lease cleanup failed; diagnostic unavailable.");
-            return new(receipt.Original, copyReceipt, retained.ToArray(), intent, cursor, canonical, lease.Errors);
+            var result = new GraphicsPostFrameSnapshotResult(receipt.Original, copyReceipt, retained.ToArray(), intent, cursor, canonical, lease.Errors)
+            { CompletionOwner = stamp.CoverageMode is null ? null : this };
+            if (stamp.CoverageMode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments)
+                result = result with { OpaqueWitness = _postFrameTape!.CompleteNativeWitness(_postFrameTapeInvocation,
+                    _postFrameTapeCompletion, receipt, result, _postFrameMaterializedWitness ?? throw new InvalidDataException("Current opaque materialization unavailable.")) };
+            if (stamp.CoverageMode is not null) _postFrameCompletedCopy = result;
+            return result;
         }
         catch (Exception error)
         {

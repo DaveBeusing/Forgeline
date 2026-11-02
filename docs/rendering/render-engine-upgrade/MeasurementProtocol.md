@@ -437,3 +437,104 @@ These are bytes observed AFTER image persistence, not evidence of what a shader 
 earlier. The copies can perturb later repetitions. Equal bytes or all-B pixels do not
 resolve the intermittent pixel cause, establish a repair, approve numeric policies,
 qualify a physical baseline or authorize the original optimization wave2.
+
+### Explicit post-FinalColor coverage modes v2
+
+`capturePostFrameResourceSnapshotVersion:2` additionally requires the exact,
+case-sensitive string `capturePostFrameResourceSnapshotMode` with one of:
+
+- `RetainedAttachmentsOnly`: the existing late resident subset plus the actual
+  captured-slot retained SceneLinear FP16, retained shadow R32 and retained final
+  depth R32 targets. It allocates no separate tape, creation catalog or root arena,
+  freezes no pipelines and records no new draw state before PNG publication.
+  Successful capture completion stores scalar facts and existing managed target
+  references. Ordinary Full collection and legacy hashing still run; this is not
+  an observer-off measurement. New fields can enlarge containing device objects.
+- `OpaqueStateAndRetainedAttachments`: those same late resources and attachments
+  plus a source-closed CPU effective opaque-state witness. Frozen creation inputs,
+  source-proved private owner postconditions and successful CPU native-call returns
+  are distinct from setter requests and cache-hit decisions. No GPU execution,
+  independent native interception or shader-fetched-byte proof is claimed.
+
+Null/default and version1 require the mode absent or null. Both fields must be
+absent/null for baseline admission. Either non-null field independently forces
+runner diagnostic classification, including malformed standalone false/zero modes.
+The native producer rejects missing, unknown, mismatched or wrong-type selection
+before graphics; shared host/common no-frame validation rejects v2. A common
+no-frame preflight clears both fields and proves shared context only.
+
+Selection attaches before any pipeline/frame. Each repetition has a current
+owner/device/mode-bound invocation. Its original successful capture and cleanup,
+closed primary/current mismatch PNG, original receipt, late copies, completed
+copy fence, canonical raw files and complete bounded metadata occur in that order.
+Export completion authenticates the actual result and receipt; failed/unpublished
+invocations cannot rearm. Selected-session termination is owner-safe and terminal,
+invalidates managed contexts/stamps/witnesses and preserves the native retirement
+registry, including uncertain work. It rejects recording-time termination before
+mutation. Cleanup failures retain the original failure and truthful incomplete facts.
+
+The v2 payload kind is `reference-post-final-color-causal-witness`; its original
+receipt is version2. The outer file hash-reference remains version1. Attachment-only
+wire explicitly records `opaqueCoverage:"not-selected"` and `opaqueWitness:null`.
+Opaque mode requires a complete, current source-closed witness. Missing required
+targets refuse; retained-final-depth is not renamed pre-overlay World depth. Opaque
+World requires the actual World/final-depth alias. Scene/shadow copies restore PSR,
+final-depth copies restore DepthWrite. All three targets share the existing aggregate
+resource, mip, canonical128MiB, staging128MiB and compact32MiB guards; no extra binary
+command/catalog/root sidecar or additional allowance is introduced.
+
+The opaque catalog encodes the method-private root graph and final PSO fields,
+derives required masks from those actual inputs and hashes the same frozen shader
+memory consumed by native creation. Native semantic names use the pinned ANSI
+marshaller; complete catalog support is restricted to nonempty non-NUL ASCII.
+Unsupported names refuse coverage while original native creation still delegates.
+The model uses the effective catalog root kind and declared immediate DWORD count,
+actual table root ordinal, resource/descriptor/view/heap association and independent
+native-return state. Requests and suppressed cache hits never assign effective state.
+Partial immediate words can recover through a later actual full write before draw.
+
+The strict consumer retains `read_capture(root, ref, expected, snapshot_version=2)`
+and `validate_series(records)`. For v2, `expected` adds exact `coverageMode`,
+`rasterWidth` and `rasterHeight` to the
+existing independent source/runtime/recipe/repetition/camera/profile/composition/
+pixel/legacy/device/owner/slot/submission expectations. That mode must come from
+the original request/plan, never from the companion. Raster dimensions likewise
+come from the original request/case and independently join the receipt and PNG.
+Scene dimensions use `ceil(double(float32(scale))*raster)` with a minimum of one,
+matching GraphicsFramePlan; effective shadow quality fixes the shadow resolution.
+A separate full-output final-depth target exists exactly when linear scene scale
+is below one, so equal rounded dimensions alone cannot establish a World/final-depth
+object alias. Catalog masks, ASCII bytes,
+current tuples, identity/source joins and effective state are independently replayed.
+Session identities are monotone and cannot be recycled between repetitions.
+
+Resident contents and each retained attachment role are compared separately from
+retained intent, local identity and CPU opaque state. A target byte difference is a
+diagnostic finding, not an automatic copy/control failure. Full native buffer views
+remain full even when only a used prefix was retained. Explicit view/dump intersections
+and uncaptured tails prevent claims that absent bytes were observed. Neither a complete
+view nor a recorded CPU root payload establishes GPU fetch coverage. Raw-reference
+hashes include filenames and are provenance, not cross-file content equality.
+
+Copies after PNG can perturb later repetitions. Every outcome stops its separately
+reviewed single-attempt protocol; there is no automatic switch, retry or follow-up
+host. Pure typed fixtures remain synthetic/incomplete and cannot supply native
+completion proof. Software functional tests do not qualify physical timing. The
+isolated tape allocation ledger is not a whole-frame/process budget. Equal bytes,
+all-equal pixels or green tests do not establish the intermittent cause, a repair,
+approved numeric policies, physical baseline qualification or original wave2 readiness.
+
+Selected v2 retained-attachment scope observes exactly mip0, array0, plane0,
+subresource0. `nativeMipLevels` is the actual late native description count;
+`observedMipSlice=0`, `observedMipLevels=1`, and `observedSubresource=0` describe
+only the copied view. Scene and shadow have one backing mip. Final depth keeps
+its original full-chain allocation: the integer bit length of the maximum actual
+width/height. Other backing mip contents remain unobserved and are not compared.
+Attachment copy barriers transition and restore only subresource0; resident
+texture copy barriers retain ALL_SUBRESOURCES. The three required views use
+array size1 and single-plane formats. Canonical/raw and staging totals continue
+to cover the copied mip0 only; these totals do not account for all GPU backing
+allocation. Backing-mip logical memory accounting remains a separate baseline
+ledger dependency. This does not identify the historical pixel mismatch or
+qualify a baseline. No original target allocation, view, shader, or render math
+changes are part of this diagnostic compatibility correction.

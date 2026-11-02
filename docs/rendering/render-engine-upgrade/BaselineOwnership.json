@@ -59,7 +59,10 @@
         "tests/ForgeLine.Presentation.Tests/PostFrameIntentTests.cs",
         "tests/ForgeLine.Client.Tests/RenderQualification/ReferencePostFrameSnapshotTests.cs",
         "build/rendering/render-engine-upgrade/post_frame_snapshot.py",
-        "build/rendering/render-engine-upgrade/test_post_frame_snapshot.py"
+        "build/rendering/render-engine-upgrade/test_post_frame_snapshot.py",
+        "src/ForgeLine.Graphics/RenderTelemetry/GraphicsPostFrameCommandTape.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameCommandTapeTests.cs",
+        "tests/ForgeLine.Graphics.Tests/RenderTelemetry/PostFrameCommandTapeNativeTests.cs"
       ]
     }
   ],

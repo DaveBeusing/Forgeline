@@ -146,8 +146,20 @@ class BaselineAdmissionContracts(unittest.TestCase):
         original_put=integration.put
         for explicit_null in (False,True):
             def put(root,name,record,raw=False):
-                if name=='actual-request.json' and explicit_null:record=dict(record,capturePostFrameResourceSnapshotVersion=None)
+                if name=='actual-request.json' and explicit_null:record=dict(record,capturePostFrameResourceSnapshotVersion=None,capturePostFrameResourceSnapshotMode=None)
                 return original_put(root,name,record,raw)
             with self.subTest(explicit_null=explicit_null),tempfile.TemporaryDirectory() as root,patch.object(integration,'put',side_effect=put):
                 self.assertTrue(integration.SyntheticProducerCohort(root).evaluate()['baselineControlsAccepted'])
+    def test_hash_bound_standalone_snapshot_mode_cannot_borrow_false_diagnostic_flag(self):
+        import test_baseline_producer_integration as integration
+        from unittest.mock import patch
+        original_put=integration.put
+        for value in ('RetainedAttachmentsOnly','OpaqueStateAndRetainedAttachments',False,0,'unsupported',{},[]):
+            def put(root,name,record,raw=False):
+                if name=='actual-request.json':record=dict(record,capturePostFrameResourceSnapshotVersion=None,capturePostFrameResourceSnapshotMode=value)
+                if name=='attempt.json':record=dict(record,diagnosticOnly=False)
+                return original_put(root,name,record,raw)
+            with self.subTest(value=value),tempfile.TemporaryDirectory() as root,patch.object(integration,'put',side_effect=put):
+                fixture=integration.SyntheticProducerCohort(root)
+                with self.assertRaisesRegex(ValueError,'post-frame snapshot'):fixture.evaluate()
 if __name__=='__main__':unittest.main()

@@ -9,7 +9,45 @@ namespace ForgeLine.Graphics;
 public sealed record GraphicsPostFrameOriginalReceipt(int SchemaVersion, string FenceDomain,
     GraphicsDeviceTelemetryIdentity DeviceIdentity, int ManagedOwnerThreadId, int FrameIndex,
     GraphicsFrameSubmission Submission, ulong CompletedFence, ulong PresentedBefore, ulong PresentedAfter,
-    int Width, int Height, ulong ResizeGeneration, ulong AppliedResizeGeneration);
+    int Width, int Height, ulong ResizeGeneration, ulong AppliedResizeGeneration)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CoverageMode { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ulong? Invocation { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? WorldDepthAliasesRetainedFinalDepth { get; init; }
+}
+
+public static class GraphicsPostFrameSnapshotModes
+{
+    public const string RetainedAttachmentsOnly = nameof(RetainedAttachmentsOnly);
+    public const string OpaqueStateAndRetainedAttachments = nameof(OpaqueStateAndRetainedAttachments);
+    public static bool IsSupported(string? mode) => string.Equals(mode, RetainedAttachmentsOnly, StringComparison.Ordinal) ||
+        string.Equals(mode, OpaqueStateAndRetainedAttachments, StringComparison.Ordinal);
+}
+
+public readonly struct GraphicsPostFrameCaptureContext
+{
+    private readonly object? _owner;
+    internal ulong Invocation { get; }
+    internal int Repetition { get; }
+    internal string? Mode { get; }
+    internal GraphicsPostFrameCaptureContext(object owner, ulong invocation, int repetition, string mode)
+        => (_owner, Invocation, Repetition, Mode) = (owner, invocation, repetition, mode);
+    internal bool Matches(object owner, ulong invocation, string? mode) => ReferenceEquals(_owner, owner) &&
+        Invocation == invocation && Mode is not null && string.Equals(Mode, mode, StringComparison.Ordinal);
+}
+
+public sealed record GraphicsPostFrameAttachmentDescription(string Role, string NativeFormat, string CanonicalFormat,
+    string? DepthViewFormat, string? ShaderViewFormat, string OriginalState,
+    int Width, int Height, int CapturedSlot, ulong ResourceGeneration, string Meaning)
+{
+    public int NativeMipLevels { get; init; }
+    public int ObservedMipSlice { get; init; }
+    public int ObservedMipLevels { get; init; }
+    public int ObservedSubresource { get; init; }
+}
 public sealed record GraphicsPostFrameCopyReceipt(int SchemaVersion, string FenceDomain, string QueueRelationship,
     ulong SubmittedFence, ulong CompletedFence, bool MayHaveExecuted, bool CompletionProved);
 public sealed record GraphicsPostFrameResourceReference(int ResourceId, string Role);
@@ -27,14 +65,45 @@ public sealed record GraphicsPostFrameMip(int MipIndex, int Width, int Height, i
 public sealed record GraphicsPostFrameResourceDescription(int LocalId, string SemanticName, string Kind,
     bool LifetimeAvailable, GraphicsBufferDescription? Buffer, GraphicsTextureDescription? Texture,
     GraphicsWorldImplicitBinding? Implicit, ulong SourceOffset, ulong ObservedBytes, string RangeMeaning,
-    GraphicsPostFrameMip[] Mips);
+    GraphicsPostFrameMip[] Mips)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public GraphicsPostFrameAttachmentDescription? Attachment { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public uint? CausalIdentityId { get; init; }
+}
 public sealed record GraphicsPostFrameResourceBytes(GraphicsPostFrameResourceDescription Description, byte[][] CanonicalBytes);
 public sealed record GraphicsPostFrameSnapshotResult(GraphicsPostFrameOriginalReceipt OriginalFrameReceipt,
     GraphicsPostFrameCopyReceipt CopyReceipt, GraphicsPostFrameResourceBytes[] Resources, GraphicsPostFrameIntent Intent,
-    ulong PaddedStagingBytes, ulong CanonicalBytes, string[] SecondaryCleanupErrors);
+    ulong PaddedStagingBytes, ulong CanonicalBytes, string[] SecondaryCleanupErrors)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public object? OpaqueWitness { get; init; }
+    internal object? CompletionOwner { get; init; }
+}
 
 public static class GraphicsPostFrameLimits
 {
+    public static int FullMipLevels(int width, int height)
+    {
+        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+        int levels = 0;
+        for (int extent = Math.Max(width, height); extent != 0; extent >>= 1) levels++;
+        return levels;
+    }
+    public static bool SupportedAttachmentMips(string role, int width, int height, int nativeMipLevels,
+        int observedMipSlice, int observedMipLevels, int observedSubresource)
+    {
+        if (width <= 0 || height <= 0 || nativeMipLevels is < 1 or > MipsPerTexture ||
+            observedMipSlice != 0 || observedMipLevels != 1 || observedSubresource != 0) return false;
+        int expected = role switch
+        {
+            "retained-scene-linear" or "retained-shadow-depth" => 1,
+            "retained-final-depth" => FullMipLevels(width, height),
+            _ => 0
+        };
+        return nativeMipLevels == expected;
+    }
     public const int Resources = 4096, MipsPerTexture = 32, MipEntries = Resources * MipsPerTexture;
     public const int TerrainChunks = 4096, MainBatches = 4096, DecorationBatches = 4096;
     public const int ResourceReferences = 131072, IndexRangesPerChunk = 32, StringUtf8Bytes = 4096;
@@ -122,9 +191,11 @@ public sealed class GraphicsPostFrameReceipt
     internal ulong Serial { get; }
     private readonly int _ownerThread = Environment.CurrentManagedThreadId;
     internal bool Consumed { get; private set; }
+    internal GraphicsPostFrameCaptureContext? CaptureContext { get; }
     public GraphicsPostFrameOriginalReceipt Original { get; }
-    internal GraphicsPostFrameReceipt(object owner, ulong serial, GraphicsPostFrameOriginalReceipt original)
-        => (Owner, Serial, Original) = (owner, serial, original);
+    internal GraphicsPostFrameReceipt(object owner, ulong serial, GraphicsPostFrameOriginalReceipt original,
+        GraphicsPostFrameCaptureContext? captureContext = null)
+        => (Owner, Serial, Original, CaptureContext) = (owner, serial, original, captureContext);
     internal void Consume(object owner)
     {
         if (_ownerThread != Environment.CurrentManagedThreadId || Consumed || !ReferenceEquals(Owner, owner)) throw new InvalidOperationException("Foreign/reused post-frame receipt.");
@@ -169,15 +240,37 @@ public sealed class GraphicsPostFrameRoster
 
 public static class GraphicsPostFrameSnapshots
 {
+    public static void Configure(IGraphicsDevice device, string mode)
+    {
+        if (device is not D3D12GraphicsDevice native) throw new NotSupportedException("Actual native snapshot owner required.");
+        native.ConfigurePostFrameSnapshots(mode);
+    }
+    public static GraphicsPostFrameCaptureContext BeginCapture(IGraphicsDevice device, string mode, int repetition)
+        => device is D3D12GraphicsDevice native ? native.BeginPostFrameCapture(mode, repetition)
+            : throw new NotSupportedException("Actual native snapshot owner required.");
     public static GraphicsPostFrameReceipt IssueReceipt(IGraphicsDevice device, int actualRecordedSlot)
         => device is D3D12GraphicsDevice native ? native.IssuePostFrameReceipt(actualRecordedSlot)
             : throw new NotSupportedException("Post-frame resource snapshots require the actual D3D12 owner.");
+    public static GraphicsPostFrameReceipt IssueReceipt(IGraphicsDevice device, int actualRecordedSlot, GraphicsPostFrameCaptureContext context)
+        => device is D3D12GraphicsDevice native ? native.IssuePostFrameReceipt(actualRecordedSlot, context)
+            : throw new NotSupportedException("Actual native snapshot owner required.");
     public static GraphicsPostFrameSnapshotFailure? Failure(Exception error, GraphicsPostFrameReceipt? receipt)
         => GraphicsPostFrameFailure.Read(error, receipt);
     public static GraphicsPostFrameSnapshotResult Capture(IGraphicsDevice device, GraphicsPostFrameReceipt receipt,
         GraphicsPostFrameRoster roster, GraphicsPostFrameIntent intent)
         => device is D3D12GraphicsDevice native ? native.CapturePostFrameSnapshot(receipt, roster, intent)
             : throw new NotSupportedException("Post-frame resource snapshots require the actual D3D12 owner.");
+    public static void CompleteExport(IGraphicsDevice device, GraphicsPostFrameReceipt receipt, GraphicsPostFrameSnapshotResult result)
+    {
+        if (device is not D3D12GraphicsDevice native) throw new NotSupportedException("Actual native snapshot owner required.");
+        native.CompletePostFrameExport(receipt, result);
+    }
+    public static object? CurrentFailureFacts(IGraphicsDevice device, GraphicsPostFrameCaptureContext context)
+        => device is D3D12GraphicsDevice native ? native.CurrentPostFrameFailureFacts(context) : null;
+    public static void EndSession(IGraphicsDevice device)
+    {
+        if (device is D3D12GraphicsDevice native) native.EndPostFrameSnapshotSession();
+    }
 }
 
 public sealed record GraphicsPostFrameSnapshotFailure(string Phase, GraphicsPostFrameOriginalReceipt OriginalFrameReceipt,
@@ -216,7 +309,19 @@ internal sealed class GraphicsPostFrameCompositeLease : IDisposable
 
 internal readonly record struct GraphicsPostFrameCompletionStamp(bool Valid, ulong Serial, GraphicsFrameSubmission Submission,
     ulong CompletedFence, int FrameIndex, ulong PresentedBefore, ulong PresentedAfter, int Width, int Height,
-    ulong ResizeGeneration, ulong AppliedResizeGeneration, int ConstantUsedPrefix, object? ConstantArenaWitness);
+    ulong ResizeGeneration, ulong AppliedResizeGeneration, int ConstantUsedPrefix, object? ConstantArenaWitness)
+{
+    internal string? CoverageMode { get; init; }
+    internal ulong Invocation { get; init; }
+    internal object? SceneWitness { get; init; }
+    internal object? ShadowWitness { get; init; }
+    internal object? FinalDepthWitness { get; init; }
+    internal object? WorldDepthWitness { get; init; }
+    internal int WorldWidth { get; init; }
+    internal int WorldHeight { get; init; }
+    internal int ShadowResolution { get; init; }
+    internal bool ShadowRecorded { get; init; }
+}
 
 // Stream-level refusal bounds escaped UTF8 while it is emitted, before any oversized result array.
 public static class GraphicsPostFrameJson

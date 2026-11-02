@@ -377,11 +377,13 @@ internal sealed partial class D3D12GraphicsDevice
     }
     internal void RecordWorldShadowFrame(GraphicsDirectionalShadowFrame frame)
     {
-        if (_worldBindingRecorder is null && _boundInputTracker is null) return;
+        if (_worldBindingRecorder is null && _boundInputTracker is null && ActivePostFrameTape is null) return;
         Span<float> data = stackalloc float[24];
         var matrix = frame.ViewProjection; MemoryMarshal.Cast<float, System.Numerics.Matrix4x4>(data[..16])[0] = matrix;
         data[16] = frame.Center.X; data[17] = frame.Center.Y; data[18] = frame.Center.Z; data[19] = frame.Radius;
         data[20] = _directionalShadows.Resolution; data[21] = frame.DepthRange; data[22] = frame.ContactStrength; data[23] = 1;
+        if (ActivePostFrameTape is { } tape)
+            tape.StoreShadowFrameWords(_postFrameTapeInvocation, MemoryMarshal.Cast<float, uint>(data));
         _boundInputTracker?.ImplicitWrite(_shadowConstants![_frameIndex], checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, 0, MemoryMarshal.AsBytes(data), shadow: true);
         _worldBindingRecorder?.ShadowFrame(data, new("directional-shadow-frame", checked((ulong)_surfaceLifecycle.AppliedResizeGeneration + 1), _frameIndex, null, null, null, 0));
     }

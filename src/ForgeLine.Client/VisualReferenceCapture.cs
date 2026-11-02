@@ -39,6 +39,8 @@ internal sealed record VisualReferenceCaptureRequest
     public int? CaptureBoundInputProvenanceVersion { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? CapturePostFrameResourceSnapshotVersion { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CapturePostFrameResourceSnapshotMode { get; init; }
     public ReferenceCollectorMode CollectorMode { get; init; }
     public uint RasterDpi { get; init; }
     public float YawDegrees { get; init; } = 45;
@@ -74,15 +76,17 @@ internal sealed record VisualReferenceCaptureRequest
                 Displays[0] != new RtsReferenceDisplay(1920, 1080) || UiScenarios is not [UiReferenceScenario.World] || UiScales is not [1])
                 throw new NotSupportedException("CPU-source provenance requires one fixed1920World native Full case with the stage/shadow/trace bundle disabled.");
         }
-        if (CapturePostFrameResourceSnapshotVersion is not null)
+        if (CapturePostFrameResourceSnapshotVersion is not null || CapturePostFrameResourceSnapshotMode is not null)
         {
-            if (!allowPostFrameSnapshot || CapturePostFrameResourceSnapshotVersion != 1 || CaptureBoundInputProvenanceVersion is not null ||
+            bool supportedSelection = CapturePostFrameResourceSnapshotVersion == 1 ? CapturePostFrameResourceSnapshotMode is null :
+                CapturePostFrameResourceSnapshotVersion == 2 && GraphicsPostFrameSnapshotModes.IsSupported(CapturePostFrameResourceSnapshotMode);
+            if (!allowPostFrameSnapshot || !supportedSelection || CaptureBoundInputProvenanceVersion is not null ||
                 CaptureStageDiagnostics || CaptureShadowDiagnostics || OwnerTraceControlDirectory is not null || CollectorMode != ReferenceCollectorMode.Full ||
                 RunProfile != ReferenceRunProfile.Warm || CameraPath != ReferenceCameraPath.Fixed || Warmups != 64 || Samples != 512 || RepeatCaptures != 8 ||
                 OwnerObservationVersion != 1 || OwnerCycleCapacity != 8192 || RasterDpi != 96 || !ContinueAfterMismatch ||
                 Scenes is not [VisualReferenceSceneKind.IndustrialBase] || Profiles is not [RenderQuality.Medium] || Zooms is not [RtsReferenceZoom.NormalGameplay] ||
                 Displays is not { Length: 1 } || Displays[0] != new RtsReferenceDisplay(1920, 1080) || UiScenarios is not [UiReferenceScenario.World] || UiScales is not [1])
-                throw new NotSupportedException("Post-frame snapshot v1 is native-only fixed IndustrialBase/Medium1920World64/512/8 with pre-draw diagnostics disabled.");
+                throw new NotSupportedException("Post-frame snapshot requires native-only fixed IndustrialBase/Medium1920World64/512/8; v1 has no mode, v2 requires an exact supported mode; pre-draw diagnostics are disabled.");
         }
         ValidateCommon();
     }
@@ -140,7 +144,7 @@ internal static class VisualReferenceCapture
         Exception? selectedSnapshotPrimary = null;
         void RememberSelectedFailure(Exception error)
         {
-            if (request?.CapturePostFrameResourceSnapshotVersion == 1)
+            if (request?.CapturePostFrameResourceSnapshotVersion is 1 or 2)
                 selectedSnapshotPrimary = ReferencePostFrameSnapshot.Remember(selectedSnapshotPrimary, error);
         }
         var captures = new List<object>();
@@ -185,8 +189,11 @@ internal static class VisualReferenceCapture
             using var graphics = GraphicsDeviceFactory.CreateForWindow(window, new()
             { EnableVSync = false, EnableMemoryDiagnostics = true, ForceSoftwareAdapter = request.Software,
                 AllowSoftwareAdapterFallback = request.Software });
+            bool postFrameSessionEnded = false;
             try
             {
+            if (request.CapturePostFrameResourceSnapshotVersion == 2)
+                GraphicsPostFrameSnapshots.Configure(graphics, request.CapturePostFrameResourceSnapshotMode!);
             if (graphics.Diagnostics.Device.IsSoftwareAdapter != request.Software)
                 throw new InvalidOperationException("Capture adapter does not match the requested lane.");
             var adapterCheckpoint = ReferenceAdapterCheckpoint.PublishAndWait(request.AdapterBindingDirectory, graphics, runtimeFingerprint, window.NativeHandle.Value.ToInt64(), () => platform.PumpEvents());
@@ -421,6 +428,7 @@ internal static class VisualReferenceCapture
                         string postPhase = "capture-setup";
                         string? postImage = null;
                         GraphicsPostFrameSnapshotResult? postSnapshot = null;
+                        GraphicsPostFrameCaptureContext? postContext = null;
                         GraphicsWorldBindingAttempt? worldAttempt = null;
                         try
                         {
@@ -431,6 +439,11 @@ internal static class VisualReferenceCapture
                         ulong beforePresent = graphics.PresentedFrameCount;
                         var beforeSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission;
                         byte[] pixels;
+                        if (request.CapturePostFrameResourceSnapshotVersion == 2)
+                        {
+                            postPhase = "capture-entry";
+                            postContext = GraphicsPostFrameSnapshots.BeginCapture(graphics, request.CapturePostFrameResourceSnapshotMode!, repetition);
+                        }
                         if (request.CaptureStageDiagnostics || request.CaptureBoundInputProvenanceVersion == 1)
                         {
                             using var attemptScope = worldAttempt = GraphicsWorldBindingJournal.BeginAttempt();
@@ -439,7 +452,7 @@ internal static class VisualReferenceCapture
                             pixels = stageCapture.FinalRgba;
                         }
                         else pixels = graphics.CaptureFrame(GraphicsColor.ForgeLineClear, record, captureShadowDepth: request.CaptureShadowDiagnostics);
-                        if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                        if (request.CapturePostFrameResourceSnapshotVersion is 1 or 2)
                         {
                             if (repetition is < 0 or > 7) throw new InvalidDataException("Selected late capture repetition unavailable.");
                             postPhase = "png-publication";
@@ -463,7 +476,8 @@ internal static class VisualReferenceCapture
                             }
                             // All new enumeration/native-copy work follows closed PNG publication.
                             postPhase = "receipt-issue";
-                            postReceipt = GraphicsPostFrameSnapshots.IssueReceipt(graphics, recordFrameIndex);
+                            postReceipt = postContext is { } currentContext ? GraphicsPostFrameSnapshots.IssueReceipt(graphics, recordFrameIndex, currentContext) :
+                                GraphicsPostFrameSnapshots.IssueReceipt(graphics, recordFrameIndex);
                             postPhase = "late-intent";
                             var roster = new GraphicsPostFrameRoster();
                             var intent = new GraphicsPostFrameIntent(ground.CapturePostFrameIntent(roster),
@@ -478,6 +492,11 @@ internal static class VisualReferenceCapture
                             ReferencePostFrameSnapshot.CleanupAssets(meshes.Submit, meshes.Retire);
                             postPhase = "export";
                             postFrameReference = ReferencePostFrameSnapshot.Write(postSnapshot, postMetadata, request.OutputRoot, key, repetition);
+                            if (request.CapturePostFrameResourceSnapshotVersion == 2)
+                            {
+                                postPhase = "export-completion";
+                                GraphicsPostFrameSnapshots.CompleteExport(graphics, postReceipt, postSnapshot);
+                            }
                         }
                         else { meshes.Submit(); meshes.Retire(); assetsCleaned = true; }
                         ReferenceFixturePresentation.RequireSuccessful(beforePresent, graphics.PresentedFrameCount, beforeSubmission, (graphics as IGraphicsRenderTelemetry)?.LastSubmission);
@@ -486,7 +505,7 @@ internal static class VisualReferenceCapture
                         }
                         catch(Exception error)
                         {
-                            if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                            if (request.CapturePostFrameResourceSnapshotVersion is 1 or 2)
                             {
                                 RememberSelectedFailure(error);
                                 if (!assetsCleaned)
@@ -494,7 +513,11 @@ internal static class VisualReferenceCapture
                                     try { meshes.Submit(); } catch (Exception cleanup) { try { error.Data["postFrameSubmitCleanup"] = cleanup.ToString(); } catch { } }
                                     try { meshes.Retire(); } catch (Exception cleanup) { try { error.Data["postFrameRetireCleanup"] = cleanup.ToString(); } catch { } }
                                 }
-                                ReferencePostFrameSnapshot.RetainFailure(error, request.OutputRoot, key + "-readback-" + repetition.ToString("D2", System.Globalization.CultureInfo.InvariantCulture), postReceipt, postMetadata, postPhase, postImage, postSnapshot);
+                                object? currentFacts = null;
+                                if (postContext is { } failedContext)
+                                    try { currentFacts = GraphicsPostFrameSnapshots.CurrentFailureFacts(graphics, failedContext); } catch { }
+                                ReferencePostFrameSnapshot.RetainFailure(error, request.OutputRoot, key + "-readback-" + repetition.ToString("D2", System.Globalization.CultureInfo.InvariantCulture), postReceipt, postMetadata, postPhase, postImage, postSnapshot,
+                                    request.CapturePostFrameResourceSnapshotMode, currentFacts);
                             }
                             else if (request.CaptureBoundInputProvenanceVersion == 1)
                                 ReferenceBoundInputProvenance.RetainCaptureFailure(error, request.OutputRoot, key,
@@ -513,7 +536,7 @@ internal static class VisualReferenceCapture
                             using var stream = new FileStream(Path.Combine(request.OutputRoot, file), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                             stream.Write(depth.Span);
                         }
-                        if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                        if (request.CapturePostFrameResourceSnapshotVersion is 1 or 2)
                             return new { repetition, worldInputDiagnostics = (object?)null, frameIndex = recordFrameIndex,
                                 fingerprint = graphics.CaptureInputFingerprint, actualSubmission = (graphics as IGraphicsRenderTelemetry)?.LastSubmission,
                                 pixelSha256 = Convert.ToHexString(SHA256.HashData(pixels)), shadowFingerprint = (string?)null, shadowFile = (string?)null,
@@ -745,6 +768,11 @@ internal static class VisualReferenceCapture
             if (aggregateFailure is not null)
                 ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "failure.json"), JsonSerializer.Serialize(new
                 { status = "structural-failure", error = aggregateFailure, completedCaptures = captures.Count, failedCaptures }, JsonOptions));
+            if (request.CapturePostFrameResourceSnapshotVersion == 2)
+            {
+                postFrameSessionEnded = true;
+                GraphicsPostFrameSnapshots.EndSession(graphics);
+            }
             return aggregateFailure is null ? 0 : 1;
 
             void WriteManifest(string status, string? error) => ReferenceCaptureManifest.Write(Path.Combine(request.OutputRoot, "manifest.json"),
@@ -768,6 +796,15 @@ internal static class VisualReferenceCapture
                     failedCaptures, captures, humanVisualAcceptance = "pending" }, JsonOptions));
             }
             catch (Exception error) { RememberSelectedFailure(error); throw; }
+            finally
+            {
+                if (request.CapturePostFrameResourceSnapshotVersion == 2 && !postFrameSessionEnded)
+                {
+                    postFrameSessionEnded = true;
+                    try { GraphicsPostFrameSnapshots.EndSession(graphics); }
+                    catch (Exception error) { RememberSelectedFailure(error); }
+                }
+            }
             }
             catch (Exception error) { RememberSelectedFailure(error); throw; }
             }
@@ -780,7 +817,7 @@ internal static class VisualReferenceCapture
         catch (Exception caught)
         {
             Exception error = ReferencePostFrameSnapshot.SelectPrimary(caught, selectedSnapshotPrimary);
-            if (request?.CapturePostFrameResourceSnapshotVersion == 1)
+            if (request?.CapturePostFrameResourceSnapshotVersion is 1 or 2)
             {
                 try { Console.Error.WriteLine($"[reference:failure] {error.GetType().Name}: {error.Message}"); }
                 catch (Exception reporting) { RememberSelectedFailure(reporting); }
@@ -791,7 +828,7 @@ internal static class VisualReferenceCapture
             // Never overwrite an existing evidence directory after a rejected request.
             if (request is not null && outputCreated)
             {
-                if (request.CapturePostFrameResourceSnapshotVersion == 1)
+                if (request.CapturePostFrameResourceSnapshotVersion is 1 or 2)
                 {
                     try
                     {

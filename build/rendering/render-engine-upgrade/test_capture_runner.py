@@ -105,4 +105,9 @@ class CaptureRunnerTests(unittest.TestCase):
             with self.subTest(value=value):self.run_mock(True,include_provenance=True,provenance_selector=value,selector_key='capturePostFrameResourceSnapshotVersion')
     def test_null_post_frame_selector_keeps_legacy_runner_mode(self):
         self.run_mock(True,include_provenance=True,provenance_selector=None,selector_key='capturePostFrameResourceSnapshotVersion')
+    def test_every_nonnull_standalone_snapshot_mode_is_diagnostic(self):
+        for value in ('RetainedAttachmentsOnly','OpaqueStateAndRetainedAttachments',False,0,'unsupported',{},[]):
+            with self.subTest(value=value):self.run_mock(True,include_provenance=True,provenance_selector=value,selector_key='capturePostFrameResourceSnapshotMode')
+    def test_null_snapshot_mode_keeps_legacy_runner_mode(self):
+        self.run_mock(True,include_provenance=True,provenance_selector=None,selector_key='capturePostFrameResourceSnapshotMode')
 if __name__=='__main__':unittest.main()

@@ -17,11 +17,31 @@ internal static class ReferencePostFrameSnapshot
     internal sealed record Wire(int SchemaVersion, string Kind, bool Complete, object Metadata,
         GraphicsPostFrameOriginalReceipt? OriginalFrameReceipt, GraphicsPostFrameCopyReceipt? CopyReceipt,
         Coverage Coverage, ResourceRow[] Resources, GraphicsPostFrameIntent? Intent);
+    internal sealed record WireV2(int SchemaVersion, string Kind, bool Complete, object Metadata,
+        GraphicsPostFrameOriginalReceipt? OriginalFrameReceipt, GraphicsPostFrameCopyReceipt? CopyReceipt,
+        Coverage Coverage, ResourceRow[] Resources, GraphicsPostFrameIntent? Intent,
+        string CoverageMode, string OpaqueCoverage, object? OpaqueWitness);
     private static readonly Coverage Scope = new(
         "Late resident-resource superset after primary PNG; not GPU-fetched bytes or historical draw bindings.",
         ["resident-terrain", "final-retained-main-scratch", "final-retained-decoration-scratch", "captured-slot-constant-arena-used-prefix-if-present"],
         ["render-targets", "depth-shadow-targets", "root-constants", "particles", "HUD", "skin-caches", "inactive-private-caches", "earlier-pass-scratch", "entity-root-associations"],
         "Stored terrain LOD includes culled history; scratch lacks an independent pass marker; raw arena padding has unknown shader relevance; subsequent repetitions are perturbed by these late copies.");
+    private static readonly Coverage AttachmentScope = new(
+        "Late resident-resource subset and retained attachments after primary PNG; not earlier shader-fetched contents.",
+        ["resident-terrain", "final-retained-main-scratch", "final-retained-decoration-scratch", "captured-slot-constant-arena-used-prefix-if-present",
+            "retained-scene-linear", "retained-shadow-depth", "retained-final-depth"],
+        ["opaque-state-not-selected", "particles", "HUD", "skin-caches", "inactive-private-caches", "earlier-pass-scratch", "entity-root-associations"],
+        "Final depth can include overlay writes. Late copies perturb subsequent repetitions; late equality is not shader fetch, cause or qualification proof.");
+    private static readonly Coverage OpaqueScope = AttachmentScope with
+    {
+        Meaning = "Source-closed effective opaque CPU input state plus late resident-resource subset and retained attachments; not native interception or GPU execution proof.",
+        Included = [.. AttachmentScope.Included, "source-closed-effective-opaque-state"],
+        Excluded = ["shadow-draw-state", "particle-draw-state", "composition-draw-state", "HUD", "skin-caches", "inactive-private-caches", "earlier-pass-scratch", "entity-root-associations"]
+    };
+    private static Coverage ScopeFor(string? mode) => mode is null ? Scope :
+        mode == GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly ? AttachmentScope :
+        mode == GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments ? OpaqueScope :
+        throw new InvalidDataException("Unsupported post-frame coverage mode.");
     internal static string Hash(ReadOnlySpan<byte> bytes) => Convert.ToHexString(SHA256.HashData(bytes));
     private static object WriteNew(string root, string file, byte[] bytes)
     {
@@ -41,7 +61,10 @@ internal static class ReferencePostFrameSnapshot
     private static void Validate(GraphicsPostFrameSnapshotResult result)
     {
         var original = result.OriginalFrameReceipt; var copy = result.CopyReceipt;
-        if (original.SchemaVersion != 1 || original.FenceDomain != "original-device-frame-fence" || original.Submission.Submission == 0 ||
+        bool v2 = original.SchemaVersion == 2 && GraphicsPostFrameSnapshotModes.IsSupported(original.CoverageMode) &&
+            original.Invocation is > 0 and < ulong.MaxValue && original.WorldDepthAliasesRetainedFinalDepth is not null;
+        bool v1 = original.SchemaVersion == 1 && original.CoverageMode is null && original.Invocation is null && original.WorldDepthAliasesRetainedFinalDepth is null;
+        if ((!v1 && !v2) || original.FenceDomain != "original-device-frame-fence" || original.Submission.Submission == 0 ||
             original.CompletedFence is 0 or ulong.MaxValue || original.CompletedFence < original.Submission.SubmittedFence ||
             original.Submission.Generation != original.DeviceIdentity.Generation || original.PresentedAfter != original.PresentedBefore + 1 ||
             original.Submission.ResourceGeneration != original.AppliedResizeGeneration + 1 || original.Width <= 0 || original.Height <= 0 ||
@@ -50,6 +73,41 @@ internal static class ReferencePostFrameSnapshot
             copy.SubmittedFence == 0 || copy.CompletedFence is 0 or ulong.MaxValue || copy.CompletedFence < copy.SubmittedFence ||
             result.SecondaryCleanupErrors.Length != 0 || result.Resources.Length is < 1 or > GraphicsPostFrameLimits.Resources)
             throw new InvalidDataException("Late snapshot receipt/completion/cleanup facts are inconsistent.");
+        if (v1 && (result.OpaqueWitness is not null || result.Resources.Any(x => x.Description.Attachment is not null || x.Description.CausalIdentityId is not null)))
+            throw new InvalidDataException("Historical v1 cannot contain selected v2 fields.");
+        if (v2)
+        {
+            string[] roles = ["retained-scene-linear", "retained-shadow-depth", "retained-final-depth"];
+            var attachments = result.Resources.Where(x => x.Description.Attachment is not null).ToArray();
+            if (attachments.Length != roles.Length || roles.Any(role => attachments.Count(x => x.Description.Attachment!.Role == role) != 1))
+                throw new InvalidDataException("Selected v2 requires all three actual retained attachment roles.");
+            foreach (var resource in attachments)
+            {
+                var d = resource.Description; var a = d.Attachment!;
+                if (d.Kind != "retained-attachment" || d.LifetimeAvailable || d.Buffer is not null || d.Texture is not null || d.Implicit is not null ||
+                    d.SourceOffset != 0 || d.Mips.Length != 1 || d.Mips[0].MipIndex != 0 || a.Width <= 0 || a.Height <= 0 ||
+                    a.CapturedSlot != original.FrameIndex || a.ResourceGeneration != original.Submission.ResourceGeneration || d.SemanticName != a.Role ||
+                    !GraphicsPostFrameLimits.SupportedAttachmentMips(a.Role, a.Width, a.Height, a.NativeMipLevels,
+                        a.ObservedMipSlice, a.ObservedMipLevels, a.ObservedSubresource))
+                    throw new InvalidDataException("Retained attachment witness/layout association differs.");
+            }
+            if (original.CoverageMode == GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly)
+            {
+                if (result.OpaqueWitness is not null || result.Resources.Any(x => x.Description.CausalIdentityId is not null))
+                    throw new InvalidDataException("Attachment-only cannot contain a tape/catalog identity or witness.");
+            }
+            else
+            {
+                if (original.WorldDepthAliasesRetainedFinalDepth != true || result.OpaqueWitness is null)
+                    throw new InvalidDataException("Opaque World lacks actual final-depth alias or a complete witness.");
+                using var wire = JsonDocument.Parse(GraphicsPostFrameJson.Serialize(result.OpaqueWitness, GraphicsPostFrameLimits.BodyBytes));
+                var witness = wire.RootElement;
+                if (witness.GetProperty("schemaVersion").GetInt32() != 2 || !witness.GetProperty("complete").GetBoolean() ||
+                    witness.GetProperty("kind").GetString() != "post-final-color-causal-witness" || witness.GetProperty("refusal").GetString() != "None" ||
+                    witness.GetProperty("invocation").GetUInt64() != original.Invocation || witness.GetProperty("managedOwnerThreadId").GetInt32() != original.ManagedOwnerThreadId)
+                    throw new InvalidDataException("Opaque witness does not describe the current completed invocation.");
+            }
+        }
         GraphicsPostFrameLimits.Totals(result.PaddedStagingBytes, result.CanonicalBytes);
         GraphicsPostFrameLimits.ValidateIntent(result.Intent, result.Resources.Length);
     }
@@ -71,7 +129,7 @@ internal static class ReferencePostFrameSnapshot
                 for (int mip = 0; mip < description.Mips.Length; mip++)
                 {
                     byte[] raw = resource.CanonicalBytes[mip]; var layout = description.Mips[mip];
-                    if (layout.MipIndex != (description.Texture is null ? -1 : mip) || (ulong)raw.LongLength != layout.CanonicalBytes) throw new InvalidDataException("Canonical raw mip length differs.");
+                    if (layout.MipIndex != (description.Texture is null && description.Attachment is null ? -1 : mip) || (ulong)raw.LongLength != layout.CanonicalBytes) throw new InvalidDataException("Canonical raw mip length differs.");
                     total = checked(total + (ulong)raw.LongLength);
                     if (total > GraphicsPostFrameLimits.RawBytes) throw new InvalidDataException("Total canonical raw capacity exceeded.");
                     string file = prefix + "-resource-" + (index + 1).ToString("D4", System.Globalization.CultureInfo.InvariantCulture) + "-mip-" + mip.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) + ".raw";
@@ -80,35 +138,48 @@ internal static class ReferencePostFrameSnapshot
                 }
             }
             if (total != result.CanonicalBytes) throw new InvalidDataException("Canonical total differs from completed snapshot.");
-            _ = GraphicsPostFrameJson.Measure(new { resources = rows, intent = result.Intent }, GraphicsPostFrameLimits.BodyBytes);
-            var value = new Wire(1, "reference-post-final-color-resident-resources", true, metadata, result.OriginalFrameReceipt, result.CopyReceipt, Scope, rows.ToArray(), result.Intent);
-            CheckEnvelope(metadata, result.OriginalFrameReceipt, result.CopyReceipt);
+            string? mode = result.OriginalFrameReceipt.CoverageMode;
+            if (mode is null) _ = GraphicsPostFrameJson.Measure(new { resources = rows, intent = result.Intent }, GraphicsPostFrameLimits.BodyBytes);
+            else _ = GraphicsPostFrameJson.Measure(new { resources = rows, intent = result.Intent, opaqueWitness = result.OpaqueWitness }, GraphicsPostFrameLimits.BodyBytes);
+            object value = mode is null ? new Wire(1, "reference-post-final-color-resident-resources", true, metadata, result.OriginalFrameReceipt, result.CopyReceipt, Scope, rows.ToArray(), result.Intent) :
+                new WireV2(2, "reference-post-final-color-causal-witness", true, metadata, result.OriginalFrameReceipt, result.CopyReceipt, ScopeFor(mode), rows.ToArray(), result.Intent,
+                    mode, mode == GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly ? "not-selected" : "source-closed-effective-opaque-state", result.OpaqueWitness);
+            CheckEnvelope(metadata, result.OriginalFrameReceipt, result.CopyReceipt, mode);
             return WriteNew(root, prefix + ".json", GraphicsPostFrameJson.Serialize(value, GraphicsPostFrameLimits.WireBytes));
         }
         catch (Exception original)
         {
-            try { Retain(original, root, prefix + "-export", metadata, result.OriginalFrameReceipt, result.CopyReceipt, rows.ToArray(), result.Intent); }
+            try { Retain(original, root, prefix + "-export", metadata, result.OriginalFrameReceipt, result.CopyReceipt, rows.ToArray(), result.Intent,
+                mode: result.OriginalFrameReceipt.CoverageMode, opaqueWitness: result.OpaqueWitness); }
             catch { }
             throw;
         }
     }
-    private static void CheckEnvelope(object metadata, GraphicsPostFrameOriginalReceipt? original, GraphicsPostFrameCopyReceipt? copy)
-        => _ = GraphicsPostFrameJson.Measure(new { metadata, originalFrameReceipt = original, copyReceipt = copy, coverage = Scope }, GraphicsPostFrameLimits.EnvelopeBytes);
+    private static void CheckEnvelope(object metadata, GraphicsPostFrameOriginalReceipt? original, GraphicsPostFrameCopyReceipt? copy, string? mode = null)
+    {
+        object envelope = mode is null ? new { metadata, originalFrameReceipt = original, copyReceipt = copy, coverage = Scope } :
+            (object)new { metadata, originalFrameReceipt = original, copyReceipt = copy, coverage = ScopeFor(mode), coverageMode = mode,
+                opaqueCoverage = mode == GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly ? "not-selected" : "source-closed-effective-opaque-state" };
+        _ = GraphicsPostFrameJson.Measure(envelope, GraphicsPostFrameLimits.EnvelopeBytes);
+    }
     private static void Retain(Exception original, string root, string prefix, object metadata, GraphicsPostFrameOriginalReceipt? receipt,
-        GraphicsPostFrameCopyReceipt? copy, ResourceRow[] rows, GraphicsPostFrameIntent? intent, object? failureDetails = null)
+        GraphicsPostFrameCopyReceipt? copy, ResourceRow[] rows, GraphicsPostFrameIntent? intent, object? failureDetails = null,
+        string? mode = null, object? opaqueWitness = null)
     {
         try
         {
             object context = new { context = metadata, failure = failureDetails ?? FailureFacts(original, "export-incomplete", copy?.MayHaveExecuted, []) };
-            try { CheckEnvelope(context, receipt, copy); }
+            try { CheckEnvelope(context, receipt, copy, mode); }
             catch { context = new { contextUnavailable = true, failure = failureDetails ?? FailureFacts(original, "export-incomplete", copy?.MayHaveExecuted, []) }; }
-            _ = WriteNew(root, prefix + ".partial.json", GraphicsPostFrameJson.Serialize(
-                new Wire(1, "reference-post-final-color-resident-resources", false, context, receipt, copy, Scope, rows, intent), GraphicsPostFrameLimits.WireBytes));
+            object value = mode is null ? new Wire(1, "reference-post-final-color-resident-resources", false, context, receipt, copy, Scope, rows, intent) :
+                new WireV2(2, "reference-post-final-color-causal-witness", false, context, receipt, copy, ScopeFor(mode), rows, intent,
+                    mode, mode == GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly ? "not-selected" : "incomplete", opaqueWitness);
+            _ = WriteNew(root, prefix + ".partial.json", GraphicsPostFrameJson.Serialize(value, GraphicsPostFrameLimits.WireBytes));
         }
         catch { }
     }
     internal static void RetainFailure(Exception original, string root, string key, GraphicsPostFrameReceipt? receipt, Metadata? metadata,
-        string phase, string? imageFile, GraphicsPostFrameSnapshotResult? current)
+        string phase, string? imageFile, GraphicsPostFrameSnapshotResult? current, string? mode = null, object? currentInvocation = null)
     {
         try
         {
@@ -126,10 +197,11 @@ internal static class ReferencePostFrameSnapshot
                 catch { }
             }
             var copy = prefix?.CopyReceipt ?? (knownCurrent ? current!.CopyReceipt : null);
-            object context = new { context = metadata, image, captureReceiptAvailable = receipt is not null };
+            object context = mode is null ? new { context = metadata, image, captureReceiptAvailable = receipt is not null } :
+                (object)new { context = metadata, image, captureReceiptAvailable = receipt is not null, currentInvocation };
             Retain(original, root, key + "-post-frame-failure", context, receipt?.Original, copy, [], null,
                 FailureFacts(original, prefix?.Phase ?? phase, prefix?.MayHaveExecuted ?? copy?.MayHaveExecuted,
-                    prefix?.SecondaryCleanupErrors ?? (knownCurrent ? current!.SecondaryCleanupErrors : [])));
+                    prefix?.SecondaryCleanupErrors ?? (knownCurrent ? current!.SecondaryCleanupErrors : [])), mode);
         }
         catch { }
     }

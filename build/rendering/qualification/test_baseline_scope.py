@@ -162,4 +162,14 @@ class PostFrameScopeTests(unittest.TestCase):
     def test_snapshot_cannot_take_unowned_shader(self):
         result,_=self.repo.check(self.repo.proposal(extra={'src/ForgeLine.Presentation/Shaders/unowned.hlsl':'foreign'}));self.assertNotEqual(result.returncode,0)
 
+class CausalWitnessScopeTests(PostFrameScopeTests):
+    def setUp(self):
+        super().setUp();self.repo.record['packages'][0]['owns']=list(scope.STABILITY_CAUSAL_WITNESS_OWNS)
+    def test_exact49_proposal_accepts_only_selected_new_paths(self):
+        self.assertEqual(len(scope.STABILITY_CAUSAL_WITNESS_OWNS),52)
+        result,_=self.repo.check(self.repo.proposal(extra={path:'typed source' for path in scope.STABILITY_CAUSAL_WITNESS_OWNS[-3:]}));self.assertEqual(result.returncode,0,result.stderr)
+    def test_old49_cannot_borrow_command_tape_paths(self):
+        record=copy.deepcopy(self.repo.record);record['packages'][0]['owns']=list(scope.STABILITY_POST_FRAME_OWNS)
+        result,_=self.repo.check(self.repo.proposal(record,extra={scope.STABILITY_CAUSAL_WITNESS_OWNS[-3]:'foreign'}));self.assertNotEqual(result.returncode,0)
+
 if __name__=='__main__':unittest.main()

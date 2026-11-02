@@ -357,6 +357,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description)
     {
         ThrowIfDisposed();
+        _postFrameAttachmentClosed = true;
         ArgumentNullException.ThrowIfNull(description);
         description.Validate();
         if (description.VertexConstantsInBuffer && !_directionalShadows.Enabled)
@@ -437,14 +438,31 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 ]
                 : null;
 
-        ID3D12RootSignature rootSignature =
-            _device.CreateRootSignature(
-                new RootSignatureDescription1(
-                    rootSignatureFlags,
-                    rootParameters.Count == 0
-                        ? null
-                        : rootParameters.ToArray(),
-                    samplers));
+        // These arrays are method-private frozen native inputs; callers cannot mutate them.
+        var rootDescription = new RootSignatureDescription1(rootSignatureFlags,
+            rootParameters.Count == 0 ? null : rootParameters.ToArray(), samplers);
+        var creationRole = description.DirectionalShadowReceiver ? PostFrameTapeCreationRole.DirectionalShadowReceiver :
+            description.SceneDepthReceiver ? PostFrameTapeCreationRole.SceneDepthReceiver : PostFrameTapeCreationRole.Ordinary;
+        PostFrameCreationBuilder catalogBuilder = default;
+        bool catalogStarted = _postFrameTape is { } catalog && catalog.TryBeginCreation(out catalogBuilder);
+        uint requiredRoots = 0; ushort requiredTextures = 0, requiredRetainedTargets = 0;
+        if (catalogStarted)
+        {
+            try
+            {
+                if (!PostFrameNativeCreationEncoder.Root(catalogBuilder, rootDescription, creationRole,
+                    out requiredRoots, out requiredTextures, out requiredRetainedTargets))
+                    _postFrameTape!.Refuse(PostFrameTapeRefusal.InvalidCatalog);
+            }
+            catch { _postFrameTape!.Refuse(PostFrameTapeRefusal.InvalidCatalog); }
+        }
+        ID3D12RootSignature rootSignature;
+        try { rootSignature = _device.CreateRootSignature(rootDescription); }
+        catch
+        {
+            if (catalogStarted) _postFrameTape!.AbortCreation(catalogBuilder);
+            throw;
+        }
         ID3D12PipelineState? pipelineState = null;
         try
         {
@@ -532,18 +550,44 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 pipelineStateDescription.BlendState = blend;
             }
 
+            PostFrameFrozenCreation frozenCreation = default;
+            uint requiredVertexSlots = 0;
+            if (catalogStarted && _postFrameTape!.Refusal == PostFrameTapeRefusal.None)
+            {
+                try
+                {
+                    if (!PostFrameNativeCreationEncoder.Pipeline(catalogBuilder, pipelineStateDescription, out requiredVertexSlots) ||
+                        !_postFrameTape.FinishCreation(catalogBuilder, inputElements, pipelineStateDescription.VertexShader.Span,
+                            pipelineStateDescription.PixelShader.Span, out frozenCreation))
+                        _postFrameTape.Refuse(PostFrameTapeRefusal.InvalidCatalog);
+                    else
+                    {
+                        // Native marshaling and later digests consume the SAME private frozen byte memory.
+                        pipelineStateDescription.VertexShader = frozenCreation.VertexShaderMemory;
+                        pipelineStateDescription.PixelShader = frozenCreation.PixelShaderMemory;
+                    }
+                }
+                catch { _postFrameTape.Refuse(PostFrameTapeRefusal.InvalidCatalog); }
+            }
             pipelineState =
                 _device.CreateGraphicsPipelineState(pipelineStateDescription);
             pipelineState.Name = "ForgeLine Graphics Pipeline";
 
-            return new D3D12GraphicsPipeline(
+            var result = new D3D12GraphicsPipeline(
                 this,
                 description,
                 rootSignature,
                 pipelineState);
+            if (catalogStarted && frozenCreation.BelongsTo(_postFrameTape!))
+                _postFrameTape!.CommitCreation(frozenCreation, result, rootSignature, result.Lifetime, out _, out _,
+                    new(requiredVertexSlots, requiredTextures, requiredRoots,
+                        pipelineStateDescription.DepthStencilState.DepthEnable || pipelineStateDescription.DepthStencilState.StencilEnable,
+                        requiredRetainedTargets), creationRole);
+            return result;
         }
         catch
         {
+            if (catalogStarted) _postFrameTape!.AbortCreation(catalogBuilder);
             pipelineState?.Dispose();
             rootSignature.Dispose();
             throw;
@@ -730,6 +774,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ThrowIfDisposed();
         ThrowIfRecording();
         InvalidatePostFrameStamp();
+        _postFrameAttachmentClosed = true;
         try
         {
             long started = !_telemetryActive ? 0 : System.Diagnostics.Stopwatch.GetTimestamp();

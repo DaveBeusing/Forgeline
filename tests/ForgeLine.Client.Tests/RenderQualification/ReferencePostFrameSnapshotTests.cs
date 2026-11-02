@@ -29,10 +29,34 @@ public sealed class ReferencePostFrameSnapshotTests
         request.Validate(false,true);
         using var wire=JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(request with {CapturePostFrameResourceSnapshotVersion=null},VisualReferenceCapture.JsonOptions));
         Assert.False(wire.RootElement.TryGetProperty("capturePostFrameResourceSnapshotVersion",out _));
+        Assert.False(wire.RootElement.TryGetProperty("capturePostFrameResourceSnapshotMode",out _));
         VisualReferenceCaptureRequest[] invalid=[request with {CapturePostFrameResourceSnapshotVersion=0},request with {CaptureStageDiagnostics=true},
             request with {CaptureShadowDiagnostics=true},request with {CaptureBoundInputProvenanceVersion=1},request with {OwnerTraceControlDirectory="trace"},
             request with {Warmups=63},request with {Samples=511},request with {RasterDpi=0},request with {ContinueAfterMismatch=false}];
         foreach(var value in invalid)Assert.Throws<NotSupportedException>(()=>value.Validate(true,true));
+    }
+    [Theory]
+    [InlineData(GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly)]
+    [InlineData(GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments)]
+    public void VersionTwoRequiresExactModeAndNativeLaneBeforeAnyDevice(string mode)
+    {
+        var selected = Request() with { CapturePostFrameResourceSnapshotVersion = 2, CapturePostFrameResourceSnapshotMode = mode };
+        selected.Validate(false, true);
+        Assert.Throws<NotSupportedException>(() => selected.Validate());
+        Assert.Throws<NotSupportedException>(() => selected.Validate(true, false));
+        var invalid = new[] { selected with { CapturePostFrameResourceSnapshotMode = null },
+            selected with { CapturePostFrameResourceSnapshotMode = mode.ToLowerInvariant() },
+            selected with { CapturePostFrameResourceSnapshotMode = "2" }, selected with { CapturePostFrameResourceSnapshotMode = "" },
+            selected with { CapturePostFrameResourceSnapshotVersion = null }, selected with { CapturePostFrameResourceSnapshotVersion = 1 },
+            selected with { CaptureStageDiagnostics = true }, selected with { CaptureShadowDiagnostics = true } };
+        foreach (var request in invalid) Assert.Throws<NotSupportedException>(() => request.Validate(true, true));
+        foreach (string rawMode in new[] { "false", "0", "2", "[]", "{}" })
+        {
+            string json = JsonSerializer.Serialize(selected, VisualReferenceCapture.JsonOptions);
+            string quoted = JsonSerializer.Serialize(mode);
+            json = json.Replace(quoted, rawMode, StringComparison.Ordinal);
+            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<VisualReferenceCaptureRequest>(json, VisualReferenceCapture.JsonOptions));
+        }
     }
     [Fact]
     public void CleanupAttemptsBothAndPreservesFirstFailure()
@@ -60,11 +84,95 @@ public sealed class ReferencePostFrameSnapshotTests
         var result=new GraphicsPostFrameSnapshotResult(receipt,new(1,"late-copy-fence-"+new string('f',32),"Same DIRECT queue; source ordered after original frame completion",1,1,true,true),
             [new(buffer,[new byte[144]]),new(texture,[new byte[16],Enumerable.Repeat((byte)255,16).ToArray()]),
                 new(instances,[new byte[112]]),new(vertices,[new byte[144]]),new(indices,[new byte[12]]),new(terrainIndices,[new byte[12]])],intent,3084,456,[]);
-        var profile=new RenderQualitySettings().Resolve(true,false,2,2,3);
+        var profile=new RenderQualitySettings { Quality = RenderQuality.Medium }.Resolve(true,false,2,2,3);
         byte[] recipe=JsonSerializer.SerializeToUtf8Bytes(new {display=new {width=2,height=2},settings=profile.RequestedSettings,runtimeFingerprint=new string('b',64)},VisualReferenceCapture.JsonOptions);
         var context=ReferencePostFrameSnapshot.Context(new string('b',64),ReferencePostFrameSnapshot.Hash(recipe),Convert.ToBase64String(recipe),0,
             new RtsCameraState(Vector3.Zero,.5f,.6f,50,false,Vector2.Zero),profile,new { profile,lighting=new {},atmosphere=new {} },pixels,new string('c',64),root,"synthetic.png");
         return(result,context);
+    }
+    private static GraphicsPostFrameSnapshotResult AttachmentFixture(GraphicsPostFrameSnapshotResult source, string mode)
+    {
+        string[] roles = ["retained-scene-linear", "retained-shadow-depth", "retained-final-depth"];
+        var additions = new List<GraphicsPostFrameResourceBytes>();
+        ulong cursor = source.PaddedStagingBytes, canonical = source.CanonicalBytes;
+        for (int i = 0; i < roles.Length; i++)
+        {
+            bool scene = i == 0; int width = i == 1 ? 2048 : 2, height = width;
+            ulong row = (ulong)width * (scene ? 8UL : 4UL), bytes = row * (ulong)height;
+            ulong pitch = GraphicsPostFrameLimits.Align(row, 256), padded = pitch * (ulong)height;
+            cursor = GraphicsPostFrameLimits.Align(cursor, 512);
+            string format = scene ? "R16G16B16A16_Float" : "R32_Typeless";
+            var description = new GraphicsPostFrameResourceDescription(source.Resources.Length + i + 1, roles[i], "retained-attachment", false,
+                null, null, null, 0, bytes, "Synthetic retained target, no device or renderer executed",
+                [new(0, width, height, height, row, pitch, cursor, padded, bytes, format)])
+            {
+                Attachment = new(roles[i], format, scene ? "R16G16B16A16_Float" : "R32_Float", scene ? null : "D32_Float",
+                    i == 2 ? null : scene ? "R16G16B16A16_Float" : "R32_Float", i == 2 ? "DepthWrite" : "PixelShaderResource",
+                    width, height, source.OriginalFrameReceipt.FrameIndex, source.OriginalFrameReceipt.Submission.ResourceGeneration, "Synthetic CPU mip0 payload only; other backing mips unobserved; not a GPU capture")
+                { NativeMipLevels = i == 2 ? GraphicsPostFrameLimits.FullMipLevels(width, height) : 1,
+                    ObservedMipSlice = 0, ObservedMipLevels = 1, ObservedSubresource = 0 }
+            };
+            additions.Add(new(description, [new byte[bytes]]));
+            cursor = checked(cursor + padded); canonical = checked(canonical + bytes);
+        }
+        return source with
+        {
+            OriginalFrameReceipt = source.OriginalFrameReceipt with { SchemaVersion = 2, CoverageMode = mode, Invocation = 1, WorldDepthAliasesRetainedFinalDepth = true },
+            Resources = [.. source.Resources, .. additions], CanonicalBytes = canonical, PaddedStagingBytes = cursor
+        };
+    }
+    [Fact]
+    public void AttachmentOnlyTypedExportRequiresThreeTargetsAndIntentionallyNullOpaqueEvidence()
+    {
+        using var root = new Output(); var fixture = Fixture(root.Path);
+        using var profile = JsonDocument.Parse(Convert.FromBase64String(fixture.Context.ProfileInputBytesBase64));
+        Assert.Equal("Medium", profile.RootElement.GetProperty("active").GetString());
+        Assert.Equal(2048, profile.RootElement.GetProperty("shadows").GetProperty("resolution").GetInt32());
+        var result = AttachmentFixture(fixture.Result, GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly);
+        Assert.Equal(16_777_720UL, result.CanonicalBytes); Assert.Equal(16_781_824UL, result.PaddedStagingBytes);
+        object reference = ReferencePostFrameSnapshot.Write(result, fixture.Context, root.Path, "attachments", 0);
+        using var refJson = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(reference, VisualReferenceCapture.JsonOptions));
+        using var wire = JsonDocument.Parse(File.ReadAllBytes(System.IO.Path.Combine(root.Path, refJson.RootElement.GetProperty("file").GetString()!)));
+        var value = wire.RootElement;
+        Assert.Equal(2, value.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly, value.GetProperty("coverageMode").GetString());
+        Assert.Equal("not-selected", value.GetProperty("opaqueCoverage").GetString());
+        Assert.Equal(JsonValueKind.Null, value.GetProperty("opaqueWitness").ValueKind);
+        Assert.Equal(3, value.GetProperty("resources").EnumerateArray().Count(x => x.GetProperty("description").TryGetProperty("attachment", out _)));
+        var last = result.Resources[^1]; var attachment = last.Description.Attachment!;
+        foreach (var invalid in new[] { attachment with { NativeMipLevels = 0 }, attachment with { NativeMipLevels = 1 },
+            attachment with { ObservedMipSlice = 1 }, attachment with { ObservedMipLevels = 2 }, attachment with { ObservedSubresource = 1 } })
+        {
+            var changed = last with { Description = last.Description with { Attachment = invalid } };
+            Assert.Throws<InvalidDataException>(() => ReferencePostFrameSnapshot.Write(result with { Resources = [.. result.Resources[..^1], changed] }, fixture.Context, root.Path, "invalid-mips", 0));
+        }
+        Assert.Throws<InvalidDataException>(() => ReferencePostFrameSnapshot.Write(result with { Resources = result.Resources[..^1] }, fixture.Context, root.Path, "missing", 0));
+        Assert.Throws<InvalidDataException>(() => ReferencePostFrameSnapshot.Write(result with { OpaqueWitness = new { complete = true } }, fixture.Context, root.Path, "unexpected", 0));
+        Assert.Throws<InvalidDataException>(() => ReferencePostFrameSnapshot.Write(result with { OriginalFrameReceipt = result.OriginalFrameReceipt with { CoverageMode = GraphicsPostFrameSnapshotModes.OpaqueStateAndRetainedAttachments } }, fixture.Context, root.Path, "opaque-missing", 0));
+        string? output = Environment.GetEnvironmentVariable("FORGELINE_POST_FRAME_V2_CPU_FIXTURE_OUTPUT");
+        if (output is not null)
+        {
+            Assert.False(Directory.Exists(output)); Directory.CreateDirectory(output);
+            foreach (string file in Directory.GetFiles(root.Path)) File.Copy(file, System.IO.Path.Combine(output, System.IO.Path.GetFileName(file)));
+            File.WriteAllBytes(System.IO.Path.Combine(output, "producer-reference.json"), JsonSerializer.SerializeToUtf8Bytes(reference, VisualReferenceCapture.JsonOptions));
+            File.WriteAllText(System.IO.Path.Combine(output, "synthetic-provenance.json"), JsonSerializer.Serialize(new { synthetic = true, qualified = false, rendererExecuted = false, nativeDeviceCreated = false, coverageMode = GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly }, VisualReferenceCapture.JsonOptions));
+        }
+    }
+    [Fact]
+    public void VersionTwoFailureBeforeCurrentClaimHasNoInventedReceiptOrImage()
+    {
+        using var root = new Output(); var error = new IOException("before begin");
+        ReferencePostFrameSnapshot.RetainFailure(error, root.Path, "before", null, null, "capture-setup", null, null,
+            GraphicsPostFrameSnapshotModes.RetainedAttachmentsOnly, null);
+        using var wire = JsonDocument.Parse(File.ReadAllBytes(System.IO.Path.Combine(root.Path, "before-post-frame-failure.partial.json")));
+        var value = wire.RootElement; Assert.False(value.GetProperty("complete").GetBoolean());
+        Assert.Equal(2, value.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(JsonValueKind.Null, value.GetProperty("originalFrameReceipt").ValueKind);
+        Assert.Equal(JsonValueKind.Null, value.GetProperty("copyReceipt").ValueKind);
+        var context = value.GetProperty("metadata").GetProperty("context");
+        Assert.Equal(JsonValueKind.Null, context.GetProperty("currentInvocation").ValueKind);
+        Assert.Equal(JsonValueKind.Null, context.GetProperty("image").ValueKind);
+        Assert.Equal(JsonValueKind.Null, value.GetProperty("opaqueWitness").ValueKind);
     }
     [Fact]
     public void NonemptyActualTypedExporterRetainsRawHashGraphAndSyntheticFixture()
