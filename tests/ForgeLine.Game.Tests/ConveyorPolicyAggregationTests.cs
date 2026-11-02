@@ -122,6 +122,7 @@ public sealed class ConveyorPolicyAggregationTests
         fixture.Give(source, ResourceIds.Steel, 100);
         fixture.AddPolicy(destination, ResourceIds.FerrousOre, 0, 10, 40);
         fixture.AddPolicy(destination, ResourceIds.Steel, 0, 20, 100);
+        double totalBefore = fixture.Total(ResourceIds.FerrousOre) + fixture.Total(ResourceIds.Steel);
 
         fixture.Step(150);
         double iron = fixture.Stock(destination, ResourceIds.FerrousOre);
