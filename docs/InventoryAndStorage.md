@@ -68,6 +68,35 @@ Optional per-resource capacities may further limit a specific resource and may n
 
 `CanAdd` and `Add` never partially commit. Partial acceptance is an explicit caller decision, used by extraction backpressure.
 
+## Building logistics stock bounds
+
+Each inventory-bearing building uses its **real** `InventoryId`: processor inputs
+and outputs are distinct; depots, hubs and command storage can share inventories
+between inbound and outbound ports. A building without inventory has no synthetic
+resource store or zero-stock policy view.
+
+Enabled `LogisticsStockPolicy` records define three finite nonnegative thresholds
+per building/material, with `Minimum <= Target <= Maximum`:
+
+- **Minimum:** stock retained against optional outbound conveyor and Cargo Truck
+  transfers. Recipe consumption, production and existing source reservations retain
+  their normal authority. The distributor starts replenishment below this level.
+- **Target:** desired automatic replenishment quantity; it does **not** cap inbound.
+- **Maximum:** hard ceiling for new logistics inbound. The actual effective ceiling
+  is `min(physical per-resource capacity, enabled policy maximum)`. Shared total
+  capacity remains independently binding.
+
+An unspecified, disabled or removed policy uses only finite physical inventory
+capacity. Multiple building ports or aliases to one inventory share one capacity
+accounting; simultaneous new dispatches account for committed truck loads once.
+A belt only admits the residual space after live inbound commitments. Trucks
+unload only what can currently fit, retaining other cargo while the receiver is
+full. A lowering of MAX below stored stock never deletes inventory; it blocks
+additional inbound until valid consumption or export opens room. When stock equals
+MAX, the operator sees a full-state reason; when it exceeds MAX after an edit,
+the operator sees an above-configured-maximum reason. Neither state modifies
+production authority or the atomic inventory conservation rules.
+
 ## Accepted-resource filters
 
 An inventory may either:
