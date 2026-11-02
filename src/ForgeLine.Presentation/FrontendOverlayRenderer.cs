@@ -189,9 +189,17 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
         }
         else if (view.Kind == FrontendSurfaceKind.Loading)
         {
-            Text("INITIALIZING COMMAND SYSTEMS", layout.Title, ForgeLineUiPalette.TextSecondary);
-            Text(view.Status, layout.Details, ForgeLineUiPalette.Accent);
-            if (view.HasProgress)
+            Text(view.LoadingHeading, layout.Title,
+                view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextSecondary);
+            var lines = Wrap(view.Status, MathF.Max(1, (layout.Details.Width - 40 * scale) / scale), 22);
+            for (int i = 0; i < Math.Min(4, lines.Length); i++)
+                Text(lines[i], layout.Details with
+                {
+                    X = layout.Details.X + 20 * scale,
+                    Y = layout.Details.Y + (20 + i * 28) * scale,
+                    Width = layout.Details.Width - 40 * scale
+                }, view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextPrimary);
+            if (view.LoadingShowsProgress)
             {
                 var r = layout.PrimaryAction;
                 EmitProgress(layout.Details.X, r.Y, layout.Details.Width, 8 * scale, view.Progress, width, height);
@@ -205,13 +213,19 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
         var footerLines = Wrap(view.Footer, layout.Footer.Width / scale, 22 * .78f);
         for (int i = 0; i < Math.Min(2, footerLines.Length); i++)
             Text(footerLines[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
-        if (!string.IsNullOrEmpty(view.Feedback)) Text(view.Feedback, layout.Feedback, ForgeLineUiPalette.Warning, .8f);
+        if (!string.IsNullOrEmpty(view.Feedback))
+            Text(view.Feedback, layout.Feedback,
+                view.IsError || view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextSecondary, .8f);
         if (!string.IsNullOrEmpty(view.ProductVersion))
             Text($"VERSION {view.ProductVersion}", layout.Footer with { Y = height - 40 * scale }, ForgeLineUiPalette.TextMuted, .65f);
         if (_skinFailure is not null)
-            Text("UI SKIN ERROR - REINSTALL FORGELINE", layout.Feedback, ForgeLineUiPalette.Warning, .72f);
+            Text("UI SKIN ERROR - REINSTALL FORGELINE",
+                layout.Footer with { Y = layout.Footer.Bottom - 20 * scale },
+                ForgeLineUiPalette.Warning, .65f);
         if (_graphics.SupportsUiText && !_text.Ready)
-            Text("UI FONT ERROR - REINSTALL FORGELINE", layout.Feedback, ForgeLineUiPalette.Warning, .8f);
+            Text("UI FONT ERROR - REINSTALL FORGELINE",
+                layout.Footer with { Y = layout.Footer.Bottom - 20 * scale },
+                ForgeLineUiPalette.Warning, .65f);
 
         void Panel(FrontendRegion r, Vector4 color) => EmitPanel(new SurfaceRect(r.X, r.Y, r.Width, r.Height), color, width, height);
         void Text(string text, FrontendRegion r, Vector4 color, float factor = 1) =>
