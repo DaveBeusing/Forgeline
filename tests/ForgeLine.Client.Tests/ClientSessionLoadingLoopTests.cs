@@ -107,4 +107,20 @@ public sealed class ClientSessionLoadingLoopTests
         Assert.Contains(diagnostics.Snapshot(), e => e.Phase == StartupPhase.SessionLoadFailed && e.SessionId == 1);
         Assert.Contains(diagnostics.Snapshot(), e => e.Phase == StartupPhase.SessionReady && e.SessionId == 2);
     }
+
+    [Fact]
+    public void SessionCancelStateRemovesProgressAndPreservesSafeNavigationFeedback()
+    {
+        var replay = new ClientSessionLoadProgress(ClientSessionLoadPhase.Replay, 128, 256);
+        var active = ClientSessionLoadingLoop.Surface(replay);
+        var cancelling = ClientSessionLoadingLoop.Surface(replay, cancelling: true);
+
+        Assert.Equal(FrontendLoadingVisualState.Running, active.LoadingState);
+        Assert.True(active.LoadingShowsProgress);
+        Assert.Equal(0.5f, active.Progress);
+        Assert.Equal(FrontendLoadingVisualState.Cancelling, cancelling.LoadingState);
+        Assert.False(cancelling.LoadingShowsProgress);
+        Assert.Contains("CANCELLATION REQUESTED", cancelling.Feedback, StringComparison.Ordinal);
+        Assert.DoesNotContain("ESC", cancelling.Feedback, StringComparison.Ordinal);
+    }
 }

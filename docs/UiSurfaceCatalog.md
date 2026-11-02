@@ -150,3 +150,14 @@ Build/processing/unit/logistics/supply/technology/tactical domain cards, actual 
 ## Graphical tactical consumer coverage
 
 [Map, native cursor and world indicators](GraphicalTacticalInterface.md) now use production panels, selector/layer glyphs, permitted contact/objective/group art, projected primary/hover corner components, transient order/target art and current owned single-entity status frames. Dynamic fog, ranges, routes, placement and terrain-sampled group outlines remain intentional geometry. [Qualification](GraphicalTacticalInterfaceQualification.md) separates native repeatability, privacy/hotspot/resource contracts, unresolved gates and pending physical/human acceptance.
+
+## Frontend lifecycle status vocabulary
+
+The shared frontend presentation contract distinguishes pending, active,
+cancelling, completed, recoverable-error and fatal-error loading states.
+A percentage is visible only for finite progress reported by the owning
+loading operation, never for an indeterminate or cancellation phase.
+Existing interactive menu, pause, settings and save regions retain their
+common geometry and focus ownership. Session errors continue to return to
+the main menu with explicit failure feedback and a normal retry entry path;
+a separate modal error workflow has not been introduced.

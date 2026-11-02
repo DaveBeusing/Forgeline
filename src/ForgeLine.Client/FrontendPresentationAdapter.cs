@@ -13,9 +13,15 @@ internal static class FrontendPresentationAdapter
     internal static FrontendSurfaceView Loading(
         FrontendLoadingState state) =>
         FrontendSurfaceView.Loading(
-            state.Status,
-            state.HasDeterminateProgress,
-            state.Progress) with { IsError = state.HasFailed };
+            state.HasFailed ? state.FailureMessage ?? state.Status : state.Status,
+            state.HasDeterminateProgress && !state.HasFailed && !state.IsComplete,
+            state.Progress) with
+        {
+            IsError = state.HasFailed,
+            LoadingState = state.HasFailed ? FrontendLoadingVisualState.FatalError :
+                state.IsComplete ? FrontendLoadingVisualState.Completed :
+                FrontendLoadingVisualState.Running
+        };
 
     internal static FrontendSurfaceView MainMenu(
         MainMenuModel menu)

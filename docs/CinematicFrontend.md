@@ -56,3 +56,12 @@ promised pixel-identical across GPU/driver versions; the accepted source hash pi
 shipped still. Player qualification uses only precompiled assets and checks repeated output,
 layout/DPI combinations, memory, window modes and zero-size restore. The capture includes
 same-device fallback/cinematic frame measurements. See [qualification](CinematicFrontendQualification.md).
+
+## Shared frontend surface treatment
+
+Normal menu and loading screens retain the existing Directorate production
+skin, wordmark, bounded geometry and typography. Loading headings and state
+feedback are derived from the shared presentation contract in both skinned
+and emergency fallback rendering. Decorative menu art remains optional and
+never obscures loading status, action regions or diagnostic repair text.
+The independent studio-video splash remains unchanged.

@@ -40,7 +40,11 @@ internal static class ClientSessionLoadingLoop
             _ => "PREPARING SESSION"
         };
         return FrontendSurfaceView.Loading(label, !cancelling && progress.HasProgress, progress.Progress)
-            with { Feedback = "ESC  RETURN TO MENU" };
+            with
+            {
+                LoadingState = cancelling ? FrontendLoadingVisualState.Cancelling : FrontendLoadingVisualState.Running,
+                Feedback = cancelling ? "CANCELLATION REQUESTED - WAITING FOR ACTIVE WORK" : "ESC  RETURN TO MENU"
+            };
     }
 
     internal static bool Wait<TSession>(ClientSessionLoadingCoordinator<TSession> coordinator,

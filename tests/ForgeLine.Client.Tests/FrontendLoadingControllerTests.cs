@@ -1,4 +1,5 @@
 using ForgeLine.UI;
+using ForgeLine.Presentation;
 using Xunit;
 
 namespace ForgeLine.Client.Tests;
@@ -96,4 +97,35 @@ public sealed class FrontendLoadingControllerTests
             loading.State.TotalSteps);
     }
 
+
+    [Fact]
+    public void FailureViewDisplaysTheActualReasonWithoutFabricatingProgress()
+    {
+        var loading = new FrontendLoadingController();
+        loading.BeginPhase(FrontendLoadingPhase.LoadingAssets, "Loading runtime assets", totalSteps: 5);
+        loading.ReportProgress(2);
+        loading.Fail("Runtime asset manifest is unavailable.");
+
+        var view = FrontendPresentationAdapter.Loading(loading.State);
+
+        Assert.Equal(FrontendLoadingVisualState.FatalError, view.LoadingState);
+        Assert.True(view.LoadingIsError);
+        Assert.Equal("Runtime asset manifest is unavailable.", view.Status);
+        Assert.False(view.LoadingShowsProgress);
+        Assert.Equal("COMMAND SYSTEMS FAILED", view.LoadingHeading);
+    }
+
+    [Fact]
+    public void CompletedViewIsNotMisrepresentedAsActiveProgress()
+    {
+        var loading = new FrontendLoadingController();
+        loading.Complete("Command interface ready");
+
+        var view = FrontendPresentationAdapter.Loading(loading.State);
+
+        Assert.Equal(FrontendLoadingVisualState.Completed, view.LoadingState);
+        Assert.Equal("COMMAND SYSTEMS READY", view.LoadingHeading);
+        Assert.False(view.LoadingShowsProgress);
+        Assert.False(view.LoadingIsError);
+    }
 }
