@@ -1489,11 +1489,20 @@ internal static partial class PlayerActionSnapshotFactory
         var policies = new List<PlayerStockPolicyActionReadModel>();
         // Only selected-facility rows survive this capture. Stable first-policy precedence is unchanged.
         var selectedPolicies = new Dictionary<ResourceId, (EntityId Entity, LogisticsStockPolicy Policy)>();
+        var sharedMaximums = new Dictionary<ResourceId, double>();
         foreach (var candidate in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
             var current = entities.GetComponent<LogisticsStockPolicy>(candidate);
             if (current.TargetEntity == entity)
                 selectedPolicies.TryAdd(current.ResourceId, (candidate, current));
+            if (current.Enabled &&
+                TryResolveDistributionInventory(entities, current.TargetEntity, out InventoryId policyInventory) &&
+                policyInventory == inventory)
+            {
+                double physical = scenario.Inventories.GetResourceCapacity(inventory, current.ResourceId);
+                sharedMaximums[current.ResourceId] = Math.Min(
+                    sharedMaximums.GetValueOrDefault(current.ResourceId, physical), current.DesiredMaximum);
+            }
         }
 
         foreach (ResourceDefinition resource in
@@ -1525,10 +1534,7 @@ internal static partial class PlayerActionSnapshotFactory
             double target = hasPolicy ? policy.DesiredTarget : defaults.Target;
             double maximum = hasPolicy ? policy.DesiredMaximum : defaults.Maximum;
             double physicalMaximum = scenario.Inventories.GetResourceCapacity(inventory, resource.Id);
-            double effectiveMaximum = physicalMaximum;
-            foreach (var candidate in selectedPolicies.Values)
-                if (candidate.Policy.Enabled && candidate.Policy.ResourceId == resource.Id)
-                    effectiveMaximum = Math.Min(effectiveMaximum, candidate.Policy.DesiredMaximum);
+            double effectiveMaximum = sharedMaximums.GetValueOrDefault(resource.Id, physicalMaximum);
             string inboundStatus = physicalMaximum <= 0 ? "NOT ACCEPTED" :
                 currentQuantity > effectiveMaximum + 1e-9 ? "ABOVE CONFIGURED MAXIMUM" :
                 currentQuantity + 1e-9 >= effectiveMaximum ? "MAXIMUM STOCK REACHED" : "ACCEPTING";
