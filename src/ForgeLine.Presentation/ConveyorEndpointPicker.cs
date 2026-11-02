@@ -147,7 +147,7 @@ internal sealed class ConveyorEndpointPicker
     // select the closest physical socket, without synthesizing an opposite port.
     internal bool TryPickEither(PresentationSnapshot? snapshot, PlayerId player, RtsCamera camera,
         Vector2 pointer, int width, int height, float scale, out ConveyorEndpoint endpoint,
-        ConveyorEndpoint? previous = null)
+        ConveyorEndpoint? previous = null, bool preferInputOnTie = false)
     {
         bool outputFound = TryPick(snapshot, player, camera, pointer, width, height, scale,
             false, out ConveyorEndpoint output, previous: previous);
@@ -175,7 +175,9 @@ internal sealed class ConveyorEndpointPicker
                 camera.WorldToScreen(input.Position + Vector3.UnitY * CarrierHeight, width, height).Position);
             // Both roles at one adaptable position remain one exclusive physical
             // socket. Output is the backward-compatible default for that tie.
-            endpoint = inputDistance < outputDistance ? input : output;
+            endpoint = inputDistance < outputDistance ||
+                preferInputOnTie && MathF.Abs(inputDistance - outputDistance) <= .25f
+                ? input : output;
         }
         else if (outputFound) endpoint = output;
         else if (inputFound) endpoint = input;

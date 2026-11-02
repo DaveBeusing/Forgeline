@@ -71,7 +71,7 @@ public sealed class RtsConveyorConstructionController
         (_awaiting?"REQUEST PENDING":Edit!=ConveyorEdit.Build?"CLICK OWN CONVEYOR":Module!=ConveyorModule.Route?
             "CLICK TO PLACE PART":_anchor.HasValue
                 ? _firstEndpoint is { Input: true } ? "SELECT COMPATIBLE OUTPUT" : "SELECT COMPATIBLE INPUT"
-                : "SELECT INPUT OR OUTPUT / CLICK BUILDING OR BELT END") +
+                : "SELECT INPUT OR OUTPUT / SHIFT SELECTS INPUT AT DUAL-ROLE SOCKETS") +
         " / GRID 4 M / Q E ROTATE / TAB BEND / T TIER / V EDIT / ESC CANCEL";
     public void Begin(ConveyorModule module)
     {
@@ -146,7 +146,9 @@ public sealed class RtsConveyorConstructionController
                     scale, _firstEndpoint is { } first ? !first.Input : true,
                     out ConveyorEndpoint selected, previous: previousSnap)
                 : _endpoints.TryPickEither(snapshot, issuer, camera, input.PointerPosition, width, height,
-                    scale, out selected, previous: previousSnap);
+                    scale, out selected, previous: previousSnap,
+                    preferInputOnTie: input.IsKeyDown(PlatformKey.LeftShift) ||
+                        input.IsKeyDown(PlatformKey.RightShift));
             if (picked)
             {
                 _snappedEndpoint = selected; _endpointTick = snapshot!.Tick;
@@ -289,7 +291,7 @@ public sealed class RtsConveyorConstructionController
         if(!_anchor.HasValue && Module==ConveyorModule.Route && Edit==ConveyorEdit.Build && !_awaiting)
             return new(PlacementContextState.Pending,"CONVEYOR",_snappedEndpoint.HasValue?
                 (_snappedEndpoint.Value.Input ? "INPUT SNAPPED / CLICK TO START" : "OUTPUT SNAPPED / CLICK TO START")
-                :"SELECT INPUT OR OUTPUT / CLICK BUILDING OR BELT END",controls,
+                :"SELECT INPUT OR OUTPUT / SHIFT FOR DUAL-ROLE INPUT",controls,
                 SessionId:snapshot?.SessionId??default,Tick:snapshot?.Tick??default,PortInformation:portInformation);
         if(ChoosingDestination)
             return new(PlacementContextState.Pending,"CONVEYOR",
