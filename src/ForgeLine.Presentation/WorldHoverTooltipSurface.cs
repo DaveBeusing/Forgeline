@@ -304,6 +304,8 @@ internal sealed class WorldHoverTooltipSurface : IGameplayHudSurface
                 BuildingConveyorPortRole.Output => "OUT ",
                 _ => "IN/OUT "
             });
+            detail.Append(port.Key);
+            detail.Append(" ");
             detail.Append(port.Facing);
             detail.Append(" / ");
             detail.Append(port.Attachment switch
