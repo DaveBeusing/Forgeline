@@ -1796,7 +1796,8 @@ internal sealed class ClientApplication
                                 placementRequest.Position,
                                 placementRequest.Orientation,
                                 constructionInventory,
-                                observedTick),
+                                observedTick,
+                                playerGrid: true),
                         out pendingPlacementHostSequence))
                     {
                         buildingPlacementController.ObserveSubmission(null, presentationInteraction);

@@ -18,6 +18,14 @@ public static class BuildingConstructionDebugVisualization
             : invalidColor;
 
         debugDraw.Box(preview.Bounds, color);
+        if (preview.GridEnvelope is ForgeLine.World.AxisAlignedBounds reserved)
+        {
+            // A shallow outline shows reserved cells without expanding the mesh.
+            var outline = new ForgeLine.World.AxisAlignedBounds(
+                new(reserved.Minimum.X, preview.GroundPosition.Y + 0.05f, reserved.Minimum.Z),
+                new(reserved.Maximum.X, preview.GroundPosition.Y + 0.12f, reserved.Maximum.Z));
+            debugDraw.Box(outline, new Vector4(color.X, color.Y, color.Z, color.W * 0.65f));
+        }
         if (preview.ConveyorPorts.Count > 0)
         {
             foreach (BuildingConveyorSocket physical in preview.ConveyorPorts)
