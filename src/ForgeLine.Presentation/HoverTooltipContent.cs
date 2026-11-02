@@ -45,10 +45,7 @@ internal static class HoverTooltipResolver
                 WrapDetails: true, Selection: experience.Selection,
                 Group: ring.Group is not null && group?.Tick == snapshot.Tick && group.TotalCount == experience.Selection.Count ? group : null,
                 Formation: formation, Feedback: experience.Feedback,
-                BuildingConveyors: experience.Selection is { Count: 1, Kind: PlayerSelectionKind.Building } selected &&
-                    snapshot.Conveyors is { } network && network.Tick == snapshot.Tick &&
-                    network.SelectedBuildingConnections is { } connection &&
-                    connection.Building == selected.PrimaryEntity ? connection : null,
+                BuildingConveyors: SelectionInspectorHudModel.ResolveConveyors(snapshot, experience.Selection),
                 OwnedActions: experience.Selection.Count == 1 &&
                     snapshot.PlayerActions is { } actions &&
                     actions.SessionId == snapshot.SessionId && actions.Tick == snapshot.Tick &&
