@@ -247,6 +247,102 @@ public sealed class ConveyorConnectionUxTests
         Assert.NotEqual(moved.Request.Start, moved.Request.End);
     }
 
+    [Fact]
+    public void InputFirstAndOutputFirstProduceTheSameForwardRouteRequest()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var source = Building(1, new(-32, 0, 0));
+        var sink = Building(2, new(32, 0, 0));
+        var ports = Ports(source).Concat(Ports(sink)).ToArray();
+        Vector3 output = ports.Single(p => p.Building == source.Entity && !p.Input).Position;
+        Vector3 input = ports.Single(p => p.Building == sink.Entity && p.Input).Position;
+
+        ConveyorBuildRequest Normalized(bool inputFirst)
+        {
+            var controller = new RtsConveyorConstructionController();
+            var interaction = new PresentationInteractionState();
+            var snapshot = Snapshot([source, sink], ports);
+            controller.Begin(ConveyorModule.Route);
+            Move(controller, interaction, snapshot, camera, inputFirst ? input : output, click: true);
+            Assert.Contains(inputFirst ? "SELECT COMPATIBLE OUTPUT" : "SELECT COMPATIBLE INPUT", controller.Hint);
+            Move(controller, interaction, snapshot, camera, inputFirst ? input : output);
+            Move(controller, interaction, snapshot, camera, inputFirst ? output : input);
+            ConveyorPreviewRequest planned = Assert.IsType<ConveyorPreviewRequest>(
+                interaction.CaptureConveyorRequest());
+            Assert.Equal(source.Entity, planned.Request.SourcePortBuilding);
+            Assert.Equal(sink.Entity, planned.Request.DestinationPortBuilding);
+            Assert.Equal(output - Vector3.UnitY * 5.8f, planned.Request.Start);
+            Assert.Equal(input - Vector3.UnitY * 5.8f, planned.Request.End);
+            Assert.True(planned.Request.AutomaticRouting);
+            var confirmed = Snapshot([source, sink], ports, requestId: planned.Id,
+                preview: new(ConveyorFailure.None,
+                    [new(ConveyorModule.Standard, Vector3.Zero, BuildingOrientation.East, 0)], 14));
+            Move(controller, interaction, confirmed, camera, inputFirst ? output : input, click: true);
+            Assert.True(controller.TryTakeRequest(out var submitted));
+            Assert.Equal(planned.Request, submitted);
+            Assert.False(controller.TryTakeRequest(out _));
+            return submitted;
+        }
+
+        Assert.Equal(Normalized(false), Normalized(true));
+    }
+
+    [Fact]
+    public void ExistingBeltEndsCanBeSelectedInEitherDirectionWithoutFlippingFlow()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var sourcePlacement = new ConveyorPlacement(ConveyorModule.Standard, new(-28, 0, 0),
+            BuildingOrientation.East, 0);
+        var sinkPlacement = new ConveyorPlacement(ConveyorModule.Standard, new(28, 0, 0),
+            BuildingOrientation.East, 0);
+        var firstPiece = new ConveyorOwnedPiece(new(41, 1), new(Player, sourcePlacement, 16));
+        var lastPiece = new ConveyorOwnedPiece(new(42, 1), new(Player, sinkPlacement, 16));
+        var pieces = new[] { firstPiece, lastPiece };
+        var instances = new[] { Piece(firstPiece), Piece(lastPiece) };
+        Vector3 output = sourcePlacement.Sockets.Single(socket => !socket.Input).Position;
+        Vector3 input = sinkPlacement.Sockets.Single(socket => socket.Input).Position;
+
+        ConveyorBuildRequest Normalized(bool inputFirst)
+        {
+            var controller = new RtsConveyorConstructionController();
+            var interaction = new PresentationInteractionState();
+            var snapshot = Snapshot(instances, [], pieces);
+            controller.Begin(ConveyorModule.Route);
+            Move(controller, interaction, snapshot, camera, inputFirst ? input : output, click: true);
+            Move(controller, interaction, snapshot, camera, inputFirst ? input : output);
+            Move(controller, interaction, snapshot, camera, inputFirst ? output : input);
+            var planned = Assert.IsType<ConveyorPreviewRequest>(interaction.CaptureConveyorRequest());
+            Assert.False(planned.Request.SourcePortBuilding.IsValid);
+            Assert.False(planned.Request.DestinationPortBuilding.IsValid);
+            Assert.Equal(output - Vector3.UnitY * 5.8f, planned.Request.Start);
+            Assert.Equal(input - Vector3.UnitY * 5.8f, planned.Request.End);
+            return planned.Request;
+        }
+
+        Assert.Equal(Normalized(false), Normalized(true));
+    }
+
+    [Fact]
+    public void SinkFirstCannotUseASecondInputAsItsSource()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var first = Building(1, new(-32, 0, 0));
+        var second = Building(2, new(32, 0, 0));
+        var ports = Ports(first).Concat(Ports(second)).ToArray();
+        var snapshot = Snapshot([first, second], ports);
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(ConveyorModule.Route);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == first.Entity && p.Input).Position, click: true);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == first.Entity && p.Input).Position);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == second.Entity && p.Input).Position, click: true);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Contains("INCOMPATIBLE", controller.Context(snapshot).Reason);
+    }
+
     [Theory]
     [InlineData(BuildingOrientation.North)]
     [InlineData(BuildingOrientation.East)]
