@@ -554,6 +554,9 @@ internal sealed partial class ClientRenderHost : IDisposable
             var renderCamera =
                 new RtsCamera(
                     cameraSettings);
+            if(_referenceFixture is {CaptureStageDiagnostics:true} inputFixture)
+                _fixtureWorldInputInspector=ReferenceWorldInputDiagnostics.Create(inputFixture.OutputRoot,"host-fixed","actual-render-host",inputFixture.RuntimeFingerprint,
+                    inputFixture.Fingerprint,inputFixture.InputBytesBase64,qualityProfile,inputFixture.RepeatCaptures,terrainRenderer,instanceRenderer,particleRenderer,graphics,renderCamera);
             var gameplayDraw =
                 new DebugDraw();
             var debugDraw =

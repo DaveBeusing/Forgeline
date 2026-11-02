@@ -92,6 +92,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
 
         try
         {
+            AttachBoundInputProvenance();
             ConfigureDred();
             bool debugLayerEnabled = TryEnableDebugLayer(configuration.EnableDebugLayer);
             _factory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(debugLayerEnabled);
@@ -356,6 +357,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     public IGraphicsPipeline CreateGraphicsPipeline(GraphicsPipelineDescription description)
     {
         ThrowIfDisposed();
+        _postFrameAttachmentClosed = true;
         ArgumentNullException.ThrowIfNull(description);
         description.Validate();
         if (description.VertexConstantsInBuffer && !_directionalShadows.Enabled)
@@ -436,14 +438,31 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 ]
                 : null;
 
-        ID3D12RootSignature rootSignature =
-            _device.CreateRootSignature(
-                new RootSignatureDescription1(
-                    rootSignatureFlags,
-                    rootParameters.Count == 0
-                        ? null
-                        : rootParameters.ToArray(),
-                    samplers));
+        // These arrays are method-private frozen native inputs; callers cannot mutate them.
+        var rootDescription = new RootSignatureDescription1(rootSignatureFlags,
+            rootParameters.Count == 0 ? null : rootParameters.ToArray(), samplers);
+        var creationRole = description.DirectionalShadowReceiver ? PostFrameTapeCreationRole.DirectionalShadowReceiver :
+            description.SceneDepthReceiver ? PostFrameTapeCreationRole.SceneDepthReceiver : PostFrameTapeCreationRole.Ordinary;
+        PostFrameCreationBuilder catalogBuilder = default;
+        bool catalogStarted = _postFrameTape is { } catalog && catalog.TryBeginCreation(out catalogBuilder);
+        uint requiredRoots = 0; ushort requiredTextures = 0, requiredRetainedTargets = 0;
+        if (catalogStarted)
+        {
+            try
+            {
+                if (!PostFrameNativeCreationEncoder.Root(catalogBuilder, rootDescription, creationRole,
+                    out requiredRoots, out requiredTextures, out requiredRetainedTargets))
+                    _postFrameTape!.Refuse(PostFrameTapeRefusal.InvalidCatalog);
+            }
+            catch { _postFrameTape!.Refuse(PostFrameTapeRefusal.InvalidCatalog); }
+        }
+        ID3D12RootSignature rootSignature;
+        try { rootSignature = _device.CreateRootSignature(rootDescription); }
+        catch
+        {
+            if (catalogStarted) _postFrameTape!.AbortCreation(catalogBuilder);
+            throw;
+        }
         ID3D12PipelineState? pipelineState = null;
         try
         {
@@ -531,18 +550,44 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 pipelineStateDescription.BlendState = blend;
             }
 
+            PostFrameFrozenCreation frozenCreation = default;
+            uint requiredVertexSlots = 0;
+            if (catalogStarted && _postFrameTape!.Refusal == PostFrameTapeRefusal.None)
+            {
+                try
+                {
+                    if (!PostFrameNativeCreationEncoder.Pipeline(catalogBuilder, pipelineStateDescription, out requiredVertexSlots) ||
+                        !_postFrameTape.FinishCreation(catalogBuilder, inputElements, pipelineStateDescription.VertexShader.Span,
+                            pipelineStateDescription.PixelShader.Span, out frozenCreation))
+                        _postFrameTape.Refuse(PostFrameTapeRefusal.InvalidCatalog);
+                    else
+                    {
+                        // Native marshaling and later digests consume the SAME private frozen byte memory.
+                        pipelineStateDescription.VertexShader = frozenCreation.VertexShaderMemory;
+                        pipelineStateDescription.PixelShader = frozenCreation.PixelShaderMemory;
+                    }
+                }
+                catch { _postFrameTape.Refuse(PostFrameTapeRefusal.InvalidCatalog); }
+            }
             pipelineState =
                 _device.CreateGraphicsPipelineState(pipelineStateDescription);
             pipelineState.Name = "ForgeLine Graphics Pipeline";
 
-            return new D3D12GraphicsPipeline(
+            var result = new D3D12GraphicsPipeline(
                 this,
                 description,
                 rootSignature,
                 pipelineState);
+            if (catalogStarted && frozenCreation.BelongsTo(_postFrameTape!))
+                _postFrameTape!.CommitCreation(frozenCreation, result, rootSignature, result.Lifetime, out _, out _,
+                    new(requiredVertexSlots, requiredTextures, requiredRoots,
+                        pipelineStateDescription.DepthStencilState.DepthEnable || pipelineStateDescription.DepthStencilState.StencilEnable,
+                        requiredRetainedTargets), creationRole);
+            return result;
         }
         catch
         {
+            if (catalogStarted) _postFrameTape!.AbortCreation(catalogBuilder);
             pipelineState?.Dispose();
             rootSignature.Dispose();
             throw;
@@ -593,6 +638,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         GraphicsTextureDescription description =
             texture.Description;
         description.Validate();
+        using var frozenSource = FreezeBoundTexture(texture);
         long residentByteCount = texture.ResidentByteCount;
 
         Format nativeFormat =
@@ -641,12 +687,13 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 }
             }, residentByteCount);
 
+            _boundInputTracker?.Register(lifetime, "texture", texture: description, committed: false);
             UploadTexture(
                 resource,
                 resourceDescription,
                 texture,
                 lifetime,
-                uploadSize);
+                uploadSize, frozenSource);
 
             InjectSchedulingFailure(SchedulingOperation.AllocateDescriptor);
             descriptorIndex =
@@ -668,6 +715,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
                 null,
                 cpuHandle);
 
+            _boundInputTracker?.Commit(lifetime, descriptorIndex, "immutable-texture");
             _loadedTextureCount++;
             _residentTextureBytes =
                 checked(
@@ -725,6 +773,8 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
     {
         ThrowIfDisposed();
         ThrowIfRecording();
+        InvalidatePostFrameStamp();
+        _postFrameAttachmentClosed = true;
         try
         {
             long started = !_telemetryActive ? 0 : System.Diagnostics.Stopwatch.GetTimestamp();
@@ -957,15 +1007,17 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         WaitForIdleCore();
     }
 
-    private void WaitForIdleCore()
+    private void WaitForIdleCore(bool provenanceCleanup = false)
     {
-        FlushUploads();
+        FlushUploads(provenanceCleanup);
 
         ulong fenceValue = _nextFenceValue++;
         CheckResult(_commandQueue.Signal(_frameFence, fenceValue), "fence-signal-failed");
 
         WaitForFence(fenceValue);
-        _resources.Collect(GetCompletedFence());
+        ulong completed = GetCompletedFence();
+        _resources.Collect(completed);
+        _postFrameIdleObserved = completed;
 
         CaptureCompletedGpuTimings();
         Array.Clear(_frameFenceValues);
@@ -983,7 +1035,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         InjectSchedulingFailure(SchedulingOperation.Dispose);
         try
         {
-            WaitForIdleCore();
+            WaitForIdleCore(provenanceCleanup: true);
         }
         catch (Exception exception)
         {
@@ -1363,7 +1415,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         ResourceDescription resourceDescription,
         GraphicsTextureData texture,
         GraphicsResourceRetirement.Resource destinationLifetime,
-        ulong size)
+        ulong size, GraphicsBoundFrozenTexture? frozenSource)
     {
         int count = texture.Description.MipCount;
         UploadBatch batch = AcquireUploadBatch(size);
@@ -1375,15 +1427,19 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             mapped.Slice(checked((int)offset), checked((int)size)).Clear();
             for (int mipIndex = 0; mipIndex < count; mipIndex++)
             {
-                GraphicsTextureMipData mip = texture.Mips[mipIndex];
+                GraphicsTextureMipData mip = frozenSource is null ? texture.Mips[mipIndex] : frozenSource.Sources[mipIndex];
                 int rowBytes = texture.Description.Format == GraphicsTextureFormat.Bc7Unorm
                     ? checked(((mip.Width + 3) / 4) * 16)
                     : checked(mip.Width * (texture.Description.Format == GraphicsTextureFormat.R8Unorm ? 1 : 4));
                 if (_uploadRowSizes[mipIndex] < (ulong)rowBytes)
                     throw new GraphicsDeviceException($"D3D12 footprint for mip {mipIndex} is smaller than its source row.");
                 for (int row = 0; row < checked((int)_uploadRows[mipIndex]); row++)
-                    mip.Pixels.AsSpan(checked(row * mip.RowPitch), rowBytes).CopyTo(mapped.Slice(
-                        checked((int)(offset + _uploadLayouts[mipIndex].Offset) + row * (int)_uploadLayouts[mipIndex].Footprint.RowPitch), rowBytes));
+                {
+                    ReadOnlySpan<byte> source = frozenSource is null
+                        ? mip.Pixels.AsSpan(checked(row * mip.RowPitch), rowBytes)
+                        : frozenSource.Bytes(mipIndex).Slice(checked(row * rowBytes), rowBytes);
+                    source.CopyTo(mapped.Slice(checked((int)(offset + _uploadLayouts[mipIndex].Offset) + row * (int)_uploadLayouts[mipIndex].Footprint.RowPitch), rowBytes));
+                }
             }
         }
         finally { batch.Upload.Unmap(0); }
@@ -1396,6 +1452,23 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
         }
         batch.Commands.ResourceBarrierTransition(destination, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
         FinishUploadTransfer(batch, destinationLifetime, offset + size, size);
+        if (frozenSource is not null)
+        {
+            ulong transfer = _boundInputTracker!.Pending(destinationLifetime);
+            for (int mip = 0; mip < count; mip++)
+            {
+                var source = frozenSource.Sources[mip];
+                int rowBytes = GraphicsBoundFrozenTexture.RowBytes(texture.Description.Format, source.Width);
+                var footprint = _uploadLayouts[mip];
+                var layout = new GraphicsTextureReadbackLayout(source.Width, source.Height, checked((int)footprint.Footprint.RowPitch),
+                    checked(offset + footprint.Offset), footprint.Footprint.Format.ToString());
+                var descriptor = new GraphicsBoundTextureSource(mip, source.Width, source.Height, source.RowPitch, rowBytes,
+                    frozenSource.Bytes(mip).Length / rowBytes, layout);
+                var bytes = frozenSource.Bytes(mip);
+                _boundInputTracker.Write(destinationLifetime, "texture-mip", 0, (ulong)bytes.Length, 1,
+                    Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)), (ulong)bytes.Length, transfer, descriptor);
+            }
+        }
         if (!texture.Description.DeferUploadWait)
         {
             FlushUploads();
@@ -1818,6 +1891,7 @@ internal sealed partial class D3D12GraphicsDevice : IGraphicsDevice
             completed = GetCompletedFence();
         }
         _resources.Retire(resource, completed);
+        _boundInputTracker?.Retire(resource);
     }
 
     private ulong GetCompletedFence()

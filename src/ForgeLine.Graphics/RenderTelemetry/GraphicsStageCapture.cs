@@ -18,7 +18,10 @@ public sealed record GraphicsStageReadback(GraphicsCaptureStages Stage, Graphics
 public sealed record GraphicsStageCapture(byte[] FinalRgba, GraphicsFrameSubmission Submission,
     ulong CompletedFence, int FrameIndex, ulong PresentedBefore, ulong PresentedAfter,
     GraphicsDeviceTelemetryIdentity DeviceIdentity, IReadOnlyList<GraphicsStageReadback> Stages)
-{ public int BufferCount { get; init; } }
+{ public int BufferCount { get; init; } public GraphicsWorldBindingJournal? WorldBindings { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public GraphicsBoundInputProvenance? BoundInputProvenance { get; init; }
+}
 
 public static class GraphicsReadbackRows
 {

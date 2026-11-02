@@ -20,7 +20,7 @@ public enum TerrainDebugVisualizationMode : byte
     MaterialPalette = 5
 }
 
-public sealed class TerrainRenderer : IDisposable
+public sealed partial class TerrainRenderer : IDisposable
 {
     private const int TerrainBaseRootConstantCount = 36;
     private const int TerrainRootConstantCount =
