@@ -420,7 +420,7 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
                 int r = (source.ResourceCursor + i) % EligibleResources.Count;
                 ResourceId id = EligibleResources[r];
                 if ((destination.AcceptedDownstream & (1 << r)) == 0 ||
-                    source.Port is { Input: false } && (source.DemandableDownstream & (1 << r)) == 0)
+                    hasDemandable && (destination.DemandableDownstream & (1 << r)) == 0)
                     continue;
                 if (available[source.Inventory][r] <= Epsilon || ((source.AllowedResources & destination.AllowedResources) & (1 << r)) == 0) continue;
                 if (Room(destination, id) > Epsilon && _stock.GetAddableQuantity(destination.Inventory, id, 1) > Epsilon) return r;
