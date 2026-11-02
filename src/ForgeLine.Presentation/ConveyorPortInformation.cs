@@ -3,7 +3,8 @@ using ForgeLine.Game;
 
 namespace ForgeLine.Presentation;
 
-public readonly record struct ConveyorPortInformation(EntityId Building, bool Input, string Materials);
+public readonly record struct ConveyorPortInformation(EntityId Building, bool Input, string Materials,
+    int AllowedResourceMask = -1);
 
 internal static class ConveyorPortText
 {

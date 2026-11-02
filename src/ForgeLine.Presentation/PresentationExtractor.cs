@@ -317,8 +317,12 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         var scenario = _extraction.Scenario;
         var ports = ConveyorConstructionService.CapturePorts(context.Entities, _extraction.Player);
         // The marker/description budget is independent of the authoritative port set.
-        var information = ports.Take(128).Select(port => new ConveyorPortInformation(port.Building, port.Input,
-            ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port)))).ToArray();
+        var information = ports.Take(128).Select(port =>
+        {
+            int mask = scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port);
+            return new ConveyorPortInformation(port.Building, port.Input,
+                ConveyorPortInformationCapture.Materials(scenario, mask), mask);
+        }).ToArray();
         var pieces = ConveyorConstructionService.Capture(context.Entities, _extraction.Player, scenario.Inventories);
         BuildingConveyorConnectionSnapshot? selectedConnections = null;
         if (selected is { Count: 1, Kind: PlayerSelectionKind.Building } focus &&

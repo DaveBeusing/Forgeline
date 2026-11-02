@@ -172,6 +172,11 @@ public sealed class RtsConveyorConstructionController
         }
         if (_snapWarning == ConveyorSnapFailure.None)
             _snapWarning = _endpoints.LastFailure;
+        if (Edit == ConveyorEdit.Build && Module == ConveyorModule.Route &&
+            _firstEndpoint is { } initial && _snappedEndpoint is { } selectedMate &&
+            initial.AllowedResourceMask >= 0 && selectedMate.AllowedResourceMask >= 0 &&
+            (initial.AllowedResourceMask & selectedMate.AllowedResourceMask) == 0)
+            _snapWarning = ConveyorSnapFailure.Incompatible;
         // Only the marker eases; real preview parts, route requests, exact
         // attachments and simulation snapshots always use the canonical target.
         if (_snappedEndpoint is { } selected)

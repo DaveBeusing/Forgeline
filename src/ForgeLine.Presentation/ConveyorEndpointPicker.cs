@@ -8,7 +8,8 @@ internal enum ConveyorSnapFailure : byte { None, Ambiguous, Blocked, Incompatibl
 
 internal readonly record struct ConveyorEndpoint(Vector3 Position, EntityId Building, int Tier,
     Vector3 Facing = default, bool Input = false, string Materials = "",
-    EntityId Source = default, string SocketKey = "", int SocketOrdinal = 0);
+    EntityId Source = default, string SocketKey = "", int SocketOrdinal = 0,
+    int AllowedResourceMask = -1);
 
 /// <summary>Selects one copied endpoint; the construction preview still validates the connection.</summary>
 internal sealed class ConveyorEndpointPicker
@@ -126,14 +127,19 @@ internal sealed class ConveyorEndpointPicker
             endpoint = bodyEndpoint;
         }
         string materials = network.BeltMaterials;
+        int allowedMask = -1;
         if (endpoint.Building.IsValid)
         {
             materials = "DETAILS UNAVAILABLE";
             foreach (var information in network.PortInformation)
                 if (information.Building == endpoint.Building && information.Input == endpoint.Input)
-                { materials = information.Materials; break; }
+                { materials = information.Materials; allowedMask = information.AllowedResourceMask; break; }
         }
-        endpoint = endpoint with { Materials = materials.Length == 0 ? "DETAILS UNAVAILABLE" : materials };
+        endpoint = endpoint with
+        {
+            Materials = materials.Length == 0 ? "DETAILS UNAVAILABLE" : materials,
+            AllowedResourceMask = allowedMask
+        };
         return true;
     }
 
