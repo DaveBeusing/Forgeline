@@ -11,6 +11,18 @@ namespace ForgeLine.Presentation;
 
 internal static class SelectionInspectorHudModel
 {
+    public static BuildingConveyorConnectionSnapshot? ResolveConveyors(
+        PresentationSnapshot snapshot, in PlayerSelectionSummary selection)
+    {
+        if (selection.Count != 1 || selection.Kind != PlayerSelectionKind.Building ||
+            snapshot.PlayerExperience is not { } experience || experience.Tick != snapshot.Tick ||
+            snapshot.Conveyors is not { } conveyors || conveyors.Tick != snapshot.Tick)
+            return null;
+
+        BuildingConveyorConnectionSnapshot? details = conveyors.SelectedBuildingConnections;
+        return details is not null && details.Building == selection.PrimaryEntity ? details : null;
+    }
+
     public static RtsUiIcon ResolveRoleIcon(
         in PlayerSelectionSummary selection)
     {
