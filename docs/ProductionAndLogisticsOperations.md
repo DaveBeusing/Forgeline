@@ -32,6 +32,16 @@ Only links whose two endpoints are live locally owned nodes are retained. LISTED
 
 Open Existing Controls selects the authorized facility and enters the existing Process, Units, Logistics or Supply Action Dock. Its existing pause/cancel, queue mode/priority, unit priority, stock thresholds/priorities and supply policy controls remain authoritative through the normal command gateway. The stock radial entries show the accepted configured priority, the bounded aging-derived dispatch class when it differs, and the observed wait or transport impediment. The `PRIOR` parameter is a draft until `APPLY POLICY` receives an authoritative accepted result. A disabled or satisfied stock policy must not be presented as an active dispatch promise. In-flight shipments retain their admission priority when the configured class changes. The dock waits for an exact matching selection capture before any manipulation. Opening controls submits no simulation command, and submission intent is not accepted execution. Saved combat groups are unchanged.
 
+Selected Logistics radial entries now show actual resource quantity against the
+effective inbound maximum (the lower physical or enabled policy cap). They
+report **FULL** when the receiving material ceiling is reached and **OVER MAX**
+when a policy is lowered beneath already stored goods. Operations captures
+show **MaximumStockReached** and **AboveConfiguredMaximum** for affected owned
+facilities. No stored resources are automatically removed; blocked deliveries
+retain their cargo until capacity becomes available. Existing Min/Target/Max
+editing and validated commands remain the only modification path; a pure
+power/radar facility without an inventory does not acquire stock controls.
+
 ## Input and bounded costs
 
 Rendering and hit testing share the same safe-area/DPI bounds. The panel occupies the left column above the inspector, preserving the right Action Dock and minimap. There is no reserved Operations tab band, hidden hit region or dormant toggle; guidance and assigned group rows may use the recovered lower-left space. Retained mouse press sequences recognize short clicks once. Resize, session, modal, focus, pause, placement and targeting transitions consume edges; skipped help/pause frames explicitly cancel retained dashboard clicks. Targeting suppresses the panel and its extraction request, then restores the open preference on return. The panel takes no keyboard focus; entering existing controls preserves their ordinary keyboard ownership.
