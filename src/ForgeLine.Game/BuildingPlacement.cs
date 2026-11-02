@@ -16,7 +16,9 @@ public enum BuildingPlacementFailureReason
     Obstructed = 5,
     OutsideBuildableArea = 6,
     ResourceDepositRequired = 7,
-    LoadingCorridorUnavailable = 8
+    LoadingCorridorUnavailable = 8,
+    GridAlignmentRequired = 9,
+    ServiceLaneUnavailable = 10
 }
 
 public readonly record struct BuildingPlacementResult(
@@ -29,6 +31,7 @@ public readonly record struct BuildingPlacementResult(
     EntityId ResourceDeposit)
 {
     public AxisAlignedBounds? LoadingCorridor { get; init; }
+    public AxisAlignedBounds? GridEnvelope { get; init; }
 
     public static BuildingPlacementResult Invalid(
         BuildingPlacementFailureReason failure,
@@ -57,6 +60,7 @@ public readonly record struct BuildingPlacementPreview(
     EntityId ResourceDeposit)
 {
     public AxisAlignedBounds? LoadingCorridor { get; init; }
+    public AxisAlignedBounds? GridEnvelope { get; init; }
     public IReadOnlyList<BuildingConveyorSocket> ConveyorPorts { get; init; } = Array.Empty<BuildingConveyorSocket>();
     public ConveyorSocket? ConveyorInput { get; init; }
     public ConveyorSocket? ConveyorOutput { get; init; }
@@ -127,14 +131,19 @@ public sealed class BuildingPlacementService
         PlayerId issuer,
         BuildingId buildingId,
         Vector3 requestedPosition,
-        BuildingOrientation orientation)
+        BuildingOrientation orientation,
+        bool newPlayerPlacement = false)
     {
+        if (newPlayerPlacement && _definitions.TryGet(buildingId, out BuildingDefinition? selected))
+            requestedPosition = ConstructionGrid.SnapBuilding(requestedPosition, selected.Footprint, orientation);
+
         BuildingPlacementResult result = Evaluate(
             entities,
             issuer,
             buildingId,
             requestedPosition,
-            orientation);
+            orientation,
+            playerGrid: newPlayerPlacement);
 
         if (!_definitions.TryGet(buildingId, out BuildingDefinition? definition))
         {
@@ -162,6 +171,9 @@ public sealed class BuildingPlacementService
             result.ResourceDeposit)
         {
             LoadingCorridor = result.LoadingCorridor,
+            GridEnvelope = newPlayerPlacement
+                ? ConstructionGrid.BuildingEnvelope(result.GroundPosition, definition.Footprint, orientation)
+                : result.GridEnvelope,
             ConveyorPorts = buildingId == BuildingIds.CommandCore || buildingId == BuildingIds.StorageDepot
                 ? ConveyorGeometry.BuildingSockets(buildingId, result.GroundPosition,
                     BuildingFootprint.GetRotation(result.Orientation))
@@ -186,7 +198,8 @@ public sealed class BuildingPlacementService
         BuildingId buildingId,
         Vector3 requestedPosition,
         BuildingOrientation orientation,
-        EntityId ignoredEntity = default)
+        EntityId ignoredEntity = default,
+        bool playerGrid = false)
     {
         ArgumentNullException.ThrowIfNull(entities);
 
@@ -215,6 +228,10 @@ public sealed class BuildingPlacementService
                 requestedPosition,
                 orientation);
         }
+
+        if (playerGrid && !ConstructionGrid.IsBuildingAligned(requestedPosition, definition.Footprint, orientation))
+            return BuildingPlacementResult.Invalid(
+                BuildingPlacementFailureReason.GridAlignmentRequired, buildingId, requestedPosition, orientation);
 
         Vector3 halfExtents =
             definition.Footprint.GetHalfExtents(orientation);
@@ -264,7 +281,11 @@ public sealed class BuildingPlacementService
             center - halfExtents,
             center + halfExtents);
 
-        if (!IsWithinWorldBounds(bounds))
+        AxisAlignedBounds? gridEnvelope = playerGrid
+            ? ConstructionGrid.BuildingEnvelope(groundPosition, definition.Footprint, orientation)
+            : null;
+
+        if (!IsWithinWorldBounds(gridEnvelope ?? bounds))
         {
             return new BuildingPlacementResult(
                 false,
@@ -288,7 +309,7 @@ public sealed class BuildingPlacementService
                 EntityId.Invalid);
         }
 
-        if (!_buildableArea.IsBuildable(issuer, bounds))
+        if (!_buildableArea.IsBuildable(issuer, gridEnvelope ?? bounds))
         {
             return new BuildingPlacementResult(
                 false,
@@ -324,6 +345,14 @@ public sealed class BuildingPlacementService
                     EntityId.Invalid);
             }
         }
+
+        // Reserve one full grid lane around normal newly placed buildings. Existing
+        // authored objects keep their original transforms and physical collision.
+        if (playerGrid && !definition.RequiresResourceDeposit &&
+            !HasServiceLane(entities, gridEnvelope!.Value, ignoredEntity))
+            return new(false, BuildingPlacementFailureReason.ServiceLaneUnavailable,
+                buildingId, groundPosition, orientation, bounds, EntityId.Invalid)
+            { GridEnvelope = gridEnvelope };
 
         EntityId deposit = EntityId.Invalid;
         if (definition.RequiresResourceDeposit)
@@ -394,7 +423,40 @@ public sealed class BuildingPlacementService
             groundPosition,
             orientation,
             bounds,
-            deposit) { LoadingCorridor = loadingCorridor };
+            deposit) { LoadingCorridor = loadingCorridor, GridEnvelope = gridEnvelope };
+    }
+
+    private bool HasServiceLane(EntityRegistry entities, AxisAlignedBounds proposed, EntityId ignoredEntity)
+    {
+        float lane = ConstructionGrid.CellSizeMeters;
+        var search = new AxisAlignedBounds(
+            new Vector3(proposed.Minimum.X - lane, _terrain.WorldBounds.Minimum.Y, proposed.Minimum.Z - lane),
+            new Vector3(proposed.Maximum.X + lane, _terrain.WorldBounds.Maximum.Y, proposed.Maximum.Z + lane));
+        _spatialIndex.QueryAabb(search, _queryBuffer, order: SpatialQueryOrder.StableEntityId);
+        foreach (EntityId neighbor in _queryBuffer.Results)
+        {
+            if (neighbor == ignoredEntity) continue;
+            bool building = entities.HasComponent<ConstructionSite>(neighbor) ||
+                            entities.HasComponent<CompletedBuilding>(neighbor);
+            if (!building || !_spatialIndex.TryGetEntry(neighbor, out SpatialEntry entry)) continue;
+
+            // Legacy buildings may have arbitrary pivots; reserve around their actual
+            // physical bounds without moving or rounding their existing positions.
+            AxisAlignedBounds physical = entry.Bounds;
+            float halfX = MathF.Ceiling(
+                (physical.Maximum.X - physical.Minimum.X) / lane) * lane * 0.5f;
+            float halfZ = MathF.Ceiling(
+                (physical.Maximum.Z - physical.Minimum.Z) / lane) * lane * 0.5f;
+            float gapX = MathF.Max(
+                physical.Center.X - halfX - proposed.Maximum.X,
+                proposed.Minimum.X - (physical.Center.X + halfX));
+            float gapZ = MathF.Max(
+                physical.Center.Z - halfZ - proposed.Maximum.Z,
+                proposed.Minimum.Z - (physical.Center.Z + halfZ));
+            if (gapX < lane - 0.001f && gapZ < lane - 0.001f)
+                return false;
+        }
+        return true;
     }
 
     private static bool IsDisconnectedAdapterAtPort(

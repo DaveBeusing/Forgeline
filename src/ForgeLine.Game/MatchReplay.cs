@@ -67,6 +67,10 @@ public sealed record RecordedSimulationCommand
 
     public BuildingOrientation BuildingOrientation { get; init; }
 
+    // Optional so historical recorded build commands retain their exact legacy semantics.
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PlayerGrid { get; init; }
+
     public FormationTemplate Formation { get; init; }
 
     public ProductionPriority ProductionPriority { get; init; }
@@ -335,6 +339,7 @@ public static class ReplayCommandCodec
                             command.Position,
                         BuildingOrientation =
                             command.Orientation,
+                        PlayerGrid = command.PlayerGrid,
                         CorrelationId =
                             command.CorrelationId.Value
                     };
@@ -633,7 +638,8 @@ public static class ReplayCommandCodec
                     command.SecondaryEntity,
                     submittedAtTick,
                     new PlayerCommandCorrelationId(
-                        command.CorrelationId)),
+                        command.CorrelationId),
+                    command.PlayerGrid),
 
             ReplayCommandKind.Demolition =>
                 new DemolishBuildingsCommand(

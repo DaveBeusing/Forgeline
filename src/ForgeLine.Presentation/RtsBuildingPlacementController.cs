@@ -17,6 +17,7 @@ public readonly record struct BuildingPlacementRequest(
 public sealed class RtsBuildingPlacementController
 {
     private const float TargetChangeToleranceSquared = 0.01f;
+    private static readonly BuildingDefinitionCatalog BuildingDefinitions = InitialBuildingDefinitions.CreateCatalog();
 
     private readonly PlayerId _issuer;
     private readonly GameplayBindingRegistry _bindings;
@@ -214,6 +215,8 @@ public sealed class RtsBuildingPlacementController
             !TryResolveWorldTarget(
                 camera,
                 terrain,
+                ActiveBuilding,
+                Orientation,
                 input.PointerPosition,
                 viewportWidth,
                 viewportHeight,
@@ -489,6 +492,8 @@ public sealed class RtsBuildingPlacementController
     private static bool TryResolveWorldTarget(
         RtsCamera camera,
         ITerrainQuery terrain,
+        BuildingId buildingId,
+        BuildingOrientation orientation,
         Vector2 pointer,
         int viewportWidth,
         int viewportHeight,
@@ -505,7 +510,12 @@ public sealed class RtsBuildingPlacementController
             return false;
         }
 
-        horizontalTarget = ConstructionGrid.Snap(horizontalTarget);
+        if (!BuildingDefinitions.TryGet(buildingId, out BuildingDefinition? definition))
+        {
+            worldTarget = default;
+            return false;
+        }
+        horizontalTarget = ConstructionGrid.SnapBuilding(horizontalTarget, definition.Footprint, orientation);
         if (!terrain.TrySampleHeight(horizontalTarget.X, horizontalTarget.Z, out float terrainHeight))
         {
             worldTarget = default;

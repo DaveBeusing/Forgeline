@@ -53,9 +53,14 @@ through SubmitBuild. The existing paginated Build menu handles the longer list.
 
 ### Shared placement grid and crossing belts
 
-Building and conveyor pointer placement share a visible **4m grid**. The local
-48m-wide grid follows the terrain around the current placement; it disappears
-when placement ends. Buildings sample their foundation at the snapped position.
+Building and conveyor placement share a visible **4m zero-origin grid**. The local
+48m-wide grid follows the terrain and disappears when placement ends. New buildings
+reserve whole 4m cells; odd cell counts use a 2m center phase, so the envelope
+edges align without resizing the real structure. The building foundation samples
+terrain at that final footprint-aware snapped pose. One 4m building service lane
+and existing truck loading corridors must remain clear. The preview displays the
+logical reservation separately from the physical mesh and uses the actual rotated
+IN/OUT sockets at the existing 5.8m conveyor tier.
 Exact compatible sockets take priority over the grid, so older freely placed
 buildings and saved layouts remain connectable. Existing scripted construction
 and recorded commands retain their original requested coordinates.

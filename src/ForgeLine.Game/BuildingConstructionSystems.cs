@@ -134,7 +134,8 @@ public sealed class BuildingCommandProcessingSystem : ISimulationSystem
             request.Issuer,
             request.BuildingId,
             request.Position,
-            request.Orientation);
+            request.Orientation,
+            playerGrid: request.PlayerGrid);
 
         if (!placement.IsValid)
         {

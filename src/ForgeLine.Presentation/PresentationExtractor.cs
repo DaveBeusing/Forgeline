@@ -1025,7 +1025,8 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 request.Issuer,
                 request.BuildingId,
                 request.RequestedPosition,
-                request.Orientation);
+                request.Orientation,
+                newPlayerPlacement: true);
 
         if (_extraction.Scenario.Services.BuildingDefinitions.TryGet(preview.BuildingId, out var building))
         {

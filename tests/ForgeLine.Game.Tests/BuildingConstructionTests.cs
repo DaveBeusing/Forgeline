@@ -13,6 +13,80 @@ public sealed class BuildingConstructionTests
 {
     private static readonly PlayerId Player = new(1);
 
+    [Fact]
+    public void PlayerGridPreviewAndAuthoritativeBuildUseTheSameSnappedPose()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventory = AddFundedInventory(test, includeAllCosts: true);
+        BuildingPlacementPreview preview = test.Placement.CreatePreview(
+            test.Simulation.Entities, Player, BuildingIds.StorageDepot, new(66, 0, 64),
+            BuildingOrientation.North, newPlayerPlacement: true);
+        Assert.True(preview.IsValid);
+        Assert.Equal(64f, preview.GroundPosition.X);
+        Assert.NotNull(preview.GridEnvelope);
+
+        var invalid = new BuildCommand(Player, BuildingIds.StorageDepot, new(66, 0, 64),
+            BuildingOrientation.North, inventory, test.Simulation.CurrentTick, playerGrid: true);
+        test.Simulation.SubmitCommand(invalid, NextTick(test), new SimulationCommandSource(Player.Value));
+        test.Simulation.AdvanceOneTick();
+        Assert.Equal(BuildingPlacementFailureReason.GridAlignmentRequired,
+            test.Commands.Metrics.LastPlacementFailure);
+
+        var valid = new BuildCommand(Player, BuildingIds.StorageDepot, preview.GroundPosition,
+            BuildingOrientation.North, inventory, test.Simulation.CurrentTick, playerGrid: true);
+        test.Simulation.SubmitCommand(valid, NextTick(test), new SimulationCommandSource(Player.Value));
+        test.Simulation.AdvanceOneTick();
+        EntityId site = test.Commands.Metrics.LastCreatedSite;
+        Assert.True(site.IsValid);
+        Assert.Equal(preview.Bounds.Center,
+            test.Simulation.Entities.GetComponent<WorldTransform>(site).Position);
+    }
+
+    [Fact]
+    public void NewPlayerBuildingsReserveAServiceLaneWithoutMovingLegacySites()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventory = AddFundedInventory(test, includeAllCosts: true);
+        Vector3 historicalPosition = new(63.5f, 0, 63.5f);
+        SubmitBuild(test, inventory, BuildingIds.StorageDepot, historicalPosition);
+        test.Simulation.AdvanceOneTick();
+        EntityId oldSite = test.Commands.Metrics.LastCreatedSite;
+        Assert.True(oldSite.IsValid);
+
+        BuildingPlacementPreview next = test.Placement.CreatePreview(
+            test.Simulation.Entities, Player, BuildingIds.StorageDepot, new(80, 0, 64),
+            BuildingOrientation.North, newPlayerPlacement: true);
+        Assert.False(next.IsValid);
+        Assert.Equal(BuildingPlacementFailureReason.ServiceLaneUnavailable, next.Failure);
+
+        var competing = new BuildCommand(Player, BuildingIds.StorageDepot, new(80, 0, 64),
+            BuildingOrientation.North, inventory, test.Simulation.CurrentTick, playerGrid: true);
+        test.Simulation.SubmitCommand(competing, NextTick(test), new SimulationCommandSource(Player.Value));
+        test.Simulation.AdvanceOneTick();
+        Assert.Equal(BuildingPlacementFailureReason.ServiceLaneUnavailable,
+            test.Commands.Metrics.LastPlacementFailure);
+        Assert.Equal(historicalPosition.X,
+            test.Simulation.Entities.GetComponent<WorldTransform>(oldSite).Position.X);
+        Assert.Equal(historicalPosition.Z,
+            test.Simulation.Entities.GetComponent<WorldTransform>(oldSite).Position.Z);
+    }
+
+    [Fact]
+    public void SameTickGridAlignedBuildsCannotOccupyTheSameEnvelope()
+    {
+        TestWorld test = CreateTestWorld();
+        EntityId inventory = AddFundedInventory(test, includeAllCosts: true);
+        for (int i = 0; i < 2; i++)
+        {
+            var command = new BuildCommand(Player, BuildingIds.PowerPlant, new(64, 0, 64),
+                BuildingOrientation.North, inventory, test.Simulation.CurrentTick, playerGrid: true);
+            test.Simulation.SubmitCommand(command, NextTick(test), new SimulationCommandSource(Player.Value));
+        }
+        test.Simulation.AdvanceOneTick();
+        Assert.Equal(1, test.Commands.Metrics.AcceptedCommands);
+        Assert.Equal(1, test.Commands.Metrics.RejectedCommands);
+    }
+
     [Theory]
     [InlineData(2u)]
     [InlineData(4u)]

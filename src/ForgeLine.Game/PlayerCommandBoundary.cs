@@ -282,7 +282,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
         Vector3 position,
         BuildingOrientation orientation,
         EntityId sourceInventory,
-        SimulationTick observedTick)
+        SimulationTick observedTick,
+        bool playerGrid = false)
     {
         if (!TryBeginSubmission(
                 PlayerCommandKind.Construction,
@@ -304,7 +305,8 @@ public sealed class PlayerCommandGateway : ISimulationTickObserver
                 orientation,
                 sourceInventory,
                 observedTick,
-                correlation);
+                correlation,
+                playerGrid);
 
         SimulationCommandEnvelope envelope =
             _simulation.SubmitCommand(

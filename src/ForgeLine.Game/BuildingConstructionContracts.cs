@@ -48,7 +48,8 @@ public sealed class BuildCommand : ISimulationCommand
         BuildingOrientation orientation,
         EntityId sourceInventory,
         SimulationTick submittedAtTick,
-        PlayerCommandCorrelationId correlationId = default)
+        PlayerCommandCorrelationId correlationId = default,
+        bool playerGrid = false)
     {
         if (!issuer.IsSpecified)
         {
@@ -84,6 +85,7 @@ public sealed class BuildCommand : ISimulationCommand
         SourceInventory = sourceInventory;
         SubmittedAtTick = submittedAtTick;
         CorrelationId = correlationId;
+        PlayerGrid = playerGrid;
     }
 
     public PlayerId Issuer { get; }
@@ -99,6 +101,8 @@ public sealed class BuildCommand : ISimulationCommand
     public SimulationTick SubmittedAtTick { get; }
 
     public PlayerCommandCorrelationId CorrelationId { get; }
+
+    public bool PlayerGrid { get; }
 
     public EntityId RequestEntity { get; private set; }
 
@@ -119,7 +123,8 @@ public sealed class BuildCommand : ISimulationCommand
                 SourceInventory,
                 SubmittedAtTick,
                 context.Tick,
-                CorrelationId));
+                CorrelationId,
+                PlayerGrid));
 
         RequestEntity = request;
         ExecutedAtTick = context.Tick;
@@ -197,7 +202,8 @@ internal readonly record struct BuildingBuildRequest(
     EntityId SourceInventory,
     SimulationTick SubmittedAtTick,
     SimulationTick ExecutedAtTick,
-    PlayerCommandCorrelationId CorrelationId);
+    PlayerCommandCorrelationId CorrelationId,
+    bool PlayerGrid);
 
 public readonly record struct ConstructionCancellationRequest(
     PlayerId Issuer,

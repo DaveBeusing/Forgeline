@@ -39,7 +39,8 @@ internal static class ConstructionTemplatePreviewFactory
         {
             BuildingId id = PaidConstructionTemplates.Building(request.Template, i);
             buildings[i] = services.BuildingPlacement.CreatePreview(context.Entities, extraction.Player, id,
-                PaidConstructionTemplates.Position(request.Anchor, request.Orientation, i), request.Orientation);
+                PaidConstructionTemplates.Position(request.Anchor, request.Orientation, i), request.Orientation,
+                newPlayerPlacement: true);
             costs[i] = Array.AsReadOnly(services.BuildingDefinitions[id].Costs.Select(c => Amount(c.ResourceId, c.Quantity)).ToArray());
             foreach (var cost in costs[i]) total[cost.ResourceId] = total.GetValueOrDefault(cost.ResourceId) + cost.RequiredQuantity;
             EntityId site = i == 0 ? request.FirstSite : request.SecondSite;
