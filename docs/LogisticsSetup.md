@@ -2,6 +2,15 @@
 
 [Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
 
+To connect local conveyor supply, open **Build → Conveyor → Draw route**, select
+an owned building's **OUT** or **IN** socket first, then the complementary
+**IN** or **OUT** on the other facility (or a compatible free belt end).
+Either click order produces the same directed OUTPUT → INPUT flow; the preview
+is checked against available materials, connections and Steel before the second
+click can submit the paid construction. An INPUT-first click does **not**
+reverse an installed belt or move material backwards. [Construction controls
+and port status](ConveyorConstructionPlacementAndUX.md) explain failure feedback.
+
 Constructing a building spends Command Core construction stock. It does not fill the new building's local production inventory. Cargo Trucks replenish building inputs through regional distribution; Supply Trucks carry Fuel/Ammunition for field recipients and use a separate drive tank. A Supply Truck is not an available regional Cargo Truck.
 
 <details>
