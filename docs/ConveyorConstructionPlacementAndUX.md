@@ -40,10 +40,11 @@ through SubmitBuild. The existing paginated Build menu handles the longer list.
 
 | Gesture while conveyor placement owns input | Behavior |
 | --- | --- |
-| first click on a source building in Draw route | choose its output and anchor the route; no command or cost yet |
-| first click on a free belt output or ground | extend that output or start a standalone route |
-| pointer movement | current-tick authoritative plan, part cages and directional IN/OUT arrows |
-| second click on a destination building, belt input or ground | choose the input automatically and request the complete route only when its preview is current and valid |
+| first click on a building OUTPUT or INPUT | select the real free port in either direction; no construction command or payment yet |
+| first click on a free belt OUTPUT, free belt INPUT or ground | select the directed socket or start a standalone route |
+| pointer movement | snap to a complementary endpoint and show the current-tick **forward-flow** plan, part cages and directional IN/OUT arrows |
+| second click on the complementary building or belt endpoint | normalize OUTPUT → INPUT regardless of click order; request the same forward-moving carriers only after a current, valid preview |
+| second click on ground | connect to/from the selected directed port; open-ended routes use the existing ordinary construction validation |
 | click with a special module selected | request that individual module and automatic feet |
 | Q / E | rotate special modules by 90 degrees |
 | Tab | change the preferred bend order for equivalent automatic routes |
@@ -82,6 +83,27 @@ A crossing at the same height still fails the collision check. The two decks
 connect only through their own directed sockets and never mix cargo at the crossing.
 
 ### Connection feedback and snapping
+
+Draw route initially displays **SELECT INPUT OR OUTPUT**. When an adaptable
+physical position supports both roles at exactly the same location, an ordinary
+click selects OUTPUT for compatibility; **Shift + click** selects INPUT without
+creating an additional position or changing the installed adapter. The first clicked
+physical port is retained with its exact building/piece generation identity,
+authored port key or socket ordinal, height tier, role, and simulation observation
+tick. After selecting an OUTPUT the second prompt is **SELECT COMPATIBLE INPUT**;
+after selecting an INPUT it is **SELECT COMPATIBLE OUTPUT**. The preview can be
+traversed backwards by the pointer, but its source, destination, generated carriers
+and adapters always follow material flow from OUTPUT to INPUT. Both click orders
+use the existing paid, atomic command, costs and bend preference; no existing
+belt is automatically rotated or reversed.
+
+A selected starting port is checked against fresh owned visible snapshot data
+before routing. Destroyed, removed, re-used-generation or occupied adaptable
+positions invalidate that starting choice instead of silently remapping it. An
+incompatible or ambiguous second endpoint gives an explicit explanation without
+submission or payment. Individual parts, road clearance, transport material
+eligibility, terrain/supports, tier constraints and old replay commands keep their
+existing authoritative rules.
 
 The pointer catches compatible building and conveyor sockets within 28 physical
 pixels at UI scale 1 (scaled with the UI). Socket candidates are ranked by projected
