@@ -570,6 +570,9 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 : _inventories.GetAvailableQuantity(
                     sourceInventory,
                     order.ResourceId);
+        if (!hasAutomatedReservation)
+            available = Math.Max(0, available - BuildingStockLimits.GetOutboundMinimum(
+                context.Entities, origin.Entity, order.ResourceId));
         double addable =
             _inventories.GetAddableQuantity(
                 transport.CargoInventory,
@@ -994,10 +997,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
         }
 
         double unloadQuantity =
-            _inventories.GetAddableQuantity(
-                destinationInventory,
-                order.ResourceId,
-                cargoQuantity);
+            BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory, order.ResourceId, cargoQuantity);
 
         if (unloadQuantity <= QuantityEpsilon)
         {
@@ -1059,7 +1060,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
 
         if (remaining > QuantityEpsilon)
         {
-            if (_inventories.GetAddableQuantity(destinationInventory, order.ResourceId, 1) <= QuantityEpsilon)
+            if (BuildingStockLimits.GetAddable(
+                context.Entities, _inventories, destinationInventory, order.ResourceId, 1) <= QuantityEpsilon)
                 Wait(context.Entities, entity, unloadedState, CargoTransportWaitReason.DestinationCapacity, context.Tick);
             else SetState(context.Entities, entity, unloadedState);
             return;
@@ -1227,10 +1229,8 @@ public sealed class CargoTransportSystem : ISimulationSystem
                             transport.CargoInventory,
                             order.ResourceId);
                     double addable =
-                        _inventories.GetAddableQuantity(
-                            destinationInventory,
-                            order.ResourceId,
-                            cargoQuantity);
+                        BuildingStockLimits.GetAddable(
+                            context.Entities, _inventories, destinationInventory, order.ResourceId, cargoQuantity);
 
                     if (cargoQuantity <= QuantityEpsilon ||
                         addable > QuantityEpsilon)
