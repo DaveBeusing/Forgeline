@@ -181,9 +181,20 @@ No overflowing, negative, NaN or infinite stock is permitted.
 Merge mode is round-robin across eligible inputs with stable port ordering. Split
 mode is round-robin among eligible outputs. Equal sub-unit transfer quanta avoid a
 recurring fractional-tail bias at rates such as 30 Hz. Full or unavailable branches
-are skipped without multiplying the shared budget. Player priorities, exclusive
-routing and configurable resource filters remain deferred; the current splitter
-chooses only destinations with compatible reachable building inputs.
+are skipped without multiplying the shared budget. The configured splitter
+OutputA/OutputB preference uses a 3:1 branch weight when Logistics Coordination
+is unlocked; otherwise successful branch service remains balanced. Material
+arbitration occurs within the selected branch's available shared throughput.
+Configurable resource filters and exclusive routing remain out of scope.
+All destinations require compatible reachable building inputs.
+
+The nominal 100 units/s is a **single shared budget**, not a separate lane for
+each material. With two sustained compatible materials the long-run split is
+approximately 50/50 units/s; with three, approximately 33.33 units/s each,
+subject to at most one regular transfer quantum of time-window imbalance.
+A depleted or maximum-blocked material frees its unused share for other
+eligible resources. Brownout, damage, reserved inputs, configured stock
+minimums and receiver limits can lower total or individual actual rates.
 
 ### Operating states and diagnostics
 
