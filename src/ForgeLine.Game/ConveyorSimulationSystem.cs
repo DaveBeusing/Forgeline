@@ -153,15 +153,19 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
             }
         // Rebuild enabled limits per tick. Input caps are shared by all ports of one physical inventory.
         // The largest minimum reserves voluntary output; the smallest maximum bounds inbound.
-        var retained = new Dictionary<(EntityId, ResourceId), double>();
+        var retained = new Dictionary<(InventoryId, ResourceId), double>();
         var inboundMaximums = new Dictionary<(InventoryId, ResourceId), double>();
         foreach (EntityId e in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
             var policy = entities.GetComponent<LogisticsStockPolicy>(e);
             if (!policy.Enabled) continue;
 
-            var retainKey = (policy.TargetEntity, policy.ResourceId);
-            retained[retainKey] = Math.Max(retained.GetValueOrDefault(retainKey), policy.DesiredMinimum);
+            InventoryId output = ResolveInventory(entities, policy.TargetEntity, input: false);
+            if (_stock.Contains(output))
+            {
+                var retainKey = (output, policy.ResourceId);
+                retained[retainKey] = Math.Max(retained.GetValueOrDefault(retainKey), policy.DesiredMinimum);
+            }
 
             InventoryId input = ResolveInventory(entities, policy.TargetEntity, input: true);
             if (!_stock.Contains(input)) continue;
@@ -175,12 +179,12 @@ public sealed class ConveyorSimulationSystem : ISimulationSystem
         var retainedInventoryResources = new HashSet<(InventoryId Inventory, ResourceId Resource)>();
         foreach (var node in nodes)
         {
-            if (node.Port is not { Input: false } || ResolveInventory(entities, node.Entity, true) != node.Inventory) continue;
+            if (node.Port is not { Input: false }) continue;
             for (int r = 0; r < EligibleResources.Count; r++)
             {
                 ResourceId resource = EligibleResources[r];
                 if (!retainedInventoryResources.Add((node.Inventory, resource))) continue;
-                double retain = retained.GetValueOrDefault((node.Entity, resource));
+                double retain = retained.GetValueOrDefault((node.Inventory, resource));
                 available[node.Inventory][r] = Math.Max(0, available[node.Inventory][r] - retain);
             }
         }
