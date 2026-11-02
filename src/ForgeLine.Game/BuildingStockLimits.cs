@@ -31,11 +31,15 @@ internal static class BuildingStockLimits
     /// <summary>Source stock floor for optional transport; reservations and recipes remain authoritative.</summary>
     internal static double GetOutboundMinimum(EntityRegistry entities, EntityId source, ResourceId resource)
     {
+        InventoryId sourceInventory = ConveyorSimulationSystem.ResolveInventory(entities, source, input: false);
+        if (!sourceInventory.IsSpecified)
+            return 0;
         double minimum = 0;
         foreach (EntityId entity in entities.Query<LogisticsStockPolicy>(QueryIterationOrder.StableByEntityIndex))
         {
             var policy = entities.GetComponent<LogisticsStockPolicy>(entity);
-            if (policy.Enabled && policy.TargetEntity == source && policy.ResourceId == resource)
+            if (policy.Enabled && policy.ResourceId == resource &&
+                ConveyorSimulationSystem.ResolveInventory(entities, policy.TargetEntity, input: false) == sourceInventory)
                 minimum = Math.Max(minimum, policy.DesiredMinimum);
         }
 
