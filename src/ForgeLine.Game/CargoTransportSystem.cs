@@ -1911,6 +1911,19 @@ public sealed class CargoTransportSystem : ISimulationSystem
             return true;
         }
 
+        if (entities.TryGetComponent(node.Entity, out LogisticsHub sourceHub) &&
+            _inventories.Contains(sourceHub.InventoryId))
+        {
+            inventoryId = sourceHub.InventoryId;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot sourceDepot) &&
+            _inventories.Contains(sourceDepot.InventoryId))
+        {
+            inventoryId = sourceDepot.InventoryId;
+            return true;
+        }
+
         inventoryId = InventoryId.None;
         return false;
     }
@@ -1944,6 +1957,25 @@ public sealed class CargoTransportSystem : ISimulationSystem
                 storage.InventoryId))
         {
             inventoryId = storage.InventoryId;
+            return true;
+        }
+
+        if (entities.TryGetComponent(node.Entity, out UnitProductionFacility unitProduction) &&
+            _inventories.Contains(unitProduction.InputInventory))
+        {
+            inventoryId = unitProduction.InputInventory;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out LogisticsHub destinationHub) &&
+            _inventories.Contains(destinationHub.InventoryId))
+        {
+            inventoryId = destinationHub.InventoryId;
+            return true;
+        }
+        if (entities.TryGetComponent(node.Entity, out SupplyDepot destinationDepot) &&
+            _inventories.Contains(destinationDepot.InventoryId))
+        {
+            inventoryId = destinationDepot.InventoryId;
             return true;
         }
 
