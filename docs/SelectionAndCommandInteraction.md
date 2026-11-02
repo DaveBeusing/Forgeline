@@ -2,6 +2,13 @@
 
 [Documentation](README.md) · [Complete catalog](DocumentationIndex.md)
 
+When an owned completed building is the only selection, its read-only ring
+status card includes the actual conveyor IN/OUT connection counts and socket
+rows. Direction-adaptable positions remain `AVAILABLE` until assigned, and
+connectedness is separate from flow health. The data is copied at the completed
+simulation tick, restricted to the player's owned building and invalidated with
+selection/session changes; other selections keep their existing summary.
+
 Owned single objects and groups use the existing world anchored action rings.
 The rectangular inspector, mode bar and command dock have been removed. Shared
 published geometry drives rendering and sector hits. Item release submits once;
