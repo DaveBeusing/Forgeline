@@ -237,6 +237,28 @@ from navigation; elevated selection cages do not become full ground barriers.
 
 ## Building ports and connectivity
 
+### Selected-building connection inspector
+
+The existing read-only selection status card, beside an open action ring, shows
+a completed owned building's authoritative conveyor connections. The summary
+lists connected/defined inputs and outputs separately, followed by physical
+socket rows with facing, actual attachment state, operational flow state and
+permitted materials. A socket counts as connected only when a single
+same-generation, same-owner complementary adapter physically mates with its
+building position and facing. Merely adjacent conveyor geometry never counts.
+
+Command Core and Storage Depot adaptable sockets are each represented once:
+unassigned physical positions are `AVAILABLE` rather than duplicate input and
+output capacity; a committed direction is counted only in its current role.
+Physical connection and flow condition are separate: an attached belt can be
+`OFFLINE`, `CONGESTED`, `DAMAGED`, `DESTROYED` or idle. Unsupported owned
+buildings show `NO CONVEYOR PORTS`; unavailable completed-building state shows
+`CONNECTION UNAVAILABLE`. Only the captured owned selection is published.
+Changes to building selection, adapters, damage and restoration appear from the
+next completed presentation snapshot, not an independent render-time scan.
+
+
+
 V1 explicitly authors four exterior sockets, in unrotated building ground space:
 
 | Building / expected physical scale XYZ | Input position / outward | Output position / outward |
