@@ -171,7 +171,9 @@ public sealed class BuildingPlacementService
             result.ResourceDeposit)
         {
             LoadingCorridor = result.LoadingCorridor,
-            GridEnvelope = result.GridEnvelope,
+            GridEnvelope = newPlayerPlacement
+                ? ConstructionGrid.BuildingEnvelope(result.GroundPosition, definition.Footprint, orientation)
+                : result.GridEnvelope,
             ConveyorPorts = buildingId == BuildingIds.CommandCore || buildingId == BuildingIds.StorageDepot
                 ? ConveyorGeometry.BuildingSockets(buildingId, result.GroundPosition,
                     BuildingFootprint.GetRotation(result.Orientation))
@@ -428,8 +430,8 @@ public sealed class BuildingPlacementService
     {
         float lane = ConstructionGrid.CellSizeMeters;
         var search = new AxisAlignedBounds(
-            new Vector3(proposed.Minimum.X - lane, proposed.Minimum.Y - 256.0f, proposed.Minimum.Z - lane),
-            new Vector3(proposed.Maximum.X + lane, proposed.Maximum.Y + 256.0f, proposed.Maximum.Z + lane));
+            new Vector3(proposed.Minimum.X - lane, _terrain.WorldBounds.Minimum.Y, proposed.Minimum.Z - lane),
+            new Vector3(proposed.Maximum.X + lane, _terrain.WorldBounds.Maximum.Y, proposed.Maximum.Z + lane));
         _spatialIndex.QueryAabb(search, _queryBuffer, order: SpatialQueryOrder.StableEntityId);
         foreach (EntityId neighbor in _queryBuffer.Results)
         {
