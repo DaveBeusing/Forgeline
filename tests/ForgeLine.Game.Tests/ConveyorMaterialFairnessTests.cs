@@ -120,7 +120,7 @@ public sealed class ConveyorMaterialFairnessTests
         double secondAfter = fixture.Stock(destination, second) - secondBefore;
         Assert.InRange(firstAfter + secondAfter, 200 - Tolerance, 200 + Tolerance);
         Assert.InRange(Math.Abs(firstAfter - secondAfter), 0, 1 + Tolerance);
-        Assert.Equal(1_000, fixture.Total(first), 6);
-        Assert.Equal(1_000, fixture.Total(second), 6);
+        Assert.Equal(originalFirst, fixture.Total(first), 6);
+        Assert.Equal(originalSecond, fixture.Total(second), 6);
     }
 }
