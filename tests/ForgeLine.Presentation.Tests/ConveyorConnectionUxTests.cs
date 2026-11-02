@@ -343,6 +343,32 @@ public sealed class ConveyorConnectionUxTests
         Assert.Contains("INCOMPATIBLE", controller.Context(snapshot).Reason);
     }
 
+    [Fact]
+    public void IncompatibleResourceMasksRejectTheSecondClickWithoutSubmission()
+    {
+        var camera = SameTypeSelectionTests.Camera();
+        var producer = Building(1, new(-32, 0, 0));
+        var consumer = Building(2, new(32, 0, 0));
+        var ports = Ports(producer).Concat(Ports(consumer)).ToArray();
+        var information = new ConveyorPortInformation[]
+        {
+            new(producer.Entity, false, "STEEL", 1 << 2),
+            new(consumer.Entity, true, "ORE", 1 << 0)
+        };
+        var snapshot = Snapshot([producer, consumer], ports, information: information);
+        var controller = new RtsConveyorConstructionController();
+        var interaction = new PresentationInteractionState();
+        controller.Begin(ConveyorModule.Route);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == consumer.Entity && p.Input).Position, click: true);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == consumer.Entity && p.Input).Position);
+        Move(controller, interaction, snapshot, camera,
+            ports.Single(p => p.Building == producer.Entity && !p.Input).Position, click: true);
+        Assert.False(controller.TryTakeRequest(out _));
+        Assert.Contains("INCOMPATIBLE", controller.Context(snapshot).Reason);
+    }
+
     [Theory]
     [InlineData(BuildingOrientation.North)]
     [InlineData(BuildingOrientation.East)]
@@ -568,12 +594,14 @@ public sealed class ConveyorConnectionUxTests
     private static PresentationSnapshot Snapshot(RenderInstance[] instances, ConveyorBuildingPort[] ports,
         ConveyorOwnedPiece[]? pieces = null, ulong requestId = 0, ConveyorPlan? preview = null,
         ulong networkTick = 4, ulong experienceTick = 4, PlayerId? experiencePlayer = null,
-        ulong session = 1, EntityId[]? selected = null) =>
+        ulong session = 1, EntityId[]? selected = null,
+        ConveyorPortInformation[]? information = null) =>
         new(new SimulationTick(4), TimeSpan.FromMilliseconds(50), instances.Length, instances,
             sessionId: new(session), playerExperience: default(PlayerExperienceSnapshot) with
             { Tick = new(experienceTick), Player = experiencePlayer ?? Player, MatchStatus = PlayerMatchStatus.Active })
         {
-            Conveyors = new(requestId, new(networkTick), preview, 1000, pieces ?? [], ports),
+            Conveyors = new(requestId, new(networkTick), preview, 1000, pieces ?? [], ports)
+            { PortInformation = information ?? [] },
             SelectedOrders = selected is null ? null : new(new(session), new(4), selected, [], "")
         };
 }
