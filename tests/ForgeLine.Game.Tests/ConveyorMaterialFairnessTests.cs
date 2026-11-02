@@ -97,6 +97,8 @@ public sealed class ConveyorMaterialFairnessTests
         ResourceId second = ResourceIds.Steel;
         fixture.Give(source, first, 1_000);
         fixture.Give(source, second, 1_000);
+        double originalFirst = fixture.Total(first);
+        double originalSecond = fixture.Total(second);
         EntityId cap = fixture.AddPolicy(destination, first, 0, 0, 0);
 
         fixture.Step(20);
