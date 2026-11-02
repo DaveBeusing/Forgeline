@@ -130,7 +130,7 @@ public sealed class ConveyorPolicyAggregationTests
         Assert.InRange(iron, 0, 40);
         Assert.InRange(steel, 0, 100);
         Assert.InRange(iron + steel, 0, 120);
-        Assert.Equal(200, fixture.Total(ResourceIds.FerrousOre) + fixture.Total(ResourceIds.Steel));
+        Assert.Equal(totalBefore, fixture.Total(ResourceIds.FerrousOre) + fixture.Total(ResourceIds.Steel));
     }
 
     [Fact]
