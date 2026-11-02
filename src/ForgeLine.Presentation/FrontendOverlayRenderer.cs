@@ -151,7 +151,7 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
         else if (view.Kind is FrontendSurfaceKind.Detail or FrontendSurfaceKind.Controls or FrontendSurfaceKind.Credits)
         {
             if (view.SettingsTabs is { } tabs)
-                for (int i = 0; i < tabs.Count; i++)
+                for (int i = 0; i < Math.Min(4, tabs.Count); i++)
                 {
                     var tab = tabs[i]; var region = layout.SettingsTab(i);
                     Panel(region, tab.IsFocused ? ForgeLineUiPalette.SurfaceActive : ForgeLineUiPalette.SurfaceRaised);
@@ -174,7 +174,8 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
                     line.IsHovered ? ForgeLineUiPalette.SurfaceHover : ForgeLineUiPalette.SurfaceRaised);
                 if (line.IsFocused || line.IsHovered) Panel(row with { Width = 4 * scale, Height = row.Height * (.6f + .4f * Math.Clamp(motion.Focus, 0, 1)) }, ForgeLineUiPalette.Accent);
                 Text(line.Label, layout.DetailLabel(i), ForgeLineUiPalette.TextSecondary);
-                var valueSlot = layout.DetailValue(i, line.CanDecrease || line.CanIncrease);
+                var valueSlot = layout.DetailValue(i,
+                    line.CanDecrease || line.CanIncrease || line.ValueKind != FrontendValueKind.Text);
                 Vector4 color = line.IsWarning ? ForgeLineUiPalette.Warning : line.IsFocused ? ForgeLineUiPalette.Accent : ForgeLineUiPalette.TextPrimary;
                 Text(line.Value, valueSlot, color, layout.Controls ? .9f : 1);
                 if (layout.Controls)
@@ -184,6 +185,16 @@ public sealed partial class FrontendOverlayRenderer : IDisposable
             }
             if (view.DetailLines.Count > count)
                 Text($"{start + 1}-{start + count} / {view.DetailLines.Count}  UP/DOWN / WHEEL", layout.Title with { X = layout.Title.X + layout.Title.Width * .42f, Width = layout.Title.Width * .58f }, ForgeLineUiPalette.TextMuted, .65f);
+            if (!string.IsNullOrEmpty(view.DisabledPrimaryAction))
+            {
+                Panel(layout.PrimaryAction, ForgeLineUiPalette.SurfaceDisabled);
+                Text(view.DisabledPrimaryAction, layout.PrimaryAction with
+                {
+                    X = layout.PrimaryAction.X + 24 * scale,
+                    Y = layout.PrimaryAction.Y + 18 * scale,
+                    Width = layout.PrimaryAction.Width - 48 * scale
+                }, ForgeLineUiPalette.TextDisabled);
+            }
             if (!string.IsNullOrEmpty(view.PrimaryAction)) Action(view.PrimaryAction, layout.PrimaryAction, true, view.PrimaryHovered, view.PrimaryPressed);
             if (!string.IsNullOrEmpty(view.SecondaryAction)) Action(view.SecondaryAction, layout.SecondaryAction, false, view.SecondaryHovered, view.SecondaryPressed);
         }
