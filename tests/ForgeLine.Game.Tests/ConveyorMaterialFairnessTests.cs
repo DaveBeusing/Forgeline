@@ -108,6 +108,9 @@ public sealed class ConveyorMaterialFairnessTests
 
         fixture.Entities.SetComponent(cap,
             new LogisticsStockPolicy(destination, first, 0, 0, 0, enabled: false));
+        // The former single-material backlog must clear before measuring
+        // steady-state fairness at the receiving end of the physical line.
+        fixture.Step(50);
         double firstBefore = fixture.Stock(destination, first);
         double secondBefore = fixture.Stock(destination, second);
         fixture.Step(40);
