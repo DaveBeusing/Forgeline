@@ -93,15 +93,15 @@ public sealed partial class FrontendOverlayRenderer
         }
         else if (view.Kind == FrontendSurfaceKind.Loading)
         {
-            Text("INITIALIZING COMMAND SYSTEMS", layout.Title, ForgeLineUiPalette.TextSecondary);
+            Text(view.LoadingHeading, layout.Title, view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextSecondary);
             var status = layout.Details;
             Panel(status, "panel.inset");
-            if (view.IsError) Overlay(UiSkinState.Error, status);
+            if (view.LoadingIsError) Overlay(UiSkinState.Error, status);
             var lines = Wrap(view.Status, MathF.Max(1, (status.Width - 40 * scale) / scale), 22);
             for (int i = 0; i < Math.Min(4, lines.Length); i++)
                 Text(lines[i], status with { X = status.X + 20 * scale, Y = status.Y + (20 + i * 28) * scale, Width = status.Width - 40 * scale },
-                    view.IsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextPrimary);
-            if (view.HasProgress)
+                    view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextPrimary);
+            if (view.LoadingShowsProgress)
             {
                 var track = new FrontendRegion(status.X, layout.PrimaryAction.Y, status.Width, 14 * scale);
                 Panel(track, "progress.progress_track");
@@ -192,8 +192,10 @@ public sealed partial class FrontendOverlayRenderer
         for (int i = 0; i < Math.Min(2, footer.Length); i++) Text(footer[i], layout.Footer with { Y = layout.Footer.Y + i * 24 * scale }, ForgeLineUiPalette.TextMuted, .78f);
         if (!string.IsNullOrEmpty(view.Feedback))
         {
-            Panel(layout.Feedback, "panel.banner"); Overlay(UiSkinState.Warning, layout.Feedback);
-            Text(view.Feedback, layout.Feedback with { X = layout.Feedback.X + 8 * scale, Width = layout.Feedback.Width - 16 * scale }, ForgeLineUiPalette.Warning, .8f);
+            Panel(layout.Feedback, "panel.banner");
+            if (view.IsError || view.LoadingIsError) Overlay(UiSkinState.Error, layout.Feedback);
+            Text(view.Feedback, layout.Feedback with { X = layout.Feedback.X + 8 * scale, Width = layout.Feedback.Width - 16 * scale },
+                view.IsError || view.LoadingIsError ? ForgeLineUiPalette.Warning : ForgeLineUiPalette.TextSecondary, .8f);
         }
         if (!string.IsNullOrEmpty(view.ProductVersion)) Text($"VERSION {view.ProductVersion}", layout.Footer with { Y = height - 40 * scale }, ForgeLineUiPalette.TextMuted, .65f);
 
