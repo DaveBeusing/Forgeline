@@ -301,6 +301,9 @@ public readonly record struct PlayerStockPolicyActionReadModel(
     public EntityId Source { get; init; }
     public string SourceName { get; init; } = string.Empty;
     public PlayerWorkSummary Service { get; init; }
+    public double PhysicalMaximum { get; init; }
+    public double EffectiveMaximum { get; init; }
+    public string InboundStatus { get; init; } = string.Empty;
 
 }
 
@@ -1521,6 +1524,14 @@ internal static partial class PlayerActionSnapshotFactory
             double minimum = hasPolicy ? policy.DesiredMinimum : defaults.Minimum;
             double target = hasPolicy ? policy.DesiredTarget : defaults.Target;
             double maximum = hasPolicy ? policy.DesiredMaximum : defaults.Maximum;
+            double physicalMaximum = scenario.Inventories.GetResourceCapacity(inventory, resource.Id);
+            double effectiveMaximum = physicalMaximum;
+            foreach (var candidate in selectedPolicies.Values)
+                if (candidate.Policy.Enabled && candidate.Policy.ResourceId == resource.Id)
+                    effectiveMaximum = Math.Min(effectiveMaximum, candidate.Policy.DesiredMaximum);
+            string inboundStatus = physicalMaximum <= 0 ? "NOT ACCEPTED" :
+                currentQuantity > effectiveMaximum + 1e-9 ? "ABOVE CONFIGURED MAXIMUM" :
+                currentQuantity + 1e-9 >= effectiveMaximum ? "MAXIMUM STOCK REACHED" : "ACCEPTING";
 
             ResolveDistributionStatus(
                 scenario,
@@ -1559,7 +1570,10 @@ internal static partial class PlayerActionSnapshotFactory
                     AnnouncedQuantity = Outstanding(policyEntity, true),
                     Source = sourceEntity,
                     SourceName = Name(sourceEntity),
-                    Service = Owned(assignedTruck) ? CaptureService(assignedTruck) : default
+                    Service = Owned(assignedTruck) ? CaptureService(assignedTruck) : default,
+                    PhysicalMaximum = physicalMaximum,
+                    EffectiveMaximum = effectiveMaximum,
+                    InboundStatus = inboundStatus
                 });
         }
 
@@ -1812,6 +1826,14 @@ internal static partial class PlayerActionSnapshotFactory
                 out SupplyDepot depot))
         {
             inventory = depot.InventoryId;
+            return inventory.IsSpecified;
+        }
+
+        if (entities.TryGetComponent(entity, out ResourceExtractor extractor) &&
+            extractor.OutputInventory.IsValid &&
+            entities.TryGetComponent(extractor.OutputInventory, out InventoryStorage extractionStock))
+        {
+            inventory = extractionStock.InventoryId;
             return inventory.IsSpecified;
         }
 
