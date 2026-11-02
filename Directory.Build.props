@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ForgeLineVersionMajor>0</ForgeLineVersionMajor>
     <ForgeLineVersionMinor>1</ForgeLineVersionMinor>
-    <ForgeLineVersionPatch>544</ForgeLineVersionPatch>
+    <ForgeLineVersionPatch>545</ForgeLineVersionPatch>
     <VersionPrefix>$(ForgeLineVersionMajor).$(ForgeLineVersionMinor).$(ForgeLineVersionPatch)</VersionPrefix>
     <Version Condition="'$(FORGELINE_BUILD_VERSION)' != ''">$(FORGELINE_BUILD_VERSION)</Version>
     <Version Condition="'$(Version)' == ''">$(VersionPrefix)-dev</Version>
