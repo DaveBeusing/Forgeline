@@ -293,7 +293,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
                 actionableAlerts) { ChunkDecorations = _decorations?.Capture(), Diagnosis = operationsDiagnosis, OperationsCauses = operationsCauses, MatchDebrief = CaptureMatchDebrief(playerExperience),
                     NavigationDiagnosis = interaction.NavigationDiagnosticsOpen ? CaptureNavigationDiagnostics(context, instances) : null,
                     ConstructionTemplate = _extraction is null ? null : ConstructionTemplatePreviewFactory.Capture(context, _extraction),
-                    Conveyors = CaptureConveyors(context), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
+                    Conveyors = CaptureConveyors(context, playerExperience?.Selection), DecalMetrics = _decals.Metrics, WorldAudio = _worldAudio?.Complete(playerExperience, this),
                     SelectedOrders = _extraction is null || interaction.SelectedEntities.Count == 0
                         ? null
                         : SelectedUnitOrderSnapshotFactory.Capture(context, _extraction, interaction.SelectedEntities),
@@ -305,7 +305,7 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         _previousCombatGroups = combatGroups;
     }
 
-    private ConveyorConstructionReadModel? CaptureConveyors(SimulationContext context)
+    private ConveyorConstructionReadModel? CaptureConveyors(SimulationContext context, PlayerSelectionSummary? selected)
     {
         if (_extraction is null) return null;
         var request=_extraction.Interaction.CaptureConveyorRequest();
@@ -319,8 +319,24 @@ public sealed partial class PresentationExtractor : ISimulationTickObserver, IDe
         // The marker/description budget is independent of the authoritative port set.
         var information = ports.Take(128).Select(port => new ConveyorPortInformation(port.Building, port.Input,
             ConveyorPortInformationCapture.Materials(scenario, scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port)))).ToArray();
-        return new(request?.Id??0,context.Tick,plan,available,ConveyorConstructionService.Capture(context.Entities,_extraction.Player,scenario.Inventories),ports)
-        { PortInformation = Array.AsReadOnly(information),
+        var pieces = ConveyorConstructionService.Capture(context.Entities, _extraction.Player, scenario.Inventories);
+        BuildingConveyorConnectionSnapshot? selectedConnections = null;
+        if (selected is { Count: 1, Kind: PlayerSelectionKind.Building } focus &&
+            context.Entities.IsAlive(focus.PrimaryEntity) &&
+            context.Entities.TryGetComponent(focus.PrimaryEntity, out ControllableEntity control) &&
+            control.Owner == _extraction.Player &&
+            (control.Category & ControllableEntityCategory.Building) != 0)
+        {
+            bool unavailable = !context.Entities.TryGetComponent(focus.PrimaryEntity, out CompletedBuilding completed) ||
+                completed.Owner != _extraction.Player ||
+                context.Entities.TryGetComponent(focus.PrimaryEntity, out HealthState health) && health.IsDepleted;
+            selectedConnections = BuildingConveyorConnectionCapture.Capture(focus.PrimaryEntity,
+                _extraction.Player, ports, pieces,
+                port => ConveyorPortInformationCapture.Materials(scenario,
+                    scenario.Services.ConveyorFlow.AllowedResources(context.Entities, port)), unavailable);
+        }
+        return new(request?.Id??0,context.Tick,plan,available,pieces,ports)
+        { PortInformation = Array.AsReadOnly(information), SelectedBuildingConnections = selectedConnections,
             BeltMaterials = ConveyorPortInformationCapture.Materials(scenario, (1 << ConveyorSimulationSystem.EligibleResources.Count) - 1) };
     }
 
