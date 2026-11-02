@@ -10,9 +10,9 @@ namespace ForgeLine.Presentation.Tests;
 public sealed class ConstructionGridTests
 {
     [Theory]
-    [InlineData(1.25f, 2.75f, 0f, 4f)]
-    [InlineData(-1.25f, -2.75f, 0f, -4f)]
-    [InlineData(8.1f, -8.1f, 8f, -8f)]
+    [InlineData(1.25f, 2.75f, 2f, 4f)]
+    [InlineData(-1.25f, -2.75f, -2f, -4f)]
+    [InlineData(8.1f, -8.1f, 10f, -8f)]
     public void BuildingPointerUsesTheConveyorGridAndSamplesItsSnappedTerrain(float x, float z, float expectedX, float expectedZ)
     {
         var terrain = new SlopedTerrain();
@@ -29,10 +29,37 @@ public sealed class ConstructionGridTests
         Assert.Equal(expectedX, request.Value.RequestedPosition.X, 3);
         Assert.Equal(expectedZ, request.Value.RequestedPosition.Z, 3);
         Assert.Equal(SlopedTerrain.Height(expectedX, expectedZ), request.Value.RequestedPosition.Y, 3);
-        Assert.Equal(ConveyorGeometry.Snap(request.Value.RequestedPosition), request.Value.RequestedPosition);
+        Assert.Equal(ConstructionGrid.SnapBuilding(request.Value.RequestedPosition,
+            InitialBuildingDefinitions.CreateCatalog()[BuildingIds.Smelter].Footprint, BuildingOrientation.North),
+            request.Value.RequestedPosition);
         Assert.Equal(request.Value.RequestedPosition, controller.GridCenter);
         controller.Cancel(interaction);
         Assert.Null(controller.GridCenter);
+    }
+
+    [Theory]
+    [InlineData(BuildingOrientation.North)]
+    [InlineData(BuildingOrientation.East)]
+    [InlineData(BuildingOrientation.South)]
+    [InlineData(BuildingOrientation.West)]
+    public void UnevenBuildingFootprintsReserveCompleteCellsWithSymmetricMargins(BuildingOrientation orientation)
+    {
+        var footprint = new BuildingFootprint(14, 18, 8);
+        Vector3 center = ConstructionGrid.SnapBuilding(new(-13.6f, 3, 17.1f), footprint, orientation);
+        var envelope = ConstructionGrid.BuildingEnvelope(center, footprint, orientation);
+        var cells = ConstructionGrid.BuildingCells(footprint, orientation);
+        Vector3 physicalHalf = footprint.GetHalfExtents(orientation);
+
+        Assert.Equal(cells.Width * 4f, envelope.Maximum.X - envelope.Minimum.X);
+        Assert.Equal(cells.Depth * 4f, envelope.Maximum.Z - envelope.Minimum.Z);
+        Assert.Equal(MathF.Round(envelope.Minimum.X / 4f) * 4f, envelope.Minimum.X);
+        Assert.Equal(MathF.Round(envelope.Minimum.Z / 4f) * 4f, envelope.Minimum.Z);
+        Assert.Equal(MathF.Round(envelope.Maximum.X / 4f) * 4f, envelope.Maximum.X);
+        Assert.Equal(MathF.Round(envelope.Maximum.Z / 4f) * 4f, envelope.Maximum.Z);
+        Assert.True(envelope.Minimum.X <= center.X - physicalHalf.X);
+        Assert.True(envelope.Maximum.X >= center.X + physicalHalf.X);
+        Assert.True(ConstructionGrid.IsBuildingAligned(center, footprint, orientation));
+        Assert.False(ConstructionGrid.IsBuildingAligned(center + new Vector3(1, 0, 0), footprint, orientation));
     }
 
     [Fact]

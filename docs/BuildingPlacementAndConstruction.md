@@ -85,9 +85,30 @@ All thirteen current definitions leave `ArmorProfileId` unspecified and retain t
 
 ## Placement grid and visible access
 
-Interactive building placement snaps to the same 4m grid as conveyors. A bounded
-terrain-following grid is visible around the preview. Foundation and clearance
-validation use that snapped site. Rotation keeps the same grid origin.
+New player-driven building placement uses the same zero-origin 4m construction grid
+as free conveyors. The logical occupied cell count is the ceiling of each rotated
+physical footprint dimension divided by 4m. Even cell counts have a grid-line
+center; odd cell counts have a half-cell (2m) center so that **both logical edges
+fall on grid lines**. Thus a 14m Storage Depot reserves 16m, while an 18m
+facility reserves 20m. The real model, physical collision, pivot, conveyor
+sockets and 5.8m raised belt tier are not enlarged or relocated independently.
+A bounded terrain-following grid and the logical envelope appear around the
+preview. Terrain is resampled after the final footprint-aware snap.
+
+New normal player buildings must retain a free 4m service lane between the
+logical reservation and neighboring building reservations; a blocked lane is
+reported as `ServiceLaneUnavailable`. This protects future vehicle and conveyor
+access in addition to the existing loading-corridor checks. Deposit-bound
+extractors retain their deposit placement exception. The simulation verifies the
+canonical pose, service lane, terrain, occupancy and costs again at the execution
+tick, including competing same-tick construction requests. Invalid grid-alignment
+commands are rejected rather than silently relocated.
+
+Authored maps, pre-existing buildings, scripted orders and historical replay
+commands continue using their original coordinates. An old off-grid building
+provides its real physical bounds as the center of any service reservation;
+new placement never normalizes that existing transform. Replay records new
+player-grid intent as an optional field, absent from historical commands.
 
 The building ghost shows cyan **IN** and amber **OUT** arrows at prospective
 fixed-purpose belt sockets. Command Core and Storage Depot instead show four
