@@ -11,6 +11,17 @@ public enum FrontendSurfaceKind : byte
     Credits = 7
 }
 
+/// <summary>Presentation-only state; progress remains authoritative in its loading owner.</summary>
+public enum FrontendLoadingVisualState : byte
+{
+    Pending,
+    Running,
+    Cancelling,
+    Completed,
+    RecoverableError,
+    FatalError
+}
+
 public enum FrontendValueKind { Text, Choice, Toggle, Slider, Binding }
 
 public readonly record struct FrontendMenuEntryView(
@@ -67,6 +78,20 @@ public readonly record struct FrontendSurfaceView(
     public int DetailRowOffset { get; init; }
     public bool PauseContext { get; init; }
     public bool IsError { get; init; }
+    public FrontendLoadingVisualState LoadingState { get; init; } = FrontendLoadingVisualState.Running;
+    public bool LoadingIsError => IsError || LoadingState is
+        FrontendLoadingVisualState.RecoverableError or FrontendLoadingVisualState.FatalError;
+    public bool LoadingShowsProgress => Kind == FrontendSurfaceKind.Loading &&
+        LoadingState == FrontendLoadingVisualState.Running && HasProgress && float.IsFinite(Progress);
+    public string LoadingHeading => LoadingState switch
+    {
+        FrontendLoadingVisualState.Pending => "WAITING FOR COMMAND SYSTEMS",
+        FrontendLoadingVisualState.Cancelling => "CANCELLATION REQUESTED",
+        FrontendLoadingVisualState.Completed => "COMMAND SYSTEMS READY",
+        FrontendLoadingVisualState.RecoverableError => "SESSION RECOVERY REQUIRED",
+        FrontendLoadingVisualState.FatalError => "COMMAND SYSTEMS FAILED",
+        _ => "INITIALIZING COMMAND SYSTEMS"
+    };
     public string DisabledPrimaryAction { get; init; } = string.Empty;
     public UiFeedbackSettings FeedbackSettings { get; init; }
     public bool FeedbackActive { get; init; } = true;
