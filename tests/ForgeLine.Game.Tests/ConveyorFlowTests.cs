@@ -201,7 +201,7 @@ public sealed class ConveyorFlowTests
         _ = fixture.Connect(source, destination);
         fixture.AddRoad(source, destination);
         fixture.Give(source, ResourceIds.FerrousOre, 100);
-        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 100);
+        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 80);
         fixture.Step();
         Assert.Equal(LogisticsTransportRequestState.RetryPending,
             Assert.Single(fixture.Distribution.LastDebugSnapshot.Requests).State);
@@ -230,7 +230,7 @@ public sealed class ConveyorFlowTests
         fixture.AddRoad(remote, destination);
         fixture.Give(source, ResourceIds.FerrousOre, 100);
         fixture.Give(remote, ResourceIds.FerrousOre, 100);
-        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 100);
+        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 80);
         EntityId truck = fixture.CreateTruck(new Vector3(212, 0, 200), capacity: 40);
         fixture.Step();
 
@@ -263,7 +263,7 @@ public sealed class ConveyorFlowTests
         fixture.AddRoad(remote, destination);
         fixture.Give(source, ResourceIds.FerrousOre, 100);
         fixture.Give(remote, ResourceIds.FerrousOre, 100);
-        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 100);
+        fixture.AddPolicy(destination, ResourceIds.FerrousOre, 50, 80, 80);
         EntityId truck = fixture.CreateTruck(new Vector3(212, 0, 200), capacity: 40);
 
         string TruckDiagnostic() => $"Cargo: {fixture.Entities.GetComponent<CargoTransportRuntimeState>(truck)}; " +
@@ -315,12 +315,12 @@ public sealed class ConveyorFlowTests
         fixture.AddRoad(source, original);
         fixture.AddRoad(source, replacement);
         fixture.Give(source, ResourceIds.FerrousOre, 100);
-        EntityId policy = fixture.AddPolicy(original, ResourceIds.FerrousOre, 50, 80, 100);
+        EntityId policy = fixture.AddPolicy(original, ResourceIds.FerrousOre, 50, 80, 80);
         EntityId truck = fixture.CreateTruck(new Vector3(41, 0, 80), capacity: 40);
         fixture.Step();
         CargoTransportOrder order = fixture.Entities.GetComponent<CargoTransportOrder>(truck);
         fixture.Entities.SetComponent(policy, new LogisticsStockPolicy(replacement, ResourceIds.FerrousOre,
-            50, 80, 100, LogisticsStockPriority.Normal));
+            50, 80, 80, LogisticsStockPriority.Normal));
         fixture.Step();
 
         Assert.Equal(order, fixture.Entities.GetComponent<CargoTransportOrder>(truck));
