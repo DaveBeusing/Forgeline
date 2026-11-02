@@ -73,6 +73,7 @@ internal static class OperationsSnapshotFactory
             if (!scenario.Inventories.Contains(input)) continue;
             var key = (input, policy.ResourceId);
             double maximum = scenario.Inventories.GetResourceCapacity(input, policy.ResourceId);
+            if (maximum <= 0) continue;
             policyMaximums[key] = Math.Min(policyMaximums.GetValueOrDefault(key, maximum), policy.DesiredMaximum);
         }
         var queues = new Dictionary<EntityId, int>();
